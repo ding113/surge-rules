@@ -57,10 +57,12 @@ jobs:
           UTC_TAG="$(date -u +'%Y%m%d-%H%M')"
           UTC_DAY="$(date -u +'%Y%m%d')"
           UTC_TITLE="$(date -u +'%Y-%m-%d %H:%M UTC')"
+          CN_TIME="$(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M')"
           {
             echo "tag=release-${UTC_TAG}"
             echo "day=${UTC_DAY}"
             echo "title=Surge Rules ${UTC_TITLE}"
+            echo "updated_at=${CN_TIME}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Cache upstream metadata feeds
@@ -90,6 +92,15 @@ jobs:
             adblock-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/adblock-sources.json') }}-
             adblock-upstream-${{ runner.os }}-
 
+      - name: Cache upstream Routing ETag & payloads
+        uses: actions/cache@v6
+        with:
+          path: .cache/routing
+          key: routing-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/routing-sources.json') }}-${{ steps.meta.outputs.day }}
+          restore-keys: |
+            routing-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/routing-sources.json') }}-
+            routing-upstream-${{ runner.os }}-
+
       - name: Sync upstream GeoIP metadata bundle
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -118,14 +129,27 @@ jobs:
       - name: Verify generated Adblock artifacts
         run: cargo run --release -- adblock verify --dir dist
 
-      - name: Combine release notes and validate all 5 artifacts
+      - name: Build Routing RULE-SETs (Direct.list, AI.list, Proxy.list)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUST_LOG: info
+        run: cargo run --release -- routing build --output dist
+
+      - name: Verify generated Routing artifacts
+        run: cargo run --release -- routing verify --dir dist
+
+      - name: Combine release notes and validate all 9 artifacts
         run: |
-          for f in Country.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Adblock.sgmodule; do
+          for f in Country.mmdb Country-only.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Adblock.sgmodule Direct.list AI.list Proxy.list; do
             test -s "dist/${f}"
           done
-          cat dist/release-notes.md > dist/combined-notes.md
-          printf '\n---\n\n' >> dist/combined-notes.md
-          cat dist/adblock-notes.md >> dist/combined-notes.md
+          {
+            cat dist/release-notes.md
+            printf '\n---\n\n'
+            cat dist/adblock-notes.md
+            printf '\n---\n\n'
+            cat dist/routing-notes.md
+          } > dist/combined-notes.md
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v3
@@ -136,7 +160,76 @@ jobs:
           make_latest: "true"
           files: |
             dist/Country.mmdb
+            dist/Country-only.mmdb
             dist/Country-cn.mmdb
             dist/ASN.mmdb
             dist/Adblock.list
             dist/Adblock.sgmodule
+            dist/Direct.list
+            dist/AI.list
+            dist/Proxy.list
+
+      - name: Sync build artifacts to orphan release branch
+        env:
+          RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          STAGE_DIR="$(mktemp -d)"
+          TMP_INDEX="$(mktemp)"
+          rm -f "${TMP_INDEX}"
+          touch "${STAGE_DIR}/.nojekyll"
+          cp scripts/install.html "${STAGE_DIR}/install.html"
+          MIRROR_FILES=(
+            Country-only.mmdb
+            Country-cn.mmdb
+            ASN.mmdb
+            Adblock.list
+            Adblock.sgmodule
+            Direct.list
+            AI.list
+            Proxy.list
+          )
+          for f in "${MIRROR_FILES[@]}"; do
+            cp "dist/${f}" "${STAGE_DIR}/${f}"
+          done
+          GIT_INDEX_FILE="${TMP_INDEX}" git --work-tree="${STAGE_DIR}" add --all
+          TREE_SHA="$(GIT_INDEX_FILE="${TMP_INDEX}" git write-tree)"
+          COMMIT_SHA="$(
+            GIT_AUTHOR_NAME="github-actions[bot]" \
+            GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+            GIT_COMMITTER_NAME="github-actions[bot]" \
+            GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+            git commit-tree "${TREE_SHA}" -m "chore(release): ${RELEASE_TAG}"
+          )"
+          git push --force origin "${COMMIT_SHA}:refs/heads/release"
+          rm -rf "${STAGE_DIR}" "${TMP_INDEX}"
+          for f in "${MIRROR_FILES[@]}"; do
+            curl -fsSL "https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@release/${f}" >/dev/null || true
+          done
+
+      - name: Update latest build timestamp in README.md
+        env:
+          UPDATED_AT: ${{ steps.meta.outputs.updated_at }}
+        run: |
+          git checkout -- .
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 -c '
+          import os, pathlib, re
+          p = pathlib.Path("README.md")
+          ts = os.environ["UPDATED_AT"]
+          old = p.read_text(encoding="utf-8")
+          new = re.sub(
+              r"<!-- updated-at -->.*?<!-- /updated-at -->",
+              f"<!-- updated-at -->{ts}<!-- /updated-at -->",
+              old,
+          )
+          if new != old:
+              p.write_text(new, encoding="utf-8")
+          '
+          if ! git diff --quiet -- README.md; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add README.md
+            git commit -m "chore(readme): update build timestamp (${UPDATED_AT}) [skip ci]"
+            git push origin HEAD:refs/heads/main
+          fi

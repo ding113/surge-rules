@@ -14,7 +14,7 @@ use surge_rules::config::{
 };
 use surge_rules::fusion::{OutputSpanV4, OutputSpanV6, flatten_disjoint_v4, run_fusion};
 use surge_rules::inspect_ip_in_dir;
-use surge_rules::mmdb_encode::{write_asn_mmdb, write_geo_mmdb};
+use surge_rules::mmdb_encode::{write_asn_mmdb, write_country_only_mmdb, write_geo_mmdb};
 use surge_rules::model::{
     COORD_UNSET, GlobalArena, IntervalV4, IsoCode, ObsPayload, ParsedSource, ResolvedGeoRecord,
     StringPool, TraitFlags, quantize_coord, range_to_ipv4_cidrs, range_to_ipv6_cidrs,
@@ -390,6 +390,53 @@ fn parsers_decode_binary_xdb_qqwry_and_ipdb_formats() {
     assert_eq!(pi.country, Some(IsoCode::CN));
     assert_eq!(parsed_ipdb.strings.get(pi.subdiv1_en), "Beijing");
     assert_eq!(parsed_ipdb.strings.get(pi.isp), "China Unicom");
+
+    // 4. Synthetic IPFire libloc v1 testing 12-byte `struct loc_database_network_v1` layout
+    let mut libloc = vec![0u8; 72];
+    libloc[0..7].copy_from_slice(b"LOCDBXX");
+    libloc[7] = 1; // version 1
+    let pool_bytes = b"\0Example Corp\0";
+    let pool_off = libloc.len() as u32;
+    libloc.extend_from_slice(pool_bytes);
+    let as_off = libloc.len() as u32;
+    libloc.extend_from_slice(&64500u32.to_be_bytes());
+    libloc.extend_from_slice(&1u32.to_be_bytes()); // offset 1 in pool -> "Example Corp"
+    let net_data_off = libloc.len() as u32;
+    // 12-byte struct loc_database_network_v1: cc[2]="DE", pad[2]=0, asn=64500, flags=ANYCAST(4), pad[2]=0
+    libloc.extend_from_slice(b"DE\0\0");
+    libloc.extend_from_slice(&64500u32.to_be_bytes());
+    libloc.extend_from_slice(&4u16.to_be_bytes());
+    libloc.extend_from_slice(&[0u8; 2]);
+    let net_tree_off = libloc.len() as u32;
+    // Root node 0 -> `1` branch (8000::/1) goes to node 1; node 1 carries network_idx = 0
+    libloc.extend_from_slice(&0u32.to_be_bytes()); // zero
+    libloc.extend_from_slice(&1u32.to_be_bytes()); // one -> node 1
+    libloc.extend_from_slice(&0xFFFF_FFFFu32.to_be_bytes());
+    libloc.extend_from_slice(&0u32.to_be_bytes()); // node 1 zero = leaf
+    libloc.extend_from_slice(&0u32.to_be_bytes()); // node 1 one = leaf
+    libloc.extend_from_slice(&0u32.to_be_bytes()); // network index 0
+    libloc[28..32].copy_from_slice(&as_off.to_be_bytes());
+    libloc[32..36].copy_from_slice(&8u32.to_be_bytes());
+    libloc[36..40].copy_from_slice(&net_data_off.to_be_bytes());
+    libloc[40..44].copy_from_slice(&12u32.to_be_bytes());
+    libloc[44..48].copy_from_slice(&net_tree_off.to_be_bytes());
+    libloc[48..52].copy_from_slice(&24u32.to_be_bytes());
+    libloc[60..64].copy_from_slice(&pool_off.to_be_bytes());
+    libloc[64..68].copy_from_slice(&(pool_bytes.len() as u32).to_be_bytes());
+
+    let src_libloc = dummy_source(
+        "test_libloc",
+        SourceTier::Tier2bGlobal,
+        SourceFormat::Libloc,
+        "ipfire",
+    );
+    let parsed_libloc = parse_source_bytes(&src_libloc, &libloc, &metadata).unwrap();
+    assert_eq!(parsed_libloc.v6.len(), 1);
+    let pl = &parsed_libloc.payloads[parsed_libloc.v6[0].payload_id() as usize];
+    assert_eq!(pl.country, IsoCode::parse_raw("DE"));
+    assert_eq!(pl.asn, 64500);
+    assert_eq!(parsed_libloc.strings.get(pl.as_org), "Example Corp");
+    assert!(pl.traits.contains(TraitFlags::IS_ANYCAST));
 }
 
 #[test]
@@ -459,6 +506,15 @@ fn end_to_end_fusion_priority0_lineage_dedup_and_mmdb_verification() {
         &metadata,
     )
     .unwrap();
+    write_country_only_mmdb(
+        &tmp.path().join("Country-only.mmdb"),
+        epoch,
+        &fused.country_records,
+        &fused.country_v4,
+        &fused.country_v6,
+        &metadata,
+    )
+    .unwrap();
     write_geo_mmdb(
         &tmp.path().join("Country-cn.mmdb"),
         "GeoLite2-Country",
@@ -496,6 +552,19 @@ fn end_to_end_fusion_priority0_lineage_dedup_and_mmdb_verification() {
     );
     assert_eq!(
         aws_inspect
+            .pointer("/Country-only.mmdb/country/iso_code")
+            .and_then(|v| v.as_str()),
+        Some("SE")
+    );
+    assert_eq!(
+        aws_inspect
+            .get("Country-only.mmdb")
+            .and_then(|v| v.as_object())
+            .map(|o| o.len()),
+        Some(1)
+    );
+    assert_eq!(
+        aws_inspect
             .pointer("/Country.mmdb/city/names/en")
             .and_then(|v| v.as_str()),
         Some("Stockholm")
@@ -507,7 +576,7 @@ fn end_to_end_fusion_priority0_lineage_dedup_and_mmdb_verification() {
         Some(16509)
     );
 
-    // Check HK/TW exclusion from Country-cn.mmdb while CN is included
+    // Check HK/TW exclusion from Country-cn.mmdb while CN is included, and Country-only.mmdb fidelity
     let cn_inspect = inspect_ip_in_dir(tmp.path(), "223.5.5.5").unwrap();
     assert_eq!(
         cn_inspect
@@ -515,10 +584,29 @@ fn end_to_end_fusion_priority0_lineage_dedup_and_mmdb_verification() {
             .and_then(|v| v.as_str()),
         Some("CN")
     );
+    assert_eq!(
+        cn_inspect
+            .pointer("/Country-only.mmdb/country/iso_code")
+            .and_then(|v| v.as_str()),
+        Some("CN")
+    );
+    assert_eq!(
+        cn_inspect
+            .get("Country-only.mmdb")
+            .and_then(|v| v.as_object())
+            .map(|o| o.len()),
+        Some(1)
+    );
     let tw_inspect = inspect_ip_in_dir(tmp.path(), "168.95.1.1").unwrap();
     assert_eq!(
         tw_inspect
             .pointer("/Country.mmdb/country/iso_code")
+            .and_then(|v| v.as_str()),
+        Some("TW")
+    );
+    assert_eq!(
+        tw_inspect
+            .pointer("/Country-only.mmdb/country/iso_code")
             .and_then(|v| v.as_str()),
         Some("TW")
     );
@@ -531,7 +619,16 @@ fn end_to_end_fusion_priority0_lineage_dedup_and_mmdb_verification() {
             .and_then(|v| v.as_str()),
         Some("HK")
     );
+    assert_eq!(
+        hk_inspect
+            .pointer("/Country-only.mmdb/country/iso_code")
+            .and_then(|v| v.as_str()),
+        Some("HK")
+    );
     assert!(hk_inspect.get("Country-cn.mmdb").unwrap().is_null());
+
+    let mesh_inspect = inspect_ip_in_dir(tmp.path(), "100.64.0.1").unwrap();
+    assert!(mesh_inspect.get("Country-only.mmdb").unwrap().is_null());
 
     // Round-trip `Country.mmdb` back through our own `parsers::mmdb::parse_mmdb`!
     let country_bytes = std::fs::read(tmp.path().join("Country.mmdb")).unwrap();
@@ -544,6 +641,115 @@ fn end_to_end_fusion_priority0_lineage_dedup_and_mmdb_verification() {
     let rt_parsed = parse_source_bytes(&mmdb_sc, &country_bytes, &metadata).unwrap();
     assert!(!rt_parsed.v4.is_empty());
     assert!(!rt_parsed.v6.is_empty());
+}
+
+#[test]
+fn country_only_mmdb_coalesces_adjacent_spans_and_omits_non_country_fields() {
+    let (metadata, _, _) = load_real_fixtures();
+    let mut strings = StringPool::new();
+    let mut records: IndexSet<ResolvedGeoRecord, FxBuildHasher> =
+        IndexSet::with_hasher(FxBuildHasher);
+
+    // Countryless anycast span (should be excluded completely from Country-only.mmdb)
+    let anycast_rec = ResolvedGeoRecord {
+        country: None,
+        traits: TraitFlags(TraitFlags::IS_ANYCAST),
+        ..ResolvedGeoRecord::default()
+    };
+    let (anycast_rid, _) = records.insert_full(anycast_rec);
+
+    // Two adjacent CN /24 blocks differing in city and ASN (should coalesce into one CN /23)
+    let hz_rec = ResolvedGeoRecord {
+        country: Some(IsoCode::CN),
+        registered_country: Some(IsoCode::CN),
+        city_en: strings.intern("Hangzhou"),
+        asn: 37963,
+        as_org: strings.intern("Hangzhou Alibaba Advertising Co."),
+        ..ResolvedGeoRecord::default()
+    };
+    let (hz_rid, _) = records.insert_full(hz_rec);
+
+    let sz_rec = ResolvedGeoRecord {
+        country: Some(IsoCode::CN),
+        registered_country: Some(IsoCode::CN),
+        city_en: strings.intern("Shenzhen"),
+        asn: 45102,
+        as_org: strings.intern("Alibaba (US) Technology Co."),
+        ..ResolvedGeoRecord::default()
+    };
+    let (sz_rid, _) = records.insert_full(sz_rec);
+
+    let net_any: Ipv4Net = "1.1.1.0/24".parse().unwrap();
+    let net_hz: Ipv4Net = "223.5.4.0/24".parse().unwrap();
+    let net_sz: Ipv4Net = "223.5.5.0/24".parse().unwrap();
+    let v4_spans = vec![
+        OutputSpanV4 {
+            start: u32::from(net_any.network()),
+            end: u32::from(net_any.broadcast()),
+            record_id: anycast_rid as u32,
+        },
+        OutputSpanV4 {
+            start: u32::from(net_hz.network()),
+            end: u32::from(net_hz.broadcast()),
+            record_id: hz_rid as u32,
+        },
+        OutputSpanV4 {
+            start: u32::from(net_sz.network()),
+            end: u32::from(net_sz.broadcast()),
+            record_id: sz_rid as u32,
+        },
+    ];
+
+    let tmp = TempDir::new().unwrap();
+    let country_path = tmp.path().join("Country.mmdb");
+    let country_only_path = tmp.path().join("Country-only.mmdb");
+
+    let country_stats = write_geo_mmdb(
+        &country_path,
+        "GeoLite2-City",
+        "Test Full",
+        "测试全量",
+        1_763_000_000,
+        &records,
+        &v4_spans,
+        &[],
+        &strings,
+        &metadata,
+    )
+    .unwrap();
+    let country_only_stats = write_country_only_mmdb(
+        &country_only_path,
+        1_763_000_000,
+        &records,
+        &v4_spans,
+        &[],
+        &metadata,
+    )
+    .unwrap();
+
+    assert_eq!(country_only_stats.unique_records, 1);
+    assert!(
+        country_only_stats.node_count < country_stats.node_count,
+        "expected coalesced Country-only nodes ({}) < Country nodes ({})",
+        country_only_stats.node_count,
+        country_stats.node_count
+    );
+
+    let reader = maxminddb::Reader::open_readfile(&country_only_path).unwrap();
+    let anycast_hit: Option<serde_json::Value> =
+        lookup_opt(&reader, IpAddr::V4(Ipv4Addr::new(1, 1, 1, 1))).unwrap();
+    assert!(anycast_hit.is_none());
+
+    for ip in [Ipv4Addr::new(223, 5, 4, 1), Ipv4Addr::new(223, 5, 5, 1)] {
+        let doc: serde_json::Value = lookup_opt(&reader, IpAddr::V4(ip)).unwrap().unwrap();
+        let obj = doc.as_object().unwrap();
+        assert_eq!(obj.len(), 1);
+        assert!(obj.contains_key("country"));
+        assert_eq!(
+            doc.pointer("/country/iso_code").and_then(|v| v.as_str()),
+            Some("CN")
+        );
+    }
 }
 
 // ============================================================================
@@ -844,6 +1050,7 @@ proptest! {
 
         let tmp = TempDir::new().unwrap();
         let path = tmp.path().join("prop.mmdb");
+        let country_only_path = tmp.path().join("prop-country-only.mmdb");
         write_geo_mmdb(
             &path,
             "GeoLite2-City",
@@ -857,18 +1064,35 @@ proptest! {
             &metadata,
         )
         .unwrap();
+        write_country_only_mmdb(
+            &country_only_path,
+            1_763_000_000,
+            &records,
+            &v4_spans,
+            &v6_spans,
+            &metadata,
+        )
+        .unwrap();
 
         let reader = maxminddb::Reader::open_readfile(&path).unwrap();
+        let country_only_reader = maxminddb::Reader::open_readfile(&country_only_path).unwrap();
         for (&(a, b), &(iso, asn)) in &v4_map {
             let ip_v4 = IpAddr::V4(Ipv4Addr::new(a, b, 42, 9));
             let doc: serde_json::Value = lookup_opt(&reader, ip_v4).unwrap().unwrap();
             prop_assert_eq!(doc.pointer("/country/iso_code").and_then(|v| v.as_str()), Some(iso.as_str()));
             prop_assert_eq!(doc.pointer("/autonomous_system_number").and_then(|v| v.as_u64()), Some(asn as u64));
 
+            let co_doc: serde_json::Value = lookup_opt(&country_only_reader, ip_v4).unwrap().unwrap();
+            prop_assert_eq!(co_doc.as_object().map(|o| o.len()), Some(1));
+            prop_assert_eq!(co_doc.pointer("/country/iso_code").and_then(|v| v.as_str()), Some(iso.as_str()));
+            prop_assert!(co_doc.get("autonomous_system_number").is_none());
+
             // Also verify IPv4-mapped IPv6 `::ffff:a.b.42.9` resolves identically!
             let mapped = IpAddr::V6(Ipv4Addr::new(a, b, 42, 9).to_ipv6_mapped());
             let doc_mapped: serde_json::Value = lookup_opt(&reader, mapped).unwrap().unwrap();
             prop_assert_eq!(doc_mapped, doc);
+            let co_mapped: serde_json::Value = lookup_opt(&country_only_reader, mapped).unwrap().unwrap();
+            prop_assert_eq!(co_mapped, co_doc);
         }
 
         for (&(seg0, seg1), &(iso, asn)) in &v6_map {
@@ -876,6 +1100,11 @@ proptest! {
             let doc: serde_json::Value = lookup_opt(&reader, ip_v6).unwrap().unwrap();
             prop_assert_eq!(doc.pointer("/country/iso_code").and_then(|v| v.as_str()), Some(iso.as_str()));
             prop_assert_eq!(doc.pointer("/autonomous_system_number").and_then(|v| v.as_u64()), Some(asn as u64));
+
+            let co_doc: serde_json::Value = lookup_opt(&country_only_reader, ip_v6).unwrap().unwrap();
+            prop_assert_eq!(co_doc.as_object().map(|o| o.len()), Some(1));
+            prop_assert_eq!(co_doc.pointer("/country/iso_code").and_then(|v| v.as_str()), Some(iso.as_str()));
+            prop_assert!(co_doc.get("autonomous_system_number").is_none());
         }
     }
 }

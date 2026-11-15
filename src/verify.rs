@@ -34,6 +34,7 @@ pub struct ArtifactSummary {
 #[derive(Clone, Debug)]
 pub struct VerificationReport {
     pub country: ArtifactSummary,
+    pub country_only: ArtifactSummary,
     pub country_cn: ArtifactSummary,
     pub asn: ArtifactSummary,
     pub canaries_checked: usize,
@@ -44,17 +45,22 @@ pub fn verify_artifact_dir(
     enforce_production_gates: bool,
 ) -> Result<VerificationReport> {
     let country_path = dir.join("Country.mmdb");
+    let country_only_path = dir.join("Country-only.mmdb");
     let cn_path = dir.join("Country-cn.mmdb");
     let asn_path = dir.join("ASN.mmdb");
 
     let country_reader = Reader::open_readfile(&country_path)
         .with_context(|| format!("failed to open {}", country_path.display()))?;
+    let country_only_reader = Reader::open_readfile(&country_only_path)
+        .with_context(|| format!("failed to open {}", country_only_path.display()))?;
     let cn_reader = Reader::open_readfile(&cn_path)
         .with_context(|| format!("failed to open {}", cn_path.display()))?;
     let asn_reader = Reader::open_readfile(&asn_path)
         .with_context(|| format!("failed to open {}", asn_path.display()))?;
 
     let country_sum = inspect_summary(&country_path, &country_reader, "GeoLite2-City")?;
+    let country_only_sum =
+        inspect_summary(&country_only_path, &country_only_reader, "GeoLite2-Country")?;
     let cn_sum = inspect_summary(&cn_path, &cn_reader, "GeoLite2-Country")?;
     let asn_sum = inspect_summary(&asn_path, &asn_reader, "GeoLite2-ASN")?;
 
@@ -64,6 +70,13 @@ pub fn verify_artifact_dir(
                 "Country.mmdb failed size/node gate: nodes={} size={}",
                 country_sum.node_count,
                 country_sum.size_bytes
+            );
+        }
+        if country_only_sum.node_count < 50_000 || country_only_sum.size_bytes > 20 * 1024 * 1024 {
+            bail!(
+                "Country-only.mmdb failed size/node gate: nodes={} size={}",
+                country_only_sum.node_count,
+                country_only_sum.size_bytes
             );
         }
         if cn_sum.node_count < 10_000 || cn_sum.size_bytes > 30 * 1024 * 1024 {
@@ -160,7 +173,14 @@ pub fn verify_artifact_dir(
             }
         }
 
-        // Must be completely absent from Country-cn.mmdb and ASN.mmdb
+        // Must be completely absent from Country-only.mmdb, Country-cn.mmdb, and ASN.mmdb
+        let country_only_hit: Option<serde_json::Value> = lookup_opt(&country_only_reader, ip)?;
+        if country_only_hit.is_some() {
+            bail!(
+                "Priority-0 special IP {} leaked into Country-only.mmdb",
+                ip_str
+            );
+        }
         let cn_hit: Option<serde_json::Value> = lookup_opt(&cn_reader, ip)?;
         if cn_hit.is_some() {
             bail!(
@@ -203,6 +223,7 @@ pub fn verify_artifact_dir(
             if typed_cn.country.and_then(|c| c.iso_code) != Some("CN") {
                 bail!("expected {} -> CN in Country-cn.mmdb", ip_str);
             }
+            assert_country_only_record(&country_only_reader, ip_str, ip, "CN")?;
             if !expected_asns.is_empty() {
                 let typed_asn: geoip2::Asn<'_> = lookup_opt(&asn_reader, ip)?
                     .with_context(|| format!("{} missing in ASN.mmdb", ip_str))?;
@@ -226,6 +247,7 @@ pub fn verify_artifact_dir(
         if mapped_city.country.and_then(|c| c.iso_code) != Some("CN") {
             bail!("::ffff:223.5.5.5 did not resolve to CN");
         }
+        assert_country_only_record(&country_only_reader, "::ffff:223.5.5.5", mapped_ip, "CN")?;
         canaries += 1;
 
         // 3. Validate Global / Anycast / Cloud Geofeed / HK-MO-TW separation canaries
@@ -251,6 +273,18 @@ pub fn verify_artifact_dir(
                         cc,
                         actual,
                         doc
+                    );
+                }
+                assert_country_only_record(&country_only_reader, ip_str, ip, cc)?;
+            } else if let Some(full_cc) = doc.pointer("/country/iso_code").and_then(|v| v.as_str())
+            {
+                assert_country_only_record(&country_only_reader, ip_str, ip, full_cc)?;
+            } else {
+                let co_leak: Option<serde_json::Value> = lookup_opt(&country_only_reader, ip)?;
+                if co_leak.is_some() {
+                    bail!(
+                        "countryless anycast {} unexpectedly leaked into Country-only.mmdb",
+                        ip_str
                     );
                 }
             }
@@ -299,10 +333,41 @@ pub fn verify_artifact_dir(
 
     Ok(VerificationReport {
         country: country_sum,
+        country_only: country_only_sum,
         country_cn: cn_sum,
         asn: asn_sum,
         canaries_checked: canaries,
     })
+}
+
+fn assert_country_only_record<S: AsRef<[u8]>>(
+    reader: &Reader<S>,
+    ip_str: &str,
+    ip: IpAddr,
+    expected_cc: &str,
+) -> Result<()> {
+    let typed: geoip2::Country<'_> = lookup_opt(reader, ip)?
+        .with_context(|| format!("{} missing in Country-only.mmdb", ip_str))?;
+    if typed.country.and_then(|c| c.iso_code) != Some(expected_cc) {
+        bail!(
+            "canary {} expected country '{}' in Country-only.mmdb",
+            ip_str,
+            expected_cc
+        );
+    }
+    let doc: serde_json::Value = lookup_opt(reader, ip)?
+        .with_context(|| format!("{} missing JSON in Country-only.mmdb", ip_str))?;
+    let is_only_country = doc
+        .as_object()
+        .is_some_and(|obj| obj.len() == 1 && obj.contains_key("country"));
+    if !is_only_country {
+        bail!(
+            "Country-only.mmdb leaked non-country top-level fields for {}: {}",
+            ip_str,
+            doc
+        );
+    }
+    Ok(())
 }
 
 fn inspect_summary<S: AsRef<[u8]>>(
@@ -379,6 +444,7 @@ pub fn render_release_notes(
 | :--- | :--- | ---: | ---: | ---: | :--- |\n\
 | `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\
 | `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\
+| `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\
 | `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\n\
 ## 覆盖统计\n\n\
 - `Country.mmdb`：合并后 IPv4 `{country_v4_cidrs}` 段 / IPv6 `{country_v6_cidrs}` 段\n\
@@ -395,6 +461,12 @@ geoip-maxmind-url = https://github.com/ding113/surge-rules/releases/latest/downl
         report.country.node_count,
         report.country.record_size,
         report.country.sha256,
+        report.country_only.file_name,
+        report.country_only.database_type,
+        fmt_mb(report.country_only.size_bytes),
+        report.country_only.node_count,
+        report.country_only.record_size,
+        report.country_only.sha256,
         report.country_cn.file_name,
         report.country_cn.database_type,
         fmt_mb(report.country_cn.size_bytes),

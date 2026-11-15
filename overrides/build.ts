@@ -2,10 +2,14 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { isIP, isIPv4, isIPv6 } from "node:net";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ADBLOCK_OVERRIDES, GEOIP_OVERRIDES } from "./index.ts";
+import { ADBLOCK_OVERRIDES, GEOIP_OVERRIDES, ROUTING_OVERRIDES } from "./index.ts";
+import type { RoutingRuleKind } from "./routing-schema.ts";
 
 const ISO_ALPHA2_RE = /^[A-Z]{2}$/;
 const DOMAIN_RE = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
+const ROUTING_DOMAIN_RE =
+  /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:[a-z]{2,63}|xn--[a-z0-9]{2,59})$/;
+const ROUTING_TLD_RE = /^(?:[a-z]{2,63}|xn--[a-z0-9]{2,59})$/;
 const WILDCARD_DOMAIN_RE = /^(?=.{1,253}$)(?:[a-z0-9*?[\]-]+\.)+[a-z*?]{2,63}$/;
 const SCRIPT_NAME_RE = /^[A-Za-z0-9_.-]+$/;
 const HEADER_FIELD_RE = /^[A-Za-z0-9-]+$/;
@@ -346,9 +350,272 @@ async function emitOrCheckBundle(
   console.log(`Wrote ${outPath} (${serialized.length} bytes).`);
 }
 
+function validateRoutingRuleValue(kind: RoutingRuleKind, value: string, context: string): void {
+  const v = value.trim();
+  if (v.length === 0 || /[\r\n]/.test(v)) {
+    throw new Error(`[${context}] Invalid empty or multiline value '${value}'`);
+  }
+  switch (kind) {
+    case "DOMAIN": {
+      if (!ROUTING_DOMAIN_RE.test(v.toLowerCase())) {
+        throw new Error(`[${context}] Invalid DOMAIN '${v}'`);
+      }
+      break;
+    }
+    case "DOMAIN-SUFFIX": {
+      const low = v.toLowerCase();
+      if (!ROUTING_DOMAIN_RE.test(low) && !ROUTING_TLD_RE.test(low)) {
+        throw new Error(`[${context}] Invalid DOMAIN-SUFFIX '${v}'`);
+      }
+      break;
+    }
+    case "DOMAIN-WILDCARD": {
+      if (!WILDCARD_DOMAIN_RE.test(v.toLowerCase())) {
+        throw new Error(`[${context}] Invalid DOMAIN-WILDCARD '${v}'`);
+      }
+      break;
+    }
+    case "IP-CIDR":
+    case "IP-CIDR6": {
+      validateCanonicalCidr(v, context);
+      break;
+    }
+    case "IP-ASN": {
+      const asn = Number(v);
+      if (!Number.isInteger(asn) || asn <= 0 || asn > 0xffffffff) {
+        throw new Error(`[${context}] Invalid IP-ASN '${v}'`);
+      }
+      break;
+    }
+    case "URL-REGEX": {
+      validateAdblockRegex(v, context);
+      break;
+    }
+    case "DOMAIN-KEYWORD":
+    case "USER-AGENT":
+    case "PROCESS-NAME": {
+      if (v.includes(",")) {
+        throw new Error(`[${context}] Comma disallowed in ${kind}: '${v}'`);
+      }
+      break;
+    }
+    case "AND": {
+      validateLogicalAndValue(v, context);
+      break;
+    }
+  }
+}
+
+const LOGICAL_AND_SUB_KINDS = new Set<string>([
+  "DOMAIN",
+  "DOMAIN-SUFFIX",
+  "DOMAIN-KEYWORD",
+  "DOMAIN-WILDCARD",
+  "IP-CIDR",
+  "IP-CIDR6",
+  "IP-ASN",
+  "URL-REGEX",
+  "USER-AGENT",
+  "PROCESS-NAME",
+]);
+
+const LOGICAL_EXTENDED_KINDS = new Set<string>([
+  "DOMAIN",
+  "DOMAIN-SUFFIX",
+  "DOMAIN-KEYWORD",
+  "DOMAIN-WILDCARD",
+  "URL-REGEX",
+]);
+
+const LOGICAL_IP_KINDS = new Set<string>(["IP-CIDR", "IP-CIDR6", "IP-ASN"]);
+
+const FORBIDDEN_LOGICAL_TOKENS = new Set<string>([
+  "DIRECT",
+  "PROXY",
+  "REJECT",
+  "REJECT-TINYGIF",
+  "REJECT-DROP",
+  "REJECT-NO-DROP",
+  "FINAL",
+  "PRE-MATCHING",
+  "FORCE-REMOTE-DNS",
+]);
+
+function splitAtZeroDepthCommas(input: string, context: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+  let paren = 0;
+  let bracket = 0;
+  let brace = 0;
+  let inQuotes = false;
+  let escaped = false;
+
+  for (let i = 0; i < input.length; i += 1) {
+    const ch = input[i];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === "\\") {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"' && paren === 0 && bracket === 0 && brace === 0) {
+      inQuotes = !inQuotes;
+      continue;
+    }
+    if (inQuotes) {
+      continue;
+    }
+    if (ch === "(") {
+      paren += 1;
+    } else if (ch === ")") {
+      paren -= 1;
+      if (paren < 0) {
+        throw new Error(`[${context}] Unbalanced ')' in AND value '${input}'`);
+      }
+    } else if (ch === "[") {
+      bracket += 1;
+    } else if (ch === "]") {
+      bracket = Math.max(0, bracket - 1);
+    } else if (ch === "{") {
+      brace += 1;
+    } else if (ch === "}") {
+      brace = Math.max(0, brace - 1);
+    } else if (ch === "," && paren === 0 && bracket === 0 && brace === 0) {
+      parts.push(input.slice(i === start ? i : start, i).trim());
+      start = i + 1;
+    }
+  }
+
+  if (paren !== 0 || inQuotes || escaped) {
+    throw new Error(`[${context}] Unterminated parenthesis or quotes in AND value '${input}'`);
+  }
+  parts.push(input.slice(start).trim());
+  return parts;
+}
+
+function validateLogicalAndValue(raw: string, context: string): void {
+  if (!raw.startsWith("((") || !raw.endsWith("))")) {
+    throw new Error(`[${context}] AND value must start with '((' and end with '))': '${raw}'`);
+  }
+  const inner = raw.slice(1, -1).trim();
+  const rawClauses = splitAtZeroDepthCommas(inner, context);
+  if (rawClauses.length < 2) {
+    throw new Error(`[${context}] AND rule must contain at least 2 sub-rules: '${raw}'`);
+  }
+  for (const rawClause of rawClauses) {
+    if (!rawClause.startsWith("(") || !rawClause.endsWith(")")) {
+      throw new Error(`[${context}] AND sub-rule must be parenthesized: '${rawClause}'`);
+    }
+    const body = rawClause.slice(1, -1).trim();
+    const parts = splitAtZeroDepthCommas(body, context);
+    if (parts.length < 2 || parts.length > 3) {
+      throw new Error(
+        `[${context}] AND sub-rule must have 2 or 3 comma-separated fields: '${rawClause}'`,
+      );
+    }
+    const subKindRaw = parts[0] ?? "";
+    const subVal = (parts[1] ?? "").trim();
+    const subKind = subKindRaw.trim().toUpperCase();
+    if (!LOGICAL_AND_SUB_KINDS.has(subKind)) {
+      throw new Error(`[${context}] Unsupported AND sub-rule kind '${subKindRaw}'`);
+    }
+    if (FORBIDDEN_LOGICAL_TOKENS.has(subVal.toUpperCase())) {
+      throw new Error(
+        `[${context}] Policy or forbidden token disallowed in AND sub-rule: '${rawClause}'`,
+      );
+    }
+    validateRoutingRuleValue(subKind as RoutingRuleKind, subVal, `${context}:AND:${subKind}`);
+    if (parts.length === 3) {
+      const opt = (parts[2] ?? "").trim();
+      const optLower = opt.toLowerCase();
+      if (FORBIDDEN_LOGICAL_TOKENS.has(opt.toUpperCase())) {
+        throw new Error(
+          `[${context}] Policy or forbidden option '${opt}' in AND sub-rule '${rawClause}'`,
+        );
+      }
+      if (LOGICAL_IP_KINDS.has(subKind)) {
+        if (optLower !== "no-resolve") {
+          throw new Error(`[${context}] IP sub-rule option must be 'no-resolve', got '${opt}'`);
+        }
+      } else if (LOGICAL_EXTENDED_KINDS.has(subKind)) {
+        if (optLower !== "extended-matching") {
+          throw new Error(
+            `[${context}] Sub-rule '${subKind}' option must be 'extended-matching', got '${opt}'`,
+          );
+        }
+      } else {
+        throw new Error(`[${context}] Sub-rule '${subKind}' does not accept option '${opt}'`);
+      }
+    }
+  }
+}
+
+function routingDedupKey(target: string, kind: RoutingRuleKind, value: string): string {
+  const caseSensitive =
+    kind === "PROCESS-NAME" || kind === "USER-AGENT" || kind === "URL-REGEX" || kind === "AND";
+  const norm = caseSensitive ? value.trim() : value.trim().toLowerCase();
+  return `${target}:${kind}:${norm}`;
+}
+
+function validateRoutingOverrides(): void {
+  const seenInfra = new Set<string>();
+  for (const item of ROUTING_OVERRIDES.sharedInfraRoots) {
+    const dom = item.domain.toLowerCase();
+    if (!ROUTING_DOMAIN_RE.test(dom)) {
+      throw new Error(`[sharedInfraRoots] Invalid domain '${item.domain}'`);
+    }
+    if (seenInfra.has(dom)) {
+      throw new Error(`[sharedInfraRoots] Duplicate domain '${dom}'`);
+    }
+    if (item.rationale.trim().length === 0) {
+      throw new Error(`[sharedInfraRoots:${dom}] Rationale must not be empty`);
+    }
+    seenInfra.add(dom);
+  }
+
+  const seenForce = new Set<string>();
+  for (const item of ROUTING_OVERRIDES.forceEntries) {
+    if (item.rationale.trim().length === 0) {
+      throw new Error(`[routingForce:${item.target}:${item.value}] Rationale must not be empty`);
+    }
+    validateRoutingRuleValue(item.kind, item.value, `routingForce:${item.target}:${item.kind}`);
+    if (
+      item.extendedMatching &&
+      !["DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD", "DOMAIN-WILDCARD", "URL-REGEX"].includes(
+        item.kind,
+      )
+    ) {
+      throw new Error(
+        `[routingForce:${item.kind}] extendedMatching is unsupported on ${item.kind}`,
+      );
+    }
+    const key = routingDedupKey(item.target, item.kind, item.value);
+    if (seenForce.has(key)) {
+      throw new Error(`[routingForce] Duplicate entry '${key}'`);
+    }
+    seenForce.add(key);
+  }
+
+  const seenExclude = new Set<string>();
+  for (const item of ROUTING_OVERRIDES.excludeEntries) {
+    if (item.rationale.trim().length === 0) {
+      throw new Error(`[routingExclude:${item.target}:${item.value}] Rationale must not be empty`);
+    }
+    validateRoutingRuleValue(item.kind, item.value, `routingExclude:${item.target}:${item.kind}`);
+    const key = routingDedupKey(item.target, item.kind, item.value);
+    if (seenExclude.has(key)) {
+      throw new Error(`[routingExclude] Duplicate entry '${key}'`);
+    }
+    seenExclude.add(key);
+  }
+}
+
 async function main(): Promise<void> {
   validateAll();
   validateAdblockOverrides();
+  validateRoutingOverrides();
 
   const currentDir = dirname(fileURLToPath(import.meta.url));
   const checkMode = process.argv.includes("--check");
@@ -363,6 +630,12 @@ async function main(): Promise<void> {
     resolve(currentDir, "generated", "adblock-overrides.json"),
     ADBLOCK_OVERRIDES,
     `Adblock overrides (${ADBLOCK_OVERRIDES.allowDomains.length} allow, ${ADBLOCK_OVERRIDES.protectedApexDomains.length} protected apex, ${ADBLOCK_OVERRIDES.forceRuleSetEntries.length} ruleset, ${ADBLOCK_OVERRIDES.mitmExcludedHosts.length} MITM exclusions)`,
+    checkMode,
+  );
+  await emitOrCheckBundle(
+    resolve(currentDir, "generated", "routing-overrides.json"),
+    ROUTING_OVERRIDES,
+    `Routing overrides (${ROUTING_OVERRIDES.sharedInfraRoots.length} shared infra roots, ${ROUTING_OVERRIDES.forceEntries.length} force, ${ROUTING_OVERRIDES.excludeEntries.length} exclude)`,
     checkMode,
   );
 }

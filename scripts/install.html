@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>导入 Surge 模块 — Adblock.sgmodule</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #0a84ff;
+      --primary-fg: #ffffff;
+      --secondary: #f1f5f9;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0f19;
+        --card: #111827;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --border: #1e293b;
+        --secondary: #1e293b;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    }
+    main {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    h1 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
+    p { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+    .actions { display: grid; gap: 10px; }
+    a.btn {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    a.btn-primary { background: var(--primary); color: var(--primary-fg); }
+    a.btn-secondary { background: var(--secondary); color: var(--text); border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>导入 Adblock.sgmodule</h1>
+    <p>正在唤起 Surge 安装模块；若未自动跳转，请点击下方按钮手动唤起：</p>
+    <div class="actions">
+      <a class="btn btn-primary" id="btn-github" href="surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fding113%2Fsurge-rules%2Freleases%2Flatest%2Fdownload%2FAdblock.sgmodule">通过 GitHub 链接导入</a>
+      <a class="btn btn-secondary" id="btn-jsdelivr" href="surge:///install-module?url=https%3A%2F%2Fcdn.jsdelivr.net%2Fgh%2Fding113%2Fsurge-rules%40release%2FAdblock.sgmodule">通过 jsDelivr 镜像导入</a>
+    </div>
+  </main>
+  <script>
+    (function () {
+      var gh = "https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule";
+      var jsd = "https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Adblock.sgmodule";
+      var params = new URLSearchParams(window.location.search);
+      var target = params.get("source") === "jsdelivr" ? jsd : gh;
+      window.location.replace("surge:///install-module?url=" + encodeURIComponent(target));
+    })();
+  </script>
+</body>
+</html>

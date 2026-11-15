@@ -5,7 +5,7 @@ use anyhow::{Context, Result, bail};
 use indexmap::IndexSet;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 
-use crate::config::MetadataRegistry;
+use crate::config::{CountryMeta, MetadataRegistry};
 use crate::fusion::{OutputSpanV4, OutputSpanV6};
 use crate::model::{
     COORD_UNSET, IsoCode, ResolvedAsnRecord, ResolvedGeoRecord, StrId, StringPool, TraitFlags,
@@ -576,20 +576,7 @@ pub fn write_geo_mmdb(
         ];
         let cont_map = enc.map_val(cont_entries);
 
-        let c_name_entries = vec![
-            ("en", enc.str_val(&cm.name_en)),
-            ("zh-CN", enc.str_val(&cm.name_zh)),
-        ];
-        let c_names = enc.map_val(c_name_entries);
-        let mut c_entries = vec![
-            ("geoname_id", enc.u32_val(cm.geoname_id)),
-            ("iso_code", enc.str_val(iso.as_str())),
-            ("names", c_names),
-        ];
-        if cm.is_eu {
-            c_entries.push(("is_in_european_union", enc.bool_val(true)));
-        }
-        let country_map = enc.map_val(c_entries);
+        let country_map = build_country_map_val(&mut enc, iso, Some(cm));
         iso_country_vals.insert(iso, (cont_map, country_map));
     }
 
@@ -671,6 +658,126 @@ pub fn write_geo_mmdb(
         &enc.buf,
         compact_records.len(),
     )
+}
+
+pub fn write_country_only_mmdb(
+    path: &Path,
+    build_epoch: u64,
+    records: &IndexSet<ResolvedGeoRecord, FxBuildHasher>,
+    v4_spans: &[OutputSpanV4<u32>],
+    v6_spans: &[OutputSpanV6<u32>],
+    metadata: &MetadataRegistry,
+) -> Result<MmdbWriteStats> {
+    let mut used_iso_map: FxHashMap<IsoCode, u32> = FxHashMap::default();
+    let mut compact_isos: Vec<IsoCode> = Vec::new();
+    let mut intern_iso = |iso: IsoCode| -> u32 {
+        *used_iso_map.entry(iso).or_insert_with(|| {
+            let id = compact_isos.len() as u32;
+            compact_isos.push(iso);
+            id
+        })
+    };
+
+    let mut coalesce_v4: Vec<OutputSpanV4<u32>> = Vec::with_capacity(v4_spans.len());
+    for s in v4_spans {
+        let Some(iso) = records[s.record_id as usize].country else {
+            continue;
+        };
+        let rid = intern_iso(iso);
+        if let Some(prev) = coalesce_v4.last_mut()
+            && prev.end.checked_add(1) == Some(s.start)
+            && prev.record_id == rid
+        {
+            prev.end = s.end;
+        } else {
+            coalesce_v4.push(OutputSpanV4 {
+                start: s.start,
+                end: s.end,
+                record_id: rid,
+            });
+        }
+    }
+
+    let mut coalesce_v6: Vec<OutputSpanV6<u32>> = Vec::with_capacity(v6_spans.len());
+    for s in v6_spans {
+        let Some(iso) = records[s.record_id as usize].country else {
+            continue;
+        };
+        let rid = intern_iso(iso);
+        if let Some(prev) = coalesce_v6.last_mut()
+            && prev.end.checked_add(1) == Some(s.start)
+            && prev.record_id == rid
+        {
+            prev.end = s.end;
+        } else {
+            coalesce_v6.push(OutputSpanV6 {
+                start: s.start,
+                end: s.end,
+                record_id: rid,
+            });
+        }
+    }
+
+    let tree_nodes = build_dual_stack_tree(&coalesce_v4, &coalesce_v6);
+    let mut enc = DataEncoder::new();
+    let mut root_ids = Vec::with_capacity(compact_isos.len());
+    for &iso in &compact_isos {
+        let country_val = build_country_map_val(&mut enc, iso, metadata.countries.get(&iso));
+        root_ids.push(enc.map_val(vec![("country", country_val)]));
+    }
+
+    enc.pre_emit_hot_nodes(
+        &root_ids,
+        &[
+            "country",
+            "iso_code",
+            "geoname_id",
+            "names",
+            "en",
+            "zh-CN",
+            "is_in_european_union",
+        ],
+    );
+
+    let mut rec_offsets = Vec::with_capacity(root_ids.len());
+    for val_id in root_ids {
+        rec_offsets.push(enc.emit_top_level_record(val_id));
+    }
+
+    finalize_mmdb_file(
+        path,
+        "GeoLite2-Country",
+        "Surge Minimal IP-to-Country GeoIP Database",
+        Some("Surge 极简仅国家/地区多源融合 GeoIP 数据库"),
+        &["en", "zh-CN"],
+        build_epoch,
+        &tree_nodes,
+        &rec_offsets,
+        &enc.buf,
+        compact_isos.len(),
+    )
+}
+
+fn build_country_map_val(enc: &mut DataEncoder, iso: IsoCode, meta: Option<&CountryMeta>) -> ValId {
+    if let Some(cm) = meta {
+        let name_en = enc.str_val(&cm.name_en);
+        let name_zh = enc.str_val(&cm.name_zh);
+        let c_names = enc.map_val(vec![("en", name_en), ("zh-CN", name_zh)]);
+        let geoname_id = enc.u32_val(cm.geoname_id);
+        let iso_val = enc.str_val(iso.as_str());
+        let mut c_entries = vec![
+            ("geoname_id", geoname_id),
+            ("iso_code", iso_val),
+            ("names", c_names),
+        ];
+        if cm.is_eu {
+            c_entries.push(("is_in_european_union", enc.bool_val(true)));
+        }
+        enc.map_val(c_entries)
+    } else {
+        let iso_val = enc.str_val(iso.as_str());
+        enc.map_val(vec![("iso_code", iso_val)])
+    }
 }
 
 pub fn write_asn_mmdb(

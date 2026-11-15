@@ -180,6 +180,43 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     domain: "tiebac.baidu.com",
     rationale: "Baidu Tieba mobile API cleaned by module",
   },
+
+  // AI authentication, human-verification, and feature-gate endpoints
+  {
+    matchType: "suffix",
+    domain: "oaistatsig.com",
+    rationale: "OpenAI ChatGPT dedicated Statsig feature-flag endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "statsig.anthropic.com",
+    rationale: "Anthropic Claude feature-flag gateway",
+  },
+  {
+    matchType: "suffix",
+    domain: "featuregates.org",
+    rationale: "OpenAI feature-gate and experimentation service",
+  },
+  {
+    matchType: "exact",
+    domain: "cdn.growthbook.io",
+    rationale: "Claude Code GrowthBook feature-flag configuration CDN",
+  },
+  {
+    matchType: "exact",
+    domain: "challenges.cloudflare.com",
+    rationale: "Cloudflare Turnstile human verification required by AI web logins",
+  },
+  {
+    matchType: "exact",
+    domain: "client-api.arkoselabs.com",
+    rationale: "Arkose Labs challenge client required by OpenAI login flows",
+  },
+  {
+    matchType: "exact",
+    domain: "openai-api.arkoselabs.com",
+    rationale: "OpenAI dedicated Arkose Labs verification API",
+  },
 ];
 
 /**

@@ -2,7 +2,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AdblockSourceEntry } from "./adblock-schema.ts";
-import { ADBLOCK_SOURCES, GEOIP_SOURCES } from "./index.ts";
+import { ADBLOCK_SOURCES, GEOIP_SOURCES, ROUTING_SOURCES } from "./index.ts";
+import type { RoutingSourceEntry, RoutingTarget } from "./routing-schema.ts";
 import type { GeoIpSourceEntry, SourceEndpoint } from "./schema.ts";
 
 const ID_RE = /^[a-z0-9_]+$/;
@@ -125,6 +126,39 @@ function validateAdblockSource(src: AdblockSourceEntry, seenIds: Set<string>): v
   }
 }
 
+function validateRoutingSource(src: RoutingSourceEntry, seenIds: Set<string>): void {
+  if (!ID_RE.test(src.id)) {
+    throw new Error(`[${src.id}] Source id must match ${ID_RE}`);
+  }
+  if (seenIds.has(src.id)) {
+    throw new Error(`Duplicate routing source id: ${src.id}`);
+  }
+  seenIds.add(src.id);
+
+  if (!ID_RE.test(src.lineage)) {
+    throw new Error(`[${src.id}] Lineage must match ${ID_RE}, got '${src.lineage}'`);
+  }
+  if (!Number.isInteger(src.weight) || src.weight < 1 || src.weight > 100) {
+    throw new Error(`[${src.id}] Weight must be an integer in 1..100, got ${src.weight}`);
+  }
+  if (src.license.trim().length === 0 || src.homepage.trim().length === 0) {
+    throw new Error(`[${src.id}] Routing source requires non-empty license and homepage`);
+  }
+  const serialized = JSON.stringify(src).toLowerCase();
+  if (serialized.includes("quixoticheart")) {
+    throw new Error(`[${src.id}] Disallowed restricted-redistribution source reference`);
+  }
+  if (src.endpoints.length === 0) {
+    throw new Error(`[${src.id}] Source must define at least one endpoint`);
+  }
+  for (let i = 0; i < src.endpoints.length; i++) {
+    const ep = src.endpoints[i];
+    if (ep !== undefined) {
+      validateEndpoint(ep, src.id, i);
+    }
+  }
+}
+
 function validateAll(): void {
   if (GEOIP_SOURCES.sources.length === 0) {
     throw new Error("GeoIP source catalog contains zero sources");
@@ -140,6 +174,27 @@ function validateAll(): void {
   const seenAdblockIds = new Set<string>();
   for (const src of ADBLOCK_SOURCES.sources) {
     validateAdblockSource(src, seenAdblockIds);
+  }
+
+  if (ROUTING_SOURCES.sources.length === 0) {
+    throw new Error("Routing source catalog contains zero sources");
+  }
+  const seenRoutingIds = new Set<string>();
+  const coreByTarget = new Map<RoutingTarget, number>([
+    ["direct", 0],
+    ["ai", 0],
+    ["proxy", 0],
+  ]);
+  for (const src of ROUTING_SOURCES.sources) {
+    validateRoutingSource(src, seenRoutingIds);
+    if (src.core) {
+      coreByTarget.set(src.target, (coreByTarget.get(src.target) ?? 0) + 1);
+    }
+  }
+  for (const [target, count] of coreByTarget.entries()) {
+    if (count === 0) {
+      throw new Error(`Routing target '${target}' requires at least one core: true source`);
+    }
   }
 }
 
@@ -192,6 +247,13 @@ async function main(): Promise<void> {
     ADBLOCK_SOURCES,
     ADBLOCK_SOURCES.sources.length,
     "Adblock",
+    checkMode,
+  );
+  await emitOrCheckBundle(
+    resolve(currentDir, "generated", "routing-sources.json"),
+    ROUTING_SOURCES,
+    ROUTING_SOURCES.sources.length,
+    "Routing",
     checkMode,
   );
 }

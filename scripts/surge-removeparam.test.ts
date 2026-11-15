@@ -138,4 +138,51 @@ describe("surge-removeparam runtime script", () => {
       expect(second).toEqual({});
     }
   });
+
+  it("reuses parsed cache on identical $argument and invalidates when $argument changes", () => {
+    const globalObj = globalThis as Record<string, unknown>;
+    delete globalObj.__surgeRemoveParamCache;
+
+    const firstOut = runSurgeRemoveParam(
+      "https://sub.bilibili.com/v?utm_source=x&spm_id_from=y&keep=1",
+      arg,
+    );
+    expect(firstOut).toEqual({ url: "https://sub.bilibili.com/v?keep=1" });
+
+    const firstCache = globalObj.__surgeRemoveParamCache as
+      | { arg: string; globalSet: Set<string>; scopedMap: Map<string, Set<string>> }
+      | undefined;
+    expect(firstCache).toBeDefined();
+    expect(firstCache?.arg).toBe(arg);
+    expect(firstCache?.globalSet.has("utm_source")).toBe(true);
+    expect(firstCache?.scopedMap.get("bilibili.com")?.has("spm_id_from")).toBe(true);
+
+    // Same $argument reuses the exact cached object instance
+    const secondOut = runSurgeRemoveParam("https://sub.bilibili.com/v?utm_medium=z&keep=2", arg);
+    expect(secondOut).toEqual({ url: "https://sub.bilibili.com/v?keep=2" });
+    expect(globalObj.__surgeRemoveParamCache).toBe(firstCache);
+
+    // Label-boundary safety: lookalike sibling domain must not match scoped rules
+    const lookalikeOut = runSurgeRemoveParam(
+      "https://notbilibili.com/v?spm_id_from=keep&keep=3",
+      arg,
+    );
+    expect(lookalikeOut).toEqual({});
+
+    // Updated $argument invalidates cache and switches active rules immediately
+    const updatedArg = "notbilibili.com=spm_id_from;sub.example.com=ref_id";
+    const thirdOut = runSurgeRemoveParam(
+      "https://a.b.notbilibili.com/v?utm_source=keep&spm_id_from=drop&keep=4",
+      updatedArg,
+    );
+    expect(thirdOut).toEqual({ url: "https://a.b.notbilibili.com/v?utm_source=keep&keep=4" });
+    const secondCache = globalObj.__surgeRemoveParamCache as
+      | { arg: string; globalSet: Set<string>; scopedMap: Map<string, Set<string>> }
+      | undefined;
+    expect(secondCache).toBeDefined();
+    expect(secondCache).not.toBe(firstCache);
+    expect(secondCache?.arg).toBe(updatedArg);
+    expect(secondCache?.globalSet.size).toBe(0);
+    expect(secondCache?.scopedMap.has("sub.example.com")).toBe(true);
+  });
 });

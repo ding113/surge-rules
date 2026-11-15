@@ -5,7 +5,13 @@ use regex::Regex;
 /// Normalizes a Surge URL regex pattern and rejects malformed or catch-all patterns.
 pub fn normalize_surge_regex(raw: &str) -> Option<String> {
     let trimmed = raw.trim();
-    if trimmed.is_empty() || trimmed.chars().any(|c| c.is_control() || c.is_whitespace()) {
+    if trimmed.is_empty()
+        || !trimmed.is_ascii()
+        || trimmed.chars().any(|c| c.is_control() || c.is_whitespace())
+        || trimmed.contains('"')
+        || trimmed.contains(",,")
+        || trimmed.ends_with(',')
+    {
         return None;
     }
 
@@ -19,7 +25,6 @@ pub fn normalize_surge_regex(raw: &str) -> Option<String> {
         return None;
     }
 
-    // Reject patterns containing Surge comma/quote breaking syntax if unquoted inside scripts later
     if !uses_pcre_lookaround_or_backref(&normalized) && Regex::new(&normalized).is_err() {
         return None;
     }
@@ -65,7 +70,86 @@ fn is_catch_all_regex(pat: &str) -> bool {
     ) {
         return true;
     }
-    bare.len() < 8 && !bare.contains('.')
+    if bare.len() < 8 && !bare.contains('.') {
+        return true;
+    }
+    if let Some(after_scheme) = strip_regex_scheme_prefix(pat) {
+        let auth = read_authority_segment(after_scheme);
+        let host_expr = strip_trailing_port_regex(auth);
+        if extract_hosts_from_regex(pat).mitm_patterns.is_empty()
+            && !authority_has_concrete_domain_or_ip(host_expr)
+        {
+            return true;
+        }
+    }
+    false
+}
+
+fn authority_has_concrete_domain_or_ip(host_expr: &str) -> bool {
+    let mut segments = Vec::new();
+    let mut current = String::new();
+    let mut in_class = false;
+    let mut escaped = false;
+
+    for ch in host_expr.chars() {
+        if escaped {
+            escaped = false;
+            if !in_class {
+                match ch {
+                    '.' | '-' => current.push(ch),
+                    _ => {
+                        if !current.is_empty() {
+                            segments.push(std::mem::take(&mut current));
+                        }
+                    }
+                }
+            }
+            continue;
+        }
+        if ch == '\\' {
+            escaped = true;
+            continue;
+        }
+        if in_class {
+            if ch == ']' {
+                in_class = false;
+            }
+            continue;
+        }
+        match ch {
+            '[' => {
+                in_class = true;
+                if !current.is_empty() {
+                    segments.push(std::mem::take(&mut current));
+                }
+            }
+            c if c.is_ascii_alphanumeric() || c == '-' || c == '.' => current.push(c),
+            _ => {
+                if !current.is_empty() {
+                    segments.push(std::mem::take(&mut current));
+                }
+            }
+        }
+    }
+    if !current.is_empty() {
+        segments.push(current);
+    }
+
+    segments.into_iter().any(|seg| {
+        if seg.parse::<IpAddr>().is_ok() {
+            return true;
+        }
+        let labels: Vec<&str> = seg.split('.').filter(|l| !l.is_empty()).collect();
+        labels.len() >= 2
+            && labels.iter().all(|l| {
+                !l.starts_with('-')
+                    && !l.ends_with('-')
+                    && l.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+            })
+            && labels
+                .last()
+                .is_some_and(|tld| tld.len() >= 2 && tld.chars().all(|c| c.is_ascii_alphabetic()))
+    })
 }
 
 pub fn has_balanced_delimiters(pat: &str) -> bool {
@@ -491,7 +575,7 @@ pub fn is_valid_mitm_host(raw: &str) -> bool {
     if host_part.parse::<IpAddr>().is_ok() {
         return true;
     }
-    if !host_part.contains('.') {
+    if !host_part.contains('.') || host_part.to_ascii_lowercase().ends_with("hostname") {
         return false;
     }
 
@@ -602,4 +686,55 @@ fn abp_wildcard_to_regex(tail: &str) -> String {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rejects_non_ascii_and_broken_commas_and_quotes() {
+        assert_eq!(
+            normalize_surge_regex("^https://j1\\.pupuapi\\.com/client/a朴朴"),
+            None
+        );
+        assert_eq!(normalize_surge_regex("^https://example\\.com/ad,,"), None);
+        assert_eq!(normalize_surge_regex("^https://example\\.com/ad,"), None);
+        assert_eq!(normalize_surge_regex("^https://example\\.com/\"ad\""), None);
+    }
+
+    #[test]
+    fn rejects_hostname_free_catch_all_authorities() {
+        assert_eq!(
+            normalize_surge_regex(
+                "^https?://[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+){1,4}:/amdc/mobileDispatch"
+            ),
+            None
+        );
+        assert_eq!(normalize_surge_regex("^https?://[^/]+/wp-json/"), None);
+        assert_eq!(
+            normalize_surge_regex("^https?://([a-z0-9-]+\\.)+[a-z]{2,}/api/v\\d/movie"),
+            None
+        );
+        assert_eq!(
+            normalize_surge_regex("^https?://[a-z0-9.-]+/api/v\\d/movie/index_recommend"),
+            None
+        );
+    }
+
+    #[test]
+    fn keeps_concrete_domain_and_quantified_path_regexes() {
+        assert_eq!(
+            normalize_surge_regex("^https?://s\\d+\\.example\\.com/ad/v{1,4}$"),
+            Some("^https?://s\\d+\\.example\\.com/ad/v{1,4}$".to_string())
+        );
+        assert_eq!(
+            normalize_surge_regex("^https?://(?:app|api)\\.example\\.com/v1"),
+            Some("^https?://(?:app|api)\\.example\\.com/v1".to_string())
+        );
+        assert_eq!(
+            normalize_surge_regex("^http://127\\.0\\.0\\.1/ad"),
+            Some("^http://127\\.0\\.0\\.1/ad".to_string())
+        );
+    }
 }

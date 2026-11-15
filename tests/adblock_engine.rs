@@ -441,7 +441,7 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         .lines()
         .find(|l| l.starts_with("hostname = "))
         .expect("expected MITM hostname line");
-    assert!(mitm_line.starts_with("hostname = %APPEND% -*.apple.com"));
+    assert!(mitm_line.starts_with("hostname = %INSERT% -*.apple.com"));
     assert!(!mitm_line.contains("push.apple.com"));
     assert!(mitm_line.contains("api.bilibili.com"));
 
@@ -477,16 +477,29 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         "RULE-SET with policy column must fail verifier"
     );
 
-    // Corrupting Adblock.sgmodule with unsafe wildcard must fail verifier
-    assert!(verify_module_text("[MITM]\nhostname = %APPEND% *\n").is_err());
+    // Corrupting Adblock.sgmodule with unsafe wildcard / %APPEND% / unquoted comma / jsc must fail verifier
+    assert!(verify_module_text("[MITM]\nhostname = %INSERT% *\n").is_err());
+    assert!(verify_module_text("[MITM]\nhostname = %APPEND% api.example.com\n").is_err());
     assert!(
-        verify_module_text("[MITM]\nhostname = %APPEND% a.example.com, -b.example.com\n").is_err()
+        verify_module_text("[MITM]\nhostname = %INSERT% a.example.com, -b.example.com\n").is_err()
+    );
+    assert!(
+        verify_module_text(
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nbad = type=http-response,pattern=^https://a\\.example\\.com/v{1,4}$,script-path=https://example.com/s.js\n[MITM]\nhostname = %INSERT% a.example.com\n"
+        )
+        .is_err()
+    );
+    assert!(
+        verify_module_text(
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nsurge-removeparam = type=http-request,pattern=^https?://[^?#]+\\?(?:[^#]*&)?(?:utm_source)=,script-path=https://example.com/rp.js,engine=jsc\n[MITM]\nhostname = %INSERT% a.example.com\n"
+        )
+        .is_err()
     );
 
     // [Map Local] allows remote HTTPS URLs for `data-type=file`, rejects local unresolved paths
-    let valid_remote_map = "#!name=Test\n#!desc=Test\n#!requirement=CORE_VERSION>=20\n[Map Local]\n^https?://api\\.example\\.com/cfg$ data-type=file data=\"https://example.com/cfg.json\" status-code=200\n[MITM]\nhostname = %APPEND% api.example.com\n";
+    let valid_remote_map = "#!name=Test\n#!desc=Test\n#!requirement=CORE_VERSION>=20\n[Map Local]\n^https?://api\\.example\\.com/cfg$ data-type=file data=\"https://example.com/cfg.json\" status-code=200\n[MITM]\nhostname = %INSERT% api.example.com\n";
     assert!(verify_module_text(valid_remote_map).is_ok());
-    let invalid_local_map = "#!name=Test\n#!desc=Test\n#!requirement=CORE_VERSION>=20\n[Map Local]\n^https?://api\\.example\\.com/cfg$ data-type=file data=\"local/cfg.json\" status-code=200\n[MITM]\nhostname = %APPEND% api.example.com\n";
+    let invalid_local_map = "#!name=Test\n#!desc=Test\n#!requirement=CORE_VERSION>=20\n[Map Local]\n^https?://api\\.example\\.com/cfg$ data-type=file data=\"local/cfg.json\" status-code=200\n[MITM]\nhostname = %INSERT% api.example.com\n";
     assert!(verify_module_text(invalid_local_map).is_err());
 }
 
@@ -615,6 +628,131 @@ fn scoped_abp_and_fallback_paths_do_not_pollute_mitm_or_suppress_forced_ad_domai
         compiled.module_text.contains("srsltid"),
         "bare $removeparam=srsltid should compile into surge-removeparam"
     );
+}
+
+#[test]
+fn script_quoting_and_mitm_excluded_https_pruning_preserve_domain_protection() {
+    let mut overrides = AdblockOverrides::empty();
+    overrides.mitm_excluded_hosts.push(MitmHostOverride {
+        pattern: "api.biliapi.net".to_string(),
+        rationale: "Pinned TLS API".to_string(),
+    });
+
+    let mut src = ParsedAdblockSource::default();
+    // Script with quantifier comma `{1,4}` on non-excluded host -> must be quoted and pass verify
+    src.scripts.push(ScriptRule {
+        name: "comma_quant".to_string(),
+        script_type: ScriptType::HttpResponse,
+        pattern: r"^https?://ads\.example\.com/v\d{1,4}/feed$".to_string(),
+        script_path: "https://example.com/feed.js".to_string(),
+        requires_body: true,
+        binary_body_mode: false,
+        max_size: Some(0),
+        timeout: None,
+        argument: None,
+        engine: None,
+        weight: 150,
+    });
+    // HTTPS script on MITM-excluded host -> script pruned, yet complex_protected_hosts still protects host
+    src.complex_protected_hosts
+        .insert("api.biliapi.net".to_string());
+    src.scripts.push(ScriptRule {
+        name: "pinned_https".to_string(),
+        script_type: ScriptType::HttpResponse,
+        pattern: r"^https?://api\.biliapi\.net/x/v2/splash$".to_string(),
+        script_path: "https://example.com/bili.js".to_string(),
+        requires_body: true,
+        binary_body_mode: false,
+        max_size: Some(0),
+        timeout: None,
+        argument: None,
+        engine: None,
+        weight: 150,
+    });
+    // Plain HTTP rule on MITM-excluded host is NOT pruned (no MITM required)
+    src.url_rewrites
+        .push(surge_rules::adblock::model::UrlRewriteRule {
+            pattern: r"^http://api\.biliapi\.net/http-only$".to_string(),
+            replacement: "_".to_string(),
+            mode: UrlRewriteMode::Reject,
+            weight: 150,
+        });
+    // Try blocking api.biliapi.net in fallback ruleset
+    src.ruleset_domains.insert("api.biliapi.net".to_string());
+
+    let compiled = compile_adblock(&[src], &overrides, 1, 1);
+    assert!(
+        compiled
+            .module_text
+            .contains("pattern=\"^https?://ads\\\\.example\\\\.com/v\\\\d{1,4}/feed$\""),
+        "comma-bearing pattern must be double-quoted with escaped backslashes"
+    );
+    assert!(!compiled.module_text.contains("pinned_https ="));
+    assert!(
+        compiled
+            .module_text
+            .contains("^http://api\\.biliapi\\.net/http-only$")
+    );
+    assert!(!compiled.ruleset_text.contains("api.biliapi.net"));
+    verify_module_text(&compiled.module_text).expect("quoted script module must verify");
+}
+
+#[test]
+fn removeparam_separates_safe_global_and_scoped_webview_scripts() {
+    let overrides = AdblockOverrides::empty();
+    let mut src = ParsedAdblockSource::default();
+    src.remove_params.extend([
+        RemoveParamRule {
+            host_scope: "*".to_string(),
+            param: "utm_source".to_string(),
+            weight: 100,
+        },
+        RemoveParamRule {
+            host_scope: "*".to_string(),
+            param: "id".to_string(),
+            weight: 100,
+        },
+        RemoveParamRule {
+            host_scope: "*".to_string(),
+            param: "from".to_string(),
+            weight: 100,
+        },
+        RemoveParamRule {
+            host_scope: "shop.example.com".to_string(),
+            param: "id".to_string(),
+            weight: 120,
+        },
+    ]);
+
+    let compiled = compile_adblock(&[src], &overrides, 1, 1);
+    verify_module_text(&compiled.module_text).expect("split removeparam module must verify");
+    let script_lines: Vec<&str> = compiled
+        .module_text
+        .lines()
+        .skip_while(|l| *l != "[Script]")
+        .skip(1)
+        .take_while(|l| !l.trim().is_empty())
+        .collect();
+    assert_eq!(script_lines.len(), 2);
+
+    let global_line = script_lines
+        .iter()
+        .copied()
+        .find(|l| l.starts_with("surge-removeparam ="))
+        .expect("missing surge-removeparam");
+    assert!(global_line.contains("engine=webview"));
+    assert!(global_line.contains("utm_source"));
+    assert!(!global_line.contains("from"));
+    assert!(!global_line.contains("*=id"));
+
+    let scoped_line = script_lines
+        .iter()
+        .copied()
+        .find(|l| l.starts_with("surge-removeparam-scoped ="))
+        .expect("missing surge-removeparam-scoped");
+    assert!(scoped_line.contains("engine=webview"));
+    assert!(scoped_line.contains("shop\\.example\\.com"));
+    assert!(scoped_line.contains("shop.example.com=id"));
 }
 
 fn arb_label() -> impl Strategy<Value = String> {
@@ -823,7 +961,7 @@ proptest! {
             .lines()
             .find(|l| l.starts_with("hostname = "))
         {
-            let rest = mitm_line.trim_start_matches("hostname = %APPEND% ");
+            let rest = mitm_line.trim_start_matches("hostname = %INSERT% ");
             for ex in &exclusions {
                 prop_assert!(
                     !rest.split(',').map(str::trim).any(|item| item == ex),
@@ -834,18 +972,48 @@ proptest! {
         }
     }
 
-    // Property 5: Arbitrary RemoveParamRule inputs compile to a single trailing `surge-removeparam` script
-    // preserving host scopes/params safely without quotes and adding non-wildcard hosts to MITM.
+    // Property 5: RemoveParamRule inputs separate safe global trackers (`surge-removeparam`) from
+    // host-scoped trackers (`surge-removeparam-scoped`), never emit generic unsafe params under `*`,
+    // always run with `engine=webview`, and add scoped hosts to MITM.
     #[test]
     fn prop_removeparam_compilation_preserves_host_scopes_and_mitm(
-        rules in prop::collection::vec(
-            (prop_oneof![Just("*".to_string()), arb_domain()], arb_field(), 50u16..180u16),
-            1..15
-        )
+        safe_globals in prop::collection::vec(
+            prop_oneof![
+                Just("utm_source".to_string()),
+                Just("utm_medium".to_string()),
+                Just("fbclid".to_string()),
+                Just("srsltid".to_string()),
+            ],
+            1..5
+        ),
+        unsafe_globals in prop::collection::vec(
+            prop_oneof![
+                Just("id".to_string()),
+                Just("from".to_string()),
+                Just("key".to_string()),
+                Just("ad".to_string()),
+            ],
+            0..4
+        ),
+        scoped_rules in prop::collection::vec((arb_domain(), arb_field(), 50u16..180u16), 1..10)
     ) {
         let overrides = AdblockOverrides::empty();
         let mut src = ParsedAdblockSource::default();
-        for (host, param, weight) in &rules {
+        for p in &safe_globals {
+            src.remove_params.push(RemoveParamRule {
+                host_scope: "*".to_string(),
+                param: p.clone(),
+                weight: 100,
+            });
+        }
+        for p in &unsafe_globals {
+            src.remove_params.push(RemoveParamRule {
+                host_scope: "*".to_string(),
+                param: p.clone(),
+                weight: 120,
+            });
+        }
+        for (host, param, weight) in &scoped_rules {
             src.remove_params.push(RemoveParamRule {
                 host_scope: host.clone(),
                 param: param.clone(),
@@ -877,25 +1045,44 @@ proptest! {
             .skip(1)
             .take_while(|l| !l.trim().is_empty())
             .collect();
-        prop_assert_eq!(script_lines.len(), 2);
+        prop_assert_eq!(script_lines.len(), 3);
         prop_assert!(script_lines[0].starts_with("app_specific ="));
         prop_assert!(script_lines[1].starts_with("surge-removeparam ="));
+        prop_assert!(script_lines[2].starts_with("surge-removeparam-scoped ="));
 
-        let rp_line = script_lines[1];
-        for (host, param, _) in &rules {
+        let global_line = script_lines[1];
+        prop_assert!(global_line.contains("engine=webview"));
+        for p in &safe_globals {
+            prop_assert!(global_line.contains(p.as_str()));
+        }
+        let global_arg = global_line.split("argument=").nth(1).unwrap_or("");
+        for p in &unsafe_globals {
+            let pat_token = format!("|{}|", p);
+            let pat_start = format!("*={}", p);
             prop_assert!(
-                rp_line.contains(param.as_str()),
-                "expected param '{}' in '{}'",
-                param,
-                rp_line
+                !global_arg.contains(&pat_token)
+                    && !global_arg.starts_with(&format!("\"{}|", pat_start))
+                    && !global_arg.contains(&format!("=\"{}\"", p)),
+                "unsafe global param '{}' leaked into '{}'",
+                p,
+                global_line
             );
-            if host != "*" {
-                prop_assert!(
-                    compiled.module_text.contains(host.as_str()),
-                    "expected non-wildcard host '{}' in [MITM]",
-                    host
-                );
-            }
+        }
+
+        let scoped_line = script_lines[2];
+        prop_assert!(scoped_line.contains("engine=webview"));
+        for (host, param, _) in &scoped_rules {
+            prop_assert!(
+                scoped_line.contains(param.as_str()),
+                "expected scoped param '{}' in '{}'",
+                param,
+                scoped_line
+            );
+            prop_assert!(
+                compiled.module_text.contains(host.as_str()),
+                "expected non-wildcard host '{}' in [MITM]",
+                host
+            );
         }
     }
 }

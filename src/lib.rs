@@ -6,6 +6,7 @@ pub mod mmdb_encode;
 pub mod model;
 pub mod overrides;
 pub mod parsers;
+pub mod routing;
 pub mod verify;
 
 use std::fs;
@@ -20,7 +21,7 @@ use tracing::{info, warn};
 use crate::config::{MetadataRegistry, SourceCatalog, SourceConfig};
 use crate::fetch::{FetchOptions, SourceFetcher};
 use crate::fusion::run_fusion;
-use crate::mmdb_encode::{write_asn_mmdb, write_geo_mmdb};
+use crate::mmdb_encode::{write_asn_mmdb, write_country_only_mmdb, write_geo_mmdb};
 use crate::model::GlobalArena;
 use crate::overrides::CompiledOverrides;
 use crate::parsers::parse_source_bytes;
@@ -151,7 +152,7 @@ pub async fn build_geoip_pipeline(opts: BuildGeoIpOptions) -> Result<Verificatio
         "completed sweep-line multi-source fusion"
     );
 
-    // Encode all three MMDB artifacts in parallel
+    // Encode all four MMDB artifacts in parallel
     fs::create_dir_all(&opts.output_dir)
         .with_context(|| format!("failed creating output dir {}", opts.output_dir.display()))?;
     let build_epoch = SystemTime::now()
@@ -160,22 +161,37 @@ pub async fn build_geoip_pipeline(opts: BuildGeoIpOptions) -> Result<Verificatio
 
     let t_enc = Instant::now();
     let country_out = opts.output_dir.join("Country.mmdb");
+    let country_only_out = opts.output_dir.join("Country-only.mmdb");
     let cn_out = opts.output_dir.join("Country-cn.mmdb");
     let asn_out = opts.output_dir.join("ASN.mmdb");
 
-    let (country_res, (cn_res, asn_res)) = rayon::join(
+    let ((country_res, country_only_res), (cn_res, asn_res)) = rayon::join(
         || {
-            write_geo_mmdb(
-                &country_out,
-                "GeoLite2-City",
-                "Surge Global Multi-Source GeoIP, ASN & Network Trait Database",
-                "Surge 全球多源融合高精度 GeoIP、ASN 与网络特征数据库",
-                build_epoch,
-                &fused.country_records,
-                &fused.country_v4,
-                &fused.country_v6,
-                &arena.strings,
-                &metadata,
+            rayon::join(
+                || {
+                    write_geo_mmdb(
+                        &country_out,
+                        "GeoLite2-City",
+                        "Surge Global Multi-Source GeoIP, ASN & Network Trait Database",
+                        "Surge 全球多源融合高精度 GeoIP、ASN 与网络特征数据库",
+                        build_epoch,
+                        &fused.country_records,
+                        &fused.country_v4,
+                        &fused.country_v6,
+                        &arena.strings,
+                        &metadata,
+                    )
+                },
+                || {
+                    write_country_only_mmdb(
+                        &country_only_out,
+                        build_epoch,
+                        &fused.country_records,
+                        &fused.country_v4,
+                        &fused.country_v6,
+                        &metadata,
+                    )
+                },
             )
         },
         || {
@@ -209,15 +225,17 @@ pub async fn build_geoip_pipeline(opts: BuildGeoIpOptions) -> Result<Verificatio
     );
 
     let s_country = country_res?;
+    let s_country_only = country_only_res?;
     let s_cn = cn_res?;
     let s_asn = asn_res?;
 
     info!(
         country_bytes = s_country.size_bytes,
+        country_only_bytes = s_country_only.size_bytes,
         cn_bytes = s_cn.size_bytes,
         asn_bytes = s_asn.size_bytes,
         elapsed_secs = t_enc.elapsed().as_secs_f64(),
-        "encoded Country.mmdb, Country-cn.mmdb, and ASN.mmdb"
+        "encoded Country.mmdb, Country-only.mmdb, Country-cn.mmdb, and ASN.mmdb"
     );
 
     // Post-build verification & release notes
@@ -249,7 +267,12 @@ pub fn inspect_ip_in_dir(dir: &Path, ip_str: &str) -> Result<serde_json::Value> 
         .parse()
         .with_context(|| format!("invalid IP address '{}'", ip_str))?;
     let mut out = serde_json::Map::new();
-    for file in ["Country.mmdb", "Country-cn.mmdb", "ASN.mmdb"] {
+    for file in [
+        "Country.mmdb",
+        "Country-only.mmdb",
+        "Country-cn.mmdb",
+        "ASN.mmdb",
+    ] {
         let p = dir.join(file);
         if p.exists() {
             let reader = maxminddb::Reader::open_readfile(&p)?;

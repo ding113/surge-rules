@@ -637,14 +637,93 @@ fn split_kv(s: &str) -> Option<(&str, &str)> {
     Some((s[..idx].trim(), s[idx + 1..].trim()))
 }
 
-fn unquote_surge_value(s: &str) -> String {
+pub fn unquote_surge_value(s: &str) -> String {
     let t = s.trim();
     if t.len() >= 2 && t.starts_with('"') && t.ends_with('"') {
         let inner = &t[1..t.len() - 1];
-        inner.replace("\\\"", "\"").replace("\\\\", "\\")
+        let mut out = String::with_capacity(inner.len());
+        let mut chars = inner.chars();
+        while let Some(ch) = chars.next() {
+            if ch == '\\' {
+                match chars.next() {
+                    Some('"') => out.push('"'),
+                    Some('\\') => out.push('\\'),
+                    Some(other) => {
+                        out.push('\\');
+                        out.push(other);
+                    }
+                    None => out.push('\\'),
+                }
+            } else {
+                out.push(ch);
+            }
+        }
+        out
     } else {
         t.to_string()
     }
+}
+
+/// Split a Surge `[Script]` RHS parameter string on commas strictly outside double quotes.
+pub fn split_surge_script_params(input: &str) -> anyhow::Result<Vec<String>> {
+    let mut parts = Vec::new();
+    let mut current = String::new();
+    let mut in_quotes = false;
+    let mut escaped = false;
+
+    for ch in input.chars() {
+        if escaped {
+            current.push(ch);
+            escaped = false;
+            continue;
+        }
+        if in_quotes {
+            match ch {
+                '\\' => {
+                    current.push(ch);
+                    escaped = true;
+                }
+                '"' => {
+                    current.push(ch);
+                    in_quotes = false;
+                }
+                _ => current.push(ch),
+            }
+        } else {
+            match ch {
+                '"' => {
+                    current.push(ch);
+                    in_quotes = true;
+                }
+                ',' => {
+                    let trimmed = current.trim();
+                    if trimmed.is_empty() {
+                        return Err(anyhow::anyhow!(
+                            "empty parameter segment in Surge [Script] line"
+                        ));
+                    }
+                    parts.push(trimmed.to_string());
+                    current.clear();
+                }
+                _ => current.push(ch),
+            }
+        }
+    }
+
+    if in_quotes || escaped {
+        return Err(anyhow::anyhow!(
+            "unterminated quoted parameter in Surge [Script] line"
+        ));
+    }
+
+    let trimmed = current.trim();
+    if trimmed.is_empty() {
+        return Err(anyhow::anyhow!(
+            "empty trailing parameter segment in Surge [Script] line"
+        ));
+    }
+    parts.push(trimmed.to_string());
+    Ok(parts)
 }
 
 /// Splits key=value pairs in a Surge `[Script]` line on top-level commas,

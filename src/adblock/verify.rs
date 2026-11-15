@@ -10,7 +10,7 @@ use sha2::{Digest, Sha256};
 
 use crate::adblock::compiler::{DomainTrie, overlaps_reserved_v4, overlaps_reserved_v6};
 use crate::adblock::config::AdblockOverrides;
-use crate::adblock::parsers::surge_module::split_top_level_commas;
+use crate::adblock::parsers::surge_module::{split_surge_script_params, unquote_surge_value};
 use crate::adblock::regex_util::{is_valid_domain, is_valid_domain_wildcard, is_valid_mitm_host};
 
 #[derive(Clone, Debug, Serialize)]
@@ -82,7 +82,18 @@ pub fn verify_adblock_dir(
         .with_context(|| format!("missing generated module {}", module_path.display()))?;
 
     let (domain_trie, ruleset_total) = verify_ruleset_text(&ruleset_raw, min_ruleset_lines)?;
-    let (module_scripts, module_mitm_hosts) = verify_module_text(&module_raw)?;
+    let (module_scripts, module_mitm_hosts, mitm_exclusions_seen) =
+        verify_module_text_inner(&module_raw)?;
+
+    for ex in &overrides.mitm_excluded_hosts {
+        let pat = ex.pattern.trim().to_ascii_lowercase();
+        if is_valid_mitm_host(&pat) && !mitm_exclusions_seen.contains(&pat) {
+            bail!(
+                "Adblock.sgmodule [MITM] missing configured exclusion '-{}'",
+                pat
+            );
+        }
+    }
 
     let mut canaries_checked = 0usize;
     for ad in PURE_AD_CANARIES {
@@ -323,6 +334,11 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
 
 /// Validates an emitted `Adblock.sgmodule` strictly against Surge's official module specification.
 pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
+    let (scripts, hosts, _) = verify_module_text_inner(text)?;
+    Ok((scripts, hosts))
+}
+
+fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<String>)> {
     if !text.contains("#!name=")
         || !text.contains("#!desc=")
         || !text.contains("#!requirement=CORE_VERSION>=20")
@@ -337,6 +353,7 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
     let mut script_names: FxHashSet<String> = FxHashSet::default();
     let mut script_triggers: FxHashSet<(String, String)> = FxHashSet::default();
     let mut mitm_hosts_count = 0usize;
+    let mut mitm_exclusions_seen: FxHashSet<String> = FxHashSet::default();
     let mut has_mitm_section = false;
 
     for (line_no, raw_line) in text.lines().enumerate() {
@@ -374,6 +391,45 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
         }
 
         match cur_section {
+            "[General]" => {
+                let Some((_k, v)) = line.split_once('=') else {
+                    bail!(
+                        "Adblock.sgmodule line {} malformed [General] line: {}",
+                        line_no + 1,
+                        line
+                    );
+                };
+                let trimmed_v = v.trim();
+                let list_rest = if let Some(r) = trimmed_v.strip_prefix("%INSERT%") {
+                    Some((true, r))
+                } else {
+                    trimmed_v.strip_prefix("%APPEND%").map(|r| (false, r))
+                };
+                if let Some((is_insert, rest)) = list_rest {
+                    let mut seen_pos = false;
+                    let mut has_neg = false;
+                    for item in rest.split(',').map(str::trim).filter(|s| !s.is_empty()) {
+                        if item.starts_with('-') {
+                            has_neg = true;
+                            if seen_pos {
+                                bail!(
+                                    "Adblock.sgmodule line {} [General] exclusion '{}' appears after positive hosts",
+                                    line_no + 1,
+                                    item
+                                );
+                            }
+                        } else {
+                            seen_pos = true;
+                        }
+                    }
+                    if has_neg && !is_insert {
+                        bail!(
+                            "Adblock.sgmodule line {} [General] exclusion-bearing list must use %INSERT%",
+                            line_no + 1
+                        );
+                    }
+                }
+            }
             "[Header Rewrite]" => {
                 let toks: Vec<&str> = line.split_whitespace().collect();
                 if toks.len() < 4 || !matches!(toks[0], "http-request" | "http-response") {
@@ -453,18 +509,26 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
                         clean_name
                     );
                 }
-                let params = split_top_level_commas(rhs);
+                let params = split_surge_script_params(rhs)?;
                 let mut stype = None;
                 let mut spattern = None;
                 let mut spath = None;
+                let mut sengine = None;
                 for p in params {
-                    if let Some((k, v)) = p.split_once('=') {
-                        match k.trim() {
-                            "type" => stype = Some(v.trim().to_string()),
-                            "pattern" => spattern = Some(v.trim().to_string()),
-                            "script-path" => spath = Some(v.trim().to_string()),
-                            _ => {}
-                        }
+                    let Some((k, raw_v)) = p.split_once('=') else {
+                        bail!(
+                            "Adblock.sgmodule line {} [Script] malformed parameter '{}'",
+                            line_no + 1,
+                            p
+                        );
+                    };
+                    let val = unquote_surge_value(raw_v);
+                    match k.trim() {
+                        "type" => stype = Some(val),
+                        "pattern" => spattern = Some(val),
+                        "script-path" => spath = Some(val),
+                        "engine" => sengine = Some(val),
+                        _ => {}
                     }
                 }
                 let (Some(st), Some(sp), Some(url)) = (stype, spattern, spath) else {
@@ -474,6 +538,15 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
                         line
                     );
                 };
+                if clean_name.starts_with("surge-removeparam")
+                    && sengine.as_deref() != Some("webview")
+                {
+                    bail!(
+                        "Adblock.sgmodule line {} removeparam script '{}' must specify engine=webview",
+                        line_no + 1,
+                        clean_name
+                    );
+                }
                 if !matches!(st.as_str(), "http-request" | "http-response")
                     || !url.starts_with("https://")
                 {
@@ -483,7 +556,10 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
                         line
                     );
                 }
-                if !sp.contains("(?=") && !sp.contains("(?!") && Regex::new(&sp).is_err() {
+                if sp.is_empty()
+                    || !sp.is_ascii()
+                    || (!sp.contains("(?=") && !sp.contains("(?!") && Regex::new(&sp).is_err())
+                {
                     bail!(
                         "Adblock.sgmodule line {} invalid script regex '{}'",
                         line_no + 1,
@@ -514,8 +590,8 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
                         k.trim()
                     );
                 }
-                let Some(rest) = v.trim().strip_prefix("%APPEND%") else {
-                    bail!("Adblock.sgmodule [MITM] hostname must use %APPEND%");
+                let Some(rest) = v.trim().strip_prefix("%INSERT%") else {
+                    bail!("Adblock.sgmodule [MITM] hostname must use %INSERT%");
                 };
                 let mut seen_positive = false;
                 for item in rest.split(',').map(str::trim).filter(|s| !s.is_empty()) {
@@ -529,6 +605,7 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
                         if !is_valid_mitm_host(excluded) {
                             bail!("Adblock.sgmodule [MITM] invalid excluded host '{}'", item);
                         }
+                        mitm_exclusions_seen.insert(excluded.to_ascii_lowercase());
                     } else {
                         seen_positive = true;
                         if !is_valid_mitm_host(item) {
@@ -546,10 +623,10 @@ pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
         bail!("Adblock.sgmodule missing [MITM] section");
     }
 
-    Ok((script_names.len(), mitm_hosts_count))
+    Ok((script_names.len(), mitm_hosts_count, mitm_exclusions_seen))
 }
 
-fn file_summary(name: &str, bytes: &[u8], line_count: usize) -> AdblockFileSummary {
+pub fn file_summary(name: &str, bytes: &[u8], line_count: usize) -> AdblockFileSummary {
     let mut hasher = Sha256::new();
     hasher.update(bytes);
     AdblockFileSummary {

@@ -2,9 +2,7 @@ use anyhow::{Result, bail};
 use rustc_hash::FxHashMap;
 
 use crate::config::{MetadataRegistry, SourceConfig};
-use crate::model::{
-    AsnMetaObs, IsoCode, ObsPayload, ParsedSource, TraitFlags, effective_prefix_v6,
-};
+use crate::model::{AsnMetaObs, IsoCode, ObsPayload, ParsedSource, TraitFlags};
 
 const LIBLOC_MAGIC: &[u8] = b"LOCDBXX";
 const LOC_NETWORK_FLAG_ANONYMOUS_PROXY: u16 = 1 << 0;
@@ -64,7 +62,7 @@ pub fn parse_libloc(
         }
     }
 
-    if as_length % 8 != 0 || net_data_length % 8 != 0 || net_tree_length % 12 != 0 {
+    if as_length % 8 != 0 || net_data_length % 12 != 0 || net_tree_length % 12 != 0 {
         bail!(
             "IPFire libloc section alignment mismatch in '{}': as={} net_data={} net_tree={}",
             src.id,
@@ -101,8 +99,10 @@ pub fn parse_libloc(
         }
     }
 
-    // 2. Lazily decode `network_data` entries (`country_code: [u8; 2], flags: u16 BE, asn: u32 BE`)
-    let net_data_count = net_data_length / 8;
+    // 2. Lazily decode `network_data` entries (`struct loc_database_network_v1`, 12 bytes:
+    //    `country_code: [u8; 2]` @ 0..2, C alignment pad @ 2..4, `asn: u32 BE` @ 4..8,
+    //    `flags: u16 BE` @ 8..10, `padding: [u8; 2]` @ 10..12)
+    let net_data_count = net_data_length / 12;
     let mut net_cache: FxHashMap<u32, Option<u32>> = FxHashMap::default();
     let decode_net = |net_idx: u32,
                       out: &mut ParsedSource,
@@ -115,10 +115,10 @@ pub fn parse_libloc(
             cache.insert(net_idx, None);
             return None;
         }
-        let off = net_data_offset + (net_idx as usize) * 8;
+        let off = net_data_offset + (net_idx as usize) * 12;
         let cc_bytes = &bytes[off..off + 2];
-        let flags = u16::from_be_bytes([bytes[off + 2], bytes[off + 3]]);
         let asn = read_u32_be(bytes, off + 4);
+        let flags = u16::from_be_bytes([bytes[off + 8], bytes[off + 9]]);
 
         let mut p = ObsPayload {
             traits: base_traits,
@@ -193,9 +193,9 @@ pub fn parse_libloc(
             active = Some((pid, depth));
         }
 
-        if depth == 128 {
+        if depth == 128 || (zero == 0 && one == 0) {
             if let Some((pid, orig_depth)) = active {
-                out.push_v6(prefix, prefix, pid, orig_depth.max(128));
+                out.push_v6(prefix, prefix | host_mask_v6(depth), pid, orig_depth);
             }
             continue;
         }
@@ -209,21 +209,11 @@ pub fn parse_libloc(
             if child_idx != 0 && child_idx < node_count {
                 stack.push((child_idx, next_depth, child_prefix, active));
             } else if let Some((pid, orig_depth)) = active {
-                let host_bits = 128 - next_depth;
-                let mask = if host_bits == 128 {
-                    u128::MAX
-                } else if host_bits == 0 {
-                    0
-                } else {
-                    (1u128 << host_bits) - 1
-                };
-                let start = child_prefix;
-                let end = child_prefix | mask;
                 out.push_v6(
-                    start,
-                    end,
+                    child_prefix,
+                    child_prefix | host_mask_v6(next_depth),
                     pid,
-                    orig_depth.max(effective_prefix_v6(start, end)),
+                    orig_depth,
                 );
             }
         }
@@ -231,6 +221,18 @@ pub fn parse_libloc(
 
     out.finalize();
     Ok(out)
+}
+
+#[inline]
+fn host_mask_v6(depth: u8) -> u128 {
+    let host_bits = 128u8.saturating_sub(depth);
+    if host_bits >= 128 {
+        u128::MAX
+    } else if host_bits == 0 {
+        0
+    } else {
+        (1u128 << host_bits) - 1
+    }
 }
 
 #[inline]

@@ -285,9 +285,14 @@ impl ScriptRule {
     }
 
     pub fn to_surge_line(&self, unique_name: &str) -> String {
+        let pattern_param = if self.pattern.contains(',') || self.pattern.contains('"') {
+            format!("pattern=\"{}\"", escape_quoted_value(&self.pattern))
+        } else {
+            format!("pattern={}", self.pattern)
+        };
         let mut params = vec![
             format!("type={}", self.script_type.as_str()),
-            format!("pattern={}", self.pattern),
+            pattern_param,
             format!("script-path={}", self.script_path),
         ];
         if self.requires_body {

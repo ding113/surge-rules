@@ -13,6 +13,10 @@ import { FORCE_RULESET_ENTRIES } from "./adblock-ruleset.ts";
 import type { AdblockOverridesBundle } from "./adblock-schema.ts";
 import { ASN_OVERRIDES } from "./geoip-asn.ts";
 import { CN_EXCLUSIONS, COUNTRY_OVERRIDES } from "./geoip-country.ts";
+import { AI_FORCE_ENTRIES, SHARED_INFRA_ROOTS } from "./routing-ai.ts";
+import { DIRECT_EXCLUDE_ENTRIES, DIRECT_FORCE_ENTRIES } from "./routing-direct.ts";
+import { PROXY_EXCLUDE_ENTRIES, PROXY_FORCE_ENTRIES } from "./routing-proxy.ts";
+import type { RoutingOverridesBundle } from "./routing-schema.ts";
 import type { GeoIpOverridesBundle } from "./schema.ts";
 import { SPECIAL_NETWORKS } from "./special-networks.ts";
 
@@ -39,11 +43,22 @@ export const ADBLOCK_OVERRIDES: AdblockOverridesBundle = {
   scripts: MODULE_SCRIPTS,
 };
 
+export const ROUTING_OVERRIDES: RoutingOverridesBundle = {
+  schemaVersion: 1,
+  sharedInfraRoots: SHARED_INFRA_ROOTS,
+  forceEntries: [...AI_FORCE_ENTRIES, ...DIRECT_FORCE_ENTRIES, ...PROXY_FORCE_ENTRIES],
+  excludeEntries: [...DIRECT_EXCLUDE_ENTRIES, ...PROXY_EXCLUDE_ENTRIES],
+};
+
 export * from "./adblock-allowlist.ts";
 export * from "./adblock-module.ts";
 export * from "./adblock-ruleset.ts";
 export * from "./adblock-schema.ts";
 export * from "./geoip-asn.ts";
 export * from "./geoip-country.ts";
+export * from "./routing-ai.ts";
+export * from "./routing-direct.ts";
+export * from "./routing-proxy.ts";
+export * from "./routing-schema.ts";
 export * from "./schema.ts";
 export * from "./special-networks.ts";

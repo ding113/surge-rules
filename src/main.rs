@@ -8,6 +8,9 @@ use surge_rules::adblock::config::AdblockOverrides;
 use surge_rules::adblock::verify::verify_adblock_dir;
 use surge_rules::adblock::{BuildAdblockOptions, build_adblock_pipeline};
 use surge_rules::fetch::FetchOptions;
+use surge_rules::routing::config::RoutingOverrides;
+use surge_rules::routing::verify::verify_routing_dir;
+use surge_rules::routing::{BuildRoutingOptions, build_routing_pipeline};
 use surge_rules::verify::verify_artifact_dir;
 use surge_rules::{BuildGeoIpOptions, build_geoip_pipeline, inspect_ip_in_dir};
 
@@ -15,7 +18,7 @@ use surge_rules::{BuildGeoIpOptions, build_geoip_pipeline, inspect_ip_in_dir};
 #[command(
     name = "surge-rules",
     version,
-    about = "Multi-source GeoIP MMDB and Surge Adblock RULE-SET / Module builder"
+    about = "Multi-source GeoIP MMDB, Surge Adblock, and Routing RULE-SET builder"
 )]
 struct Cli {
     #[command(subcommand)]
@@ -33,6 +36,47 @@ enum TopCommand {
     Adblock {
         #[command(subcommand)]
         action: AdblockCommand,
+    },
+    /// Build or verify Surge Routing RULE-SETs (Direct.list, AI.list, Proxy.list)
+    Routing {
+        #[command(subcommand)]
+        action: RoutingCommand,
+    },
+}
+
+#[derive(Subcommand)]
+enum RoutingCommand {
+    /// Fetch upstream routing feeds, compile Direct.list/AI.list/Proxy.list, and run verification
+    Build {
+        #[arg(long, default_value = "sources/generated/routing-sources.json")]
+        catalog: PathBuf,
+        #[arg(long, default_value = "overrides/generated/routing-overrides.json")]
+        overrides: PathBuf,
+        #[arg(long, default_value = "overrides/generated/adblock-overrides.json")]
+        adblock_overrides: PathBuf,
+        #[arg(long, default_value = ".cache/routing")]
+        cache_dir: PathBuf,
+        #[arg(long, default_value = "dist")]
+        output: PathBuf,
+        #[arg(long, default_value_t = 16)]
+        concurrency: usize,
+        #[arg(long, default_value_t = false)]
+        offline: bool,
+        #[arg(long, default_value_t = 1800)]
+        max_cache_age_secs: u64,
+    },
+    /// Verify generated Direct.list, AI.list, and Proxy.list in a directory
+    Verify {
+        #[arg(long, default_value = "dist")]
+        dir: PathBuf,
+        #[arg(long, default_value = "overrides/generated/routing-overrides.json")]
+        overrides: PathBuf,
+        #[arg(long, default_value_t = 5_000)]
+        min_direct_lines: usize,
+        #[arg(long, default_value_t = 200)]
+        min_ai_lines: usize,
+        #[arg(long, default_value_t = 5_000)]
+        min_proxy_lines: usize,
     },
 }
 
@@ -137,9 +181,11 @@ async fn main() -> Result<()> {
                 };
                 let report = build_geoip_pipeline(opts).await?;
                 println!(
-                    "Built and verified {} ({} B), {} ({} B), {} ({} B) [{} canaries passed]",
+                    "Built and verified {} ({} B), {} ({} B), {} ({} B), {} ({} B) [{} canaries passed]",
                     report.country.file_name,
                     report.country.size_bytes,
+                    report.country_only.file_name,
+                    report.country_only.size_bytes,
                     report.country_cn.file_name,
                     report.country_cn.size_bytes,
                     report.asn.file_name,
@@ -150,9 +196,11 @@ async fn main() -> Result<()> {
             GeoipCommand::Verify { dir } => {
                 let report = verify_artifact_dir(&dir, true)?;
                 println!(
-                    "Verified {} ({} nodes), {} ({} nodes), {} ({} nodes) [{} canaries passed]",
+                    "Verified {} ({} nodes), {} ({} nodes), {} ({} nodes), {} ({} nodes) [{} canaries passed]",
                     report.country.file_name,
                     report.country.node_count,
+                    report.country_only.file_name,
+                    report.country_only.node_count,
                     report.country_cn.file_name,
                     report.country_cn.node_count,
                     report.asn.file_name,
@@ -215,6 +263,74 @@ async fn main() -> Result<()> {
                     report.module.file_name,
                     report.module_scripts,
                     report.module_mitm_hosts,
+                    report.canaries_checked
+                );
+            }
+        },
+        TopCommand::Routing { action } => match action {
+            RoutingCommand::Build {
+                catalog,
+                overrides,
+                adblock_overrides,
+                cache_dir,
+                output,
+                concurrency,
+                offline,
+                max_cache_age_secs,
+            } => {
+                let opts = BuildRoutingOptions {
+                    catalog_path: catalog,
+                    overrides_path: overrides,
+                    adblock_overrides_path: adblock_overrides,
+                    output_dir: output,
+                    fetch: FetchOptions {
+                        cache_dir,
+                        concurrency,
+                        offline,
+                        max_cache_age_secs,
+                        timeout_secs: 120,
+                    },
+                    ..BuildRoutingOptions::default()
+                };
+                let report = build_routing_pipeline(opts).await?;
+                println!(
+                    "Built and verified {} ({} rules, {} B), {} ({} rules, {} B), {} ({} rules, {} B) [{} canaries passed]",
+                    report.direct.file_name,
+                    report.direct_total,
+                    report.direct.size_bytes,
+                    report.ai.file_name,
+                    report.ai_total,
+                    report.ai.size_bytes,
+                    report.proxy.file_name,
+                    report.proxy_total,
+                    report.proxy.size_bytes,
+                    report.canaries_checked
+                );
+            }
+            RoutingCommand::Verify {
+                dir,
+                overrides,
+                min_direct_lines,
+                min_ai_lines,
+                min_proxy_lines,
+            } => {
+                let ov = RoutingOverrides::load_from_path(&overrides)?;
+                let report = verify_routing_dir(
+                    &dir,
+                    &ov,
+                    min_direct_lines,
+                    min_ai_lines,
+                    min_proxy_lines,
+                    true,
+                )?;
+                println!(
+                    "Verified {} ({} rules), {} ({} rules), {} ({} rules) [{} canaries passed]",
+                    report.direct.file_name,
+                    report.direct_total,
+                    report.ai.file_name,
+                    report.ai_total,
+                    report.proxy.file_name,
+                    report.proxy_total,
                     report.canaries_checked
                 );
             }

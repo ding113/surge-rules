@@ -31,6 +31,18 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   { pattern: "*.1password.com", rationale: "Password vault requires unmodified TLS" },
   { pattern: "*.bitwarden.com", rationale: "Password vault requires unmodified TLS" },
   { pattern: "*.github.com", rationale: "Developer authentication and Git SSH/HTTPS endpoints" },
+  {
+    pattern: "*.biliapi.net",
+    rationale: "Bilibili API/gRPC endpoints enforce TLS certificate pinning",
+  },
+  { pattern: "*.biliapi.com", rationale: "Bilibili API endpoints enforce TLS certificate pinning" },
+  { pattern: "api.bilibili.com", rationale: "Bilibili REST API enforces TLS certificate pinning" },
+  { pattern: "app.bilibili.com", rationale: "Bilibili app API enforces TLS certificate pinning" },
+  { pattern: "weatherkit.apple.com", rationale: "Apple WeatherKit enforces strict TLS pinning" },
+  {
+    pattern: "www.xiaohongshu.com",
+    rationale: "Xiaohongshu endpoints enforce TLS certificate pinning",
+  },
 ];
 
 export const MITM_ADDED_HOSTS: readonly MitmHostEntry[] = [];
@@ -38,7 +50,20 @@ export const MITM_ADDED_HOSTS: readonly MitmHostEntry[] = [];
 /**
  * Regex substrings identifying broken or overly risky upstream module patterns to suppress.
  */
-export const DISABLED_URL_PATTERNS: readonly string[] = ["^https?:\\/\\/202\\d\\.\\d{2}\\.\\d{2}"];
+export const DISABLED_URL_PATTERNS: readonly string[] = [
+  "^https?:\\/\\/202\\d\\.\\d{2}\\.\\d{2}",
+  "/amdc/mobileDispatch",
+  "/api/v\\d/movie/index_recommend",
+  "/wp-json/",
+  "j1\\.pupuapi\\.com/client/a朴朴",
+  "朴朴超市",
+  "grpc\\.biliapi\\.net",
+  "app\\.biliapi\\.",
+  "(?:app|api)\\.bilibili\\.com",
+  "app\\.bilibili\\.com",
+  "api\\.bilibili\\.com",
+  "www\\.xiaohongshu\\.com",
+];
 
 export const MODULE_URL_REWRITES: readonly ModuleUrlRewriteOverride[] = [];
 
@@ -53,23 +78,8 @@ export const MODULE_MAP_LOCALS: readonly ModuleMapLocalOverride[] = [
   },
 ];
 
-export const MODULE_HEADER_REWRITES: readonly ModuleHeaderRewriteOverride[] = [
-  {
-    direction: "http-request",
-    pattern: "^https?:\\/\\/(?:app|api)\\.bilibili\\.com\\/x\\/",
-    action: "header-del",
-    field: "Buvid",
-    rationale: "Avoid sending persistent advertising tracking device header on ad-heavy endpoints",
-  },
-];
+export const MODULE_HEADER_REWRITES: readonly ModuleHeaderRewriteOverride[] = [];
 
-export const MODULE_BODY_REWRITES: readonly ModuleBodyRewriteOverride[] = [
-  {
-    kind: "http-response-jq",
-    pattern: "^https?:\\/\\/app\\.bilibili\\.com\\/x\\/v2\\/splash\\/(list|show)",
-    expression: "if .data? then .data.list = [] | .data.show = [] else . end",
-    rationale: "Strip Bilibili splash ad payloads natively via Surge JQ Body Rewrite",
-  },
-];
+export const MODULE_BODY_REWRITES: readonly ModuleBodyRewriteOverride[] = [];
 
 export const MODULE_SCRIPTS: readonly ModuleScriptOverride[] = [];

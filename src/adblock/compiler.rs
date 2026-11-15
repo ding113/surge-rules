@@ -277,6 +277,14 @@ pub fn compile_adblock(
     let mitm_exclusion_set = mitm_exclusions.clone();
     mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
 
+    // Prune HTTPS module rules whose target hosts are all excluded from MITM (after complex_host_set registration)
+    header_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    url_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    map_local_map
+        .retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    body_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    final_scripts.retain(|s| !pattern_targets_excluded_https_only(&s.pattern, &mitm_exclusion_set));
+
     // 5. Compile fallback RULE-SET with complex-over-host protection and domain trie compression
     let mut allow_suffix_trie = DomainTrie::default();
     for s in &allow_suffix_set {
@@ -460,16 +468,14 @@ pub fn compile_adblock(
     ruleset_counts.suppressed_by_protection = suppressed_by_protection;
     ruleset_counts.subsumed_by_trie = subsumed_by_trie;
 
-    // Append unified `$removeparam` script last so app-specific http-request scripts run first
-    if let Some(rp_script) = build_removeparam_script(
+    // Append `$removeparam` scripts last (global + host-scoped) so app-specific http-request scripts run first
+    final_scripts.extend(build_removeparam_scripts(
         &remove_params,
         &mut mitm_positive,
         &mitm_exclusion_set,
         &final_suffix_trie,
         &compressed_domains,
-    ) {
-        final_scripts.push(rp_script);
-    }
+    ));
 
     // Enforce `-` exclusions again in case small-scale removeparam rules introduced MITM hosts
     mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
@@ -686,8 +692,8 @@ fn resolve_script_conflicts(mut candidates: Vec<ScriptRule>) -> Vec<ScriptRule> 
 
     let mut used_names: FxHashSet<String> = FxHashSet::default();
     for s in &mut kept {
-        let base = if s.name == "surge-removeparam" {
-            "surge-removeparam_custom".to_string()
+        let base = if s.name == "surge-removeparam" || s.name == "surge-removeparam-scoped" {
+            format!("{}_custom", s.name)
         } else {
             s.name.clone()
         };
@@ -703,26 +709,115 @@ fn resolve_script_conflicts(mut candidates: Vec<ScriptRule>) -> Vec<ScriptRule> 
     kept
 }
 
-fn build_removeparam_script(
+fn pattern_targets_excluded_https_only(pattern: &str, exclusions: &BTreeSet<String>) -> bool {
+    let bare = pattern.trim_start_matches('^');
+    if bare.starts_with("http://") {
+        return false;
+    }
+    let info = extract_hosts_from_regex(pattern);
+    !info.mitm_patterns.is_empty()
+        && info
+            .mitm_patterns
+            .iter()
+            .all(|h| mitm_host_is_excluded(h, exclusions))
+}
+
+fn is_safe_global_tracking_param(param: &str) -> bool {
+    let p = param.trim().to_ascii_lowercase();
+    if p.is_empty() {
+        return false;
+    }
+    const SAFE_PREFIXES: &[&str] = &[
+        "utm_", "stm_", "hsa_", "mtm_", "pk_", "piwik_", "matomo_", "mc_", "oly_", "_ga", "__utm",
+        "__hs", "spm_", "scm_",
+    ];
+    if SAFE_PREFIXES.iter().any(|pre| p.starts_with(pre)) {
+        return true;
+    }
+    matches!(
+        p.as_str(),
+        "fbclid"
+            | "gclid"
+            | "gbraid"
+            | "wbraid"
+            | "dclid"
+            | "msclkid"
+            | "ttclid"
+            | "twclid"
+            | "li_fat_id"
+            | "yclid"
+            | "ymclid"
+            | "_openstat"
+            | "igshid"
+            | "igsh"
+            | "wickedid"
+            | "vero_conv"
+            | "vero_id"
+            | "nr_email_referer"
+            | "mkt_tok"
+            | "rb_clickid"
+            | "s_kwcid"
+            | "ef_id"
+            | "epik"
+            | "irclickid"
+            | "guce_referrer"
+            | "guce_referrer_sig"
+            | "vd_source"
+            | "srsltid"
+            | "_hsenc"
+            | "_hsmi"
+            | "_bta_tid"
+            | "_bta_c"
+            | "_ke"
+            | "_kx"
+    )
+}
+
+fn host_scope_to_regex(host: &str) -> String {
+    if let Some(suf) = host.strip_prefix("*.") {
+        format!(
+            "[^/?#]+\\.{}",
+            crate::adblock::regex_util::escape_literal_regex(suf)
+        )
+    } else {
+        format!(
+            "(?:[^/?#]+\\.)?{}",
+            crate::adblock::regex_util::escape_literal_regex(host)
+        )
+    }
+}
+
+fn build_removeparam_scripts(
     rules: &[RemoveParamRule],
     mitm_positive: &mut BTreeSet<String>,
     mitm_exclusion_set: &BTreeSet<String>,
     final_suffix_trie: &DomainTrie,
     compressed_domains: &BTreeSet<String>,
-) -> Option<ScriptRule> {
+) -> Vec<ScriptRule> {
     if rules.is_empty() {
-        return None;
+        return Vec::new();
     }
 
+    let mut global_params: BTreeMap<String, u16> = BTreeMap::new();
     let mut scope_params: BTreeMap<String, (u16, BTreeSet<String>)> = BTreeMap::new();
 
     for r in rules {
+        let param_clean = r.param.trim().to_ascii_lowercase();
+        if param_clean.is_empty() {
+            continue;
+        }
         let host = r.host_scope.as_str();
-        if host != "*"
-            && (!is_valid_mitm_host(host)
-                || mitm_host_is_excluded(host, mitm_exclusion_set)
-                || final_suffix_trie.matches_domain(host)
-                || compressed_domains.contains(host))
+        if host == "*" {
+            if is_safe_global_tracking_param(&param_clean) {
+                let entry = global_params.entry(param_clean).or_insert(r.weight);
+                *entry = (*entry).max(r.weight);
+            }
+            continue;
+        }
+        if !is_valid_mitm_host(host)
+            || mitm_host_is_excluded(host, mitm_exclusion_set)
+            || final_suffix_trie.matches_domain(host)
+            || compressed_domains.contains(host)
         {
             continue;
         }
@@ -730,80 +825,125 @@ fn build_removeparam_script(
             .entry(r.host_scope.clone())
             .or_insert_with(|| (r.weight, BTreeSet::new()));
         entry.0 = entry.0.max(r.weight);
-        entry.1.insert(r.param.clone());
+        entry.1.insert(param_clean);
     }
 
-    if scope_params.is_empty() {
-        return None;
-    }
+    let mut scripts = Vec::new();
 
-    let non_wildcard_count = scope_params.keys().filter(|h| h.as_str() != "*").count();
-    let bulk_mode = non_wildcard_count > 32;
+    if !global_params.is_empty() {
+        let mut ranked_global: Vec<(String, u16)> = global_params.into_iter().collect();
+        ranked_global.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
 
-    // Sort scopes with `*` first, then by weight desc, param count desc, and host name, keeping `$argument` compact
-    let mut ranked_scopes: Vec<(String, u16, BTreeSet<String>)> = scope_params
-        .into_iter()
-        .filter(|(host, _)| !bulk_mode || host == "*" || mitm_host_is_excluded(host, mitm_positive))
-        .map(|(host, (w, params))| (host, w, params))
-        .collect();
-    ranked_scopes.sort_by(|a, b| {
-        let a_star = a.0 == "*";
-        let b_star = b.0 == "*";
-        b_star
-            .cmp(&a_star)
-            .then_with(|| b.1.cmp(&a.1))
-            .then_with(|| b.2.len().cmp(&a.2.len()))
-            .then_with(|| a.0.cmp(&b.0))
-    });
-
-    let mut arg_chunks: Vec<String> = Vec::new();
-    let mut total_arg_len = 0usize;
-    let mut active_param_tokens: BTreeSet<String> = BTreeSet::new();
-
-    for (host, _, params) in ranked_scopes {
-        let param_list: Vec<String> = params.iter().take(24).cloned().collect();
-        let chunk = format!("{}={}", host, param_list.join("|"));
-        if total_arg_len + chunk.len() + 1 > 3400 {
-            break;
+        let mut selected_global = Vec::new();
+        let mut arg_len = 2usize; // `*=`
+        for (p, _) in ranked_global {
+            let add_len = if selected_global.is_empty() {
+                p.len()
+            } else {
+                p.len() + 1
+            };
+            if selected_global.len() >= 120 || arg_len + add_len > 3400 {
+                break;
+            }
+            arg_len += add_len;
+            selected_global.push(p);
         }
-        if !bulk_mode && host != "*" {
-            mitm_positive.insert(host.clone());
+
+        if !selected_global.is_empty() {
+            selected_global.sort();
+            let escaped_keys: Vec<String> = selected_global
+                .iter()
+                .map(|k| crate::adblock::regex_util::escape_literal_regex(k))
+                .collect();
+            let pattern = format!(
+                "^https?://[^?#]+\\?(?:[^#]*&)?(?:{})=",
+                escaped_keys.join("|")
+            );
+            scripts.push(ScriptRule {
+                name: "surge-removeparam".to_string(),
+                script_type: ScriptType::HttpRequest,
+                pattern,
+                script_path: REMOVEPARAM_SCRIPT_URL.to_string(),
+                requires_body: false,
+                binary_body_mode: false,
+                max_size: None,
+                timeout: Some(5),
+                argument: Some(format!("*={}", selected_global.join("|"))),
+                engine: Some("webview".to_string()),
+                weight: 1,
+            });
         }
-        total_arg_len += chunk.len() + 1;
-        for p in &param_list {
-            active_param_tokens.insert(p.clone());
-        }
-        arg_chunks.push(chunk);
     }
 
-    if arg_chunks.is_empty() || active_param_tokens.is_empty() {
-        return None;
+    if !scope_params.is_empty() {
+        let bulk_mode = scope_params.len() > 32;
+        let mut ranked_scopes: Vec<(String, u16, BTreeSet<String>)> = scope_params
+            .into_iter()
+            .filter(|(host, _)| !bulk_mode || mitm_host_is_excluded(host, mitm_positive))
+            .map(|(host, (w, params))| (host, w, params))
+            .collect();
+        ranked_scopes.sort_by(|a, b| {
+            b.1.cmp(&a.1)
+                .then_with(|| b.2.len().cmp(&a.2.len()))
+                .then_with(|| a.0.cmp(&b.0))
+        });
+
+        let mut arg_chunks: Vec<String> = Vec::new();
+        let mut total_arg_len = 0usize;
+        let mut active_hosts: BTreeSet<String> = BTreeSet::new();
+        let mut active_param_tokens: BTreeSet<String> = BTreeSet::new();
+
+        for (host, _, params) in ranked_scopes {
+            let param_list: Vec<String> = params.iter().take(24).cloned().collect();
+            let mut next_params = active_param_tokens.clone();
+            next_params.extend(param_list.iter().cloned());
+            if next_params.len() > 120 {
+                continue;
+            }
+            let chunk = format!("{}={}", host, param_list.join("|"));
+            if total_arg_len + chunk.len() + 1 > 3400 {
+                break;
+            }
+            if !bulk_mode {
+                mitm_positive.insert(host.clone());
+            }
+            total_arg_len += chunk.len() + 1;
+            active_hosts.insert(host);
+            active_param_tokens = next_params;
+            arg_chunks.push(chunk);
+        }
+
+        if !arg_chunks.is_empty() && !active_hosts.is_empty() && !active_param_tokens.is_empty() {
+            let host_atoms: Vec<String> = active_hosts
+                .iter()
+                .map(|h| host_scope_to_regex(h))
+                .collect();
+            let escaped_keys: Vec<String> = active_param_tokens
+                .iter()
+                .map(|k| crate::adblock::regex_util::escape_literal_regex(k))
+                .collect();
+            let pattern = format!(
+                "^https?://(?:{})(?::\\d+)?(?:/[^?#]*)?\\?(?:[^#]*&)?(?:{})=",
+                host_atoms.join("|"),
+                escaped_keys.join("|")
+            );
+            scripts.push(ScriptRule {
+                name: "surge-removeparam-scoped".to_string(),
+                script_type: ScriptType::HttpRequest,
+                pattern,
+                script_path: REMOVEPARAM_SCRIPT_URL.to_string(),
+                requires_body: false,
+                binary_body_mode: false,
+                max_size: None,
+                timeout: Some(5),
+                argument: Some(arg_chunks.join(";")),
+                engine: Some("webview".to_string()),
+                weight: 1,
+            });
+        }
     }
 
-    // Trigger script strictly on URLs whose query string contains one of the tracked parameter keys
-    let escaped_keys: Vec<String> = active_param_tokens
-        .iter()
-        .take(120)
-        .map(|k| crate::adblock::regex_util::escape_literal_regex(k))
-        .collect();
-    let pattern = format!(
-        "^https?://[^?#]+\\?(?:[^#]*&)?(?:{})=",
-        escaped_keys.join("|")
-    );
-
-    Some(ScriptRule {
-        name: "surge-removeparam".to_string(),
-        script_type: ScriptType::HttpRequest,
-        pattern,
-        script_path: REMOVEPARAM_SCRIPT_URL.to_string(),
-        requires_body: false,
-        binary_body_mode: false,
-        max_size: None,
-        timeout: Some(5),
-        argument: Some(arg_chunks.join(";")),
-        engine: Some("jsc".to_string()),
-        weight: 1,
-    })
+    scripts
 }
 
 fn mitm_host_is_excluded(host: &str, exclusions: &BTreeSet<String>) -> bool {
@@ -825,7 +965,7 @@ fn mitm_host_is_excluded(host: &str, exclusions: &BTreeSet<String>) -> bool {
     false
 }
 
-fn wildcard_matches_domain(wildcard: &str, domain: &str) -> bool {
+pub fn wildcard_matches_domain(wildcard: &str, domain: &str) -> bool {
     if !wildcard.contains('*') && !wildcard.contains('?') {
         return wildcard == domain;
     }
@@ -956,7 +1096,12 @@ fn render_module(
                 continue;
             }
             let ordered = order_host_list(vals);
-            out.push_str(&format!("{} = %APPEND% {}\n", key, ordered.join(", ")));
+            let directive = if ordered.iter().any(|v| v.starts_with('-')) {
+                "%INSERT%"
+            } else {
+                "%APPEND%"
+            };
+            out.push_str(&format!("{} = {} {}\n", key, directive, ordered.join(", ")));
             stats.general_keys += 1;
         }
         out.push('\n');
@@ -1057,7 +1202,7 @@ fn render_module(
     out.push_str("[MITM]\n");
     let mut mitm_list: Vec<String> = mitm_exclusions.iter().map(|h| format!("-{}", h)).collect();
     mitm_list.extend(mitm_positive.iter().cloned());
-    out.push_str(&format!("hostname = %APPEND% {}\n", mitm_list.join(", ")));
+    out.push_str(&format!("hostname = %INSERT% {}\n", mitm_list.join(", ")));
 
     (out, stats)
 }
