@@ -1,4 +1,4 @@
-name: Build GeoIP
+name: Build & Release
 
 on:
   schedule:
@@ -13,22 +13,23 @@ on:
       - "metadata/**"
       - "sources/**"
       - "overrides/**"
+      - "scripts/**"
       - "package.json"
       - "bun.lock"
       - "Cargo.toml"
       - "Cargo.lock"
-      - ".github/workflows/build-geoip.yml"
+      - ".github/workflows/release.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: build-geoip
+  group: build-and-release
   cancel-in-progress: false
 
 jobs:
   build-and-release:
-    name: Build, Verify & Release MMDB
+    name: Build, Verify & Release Rules & MMDB
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -38,10 +39,11 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Verify TypeScript sources and overrides
+      - name: Verify TypeScript sources, overrides & runtime scripts
         run: |
           bun install --frozen-lockfile
           bun run check
+          bun test
 
       - name: Setup Rust stable toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -49,16 +51,16 @@ jobs:
       - name: Cache Cargo build
         uses: Swatinem/rust-cache@v2
 
-      - name: Compute cache timestamp
+      - name: Compute release timestamp
         id: meta
         run: |
           UTC_TAG="$(date -u +'%Y%m%d-%H%M')"
           UTC_DAY="$(date -u +'%Y%m%d')"
           UTC_TITLE="$(date -u +'%Y-%m-%d %H:%M UTC')"
           {
-            echo "tag=geoip-${UTC_TAG}"
+            echo "tag=release-${UTC_TAG}"
             echo "day=${UTC_DAY}"
-            echo "title=GeoIP ${UTC_TITLE}"
+            echo "title=Surge Rules ${UTC_TITLE}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Cache upstream metadata feeds
@@ -70,7 +72,7 @@ jobs:
             geoip-metadata-${{ runner.os }}-${{ hashFiles('metadata/sources.ts', 'metadata/sync.ts') }}-
             geoip-metadata-${{ runner.os }}-
 
-      - name: Cache upstream ETag & feed payloads
+      - name: Cache upstream GeoIP ETag & payloads
         uses: actions/cache@v6
         with:
           path: .cache/upstream
@@ -78,6 +80,15 @@ jobs:
           restore-keys: |
             geoip-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/geoip-sources.json') }}-
             geoip-upstream-${{ runner.os }}-
+
+      - name: Cache upstream Adblock ETag & payloads
+        uses: actions/cache@v6
+        with:
+          path: .cache/adblock
+          key: adblock-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/adblock-sources.json') }}-${{ steps.meta.outputs.day }}
+          restore-keys: |
+            adblock-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/adblock-sources.json') }}-
+            adblock-upstream-${{ runner.os }}-
 
       - name: Sync upstream GeoIP metadata bundle
         env:
@@ -98,14 +109,34 @@ jobs:
       - name: Verify generated MMDB artifacts
         run: cargo run --release -- geoip verify --dir dist
 
+      - name: Build Adblock RULE-SET & Surge Module
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUST_LOG: info
+        run: cargo run --release -- adblock build --output dist
+
+      - name: Verify generated Adblock artifacts
+        run: cargo run --release -- adblock verify --dir dist
+
+      - name: Combine release notes and validate all 5 artifacts
+        run: |
+          for f in Country.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Adblock.sgmodule; do
+            test -s "dist/${f}"
+          done
+          cat dist/release-notes.md > dist/combined-notes.md
+          printf '\n---\n\n' >> dist/combined-notes.md
+          cat dist/adblock-notes.md >> dist/combined-notes.md
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           name: ${{ steps.meta.outputs.title }}
-          body_path: dist/release-notes.md
+          body_path: dist/combined-notes.md
           make_latest: "true"
           files: |
             dist/Country.mmdb
             dist/Country-cn.mmdb
             dist/ASN.mmdb
+            dist/Adblock.list
+            dist/Adblock.sgmodule

@@ -17,6 +17,26 @@ use tracing::{info, warn};
 
 use crate::config::{EndpointConfig, SourceConfig};
 
+pub trait FetchableSource: Send + Sync + Clone + 'static {
+    fn id(&self) -> &str;
+    fn is_core(&self) -> bool;
+    fn endpoints(&self) -> &[EndpointConfig];
+}
+
+impl FetchableSource for SourceConfig {
+    fn id(&self) -> &str {
+        &self.id
+    }
+
+    fn is_core(&self) -> bool {
+        self.core
+    }
+
+    fn endpoints(&self) -> &[EndpointConfig] {
+        &self.endpoints
+    }
+}
+
 pub const BUILDER_USER_AGENT: &str =
     "surge-rules-geoip-builder/0.1 (+https://github.com/ding113/surge-rules)";
 
@@ -118,9 +138,9 @@ impl SourceFetcher {
         })
     }
 
-    pub async fn fetch_all(
+    pub async fn fetch_all<S: FetchableSource>(
         self: Arc<Self>,
-        sources: &[SourceConfig],
+        sources: &[S],
     ) -> Result<Vec<FetchedSource>> {
         let sem = Arc::new(Semaphore::new(self.opts.concurrency.max(1)));
         let mut handles = Vec::with_capacity(sources.len());
@@ -131,7 +151,7 @@ impl SourceFetcher {
             handles.push(tokio::spawn(async move {
                 let _permit = sem.acquire_owned().await?;
                 let res = fetcher.fetch_one(&src).await;
-                Ok::<(SourceConfig, Result<FetchedSource>), anyhow::Error>((src, res))
+                Ok::<(S, Result<FetchedSource>), anyhow::Error>((src, res))
             }));
         }
 
@@ -143,10 +163,10 @@ impl SourceFetcher {
             match outcome {
                 Ok(item) => fetched.push(item),
                 Err(err) => {
-                    if src.core {
-                        core_failures.push(format!("{}: {:#}", src.id, err));
+                    if src.is_core() {
+                        core_failures.push(format!("{}: {:#}", src.id(), err));
                     } else {
-                        warn!(source = %src.id, error = %format!("{:#}", err), "non-core source unavailable; continuing");
+                        warn!(source = %src.id(), error = %format!("{:#}", err), "non-core source unavailable; continuing");
                     }
                 }
             }
@@ -163,9 +183,11 @@ impl SourceFetcher {
         Ok(fetched)
     }
 
-    pub async fn fetch_one(&self, src: &SourceConfig) -> Result<FetchedSource> {
-        let data_path = self.opts.cache_dir.join(format!("{}.bin", src.id));
-        let meta_path = self.opts.cache_dir.join(format!("{}.meta.json", src.id));
+    pub async fn fetch_one<S: FetchableSource>(&self, src: &S) -> Result<FetchedSource> {
+        let id = src.id();
+        let endpoints = src.endpoints();
+        let data_path = self.opts.cache_dir.join(format!("{}.bin", id));
+        let meta_path = self.opts.cache_dir.join(format!("{}.meta.json", id));
 
         let existing_meta: Option<CachedSourceMeta> = if data_path.exists() && meta_path.exists() {
             fs::read_to_string(&meta_path)
@@ -180,30 +202,29 @@ impl SourceFetcher {
         if self.opts.offline {
             if let Some(meta) = existing_meta {
                 return Ok(FetchedSource {
-                    source_id: src.id.clone(),
+                    source_id: id.to_string(),
                     data_path,
                     meta,
                     from_cache: true,
                 });
             }
-            bail!("offline mode enabled and no cached file for '{}'", src.id);
+            bail!("offline mode enabled and no cached file for '{}'", id);
         }
 
         if let Some(ref meta) = existing_meta {
-            let url_matches_endpoints = !src
-                .endpoints
+            let url_matches_endpoints = !endpoints
                 .iter()
                 .all(|ep| matches!(ep, EndpointConfig::Direct { .. }))
-                || src.endpoints.iter().any(
+                || endpoints.iter().any(
                     |ep| matches!(ep, EndpointConfig::Direct { url } if url == &meta.resolved_url),
                 );
             if url_matches_endpoints
                 && now.saturating_sub(meta.fetched_at_epoch) < self.opts.max_cache_age_secs
                 && meta.size_bytes > 0
             {
-                info!(source = %src.id, size = meta.size_bytes, "using fresh cached upstream artifact");
+                info!(source = %id, size = meta.size_bytes, "using fresh cached upstream artifact");
                 return Ok(FetchedSource {
-                    source_id: src.id.clone(),
+                    source_id: id.to_string(),
                     data_path,
                     meta: meta.clone(),
                     from_cache: true,
@@ -213,21 +234,15 @@ impl SourceFetcher {
 
         let mut errors = Vec::new();
 
-        for endpoint in &src.endpoints {
+        for endpoint in endpoints {
             match self
-                .fetch_from_endpoint(
-                    src,
-                    endpoint,
-                    existing_meta.as_ref(),
-                    &data_path,
-                    &meta_path,
-                )
+                .fetch_from_endpoint(id, endpoint, existing_meta.as_ref(), &data_path, &meta_path)
                 .await
             {
                 Ok(res) => return Ok(res),
                 Err(err) => {
                     warn!(
-                        source = %src.id,
+                        source = %id,
                         endpoint = ?endpoint,
                         error = %format!("{:#}", err),
                         "endpoint attempt failed; trying next fallback if available"
@@ -239,12 +254,12 @@ impl SourceFetcher {
 
         if let Some(meta) = existing_meta {
             warn!(
-                source = %src.id,
+                source = %id,
                 cached_url = %meta.resolved_url,
                 "all live endpoints failed; falling back to previously cached artifact"
             );
             return Ok(FetchedSource {
-                source_id: src.id.clone(),
+                source_id: id.to_string(),
                 data_path,
                 meta,
                 from_cache: true,
@@ -253,14 +268,14 @@ impl SourceFetcher {
 
         Err(anyhow!(
             "all endpoints failed for '{}': {}",
-            src.id,
+            id,
             errors.join(" | ")
         ))
     }
 
     async fn fetch_from_endpoint(
         &self,
-        src: &SourceConfig,
+        source_id: &str,
         endpoint: &EndpointConfig,
         existing_meta: Option<&CachedSourceMeta>,
         data_path: &Path,
@@ -290,7 +305,7 @@ impl SourceFetcher {
         for attempt in 1..=3u32 {
             match self
                 .download_with_cache(
-                    src,
+                    source_id,
                     &resolved_url,
                     npm_member_path,
                     existing_meta,
@@ -393,7 +408,7 @@ impl SourceFetcher {
 
     async fn download_with_cache(
         &self,
-        src: &SourceConfig,
+        source_id: &str,
         url: &str,
         npm_member_path: Option<&str>,
         existing_meta: Option<&CachedSourceMeta>,
@@ -428,9 +443,9 @@ impl SourceFetcher {
             let mut refreshed = meta.clone();
             refreshed.fetched_at_epoch = now_epoch();
             let _ = fs::write(meta_path, serde_json::to_vec_pretty(&refreshed)?);
-            info!(source = %src.id, "304 Not Modified; reusing cached file");
+            info!(source = %source_id, "304 Not Modified; reusing cached file");
             return Ok(FetchedSource {
-                source_id: src.id.clone(),
+                source_id: source_id.to_string(),
                 data_path: data_path.to_path_buf(),
                 meta: refreshed,
                 from_cache: true,
@@ -490,7 +505,7 @@ impl SourceFetcher {
         })?;
 
         let meta = CachedSourceMeta {
-            source_id: src.id.clone(),
+            source_id: source_id.to_string(),
             resolved_url: url.to_string(),
             etag,
             last_modified,
@@ -501,9 +516,9 @@ impl SourceFetcher {
         fs::write(meta_path, serde_json::to_vec_pretty(&meta)?)
             .with_context(|| format!("failed writing {}", meta_path.display()))?;
 
-        info!(source = %src.id, bytes = size_bytes, url = %url, "fetched and unpacked upstream source");
+        info!(source = %source_id, bytes = size_bytes, url = %url, "fetched and unpacked upstream source");
         Ok(FetchedSource {
-            source_id: src.id.clone(),
+            source_id: source_id.to_string(),
             data_path: data_path.to_path_buf(),
             meta,
             from_cache: false,

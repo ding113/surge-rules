@@ -3,5 +3,6 @@
 /dist/
 /node_modules/
 /.local/
+/.build/
 .DS_Store
 *.swp

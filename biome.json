@@ -5,6 +5,8 @@
       "sources/**/*.ts",
       "overrides/**/*.ts",
       "metadata/**/*.ts",
+      "scripts/**/*.js",
+      "scripts/**/*.ts",
       "package.json",
       "tsconfig.json",
       "biome.json"

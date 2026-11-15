@@ -1,0 +1,456 @@
+import type { AdblockSourceEntry } from "./adblock-schema.ts";
+
+/**
+ * Fallback domain, IP, and network filter feeds compiled into RULE-SET (plus complex network
+ * rules extracted into the Surge module before domain fallback is considered).
+ */
+export const ADBLOCK_RULESET_SOURCES: readonly AdblockSourceEntry[] = [
+  {
+    id: "awavenue_ads_surge",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "awavenue_ads",
+    weight: 95,
+    core: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-RULE-SET.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Surge-RULE-SET.list",
+      },
+    ],
+  },
+  {
+    id: "sukka_reject_ruleset",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "sukka_ruleset",
+    weight: 94,
+    core: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://ruleset.skk.moe/Clash/non_ip/reject.txt",
+      },
+    ],
+  },
+  {
+    id: "sukka_reject_drop",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "sukka_ruleset",
+    weight: 94,
+    core: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://ruleset.skk.moe/Clash/non_ip/reject-drop.txt",
+      },
+    ],
+  },
+  {
+    id: "sukka_reject_domainset",
+    role: "ruleset_fallback",
+    format: "surge_domainset",
+    platform: "universal",
+    lineage: "sukka_ruleset",
+    weight: 92,
+    core: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://ruleset.skk.moe/List/domainset/reject.conf",
+      },
+    ],
+  },
+  {
+    id: "sukka_reject_ip",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "sukka_ruleset",
+    weight: 93,
+    core: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://ruleset.skk.moe/List/ip/reject.conf",
+      },
+    ],
+  },
+  {
+    id: "adguard_mobile_ads",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "mobile",
+    lineage: "adguard_filters",
+    weight: 93,
+    core: true,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://filters.adtidy.org/extension/ublock/filters/11.txt",
+      },
+    ],
+  },
+  {
+    id: "ubo_filters",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "ubo_uassets",
+    weight: 93,
+    core: true,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_base",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 92,
+    core: true,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://filters.adtidy.org/extension/ublock/filters/2.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_chinese",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 92,
+    core: true,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://filters.adtidy.org/extension/ublock/filters/224.txt",
+      },
+    ],
+  },
+  {
+    id: "ubo_privacy",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "ubo_uassets",
+    weight: 92,
+    core: true,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_tracking",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 91,
+    core: true,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://filters.adtidy.org/extension/ublock/filters/3.txt",
+      },
+    ],
+  },
+  {
+    id: "mieqq_in_app_tracker",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "mobile",
+    lineage: "mieqq_tracker",
+    weight: 91,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/mieqq/mieqq/master/In-AppTracker.txt",
+      },
+    ],
+  },
+  {
+    id: "ubo_badware",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "ubo_uassets",
+    weight: 90,
+    core: true,
+    extractComplexNetworkRules: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt",
+      },
+    ],
+  },
+  {
+    id: "peter_lowe",
+    role: "ruleset_fallback",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "peter_lowe",
+    weight: 90,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=1&mimetype=plaintext",
+      },
+    ],
+  },
+  {
+    id: "adguard_dns_filter",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_dns",
+    weight: 89,
+    core: true,
+    extractComplexNetworkRules: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://filters.adtidy.org/windows/filters/15.txt",
+      },
+    ],
+  },
+  {
+    id: "easyprivacy",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 89,
+    core: true,
+    extractComplexNetworkRules: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://easylist.to/easylist/easyprivacy.txt",
+      },
+    ],
+  },
+  {
+    id: "hagezi_pro_domains",
+    role: "ruleset_fallback",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "hagezi_dns",
+    weight: 89,
+    core: true,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro-onlydomains.txt",
+      },
+    ],
+  },
+  {
+    id: "hackl0us_video_ad",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "hackl0us_ruleset",
+    weight: 89,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Custom/video-ad.list",
+      },
+    ],
+  },
+  {
+    id: "easylist",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 88,
+    core: true,
+    extractComplexNetworkRules: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://easylist.to/easylist/easylist.txt",
+      },
+    ],
+  },
+  {
+    id: "easylist_china",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 88,
+    core: true,
+    extractComplexNetworkRules: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylistchina/master/easylistchina.txt",
+      },
+    ],
+  },
+  {
+    id: "oisd_big",
+    role: "ruleset_fallback",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "oisd",
+    weight: 86,
+    core: false,
+    extractComplexNetworkRules: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://big.oisd.nl/",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_ban_program_ad",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "acl4ssr",
+    weight: 86,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanProgramAD.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_ban_ad",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "acl4ssr",
+    weight: 86,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanAD.list",
+      },
+    ],
+  },
+  {
+    id: "onehosts_lite",
+    role: "ruleset_fallback",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "onehosts",
+    weight: 85,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.wildcards",
+      },
+    ],
+  },
+  {
+    id: "cats_adrules_domainset",
+    role: "ruleset_fallback",
+    format: "surge_domainset",
+    platform: "universal",
+    lineage: "cats_adrules",
+    weight: 84,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Cats-Team/AdRules/main/adrules_surge_domainset.txt",
+      },
+    ],
+  },
+  {
+    id: "anti_ad_surge",
+    role: "ruleset_fallback",
+    format: "surge_ruleset",
+    platform: "universal",
+    lineage: "anti_ad",
+    weight: 82,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt",
+      },
+    ],
+  },
+  {
+    id: "stevenblack_hosts",
+    role: "ruleset_fallback",
+    format: "hosts",
+    platform: "universal",
+    lineage: "stevenblack",
+    weight: 82,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
+      },
+    ],
+  },
+];

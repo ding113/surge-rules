@@ -1,10 +1,15 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { isIPv4, isIPv6 } from "node:net";
+import { isIP, isIPv4, isIPv6 } from "node:net";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { GEOIP_OVERRIDES } from "./index.ts";
+import { ADBLOCK_OVERRIDES, GEOIP_OVERRIDES } from "./index.ts";
 
 const ISO_ALPHA2_RE = /^[A-Z]{2}$/;
+const DOMAIN_RE = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
+const WILDCARD_DOMAIN_RE = /^(?=.{1,253}$)(?:[a-z0-9*?[\]-]+\.)+[a-z*?]{2,63}$/;
+const SCRIPT_NAME_RE = /^[A-Za-z0-9_.-]+$/;
+const HEADER_FIELD_RE = /^[A-Za-z0-9-]+$/;
+const FORBIDDEN_HEADERS = new Set(["content-length", "transfer-encoding"]);
 const DISALLOWED_ISO = new Set(["XX", "ZZ", "AA", "OO", "UK"]);
 
 function parseIpv4ToBigInt(ip: string): bigint {
@@ -168,14 +173,156 @@ function validateAll(): void {
   }
 }
 
-async function main(): Promise<void> {
-  validateAll();
+function validateAdblockRegex(pattern: string, context: string): void {
+  if (pattern.trim().length === 0 || /[\r\n\s]/.test(pattern)) {
+    throw new Error(`[${context}] Invalid empty or whitespace regex: '${pattern}'`);
+  }
+  try {
+    new RegExp(pattern);
+  } catch (err) {
+    throw new Error(`[${context}] Invalid regex '${pattern}': ${String(err)}`);
+  }
+}
 
-  const currentDir = dirname(fileURLToPath(import.meta.url));
-  const outPath = resolve(currentDir, "generated", "geoip-overrides.json");
-  const serialized = `${JSON.stringify(GEOIP_OVERRIDES, null, 2)}\n`;
+function validateAdblockOverrides(): void {
+  const seenAllow = new Set<string>();
+  for (const item of ADBLOCK_OVERRIDES.allowDomains) {
+    const dom = item.domain.toLowerCase();
+    if (!DOMAIN_RE.test(dom)) {
+      throw new Error(`[allowDomains] Invalid domain '${item.domain}'`);
+    }
+    const key = `${item.matchType}:${dom}`;
+    if (seenAllow.has(key)) {
+      throw new Error(`[allowDomains] Duplicate entry '${key}'`);
+    }
+    seenAllow.add(key);
+  }
 
-  const checkMode = process.argv.includes("--check");
+  const seenApex = new Set<string>();
+  for (const item of ADBLOCK_OVERRIDES.protectedApexDomains) {
+    const dom = item.domain.toLowerCase();
+    if (!DOMAIN_RE.test(dom)) {
+      throw new Error(`[protectedApexDomains] Invalid domain '${item.domain}'`);
+    }
+    if (seenApex.has(dom)) {
+      throw new Error(`[protectedApexDomains] Duplicate domain '${dom}'`);
+    }
+    seenApex.add(dom);
+  }
+
+  for (const item of ADBLOCK_OVERRIDES.forceRuleSetEntries) {
+    const v = item.value.trim();
+    if (v.length === 0 || /[\r\n]/.test(v)) {
+      throw new Error(`[forceRuleSetEntries] Invalid value '${item.value}'`);
+    }
+    switch (item.kind) {
+      case "DOMAIN":
+      case "DOMAIN-SUFFIX": {
+        if (!DOMAIN_RE.test(v.toLowerCase())) {
+          throw new Error(`[forceRuleSetEntries] Invalid domain for ${item.kind}: '${v}'`);
+        }
+        break;
+      }
+      case "DOMAIN-WILDCARD": {
+        if (!WILDCARD_DOMAIN_RE.test(v.toLowerCase())) {
+          throw new Error(`[forceRuleSetEntries] Invalid wildcard domain: '${v}'`);
+        }
+        break;
+      }
+      case "IP-CIDR":
+      case "IP-CIDR6": {
+        validateCanonicalCidr(v, "forceRuleSetEntries");
+        break;
+      }
+      case "IP-ASN": {
+        const asn = Number(v);
+        if (!Number.isInteger(asn) || asn <= 0 || asn > 0xffffffff) {
+          throw new Error(`[forceRuleSetEntries] Invalid IP-ASN: '${v}'`);
+        }
+        break;
+      }
+      case "DOMAIN-KEYWORD":
+      case "USER-AGENT":
+      case "PROCESS-NAME": {
+        if (v.includes(",")) {
+          throw new Error(`[forceRuleSetEntries] Comma disallowed in ${item.kind}: '${v}'`);
+        }
+        break;
+      }
+    }
+  }
+
+  for (const entry of [
+    ...ADBLOCK_OVERRIDES.mitmExcludedHosts,
+    ...ADBLOCK_OVERRIDES.mitmAddedHosts,
+  ]) {
+    const p = entry.pattern.trim();
+    if (p.length === 0 || p === "*" || p.includes(",") || /[\r\n\s]/.test(p)) {
+      throw new Error(`[mitmHosts] Invalid MITM host pattern '${entry.pattern}'`);
+    }
+    if (!p.startsWith("<") && !isIP(p) && p.includes(".") && p.split(".").length < 2) {
+      throw new Error(`[mitmHosts] Bare TLD pattern not allowed: '${entry.pattern}'`);
+    }
+  }
+
+  for (const rule of ADBLOCK_OVERRIDES.urlRewrites) {
+    validateAdblockRegex(rule.pattern, "urlRewrites");
+    if (rule.mode === "reject" && rule.replacement !== "_") {
+      throw new Error("[urlRewrites] reject mode replacement must be '_'");
+    }
+  }
+
+  for (const rule of ADBLOCK_OVERRIDES.mapLocals) {
+    validateAdblockRegex(rule.pattern, "mapLocals");
+    if (rule.statusCode !== undefined && (rule.statusCode < 200 || rule.statusCode > 999)) {
+      throw new Error(`[mapLocals] Invalid HTTP statusCode: ${rule.statusCode}`);
+    }
+    if (rule.dataType === "text" && rule.data === undefined) {
+      throw new Error("[mapLocals] dataType=text requires 'data'");
+    }
+  }
+
+  for (const rule of ADBLOCK_OVERRIDES.headerRewrites) {
+    validateAdblockRegex(rule.pattern, "headerRewrites");
+    if (!HEADER_FIELD_RE.test(rule.field)) {
+      throw new Error(`[headerRewrites] Invalid header field '${rule.field}'`);
+    }
+    if (FORBIDDEN_HEADERS.has(rule.field.toLowerCase())) {
+      throw new Error(`[headerRewrites] Surge Header Rewrite forbids mutating '${rule.field}'`);
+    }
+  }
+
+  for (const rule of ADBLOCK_OVERRIDES.bodyRewrites) {
+    validateAdblockRegex(rule.pattern, "bodyRewrites");
+    if (rule.expression.trim().length === 0 || /[\r\n]/.test(rule.expression)) {
+      throw new Error("[bodyRewrites] Body rewrite expression must be single-line non-empty");
+    }
+  }
+
+  const seenScripts = new Set<string>();
+  for (const s of ADBLOCK_OVERRIDES.scripts) {
+    if (!SCRIPT_NAME_RE.test(s.name)) {
+      throw new Error(`[scripts] Invalid script name '${s.name}'`);
+    }
+    if (seenScripts.has(s.name)) {
+      throw new Error(`[scripts] Duplicate script name '${s.name}'`);
+    }
+    seenScripts.add(s.name);
+    validateAdblockRegex(s.pattern, `scripts:${s.name}`);
+    const parsedUrl = new URL(s.scriptPath);
+    if (parsedUrl.protocol !== "https:") {
+      throw new Error(`[scripts:${s.name}] scriptPath must use HTTPS`);
+    }
+  }
+}
+
+async function emitOrCheckBundle(
+  outPath: string,
+  bundle: unknown,
+  summary: string,
+  checkMode: boolean,
+): Promise<void> {
+  const serialized = `${JSON.stringify(bundle, null, 2)}\n`;
   if (checkMode) {
     let existing: string;
     try {
@@ -190,15 +337,34 @@ async function main(): Promise<void> {
         `Out-of-date ${outPath}. Run 'bun run build:overrides' and commit the updated file.`,
       );
     }
-    console.log(
-      `Verified overrides in sync (${GEOIP_OVERRIDES.specialNetworks.length} special, ${GEOIP_OVERRIDES.countryOverrides.length} country, ${GEOIP_OVERRIDES.cnExclusions.length} CN exclusions, ${GEOIP_OVERRIDES.asnOverrides.length} ASN).`,
-    );
+    console.log(`Verified ${summary}.`);
     return;
   }
 
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, serialized, "utf8");
   console.log(`Wrote ${outPath} (${serialized.length} bytes).`);
+}
+
+async function main(): Promise<void> {
+  validateAll();
+  validateAdblockOverrides();
+
+  const currentDir = dirname(fileURLToPath(import.meta.url));
+  const checkMode = process.argv.includes("--check");
+
+  await emitOrCheckBundle(
+    resolve(currentDir, "generated", "geoip-overrides.json"),
+    GEOIP_OVERRIDES,
+    `GeoIP overrides (${GEOIP_OVERRIDES.specialNetworks.length} special, ${GEOIP_OVERRIDES.countryOverrides.length} country, ${GEOIP_OVERRIDES.cnExclusions.length} CN exclusions, ${GEOIP_OVERRIDES.asnOverrides.length} ASN)`,
+    checkMode,
+  );
+  await emitOrCheckBundle(
+    resolve(currentDir, "generated", "adblock-overrides.json"),
+    ADBLOCK_OVERRIDES,
+    `Adblock overrides (${ADBLOCK_OVERRIDES.allowDomains.length} allow, ${ADBLOCK_OVERRIDES.protectedApexDomains.length} protected apex, ${ADBLOCK_OVERRIDES.forceRuleSetEntries.length} ruleset, ${ADBLOCK_OVERRIDES.mitmExcludedHosts.length} MITM exclusions)`,
+    checkMode,
+  );
 }
 
 await main();

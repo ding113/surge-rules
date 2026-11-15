@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["sources/**/*.ts", "overrides/**/*.ts", "metadata/**/*.ts"]
+  "include": ["sources/**/*.ts", "overrides/**/*.ts", "metadata/**/*.ts", "scripts/**/*.ts"]
 }

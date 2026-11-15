@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "biome check sources overrides metadata package.json tsconfig.json biome.json",
-    "format": "biome format --write sources overrides metadata package.json tsconfig.json biome.json",
+    "lint": "biome check sources overrides metadata scripts package.json tsconfig.json biome.json",
+    "format": "biome format --write sources overrides metadata scripts package.json tsconfig.json biome.json",
     "build:sources": "bun run sources/build.ts",
     "verify:sources": "bun run sources/build.ts --check",
     "build:overrides": "bun run overrides/build.ts",

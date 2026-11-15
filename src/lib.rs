@@ -1,3 +1,4 @@
+pub mod adblock;
 pub mod config;
 pub mod fetch;
 pub mod fusion;

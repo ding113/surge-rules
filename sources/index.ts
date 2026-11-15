@@ -1,3 +1,7 @@
+import { ADBLOCK_ALLOWLIST_SOURCES } from "./adblock-allowlists.ts";
+import { ADBLOCK_COMPLEX_SOURCES } from "./adblock-complex.ts";
+import { ADBLOCK_RULESET_SOURCES } from "./adblock-rulesets.ts";
+import type { AdblockSourceCatalogBundle } from "./adblock-schema.ts";
 import type { GeoIpSourceCatalogBundle } from "./schema.ts";
 import { TIER1_GEOFEED_SOURCES } from "./tier1-geofeed.ts";
 import { TIER2A_CN_SOURCES } from "./tier2a-cn.ts";
@@ -16,6 +20,15 @@ export const GEOIP_SOURCES: GeoIpSourceCatalogBundle = {
   ],
 };
 
+export const ADBLOCK_SOURCES: AdblockSourceCatalogBundle = {
+  schemaVersion: 1,
+  sources: [...ADBLOCK_ALLOWLIST_SOURCES, ...ADBLOCK_COMPLEX_SOURCES, ...ADBLOCK_RULESET_SOURCES],
+};
+
+export * from "./adblock-allowlists.ts";
+export * from "./adblock-complex.ts";
+export * from "./adblock-rulesets.ts";
+export * from "./adblock-schema.ts";
 export * from "./schema.ts";
 export * from "./tier1-geofeed.ts";
 export * from "./tier2a-cn.ts";

@@ -40,6 +40,9 @@ jobs:
       - name: Validate types, Biome lint, and deterministic JSON sync
         run: bun run check
 
+      - name: Run runtime script unit and property tests
+        run: bun test
+
   rust:
     name: Rust Format, Clippy & Tests
     runs-on: ubuntu-latest

@@ -1,7 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { GEOIP_SOURCES } from "./index.ts";
+import type { AdblockSourceEntry } from "./adblock-schema.ts";
+import { ADBLOCK_SOURCES, GEOIP_SOURCES } from "./index.ts";
 import type { GeoIpSourceEntry, SourceEndpoint } from "./schema.ts";
 
 const ID_RE = /^[a-z0-9_]+$/;
@@ -98,44 +99,100 @@ function validateSource(src: GeoIpSourceEntry, seenIds: Set<string>): void {
   }
 }
 
-function validateAll(): void {
-  if (GEOIP_SOURCES.sources.length === 0) {
-    throw new Error("Source catalog contains zero sources");
+function validateAdblockSource(src: AdblockSourceEntry, seenIds: Set<string>): void {
+  if (!ID_RE.test(src.id)) {
+    throw new Error(`[${src.id}] Source id must match ${ID_RE}`);
   }
-  const seenIds = new Set<string>();
-  for (const src of GEOIP_SOURCES.sources) {
-    validateSource(src, seenIds);
+  if (seenIds.has(src.id)) {
+    throw new Error(`Duplicate adblock source id: ${src.id}`);
+  }
+  seenIds.add(src.id);
+
+  if (!ID_RE.test(src.lineage)) {
+    throw new Error(`[${src.id}] Lineage must match ${ID_RE}, got '${src.lineage}'`);
+  }
+  if (!Number.isInteger(src.weight) || src.weight < 1 || src.weight > 100) {
+    throw new Error(`[${src.id}] Weight must be an integer in 1..100, got ${src.weight}`);
+  }
+  if (src.endpoints.length === 0) {
+    throw new Error(`[${src.id}] Source must define at least one endpoint`);
+  }
+  for (let i = 0; i < src.endpoints.length; i++) {
+    const ep = src.endpoints[i];
+    if (ep !== undefined) {
+      validateEndpoint(ep, src.id, i);
+    }
   }
 }
 
-async function main(): Promise<void> {
-  validateAll();
+function validateAll(): void {
+  if (GEOIP_SOURCES.sources.length === 0) {
+    throw new Error("GeoIP source catalog contains zero sources");
+  }
+  const seenGeoIds = new Set<string>();
+  for (const src of GEOIP_SOURCES.sources) {
+    validateSource(src, seenGeoIds);
+  }
 
-  const currentDir = dirname(fileURLToPath(import.meta.url));
-  const outPath = resolve(currentDir, "generated", "geoip-sources.json");
-  const serialized = `${JSON.stringify(GEOIP_SOURCES, null, 2)}\n`;
+  if (ADBLOCK_SOURCES.sources.length === 0) {
+    throw new Error("Adblock source catalog contains zero sources");
+  }
+  const seenAdblockIds = new Set<string>();
+  for (const src of ADBLOCK_SOURCES.sources) {
+    validateAdblockSource(src, seenAdblockIds);
+  }
+}
 
-  const checkMode = process.argv.includes("--check");
+async function emitOrCheckBundle(
+  outPath: string,
+  bundle: unknown,
+  count: number,
+  label: string,
+  checkMode: boolean,
+): Promise<void> {
+  const serialized = `${JSON.stringify(bundle, null, 2)}\n`;
   if (checkMode) {
     let existing: string;
     try {
       existing = await readFile(outPath, "utf8");
     } catch {
-      throw new Error(`Missing generated sources file at ${outPath}. Run 'bun run build:sources'.`);
+      throw new Error(
+        `Missing generated ${label} file at ${outPath}. Run 'bun run build:sources'.`,
+      );
     }
     if (existing !== serialized) {
       throw new Error(
         `Out-of-date ${outPath}. Run 'bun run build:sources' and commit the updated file.`,
       );
     }
-    console.log(`Verified sources in sync (${GEOIP_SOURCES.sources.length} sources).`);
+    console.log(`Verified ${label} sources in sync (${count} sources).`);
     return;
   }
 
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, serialized, "utf8");
-  console.log(
-    `Wrote ${outPath} (${GEOIP_SOURCES.sources.length} sources, ${serialized.length} bytes).`,
+  console.log(`Wrote ${outPath} (${count} sources, ${serialized.length} bytes).`);
+}
+
+async function main(): Promise<void> {
+  validateAll();
+
+  const currentDir = dirname(fileURLToPath(import.meta.url));
+  const checkMode = process.argv.includes("--check");
+
+  await emitOrCheckBundle(
+    resolve(currentDir, "generated", "geoip-sources.json"),
+    GEOIP_SOURCES,
+    GEOIP_SOURCES.sources.length,
+    "GeoIP",
+    checkMode,
+  );
+  await emitOrCheckBundle(
+    resolve(currentDir, "generated", "adblock-sources.json"),
+    ADBLOCK_SOURCES,
+    ADBLOCK_SOURCES.sources.length,
+    "Adblock",
+    checkMode,
   );
 }
 
