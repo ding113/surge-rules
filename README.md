@@ -6,15 +6,15 @@
 
 | 产物 | 说明 | 下载链接 | 最新更新 |
 | :--- | :--- | :--- | :--- |
-| `Country.mmdb` | 全球双栈全量 GeoIP 库（含省市、ASN、ISP 及内网/组网标记） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country.mmdb) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `Country-only.mmdb` | 全球双栈精简国家库（仅含 IP 与 `country` 字段） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-only.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country-only.mmdb) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `Country-cn.mmdb` | 中国大陆（`CN`）专属双栈 GeoIP 库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-cn.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country-cn.mmdb) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `ASN.mmdb` | 全球公网自治系统（ASN）库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/ASN.mmdb) · [Cloudflare](https://rule-set.ygxz.de/ASN.mmdb) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `Adblock.sgmodule` | 去广告与隐私净化模块（重写、脚本、Map Local 与 HTTPDNS 拦截） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule) · [Cloudflare](https://rule-set.ygxz.de/Adblock.sgmodule) · <kbd>[一键导入](https://rule-set.ygxz.de/install.html)</kbd> | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `Adblock.list` | 广告与跟踪域名/IP 兜底拦截规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.list) · [Cloudflare](https://rule-set.ygxz.de/Adblock.list) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `Direct.list` | 中国大陆服务、国内流媒体、国产 AI 及境外服务国内 CDN 直连规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Direct.list) · [Cloudflare](https://rule-set.ygxz.de/Direct.list) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `AI.list` | 境外 AI、境外银行支付、PayPal、风控与遥测规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/AI.list) · [Cloudflare](https://rule-set.ygxz.de/AI.list) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
-| `Proxy.list` | 境外服务与海外流媒体全量代理规则集（已包含 `AI.list`） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Proxy.list) · [Cloudflare](https://rule-set.ygxz.de/Proxy.list) | <!-- updated-at -->2026-11-16 00:23<!-- /updated-at --> |
+| `Country.mmdb` | 全球双栈全量 GeoIP 库（含省市、ASN、ISP 及内网/组网标记） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country.mmdb) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `Country-only.mmdb` | 全球双栈精简国家库（仅含 IP 与 `country` 字段） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-only.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country-only.mmdb) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `Country-cn.mmdb` | 中国大陆（`CN`）专属双栈 GeoIP 库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-cn.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country-cn.mmdb) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `ASN.mmdb` | 全球公网自治系统（ASN）库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/ASN.mmdb) · [Cloudflare](https://rule-set.ygxz.de/ASN.mmdb) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `Adblock.sgmodule` | 去广告与隐私净化模块（重写、脚本、Map Local 与 HTTPDNS 拦截） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule) · [Cloudflare](https://rule-set.ygxz.de/Adblock.sgmodule) · <kbd>[一键导入](https://rule-set.ygxz.de/install.html)</kbd> | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `Adblock.list` | 广告与跟踪域名/IP 兜底拦截规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.list) · [Cloudflare](https://rule-set.ygxz.de/Adblock.list) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `Direct.list` | 中国大陆服务、国内流媒体、国产 AI 及境外服务国内 CDN 直连规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Direct.list) · [Cloudflare](https://rule-set.ygxz.de/Direct.list) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `AI.list` | 境外 AI、境外银行支付、PayPal、风控与遥测规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/AI.list) · [Cloudflare](https://rule-set.ygxz.de/AI.list) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
+| `Proxy.list` | 境外服务与海外流媒体全量代理规则集（已包含 `AI.list`） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Proxy.list) · [Cloudflare](https://rule-set.ygxz.de/Proxy.list) | <!-- updated-at -->2026-11-16 02:35<!-- /updated-at --> |
 
 ## Surge 配置示例
 
