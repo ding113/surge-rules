@@ -15,6 +15,7 @@ export type AdblockPlatformScope = "universal" | "mobile" | "desktop";
 
 export interface AdblockSourceEntry {
   readonly id: string;
+  readonly name?: string;
   readonly role: AdblockSourceRole;
   readonly format: AdblockSourceFormat;
   readonly platform: AdblockPlatformScope;

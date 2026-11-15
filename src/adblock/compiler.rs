@@ -8,9 +8,9 @@ use rustc_hash::FxHashSet;
 use crate::adblock::config::AllowDomainMatchType;
 use crate::adblock::config::{AdblockOverrides, ModuleScriptOverride};
 use crate::adblock::model::{
-    BodyRewriteKind, BodyRewriteRule, HeaderAction, HeaderDirection, HeaderRewriteRule,
-    MapLocalDataType, MapLocalRule, ParsedAdblockSource, RemoveParamRule, ScriptRule, ScriptType,
-    UrlRewriteMode, UrlRewriteRule,
+    AdguardTransformOp, AdguardTransformRule, BodyRewriteKind, BodyRewriteRule, HeaderAction,
+    HeaderDirection, HeaderRewriteRule, MapLocalDataType, MapLocalRule, ParsedAdblockSource,
+    RemoveParamRule, ScriptRule, ScriptType, UrlRewriteMode, UrlRewriteRule,
 };
 use crate::adblock::regex_util::{extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host};
 
@@ -139,8 +139,8 @@ pub struct ModuleStats {
     pub mitm_included_count: usize,
 }
 
-pub const REMOVEPARAM_SCRIPT_URL: &str =
-    "https://raw.githubusercontent.com/ding113/surge-rules/main/scripts/surge-removeparam.js";
+pub const REMOVEPARAM_SCRIPT_URL: &str = "https://rule-set.ygxz.de/surge-removeparam.js";
+pub const ADGUARD_SCRIPT_URL: &str = "https://rule-set.ygxz.de/surge-adguard.js";
 
 /// Compiles parsed upstream feeds and TypeScript human overrides into `Adblock.list` and `Adblock.sgmodule`.
 pub fn compile_adblock(
@@ -149,9 +149,15 @@ pub fn compile_adblock(
     active_sources: usize,
     total_sources: usize,
 ) -> CompiledAdblockArtifacts {
-    // 1. Assemble protection / allowlist tries first
-    let mut allow_exact_set: FxHashSet<String> = FxHashSet::default();
-    let mut allow_suffix_set: FxHashSet<String> = FxHashSet::default();
+    // 1. Assemble 4-tier protection / allowlist sets:
+    //    P0a: Human allowDomains & protectedApexDomains (always win, even over forceRuleSetEntries)
+    //    P0b: Human forceRuleSetEntries (beat upstream allowlists and complex_protected_hosts)
+    //    P1/P2: Upstream allowlists & complex_protected_hosts (suppress upstream blocklists)
+    //    P3: Upstream fallback blocklists
+    let mut human_allow_exact_set: FxHashSet<String> = FxHashSet::default();
+    let mut human_allow_suffix_set: FxHashSet<String> = FxHashSet::default();
+    let mut upstream_allow_exact_set: FxHashSet<String> = FxHashSet::default();
+    let mut upstream_allow_suffix_set: FxHashSet<String> = FxHashSet::default();
     let mut protected_apex_set: FxHashSet<String> = FxHashSet::default();
     let mut complex_host_set: FxHashSet<String> = FxHashSet::default();
 
@@ -163,10 +169,10 @@ pub fn compile_adblock(
             .to_ascii_lowercase();
         match entry.match_type {
             AllowDomainMatchType::Exact => {
-                allow_exact_set.insert(dom);
+                human_allow_exact_set.insert(dom);
             }
             AllowDomainMatchType::Suffix => {
-                allow_suffix_set.insert(dom);
+                human_allow_suffix_set.insert(dom);
             }
         }
     }
@@ -179,12 +185,21 @@ pub fn compile_adblock(
         );
     }
     for src in sources {
-        allow_exact_set.extend(src.allow_exact_domains.iter().cloned());
-        allow_suffix_set.extend(src.allow_suffix_domains.iter().cloned());
+        upstream_allow_exact_set.extend(src.allow_exact_domains.iter().cloned());
+        upstream_allow_suffix_set.extend(src.allow_suffix_domains.iter().cloned());
         complex_host_set.extend(src.complex_protected_hosts.iter().cloned());
     }
 
-    // 2. Collect module sections (overrides get weight 200) and disabled pattern filters
+    // 2. Collect ComplexFirst module sections, MITM exclusions, and human module overrides (weight 200)
+    let mut mitm_exclusions: BTreeSet<String> = BTreeSet::new();
+    for ex in &overrides.mitm_excluded_hosts {
+        let p = ex.pattern.trim().to_ascii_lowercase();
+        if is_valid_mitm_host(&p) {
+            mitm_exclusions.insert(p);
+        }
+    }
+    let mitm_exclusion_set = mitm_exclusions.clone();
+
     let mut general_hosts: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let mut module_rule_map: BTreeMap<String, u16> = BTreeMap::new();
     let mut header_map: BTreeMap<
@@ -195,8 +210,10 @@ pub fn compile_adblock(
     let mut map_local_map: BTreeMap<String, MapLocalRule> = BTreeMap::new();
     let mut body_map: BTreeMap<(BodyRewriteKind, String, String), BodyRewriteRule> =
         BTreeMap::new();
+    let mut adguard_transforms: Vec<AdguardTransformRule> = Vec::new();
     let mut script_candidates: Vec<ScriptRule> = Vec::new();
     let mut remove_params: Vec<RemoveParamRule> = Vec::new();
+    let mut removeparam_exceptions: Vec<(String, String)> = Vec::new();
     let mut mitm_positive: BTreeSet<String> = BTreeSet::new();
 
     for src in sources {
@@ -237,12 +254,18 @@ pub fn compile_adblock(
             }
             insert_weighted(&mut body_map, br.dedup_key(), br.clone(), |x| x.weight);
         }
+        for ag in &src.adguard_transforms {
+            if !is_pattern_disabled(&ag.pattern, &overrides.disabled_url_patterns) {
+                adguard_transforms.push(ag.clone());
+            }
+        }
         for s in &src.scripts {
             if !is_pattern_disabled(&s.pattern, &overrides.disabled_url_patterns) {
                 script_candidates.push(s.clone());
             }
         }
         remove_params.extend(src.remove_params.iter().cloned());
+        removeparam_exceptions.extend(src.removeparam_exceptions.iter().cloned());
         for mh in &src.mitm_hosts {
             let clean = mh.trim().to_ascii_lowercase();
             if is_valid_mitm_host(&clean) {
@@ -251,7 +274,7 @@ pub fn compile_adblock(
         }
     }
 
-    // Apply human module overrides at top weight (200)
+    // Apply human module overrides at top weight (200) — may also register complex_host_set entries
     apply_module_overrides(
         overrides,
         &mut complex_host_set,
@@ -263,37 +286,32 @@ pub fn compile_adblock(
         &mut script_candidates,
     );
 
-    // 3. Deduplicate scripts while enforcing Surge's 1-script-per-(type, pattern) precedence
-    let mut final_scripts = resolve_script_conflicts(script_candidates);
-
-    // 4. Filter MITM hosts against `-` exclusions before checking `$removeparam` host coverage
-    let mut mitm_exclusions: BTreeSet<String> = BTreeSet::new();
-    for ex in &overrides.mitm_excluded_hosts {
-        let p = ex.pattern.trim().to_ascii_lowercase();
-        if is_valid_mitm_host(&p) {
-            mitm_exclusions.insert(p);
-        }
+    // 3. Compile fallback RULE-SET (`Adblock.list`) with 4-tier domain precedence and trie compression
+    let mut human_allow_suffix_trie = DomainTrie::default();
+    for s in &human_allow_suffix_set {
+        human_allow_suffix_trie.insert_suffix(s);
     }
-    let mitm_exclusion_set = mitm_exclusions.clone();
-    mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
-
-    // Prune HTTPS module rules whose target hosts are all excluded from MITM (after complex_host_set registration)
-    header_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
-    url_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
-    map_local_map
-        .retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
-    body_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
-    final_scripts.retain(|s| !pattern_targets_excluded_https_only(&s.pattern, &mitm_exclusion_set));
-
-    // 5. Compile fallback RULE-SET with complex-over-host protection and domain trie compression
-    let mut allow_suffix_trie = DomainTrie::default();
-    for s in &allow_suffix_set {
-        allow_suffix_trie.insert_suffix(s);
+    let mut human_allow_point_trie = DomainTrie::default();
+    for d in &human_allow_exact_set {
+        human_allow_point_trie.insert_exact(d);
     }
 
-    let mut allow_point_trie = DomainTrie::default();
-    for d in &allow_exact_set {
-        allow_point_trie.insert_exact(d);
+    let mut upstream_allow_suffix_trie = DomainTrie::default();
+    for s in &upstream_allow_suffix_set {
+        upstream_allow_suffix_trie.insert_suffix(s);
+    }
+    let mut upstream_allow_point_trie = DomainTrie::default();
+    for d in &upstream_allow_exact_set {
+        upstream_allow_point_trie.insert_exact(d);
+    }
+
+    let mut all_allow_exact_set = human_allow_exact_set.clone();
+    all_allow_exact_set.extend(upstream_allow_exact_set.iter().cloned());
+    let mut all_allow_suffix_set = human_allow_suffix_set.clone();
+    all_allow_suffix_set.extend(upstream_allow_suffix_set.iter().cloned());
+    let mut all_allow_suffix_trie = DomainTrie::default();
+    for s in &all_allow_suffix_set {
+        all_allow_suffix_trie.insert_suffix(s);
     }
 
     let mut complex_point_trie = DomainTrie::default();
@@ -380,12 +398,16 @@ pub fn compile_adblock(
     let mut surviving_suffixes: Vec<String> = Vec::new();
     for s in candidate_suffixes {
         let is_forced = forced_suffixes.contains(&s);
-        let blocked_by_allow = allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
-            || allow_suffix_trie.has_mark_at_or_below(&s)
-            || allow_point_trie.has_mark_at_or_below(&s);
-        let blocked_by_complex = !is_forced
-            && (protected_apex_set.contains(&s) || complex_point_trie.has_mark_at_or_below(&s));
-        if blocked_by_allow || blocked_by_complex {
+        let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
+            || human_allow_suffix_trie.has_mark_at_or_below(&s)
+            || human_allow_point_trie.has_mark_at_or_below(&s)
+            || protected_apex_set.contains(&s);
+        let blocked_by_upstream_or_complex = !is_forced
+            && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
+                || upstream_allow_suffix_trie.has_mark_at_or_below(&s)
+                || upstream_allow_point_trie.has_mark_at_or_below(&s)
+                || complex_point_trie.has_mark_at_or_below(&s));
+        if blocked_by_human || blocked_by_upstream_or_complex {
             suppressed_by_protection += 1;
         } else {
             surviving_suffixes.push(s);
@@ -415,10 +437,14 @@ pub fn compile_adblock(
     let mut compressed_domains: BTreeSet<String> = BTreeSet::new();
     for d in candidate_domains {
         let is_forced = forced_domains.contains(&d);
-        let blocked_by_allow = allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
-            || allow_exact_set.contains(&d)
-            || (!is_forced && complex_host_set.contains(&d));
-        if blocked_by_allow {
+        let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
+            || human_allow_exact_set.contains(&d)
+            || protected_apex_set.contains(&d);
+        let blocked_by_upstream_or_complex = !is_forced
+            && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
+                || upstream_allow_exact_set.contains(&d)
+                || complex_host_set.contains(&d));
+        if blocked_by_human || blocked_by_upstream_or_complex {
             suppressed_by_protection += 1;
             continue;
         }
@@ -431,9 +457,16 @@ pub fn compile_adblock(
 
     // Drop unsafe domain-keywords or wildcards that collide with protected/allowed domains
     candidate_keywords.retain(|kw| {
-        !allow_exact_set
+        if kw.contains("made_by_") || kw.contains("7h1s_rul3") {
+            return false;
+        }
+        let trimmed = kw.trim_matches(|c: char| !c.is_ascii_alphanumeric());
+        if trimmed.contains('.') && all_allow_suffix_trie.has_suffix_ancestor_or_eq(trimmed) {
+            return false;
+        }
+        !all_allow_exact_set
             .iter()
-            .chain(allow_suffix_set.iter())
+            .chain(all_allow_suffix_set.iter())
             .chain(protected_apex_set.iter())
             .chain(complex_host_set.iter())
             .any(|dom| dom.contains(kw.as_str()))
@@ -441,18 +474,75 @@ pub fn compile_adblock(
     candidate_wildcards.retain(|wc| {
         let static_tail = wildcard_static_suffix(wc);
         let covered_by_allow_suffix =
-            static_tail.is_some_and(|tail| allow_suffix_trie.has_suffix_ancestor_or_eq(tail));
+            static_tail.is_some_and(|tail| all_allow_suffix_trie.has_suffix_ancestor_or_eq(tail));
         !covered_by_allow_suffix
-            && !allow_exact_set
+            && !all_allow_exact_set
                 .iter()
-                .chain(allow_suffix_set.iter())
+                .chain(all_allow_suffix_set.iter())
                 .chain(complex_host_set.iter())
                 .any(|dom| wildcard_matches_domain(wc, dom))
     });
 
-    // Exclude RFC 6890 private / LAN / Surge Fake-IP / CGNAT / Tailscale / Cloudflare Mesh / bogons before aggregating CIDRs
-    raw_v4.retain(|net| !overlaps_reserved_v4(*net));
-    raw_v6.retain(|net| !overlaps_reserved_v6(*net));
+    // Enforce 4-tier domain precedence and reserved/shared-CDN CIDR guards on module `[Rule]` REJECT entries too
+    module_rule_map.retain(|line, _| {
+        let parts: Vec<&str> = line.split(',').map(str::trim).collect();
+        let is_reject = parts
+            .iter()
+            .any(|p| p.to_ascii_uppercase().starts_with("REJECT"));
+        if !is_reject || parts.len() < 2 {
+            return true;
+        }
+        match parts[0].to_ascii_uppercase().as_str() {
+            "DOMAIN" => {
+                let d = parts[1].trim_end_matches('.').to_ascii_lowercase();
+                let is_forced = forced_domains.contains(&d);
+                let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
+                    || human_allow_exact_set.contains(&d)
+                    || protected_apex_set.contains(&d);
+                let blocked_by_upstream = !is_forced
+                    && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
+                        || upstream_allow_exact_set.contains(&d)
+                        || complex_host_set.contains(&d));
+                !(blocked_by_human || blocked_by_upstream)
+            }
+            "DOMAIN-SUFFIX" => {
+                let s = parts[1]
+                    .trim_start_matches('.')
+                    .trim_end_matches('.')
+                    .to_ascii_lowercase();
+                let is_forced = forced_suffixes.contains(&s);
+                let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
+                    || human_allow_suffix_trie.has_mark_at_or_below(&s)
+                    || human_allow_point_trie.has_mark_at_or_below(&s)
+                    || protected_apex_set.contains(&s);
+                let blocked_by_upstream = !is_forced
+                    && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
+                        || upstream_allow_suffix_trie.has_mark_at_or_below(&s)
+                        || upstream_allow_point_trie.has_mark_at_or_below(&s)
+                        || complex_point_trie.has_mark_at_or_below(&s));
+                !(blocked_by_human || blocked_by_upstream)
+            }
+            "IP-CIDR" => parts[1]
+                .parse::<Ipv4Net>()
+                .map(|n| {
+                    let net = n.trunc();
+                    !overlaps_reserved_v4(net) && !overlaps_shared_cdn_or_dns_v4(net)
+                })
+                .unwrap_or(false),
+            "IP-CIDR6" => parts[1]
+                .parse::<Ipv6Net>()
+                .map(|n| {
+                    let net = n.trunc();
+                    !overlaps_reserved_v6(net) && !overlaps_shared_cdn_or_dns_v6(net)
+                })
+                .unwrap_or(false),
+            _ => true,
+        }
+    });
+
+    // Exclude RFC 6890 private / LAN / Fake-IP / Tailscale AND shared Anycast CDN / public DNS CIDRs
+    raw_v4.retain(|net| !overlaps_reserved_v4(*net) && !overlaps_shared_cdn_or_dns_v4(*net));
+    raw_v6.retain(|net| !overlaps_reserved_v6(*net) && !overlaps_shared_cdn_or_dns_v6(*net));
     let coalesced_v4 = Ipv4Net::aggregate(&raw_v4);
     let coalesced_v6 = Ipv6Net::aggregate(&raw_v6);
 
@@ -472,9 +562,81 @@ pub fn compile_adblock(
     ruleset_counts.suppressed_by_protection = suppressed_by_protection;
     ruleset_counts.subsumed_by_trie = subsumed_by_trie;
 
-    // Append `$removeparam` scripts last (global + host-scoped) so app-specific http-request scripts run first
+    // 4. Promote surgical rules from RulesetFallback feeds ONLY when their target hosts are NOT already
+    //    blocked in Adblock.list and NOT excluded from MITM.
+    for src in sources {
+        for h in &src.fallback_header_rewrites {
+            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+                &h.pattern,
+                &overrides.disabled_url_patterns,
+                &mitm_exclusion_set,
+                &final_suffix_trie,
+                &compressed_domains,
+            ) {
+                mitm_positive.extend(mitm_hosts);
+                insert_weighted(&mut header_map, h.dedup_key(), h.clone(), |x| x.weight);
+            }
+        }
+        for ml in &src.fallback_map_locals {
+            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+                &ml.pattern,
+                &overrides.disabled_url_patterns,
+                &mitm_exclusion_set,
+                &final_suffix_trie,
+                &compressed_domains,
+            ) {
+                mitm_positive.extend(mitm_hosts);
+                insert_weighted(&mut map_local_map, ml.dedup_key(), ml.clone(), |x| x.weight);
+            }
+        }
+        for br in &src.fallback_body_rewrites {
+            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+                &br.pattern,
+                &overrides.disabled_url_patterns,
+                &mitm_exclusion_set,
+                &final_suffix_trie,
+                &compressed_domains,
+            ) {
+                mitm_positive.extend(mitm_hosts);
+                insert_weighted(&mut body_map, br.dedup_key(), br.clone(), |x| x.weight);
+            }
+        }
+        for ag in &src.fallback_adguard_transforms {
+            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+                &ag.pattern,
+                &overrides.disabled_url_patterns,
+                &mitm_exclusion_set,
+                &final_suffix_trie,
+                &compressed_domains,
+            ) {
+                mitm_positive.extend(mitm_hosts);
+                adguard_transforms.push(ag.clone());
+            }
+        }
+    }
+
+    // 5. Compile AdGuard runtime transforms ($replace, $hls, $xmlprune, $jsonprune) into `surge-adguard-*` scripts
+    //    BEFORE resolving script conflicts so higher-weight app scripts cleanly win on exact trigger collisions.
+    adguard_transforms
+        .retain(|ag| !pattern_targets_excluded_https_only(&ag.pattern, &mitm_exclusion_set));
+    script_candidates.extend(build_adguard_transform_scripts(adguard_transforms));
+
+    // 6. Deduplicate scripts while enforcing Surge's 1-script-per-(type, pattern) precedence
+    let mut final_scripts = resolve_script_conflicts(script_candidates);
+
+    // 7. Filter MITM hosts against `-` exclusions and prune HTTPS-only module rules targeting excluded hosts
+    mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
+    header_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    url_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    map_local_map
+        .retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    body_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    final_scripts.retain(|s| !pattern_targets_excluded_https_only(&s.pattern, &mitm_exclusion_set));
+
+    // 8. Append `$removeparam` scripts last (global + host-scoped) so app-specific http-request scripts run first
     final_scripts.extend(build_removeparam_scripts(
         &remove_params,
+        &removeparam_exceptions,
         &mut mitm_positive,
         &mitm_exclusion_set,
         &final_suffix_trie,
@@ -667,6 +829,119 @@ fn script_override_to_rule(s: &ModuleScriptOverride) -> ScriptRule {
     }
 }
 
+fn fallback_rule_targets_survive(
+    pattern: &str,
+    disabled: &[String],
+    mitm_exclusions: &BTreeSet<String>,
+    final_suffix_trie: &DomainTrie,
+    compressed_domains: &BTreeSet<String>,
+) -> Option<Vec<String>> {
+    if is_pattern_disabled(pattern, disabled) {
+        return None;
+    }
+    if pattern_targets_excluded_https_only(pattern, mitm_exclusions) {
+        return None;
+    }
+    let info = extract_hosts_from_regex(pattern);
+    if info.mitm_patterns.is_empty() {
+        return None;
+    }
+    let check_hosts: Vec<&str> = if !info.concrete_hosts.is_empty() {
+        info.concrete_hosts.iter().map(String::as_str).collect()
+    } else {
+        info.mitm_patterns
+            .iter()
+            .map(|h| h.trim_start_matches("*."))
+            .collect()
+    };
+    let all_blocked = !check_hosts.is_empty()
+        && check_hosts
+            .iter()
+            .all(|h| final_suffix_trie.matches_domain(h) || compressed_domains.contains(*h));
+    if all_blocked {
+        return None;
+    }
+    let surviving_mitm: Vec<String> = info
+        .mitm_patterns
+        .into_iter()
+        .map(|m| m.to_ascii_lowercase())
+        .filter(|m| is_valid_mitm_host(m) && !mitm_host_is_excluded(m, mitm_exclusions))
+        .collect();
+    if surviving_mitm.is_empty() && !pattern.trim_start_matches('^').starts_with("http://") {
+        return None;
+    }
+    Some(surviving_mitm)
+}
+
+fn percent_encode_uri_component(raw: &str) -> String {
+    let mut out = String::with_capacity(raw.len() + 32);
+    for b in raw.bytes() {
+        if b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-' | b'.' | b'~') {
+            out.push(b as char);
+        } else {
+            out.push_str(&format!("%{:02X}", b));
+        }
+    }
+    out
+}
+
+fn build_adguard_transform_scripts(mut rules: Vec<AdguardTransformRule>) -> Vec<ScriptRule> {
+    if rules.is_empty() {
+        return Vec::new();
+    }
+
+    // Higher-weight rules come first within each URL pattern while preserving stable op order
+    rules.sort_by(|a, b| {
+        a.pattern
+            .cmp(&b.pattern)
+            .then_with(|| b.weight.cmp(&a.weight))
+    });
+
+    let mut grouped: BTreeMap<String, (u16, Vec<AdguardTransformOp>)> = BTreeMap::new();
+    for r in rules {
+        let entry = grouped
+            .entry(r.pattern)
+            .or_insert_with(|| (r.weight, Vec::new()));
+        entry.0 = entry.0.max(r.weight);
+        if !entry.1.contains(&r.op) {
+            entry.1.push(r.op);
+        }
+    }
+
+    let mut out = Vec::with_capacity(grouped.len());
+    for (idx, (pattern, (weight, mut ops))) in grouped.into_iter().enumerate() {
+        let mut encoded_arg = None;
+        while !ops.is_empty() {
+            if let Ok(json) = serde_json::to_string(&ops) {
+                let candidate = format!("u:{}", percent_encode_uri_component(&json));
+                if candidate.len() <= 3800 || (ops.len() == 1 && candidate.len() <= 7600) {
+                    encoded_arg = Some(candidate);
+                    break;
+                }
+            }
+            ops.pop();
+        }
+        let Some(argument) = encoded_arg else {
+            continue;
+        };
+        out.push(ScriptRule {
+            name: format!("surge-adguard-{}", idx + 1),
+            script_type: ScriptType::HttpResponse,
+            pattern,
+            script_path: ADGUARD_SCRIPT_URL.to_string(),
+            requires_body: true,
+            binary_body_mode: false,
+            max_size: Some(524_288),
+            timeout: Some(5),
+            argument: Some(argument),
+            engine: Some("webview".to_string()),
+            weight,
+        });
+    }
+
+    out
+}
+
 fn resolve_script_conflicts(mut candidates: Vec<ScriptRule>) -> Vec<ScriptRule> {
     candidates.sort_by(|a, b| {
         b.weight
@@ -696,7 +971,7 @@ fn resolve_script_conflicts(mut candidates: Vec<ScriptRule>) -> Vec<ScriptRule> 
 
     let mut used_names: FxHashSet<String> = FxHashSet::default();
     for s in &mut kept {
-        let base = if s.name == "surge-removeparam" || s.name == "surge-removeparam-scoped" {
+        let base = if s.name.starts_with("surge-removeparam") {
             format!("{}_custom", s.name)
         } else {
             s.name.clone()
@@ -727,10 +1002,22 @@ fn pattern_targets_excluded_https_only(pattern: &str, exclusions: &BTreeSet<Stri
 }
 
 fn is_safe_global_tracking_param(param: &str) -> bool {
-    let p = param.trim().to_ascii_lowercase();
-    if p.is_empty() {
+    let trimmed = param.trim();
+    if trimmed.is_empty() || trimmed == "*" {
         return false;
     }
+    if let Some(rest) = trimmed.strip_prefix('~') {
+        let Some((_flags, encoded)) = rest.split_once(':') else {
+            return false;
+        };
+        let lower = encoded.to_ascii_lowercase();
+        return lower.starts_with("%5eutm_")
+            || lower.starts_with("%5emtm_")
+            || lower.starts_with("%5epk_")
+            || lower.starts_with("%5ehsa_")
+            || lower.starts_with("%5ematomo_");
+    }
+    let p = trimmed.to_ascii_lowercase();
     const SAFE_PREFIXES: &[&str] = &[
         "utm_", "stm_", "hsa_", "mtm_", "pk_", "piwik_", "matomo_", "mc_", "oly_", "_ga", "__utm",
         "__hs", "spm_", "scm_",
@@ -748,6 +1035,7 @@ fn is_safe_global_tracking_param(param: &str) -> bool {
             | "msclkid"
             | "ttclid"
             | "twclid"
+            | "tgclid"
             | "li_fat_id"
             | "yclid"
             | "ymclid"
@@ -768,6 +1056,11 @@ fn is_safe_global_tracking_param(param: &str) -> bool {
             | "guce_referrer_sig"
             | "vd_source"
             | "srsltid"
+            | "share_source"
+            | "share_medium"
+            | "share_plat"
+            | "share_session_id"
+            | "share_tag"
             | "_hsenc"
             | "_hsmi"
             | "_bta_tid"
@@ -775,6 +1068,30 @@ fn is_safe_global_tracking_param(param: &str) -> bool {
             | "_ke"
             | "_kx"
     )
+}
+
+fn global_param_trigger_atom(token: &str) -> String {
+    if let Some(rest) = token.strip_prefix('~')
+        && let Some((_flags, encoded)) = rest.split_once(':')
+    {
+        let lower = encoded.to_ascii_lowercase();
+        if lower.starts_with("%5eutm_") {
+            return "(?:utm|UTM)_[^=&#]*".to_string();
+        }
+        if lower.starts_with("%5emtm_") {
+            return "(?:mtm|MTM)_[^=&#]*".to_string();
+        }
+        if lower.starts_with("%5epk_") {
+            return "(?:pk|PK)_[^=&#]*".to_string();
+        }
+        if lower.starts_with("%5ehsa_") {
+            return "(?:hsa|HSA)_[^=&#]*".to_string();
+        }
+        if lower.starts_with("%5ematomo_") {
+            return "(?:matomo|MATOMO)_[^=&#]*".to_string();
+        }
+    }
+    crate::adblock::regex_util::escape_literal_regex(token)
 }
 
 fn host_scope_to_regex(host: &str) -> String {
@@ -791,8 +1108,18 @@ fn host_scope_to_regex(host: &str) -> String {
     }
 }
 
+fn normalize_removeparam_token(raw: &str) -> String {
+    let trimmed = raw.trim();
+    if trimmed == "*" || trimmed.starts_with('~') {
+        trimmed.to_string()
+    } else {
+        trimmed.to_ascii_lowercase()
+    }
+}
+
 fn build_removeparam_scripts(
     rules: &[RemoveParamRule],
+    exceptions: &[(String, String)],
     mitm_positive: &mut BTreeSet<String>,
     mitm_exclusion_set: &BTreeSet<String>,
     final_suffix_trie: &DomainTrie,
@@ -802,15 +1129,29 @@ fn build_removeparam_scripts(
         return Vec::new();
     }
 
+    let mut exempt_map: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    for (raw_host, raw_tok) in exceptions {
+        let host = raw_host.trim().trim_end_matches('.').to_ascii_lowercase();
+        let tok = normalize_removeparam_token(raw_tok);
+        if tok.is_empty()
+            || !is_valid_mitm_host(&host)
+            || final_suffix_trie.matches_domain(&host)
+            || compressed_domains.contains(&host)
+        {
+            continue;
+        }
+        exempt_map.entry(host).or_default().insert(tok);
+    }
+
     let mut global_params: BTreeMap<String, u16> = BTreeMap::new();
     let mut scope_params: BTreeMap<String, (u16, BTreeSet<String>)> = BTreeMap::new();
 
     for r in rules {
-        let param_clean = r.param.trim().to_ascii_lowercase();
+        let param_clean = normalize_removeparam_token(&r.param);
         if param_clean.is_empty() {
             continue;
         }
-        let host = r.host_scope.as_str();
+        let host = r.host_scope.trim().to_ascii_lowercase();
         if host == "*" {
             if is_safe_global_tracking_param(&param_clean) {
                 let entry = global_params.entry(param_clean).or_insert(r.weight);
@@ -818,15 +1159,20 @@ fn build_removeparam_scripts(
             }
             continue;
         }
-        if !is_valid_mitm_host(host)
-            || mitm_host_is_excluded(host, mitm_exclusion_set)
-            || final_suffix_trie.matches_domain(host)
-            || compressed_domains.contains(host)
+        if !is_valid_mitm_host(&host)
+            || mitm_host_is_excluded(&host, mitm_exclusion_set)
+            || final_suffix_trie.matches_domain(&host)
+            || compressed_domains.contains(&host)
+        {
+            continue;
+        }
+        if let Some(ex_set) = exempt_map.get(&host)
+            && (ex_set.contains("*") || ex_set.contains(&param_clean))
         {
             continue;
         }
         let entry = scope_params
-            .entry(r.host_scope.clone())
+            .entry(host)
             .or_insert_with(|| (r.weight, BTreeSet::new()));
         entry.0 = entry.0.max(r.weight);
         entry.1.insert(param_clean);
@@ -846,7 +1192,7 @@ fn build_removeparam_scripts(
             } else {
                 p.len() + 1
             };
-            if selected_global.len() >= 120 || arg_len + add_len > 3400 {
+            if selected_global.len() >= 120 || arg_len + add_len > 2800 {
                 break;
             }
             arg_len += add_len;
@@ -855,13 +1201,41 @@ fn build_removeparam_scripts(
 
         if !selected_global.is_empty() {
             selected_global.sort();
-            let escaped_keys: Vec<String> = selected_global
+            let has_global_regex = selected_global.iter().any(|t| t.starts_with('~'));
+            let selected_set: BTreeSet<&str> = selected_global.iter().map(String::as_str).collect();
+
+            let mut arg_parts = vec![format!("*={}", selected_global.join("|"))];
+            let mut cur_len = arg_parts[0].len();
+            for (ex_host, ex_toks) in &exempt_map {
+                let relevant: Vec<&str> = if ex_toks.contains("*") {
+                    vec!["*"]
+                } else {
+                    ex_toks
+                        .iter()
+                        .map(String::as_str)
+                        .filter(|t| selected_set.contains(t) || has_global_regex)
+                        .collect()
+                };
+                if relevant.is_empty() {
+                    continue;
+                }
+                let ex_chunk = format!("-{}={}", ex_host, relevant.join("|"));
+                if cur_len + 1 + ex_chunk.len() > 3500 {
+                    break;
+                }
+                cur_len += 1 + ex_chunk.len();
+                arg_parts.push(ex_chunk);
+            }
+
+            let mut trigger_atoms: Vec<String> = selected_global
                 .iter()
-                .map(|k| crate::adblock::regex_util::escape_literal_regex(k))
+                .map(|k| global_param_trigger_atom(k))
                 .collect();
+            trigger_atoms.sort();
+            trigger_atoms.dedup();
             let pattern = format!(
                 "^https?://[^?#]+\\?(?:[^#]*&)?(?:{})=",
-                escaped_keys.join("|")
+                trigger_atoms.join("|")
             );
             scripts.push(ScriptRule {
                 name: "surge-removeparam".to_string(),
@@ -872,7 +1246,7 @@ fn build_removeparam_scripts(
                 binary_body_mode: false,
                 max_size: None,
                 timeout: Some(5),
-                argument: Some(format!("*={}", selected_global.join("|"))),
+                argument: Some(arg_parts.join(";")),
                 engine: Some("webview".to_string()),
                 weight: 1,
             });
@@ -881,58 +1255,116 @@ fn build_removeparam_scripts(
 
     if !scope_params.is_empty() {
         let bulk_mode = scope_params.len() > 32;
-        let mut ranked_scopes: Vec<(String, u16, BTreeSet<String>)> = scope_params
+        let mut all_ranked: Vec<(String, u16, BTreeSet<String>)> = scope_params
             .into_iter()
-            .filter(|(host, _)| !bulk_mode || mitm_host_is_excluded(host, mitm_positive))
             .map(|(host, (w, params))| (host, w, params))
             .collect();
-        ranked_scopes.sort_by(|a, b| {
+        all_ranked.sort_by(|a, b| {
             b.1.cmp(&a.1)
                 .then_with(|| b.2.len().cmp(&a.2.len()))
                 .then_with(|| a.0.cmp(&b.0))
         });
 
-        let mut arg_chunks: Vec<String> = Vec::new();
-        let mut total_arg_len = 0usize;
-        let mut active_hosts: BTreeSet<String> = BTreeSet::new();
-        let mut active_param_tokens: BTreeSet<String> = BTreeSet::new();
-
-        for (host, _, params) in ranked_scopes {
-            let param_list: Vec<String> = params.iter().take(24).cloned().collect();
-            let mut next_params = active_param_tokens.clone();
-            next_params.extend(param_list.iter().cloned());
-            if next_params.len() > 120 {
-                continue;
-            }
-            let chunk = format!("{}={}", host, param_list.join("|"));
-            if total_arg_len + chunk.len() + 1 > 3400 {
-                break;
-            }
+        let mut extra_mitm_budget = 24usize;
+        let mut ranked_scopes: Vec<(String, u16, BTreeSet<String>, bool)> = Vec::new();
+        for (host, w, params) in all_ranked {
             if !bulk_mode {
-                mitm_positive.insert(host.clone());
+                ranked_scopes.push((host, w, params, true));
+            } else if mitm_host_is_excluded(&host, mitm_positive) {
+                ranked_scopes.push((host, w, params, false));
+            } else if w >= 130 && extra_mitm_budget > 0 {
+                extra_mitm_budget -= 1;
+                ranked_scopes.push((host, w, params, true));
             }
-            total_arg_len += chunk.len() + 1;
-            active_hosts.insert(host);
-            active_param_tokens = next_params;
-            arg_chunks.push(chunk);
         }
 
-        if !arg_chunks.is_empty() && !active_hosts.is_empty() && !active_param_tokens.is_empty() {
+        let mut cursor = 0usize;
+        for shard_idx in 0..3usize {
+            if cursor >= ranked_scopes.len() {
+                break;
+            }
+            let mut arg_chunks: Vec<String> = Vec::new();
+            let mut total_arg_len = 0usize;
+            let mut active_hosts: BTreeSet<String> = BTreeSet::new();
+            let mut active_literals: BTreeSet<String> = BTreeSet::new();
+            let mut has_wildcard_or_regex_param = false;
+
+            while cursor < ranked_scopes.len() {
+                let (ref host, _, ref params, add_mitm) = ranked_scopes[cursor];
+                let param_list: Vec<String> = if params.contains("*") {
+                    vec!["*".to_string()]
+                } else {
+                    params.iter().take(24).cloned().collect()
+                };
+                let new_literals: Vec<&String> = param_list
+                    .iter()
+                    .filter(|p| *p != "*" && !p.starts_with('~'))
+                    .collect();
+                if active_literals.len() + new_literals.len() > 120 && !active_hosts.is_empty() {
+                    break;
+                }
+                let chunk = format!("{}={}", host, param_list.join("|"));
+                if total_arg_len + chunk.len() + 1 > 3200 && !arg_chunks.is_empty() {
+                    break;
+                }
+                if add_mitm {
+                    mitm_positive.insert(host.clone());
+                }
+                if param_list.iter().any(|p| p == "*" || p.starts_with('~')) {
+                    has_wildcard_or_regex_param = true;
+                }
+                for lit in new_literals {
+                    active_literals.insert(lit.clone());
+                }
+                total_arg_len += chunk.len() + 1;
+                active_hosts.insert(host.clone());
+                arg_chunks.push(chunk);
+                cursor += 1;
+            }
+
+            if arg_chunks.is_empty() || active_hosts.is_empty() {
+                break;
+            }
+
+            // Attach host-level exemptions matching any host in this shard
+            for (ex_host, ex_toks) in &exempt_map {
+                if mitm_host_is_excluded(ex_host, &active_hosts) {
+                    let ex_list: Vec<&str> = ex_toks.iter().map(String::as_str).collect();
+                    let ex_chunk = format!("-{}={}", ex_host, ex_list.join("|"));
+                    if total_arg_len + ex_chunk.len() < 3500 {
+                        total_arg_len += ex_chunk.len() + 1;
+                        arg_chunks.push(ex_chunk);
+                    }
+                }
+            }
+
             let host_atoms: Vec<String> = active_hosts
                 .iter()
                 .map(|h| host_scope_to_regex(h))
                 .collect();
-            let escaped_keys: Vec<String> = active_param_tokens
-                .iter()
-                .map(|k| crate::adblock::regex_util::escape_literal_regex(k))
-                .collect();
-            let pattern = format!(
-                "^https?://(?:{})(?::\\d+)?(?:/[^?#]*)?\\?(?:[^#]*&)?(?:{})=",
-                host_atoms.join("|"),
-                escaped_keys.join("|")
-            );
+            let pattern = if has_wildcard_or_regex_param || active_literals.is_empty() {
+                format!(
+                    "^https?://(?:{})(?::\\d+)?(?:/[^?#]*)?\\?[^#]+",
+                    host_atoms.join("|")
+                )
+            } else {
+                let escaped_keys: Vec<String> = active_literals
+                    .iter()
+                    .map(|k| crate::adblock::regex_util::escape_literal_regex(k))
+                    .collect();
+                format!(
+                    "^https?://(?:{})(?::\\d+)?(?:/[^?#]*)?\\?(?:[^#]*&)?(?:{})=",
+                    host_atoms.join("|"),
+                    escaped_keys.join("|")
+                )
+            };
+            let script_name = if shard_idx == 0 {
+                "surge-removeparam-scoped".to_string()
+            } else {
+                format!("surge-removeparam-scoped-{}", shard_idx + 1)
+            };
             scripts.push(ScriptRule {
-                name: "surge-removeparam-scoped".to_string(),
+                name: script_name,
                 script_type: ScriptType::HttpRequest,
                 pattern,
                 script_path: REMOVEPARAM_SCRIPT_URL.to_string(),
@@ -1040,6 +1472,70 @@ pub fn overlaps_reserved_v6(net: Ipv6Net) -> bool {
     let s1 = u128::from(net.network());
     let e1 = u128::from(net.broadcast());
     RESERVED_V6.iter().any(|&(base, pfx)| {
+        let mask = if pfx == 0 {
+            0
+        } else {
+            u128::MAX << (128 - pfx)
+        };
+        let s2 = base & mask;
+        let e2 = s2 | !mask;
+        s1 <= e2 && s2 <= e1
+    })
+}
+
+/// Prevents shared Anycast CDNs, public DNS resolvers, and core OS infrastructure from being
+/// whole-prefix blocked in `Adblock.list` if a noisy threat IP feed includes a shared edge IP.
+pub fn overlaps_shared_cdn_or_dns_v4(net: Ipv4Net) -> bool {
+    const PROTECTED_V4: &[([u8; 4], u8)] = &[
+        ([1, 0, 0, 0], 24),       // Cloudflare DNS
+        ([1, 1, 1, 0], 24),       // Cloudflare DNS
+        ([8, 8, 4, 0], 24),       // Google Public DNS
+        ([8, 8, 8, 0], 24),       // Google Public DNS
+        ([9, 9, 9, 0], 24),       // Quad9 DNS
+        ([17, 0, 0, 0], 8),       // Apple Inc.
+        ([103, 21, 244, 0], 22),  // Cloudflare Anycast
+        ([103, 22, 200, 0], 22),  // Cloudflare Anycast
+        ([103, 31, 4, 0], 22),    // Cloudflare Anycast
+        ([104, 16, 0, 0], 12),    // Cloudflare Anycast (104.16.0.0 - 104.31.255.255)
+        ([108, 162, 192, 0], 18), // Cloudflare Anycast
+        ([119, 29, 29, 0], 24),   // Tencent DNSPod
+        ([131, 0, 72, 0], 22),    // Cloudflare Anycast
+        ([140, 82, 112, 0], 20),  // GitHub
+        ([141, 101, 64, 0], 18),  // Cloudflare Anycast
+        ([151, 101, 0, 0], 16),   // Fastly CDN
+        ([162, 158, 0, 0], 15),   // Cloudflare Anycast
+        ([172, 64, 0, 0], 13),    // Cloudflare Anycast
+        ([173, 245, 48, 0], 20),  // Cloudflare Anycast
+        ([185, 199, 108, 0], 22), // GitHub Pages / raw.githubusercontent.com
+        ([188, 114, 96, 0], 20),  // Cloudflare Anycast
+        ([190, 93, 240, 0], 20),  // Cloudflare Anycast
+        ([197, 234, 240, 0], 22), // Cloudflare Anycast
+        ([198, 41, 128, 0], 17),  // Cloudflare Anycast
+        ([223, 5, 5, 0], 24),     // Alibaba Public DNS
+        ([223, 6, 6, 0], 24),     // Alibaba Public DNS
+    ];
+    let s1 = u32::from(net.network());
+    let e1 = u32::from(net.broadcast());
+    PROTECTED_V4.iter().any(|&(octets, pfx)| {
+        let base = u32::from_be_bytes(octets);
+        let mask = if pfx == 0 { 0 } else { u32::MAX << (32 - pfx) };
+        let s2 = base & mask;
+        let e2 = s2 | !mask;
+        s1 <= e2 && s2 <= e1
+    })
+}
+
+pub fn overlaps_shared_cdn_or_dns_v6(net: Ipv6Net) -> bool {
+    const PROTECTED_V6: &[(u128, u8)] = &[
+        (0x2001_4860_4860_0000_0000_0000_0000_0000, 48), // Google Public DNS
+        (0x2400_cb00_0000_0000_0000_0000_0000_0000, 32), // Cloudflare Anycast
+        (0x2400_3200_0000_0000_0000_0000_0000_0000, 32), // Alibaba Public DNS / Cloud
+        (0x2606_4700_0000_0000_0000_0000_0000_0000, 32), // Cloudflare Anycast + 1.1.1.1
+        (0x2a04_4e40_0000_0000_0000_0000_0000_0000, 32), // Fastly CDN
+    ];
+    let s1 = u128::from(net.network());
+    let e1 = u128::from(net.broadcast());
+    PROTECTED_V6.iter().any(|&(base, pfx)| {
         let mask = if pfx == 0 {
             0
         } else {

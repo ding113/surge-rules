@@ -8,7 +8,10 @@ use rustc_hash::FxHashSet;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
-use crate::adblock::compiler::{DomainTrie, overlaps_reserved_v4, overlaps_reserved_v6};
+use crate::adblock::compiler::{
+    DomainTrie, overlaps_reserved_v4, overlaps_reserved_v6, overlaps_shared_cdn_or_dns_v4,
+    overlaps_shared_cdn_or_dns_v6,
+};
 use crate::adblock::config::AdblockOverrides;
 use crate::adblock::parsers::surge_module::{split_surge_script_params, unquote_surge_value};
 use crate::adblock::regex_util::{is_valid_domain, is_valid_domain_wildcard, is_valid_mitm_host};
@@ -176,7 +179,13 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
         for forbidden in [
             "##",
             "#@#",
+            "#?#",
+            "#%#",
+            "#@%#",
+            "#$#",
+            "#@$#",
             "#+js(",
+            "$$",
             "FINAL",
             "pre-matching",
             ",REJECT",
@@ -248,9 +257,9 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
                         val
                     );
                 }
-                if overlaps_reserved_v4(net) {
+                if overlaps_reserved_v4(net) || overlaps_shared_cdn_or_dns_v4(net) {
                     bail!(
-                        "Adblock.list line {} overlaps reserved/private/virtual-mesh range '{}'",
+                        "Adblock.list line {} overlaps reserved/private/shared-CDN/DNS range '{}'",
                         line_no + 1,
                         val
                     );
@@ -278,9 +287,9 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
                         val
                     );
                 }
-                if overlaps_reserved_v6(net) {
+                if overlaps_reserved_v6(net) || overlaps_shared_cdn_or_dns_v6(net) {
                     bail!(
-                        "Adblock.list line {} overlaps reserved/private/virtual-mesh range '{}'",
+                        "Adblock.list line {} overlaps reserved/private/shared-CDN/DNS range '{}'",
                         line_no + 1,
                         val
                     );
@@ -538,11 +547,12 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                         line
                     );
                 };
-                if clean_name.starts_with("surge-removeparam")
+                if (clean_name.starts_with("surge-removeparam")
+                    || clean_name.starts_with("surge-adguard"))
                     && sengine.as_deref() != Some("webview")
                 {
                     bail!(
-                        "Adblock.sgmodule line {} removeparam script '{}' must specify engine=webview",
+                        "Adblock.sgmodule line {} built-in runtime script '{}' must specify engine=webview",
                         line_no + 1,
                         clean_name
                     );
@@ -556,9 +566,14 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                         line
                     );
                 }
+                let rust_probe = sp.replace("(?>", "(?:");
                 if sp.is_empty()
                     || !sp.is_ascii()
-                    || (!sp.contains("(?=") && !sp.contains("(?!") && Regex::new(&sp).is_err())
+                    || (!sp.contains("(?=")
+                        && !sp.contains("(?!")
+                        && !sp.contains("(?<=")
+                        && !sp.contains("(?<!")
+                        && Regex::new(&rust_probe).is_err())
                 {
                     bail!(
                         "Adblock.sgmodule line {} invalid script regex '{}'",

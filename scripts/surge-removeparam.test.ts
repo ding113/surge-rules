@@ -52,6 +52,57 @@ describe("surge-removeparam runtime script", () => {
     });
   });
 
+  it("supports AdGuard regex $removeparam rules and @@||host^$removeparam exemptions", () => {
+    const regexPat = encodeURIComponent("^(cookie|ga_|u_)");
+    const adPat = encodeURIComponent("^ad[A-Z]");
+    const complexArg = `*=${`~i:${encodeURIComponent("^mtm_")}`}|fbclid;discovery.com=~:${adPat};g.doubleclick.net=~:${regexPat};-exempt.example.com=*;partial.example.com=fbclid|-partial.example.com=fbclid`;
+
+    // Global case-insensitive regex `^mtm_`
+    expect(
+      runSurgeRemoveParam("https://news.site.org/read?MTM_campaign=fall&id=9", complexArg),
+    ).toEqual({
+      url: "https://news.site.org/read?id=9",
+    });
+
+    // Scoped case-sensitive regex `^ad[A-Z]` removes `adNetworkId` but keeps `adaptive=1` and `word=adTest`
+    expect(
+      runSurgeRemoveParam(
+        "https://api.discovery.com/v1/streaming/video?adNetworkId=123&adaptive=1&word=adTest",
+        complexArg,
+      ),
+    ).toEqual({
+      url: "https://api.discovery.com/v1/streaming/video?adaptive=1&word=adTest",
+    });
+
+    // Pipe-containing regex `^(cookie|ga_|u_)` encoded cleanly inside `;`/`|` argument
+    expect(
+      runSurgeRemoveParam(
+        "https://pubads.g.doubleclick.net/gampad/ads?ga_vid=1&u_tz=480&iu=keep",
+        complexArg,
+      ),
+    ).toEqual({
+      url: "https://pubads.g.doubleclick.net/gampad/ads?iu=keep",
+    });
+
+    // Host-wide exemption (`@@||exempt.example.com^$removeparam`) leaves global trackers untouched
+    expect(
+      runSurgeRemoveParam(
+        "https://sub.exempt.example.com/callback?fbclid=keep&mtm_kwd=keep",
+        complexArg,
+      ),
+    ).toEqual({});
+  });
+
+  it("supports scoped strip-all (<host>=*) without allowing global *=*", () => {
+    const stripArg = "*=*;splash.tracker.example=*";
+    expect(runSurgeRemoveParam("https://benign.example.org/p?keep=1", stripArg)).toEqual({});
+    expect(
+      runSurgeRemoveParam("https://splash.tracker.example/splash.php?a=1&b=2#x", stripArg),
+    ).toEqual({
+      url: "https://splash.tracker.example/splash.php#x",
+    });
+  });
+
   it("is strictly idempotent", () => {
     const first = runSurgeRemoveParam(
       "https://m.bilibili.com/v?utm_source=a&spm_id_from=b&cid=42",

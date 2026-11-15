@@ -232,7 +232,16 @@ pub fn parse_domain_list(text: &str, src: &AdblockSourceConfig, out: &mut Parsed
             (true, rest)
         } else if let Some(rest) = line.strip_prefix('.') {
             (true, rest)
-        } else if src.id.contains("pro_domains") || src.id.contains("wildcards") {
+        } else if src.id.contains("pro_domains")
+            || src.id.contains("wildcards")
+            || src.endpoints.iter().any(|e| {
+                matches!(
+                    e,
+                    crate::config::EndpointConfig::Direct { url }
+                        if url.contains("/wildcard/") || url.ends_with("-onlydomains.txt")
+                )
+            })
+        {
             // HaGeZi *-onlydomains.txt / 1Hosts wildcards match domains as suffixes
             (true, line)
         } else {

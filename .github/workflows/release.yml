@@ -2,7 +2,7 @@ name: Build & Release
 
 on:
   schedule:
-    - cron: "17 */12 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
   push:
     branches:
@@ -56,11 +56,13 @@ jobs:
         id: meta
         run: |
           UTC_TAG="$(date -u +'%Y%m%d-%H%M')"
+          UTC_HOUR="$(date -u +'%Y%m%d-%H')"
           UTC_DAY="$(date -u +'%Y%m%d')"
           UTC_TITLE="$(date -u +'%Y-%m-%d %H:%M UTC')"
           CN_TIME="$(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M')"
           {
             echo "tag=release-${UTC_TAG}"
+            echo "hour=${UTC_HOUR}"
             echo "day=${UTC_DAY}"
             echo "title=Surge Rules ${UTC_TITLE}"
             echo "updated_at=${CN_TIME}"
@@ -70,8 +72,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .cache/metadata
-          key: geoip-metadata-${{ runner.os }}-${{ hashFiles('metadata/sources.ts', 'metadata/sync.ts') }}-${{ steps.meta.outputs.day }}
+          key: geoip-metadata-${{ runner.os }}-${{ hashFiles('metadata/sources.ts', 'metadata/sync.ts') }}-${{ steps.meta.outputs.hour }}
           restore-keys: |
+            geoip-metadata-${{ runner.os }}-${{ hashFiles('metadata/sources.ts', 'metadata/sync.ts') }}-${{ steps.meta.outputs.day }}-
             geoip-metadata-${{ runner.os }}-${{ hashFiles('metadata/sources.ts', 'metadata/sync.ts') }}-
             geoip-metadata-${{ runner.os }}-
 
@@ -79,8 +82,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .cache/upstream
-          key: geoip-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/geoip-sources.json') }}-${{ steps.meta.outputs.day }}
+          key: geoip-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/geoip-sources.json') }}-${{ steps.meta.outputs.hour }}
           restore-keys: |
+            geoip-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/geoip-sources.json') }}-${{ steps.meta.outputs.day }}-
             geoip-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/geoip-sources.json') }}-
             geoip-upstream-${{ runner.os }}-
 
@@ -88,8 +92,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .cache/adblock
-          key: adblock-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/adblock-sources.json') }}-${{ steps.meta.outputs.day }}
+          key: adblock-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/adblock-sources.json') }}-${{ steps.meta.outputs.hour }}
           restore-keys: |
+            adblock-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/adblock-sources.json') }}-${{ steps.meta.outputs.day }}-
             adblock-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/adblock-sources.json') }}-
             adblock-upstream-${{ runner.os }}-
 
@@ -97,8 +102,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .cache/routing
-          key: routing-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/routing-sources.json') }}-${{ steps.meta.outputs.day }}
+          key: routing-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/routing-sources.json') }}-${{ steps.meta.outputs.hour }}
           restore-keys: |
+            routing-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/routing-sources.json') }}-${{ steps.meta.outputs.day }}-
             routing-upstream-${{ runner.os }}-${{ hashFiles('sources/generated/routing-sources.json') }}-
             routing-upstream-${{ runner.os }}-
 
@@ -170,7 +176,37 @@ jobs:
             dist/AI.list
             dist/Proxy.list
 
-      - name: Sync build artifacts to orphan release branch
+      - name: Prune older GitHub Releases and tags (retain latest 1)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          OLD_RELEASES=()
+          while IFS= read -r tag; do
+            if [ -n "${tag}" ] && [ "${tag}" != "${RELEASE_TAG}" ]; then
+              OLD_RELEASES+=("${tag}")
+            fi
+          done < <(gh api --paginate "repos/${GITHUB_REPOSITORY}/releases" --jq '.[].tag_name')
+          if [ "${#OLD_RELEASES[@]}" -gt 0 ]; then
+            for tag in "${OLD_RELEASES[@]}"; do
+              echo "Deleting older GitHub Release and tag: ${tag}"
+              gh release delete "${tag}" --yes --cleanup-tag || true
+            done
+          fi
+          OLD_TAGS=()
+          while IFS= read -r tag; do
+            if [ -n "${tag}" ] && [ "${tag}" != "${RELEASE_TAG}" ]; then
+              OLD_TAGS+=("${tag}")
+            fi
+          done < <(git ls-remote --tags --refs origin 'refs/tags/release-*' | awk '{sub("refs/tags/", "", $2); print $2}')
+          if [ "${#OLD_TAGS[@]}" -gt 0 ]; then
+            for tag in "${OLD_TAGS[@]}"; do
+              echo "Deleting leftover remote release tag: ${tag}"
+              git push origin ":refs/tags/${tag}" || true
+            done
+          fi
+
+      - name: Sync build artifacts to rolling release branch (retain latest 24)
         env:
           RELEASE_TAG: ${{ steps.meta.outputs.tag }}
         run: |
@@ -183,6 +219,8 @@ jobs:
           cp cloudflare/_headers "${STAGE_DIR}/_headers"
           cp cloudflare/_redirects "${STAGE_DIR}/_redirects"
           cp scripts/install.html "${STAGE_DIR}/install.html"
+          cp scripts/surge-removeparam.js "${STAGE_DIR}/surge-removeparam.js"
+          cp scripts/surge-adguard.js "${STAGE_DIR}/surge-adguard.js"
           MIRROR_FILES=(
             Country-only.mmdb
             Country-cn.mmdb
@@ -193,18 +231,73 @@ jobs:
             AI.list
             Proxy.list
           )
+          MAX_ASSET_BYTES=25690112
           for f in "${MIRROR_FILES[@]}"; do
-            cp "dist/${f}" "${STAGE_DIR}/${f}"
+            FILE_SIZE="$(wc -c < "dist/${f}" | tr -d ' ')"
+            if [ "${FILE_SIZE}" -gt "${MAX_ASSET_BYTES}" ]; then
+              echo "Asset ${f} (${FILE_SIZE} bytes) exceeds 24.5 MiB static limit; adding 302 redirect to GitHub Release"
+              printf '/%s https://github.com/%s/releases/latest/download/%s 302\n' "${f}" "${GITHUB_REPOSITORY}" "${f}" >> "${STAGE_DIR}/_redirects"
+            else
+              cp "dist/${f}" "${STAGE_DIR}/${f}"
+            fi
           done
           GIT_INDEX_FILE="${TMP_INDEX}" git --work-tree="${STAGE_DIR}" add --all
           TREE_SHA="$(GIT_INDEX_FILE="${TMP_INDEX}" git write-tree)"
-          COMMIT_SHA="$(
-            GIT_AUTHOR_NAME="github-actions[bot]" \
-            GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
-            GIT_COMMITTER_NAME="github-actions[bot]" \
-            GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
-            git commit-tree "${TREE_SHA}" -m "chore(release): ${RELEASE_TAG}"
-          )"
+          git fetch --no-tags --filter=blob:none --depth=25 origin refs/heads/release:refs/remotes/origin/release || true
+          PARENT_SHA=""
+          if git rev-parse --verify --quiet refs/remotes/origin/release >/dev/null; then
+            TOTAL_FETCHED="$(git rev-list --count refs/remotes/origin/release)"
+            if [ "${TOTAL_FETCHED}" -lt 24 ]; then
+              PARENT_SHA="$(git rev-parse refs/remotes/origin/release)"
+            else
+              OLD_COMMITS=()
+              while IFS= read -r c; do
+                if [ -n "${c}" ]; then
+                  OLD_COMMITS+=("${c}")
+                fi
+              done < <(git rev-list --max-count=23 --reverse refs/remotes/origin/release)
+              for c in "${OLD_COMMITS[@]}"; do
+                c_tree="$(git rev-parse "${c}^{tree}")"
+                c_msg="$(git log -1 --format=%B "${c}")"
+                c_an="$(git log -1 --format=%an "${c}")"
+                c_ae="$(git log -1 --format=%ae "${c}")"
+                c_ad="$(git log -1 --format=%aI "${c}")"
+                c_cn="$(git log -1 --format=%cn "${c}")"
+                c_ce="$(git log -1 --format=%ce "${c}")"
+                c_cd="$(git log -1 --format=%cI "${c}")"
+                if [ -z "${PARENT_SHA}" ]; then
+                  PARENT_SHA="$(
+                    GIT_AUTHOR_NAME="${c_an}" GIT_AUTHOR_EMAIL="${c_ae}" GIT_AUTHOR_DATE="${c_ad}" \
+                    GIT_COMMITTER_NAME="${c_cn}" GIT_COMMITTER_EMAIL="${c_ce}" GIT_COMMITTER_DATE="${c_cd}" \
+                    git commit-tree "${c_tree}" -m "${c_msg}"
+                  )"
+                else
+                  PARENT_SHA="$(
+                    GIT_AUTHOR_NAME="${c_an}" GIT_AUTHOR_EMAIL="${c_ae}" GIT_AUTHOR_DATE="${c_ad}" \
+                    GIT_COMMITTER_NAME="${c_cn}" GIT_COMMITTER_EMAIL="${c_ce}" GIT_COMMITTER_DATE="${c_cd}" \
+                    git commit-tree "${c_tree}" -p "${PARENT_SHA}" -m "${c_msg}"
+                  )"
+                fi
+              done
+            fi
+          fi
+          if [ -z "${PARENT_SHA}" ]; then
+            COMMIT_SHA="$(
+              GIT_AUTHOR_NAME="github-actions[bot]" \
+              GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+              GIT_COMMITTER_NAME="github-actions[bot]" \
+              GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+              git commit-tree "${TREE_SHA}" -m "chore(release): ${RELEASE_TAG}"
+            )"
+          else
+            COMMIT_SHA="$(
+              GIT_AUTHOR_NAME="github-actions[bot]" \
+              GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+              GIT_COMMITTER_NAME="github-actions[bot]" \
+              GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+              git commit-tree "${TREE_SHA}" -p "${PARENT_SHA}" -m "chore(release): ${RELEASE_TAG}"
+            )"
+          fi
           git push --force origin "${COMMIT_SHA}:refs/heads/release"
           rm -rf "${STAGE_DIR}" "${TMP_INDEX}"
 

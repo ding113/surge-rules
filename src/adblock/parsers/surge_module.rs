@@ -377,10 +377,12 @@ fn parse_header_rewrite_line(line: &str, weight: u16, out: &mut ParsedAdblockSou
     let Some(action_str) = tokens.get(offset + 1) else {
         return;
     };
-    let Some(field) = tokens.get(offset + 2) else {
+    let Some(raw_field) = tokens.get(offset + 2) else {
         return;
     };
-    if field.eq_ignore_ascii_case("content-length")
+    let field = unquote_surge_value(raw_field);
+    if field.is_empty()
+        || field.eq_ignore_ascii_case("content-length")
         || field.eq_ignore_ascii_case("transfer-encoding")
     {
         return;
@@ -401,9 +403,9 @@ fn parse_header_rewrite_line(line: &str, weight: u16, out: &mut ParsedAdblockSou
         direction: dir,
         pattern,
         action,
-        field: (*field).to_string(),
-        value: tokens.get(offset + 3).map(|s| (*s).to_string()),
-        replace_regex: tokens.get(offset + 4).map(|s| (*s).to_string()),
+        field,
+        value: tokens.get(offset + 3).map(|s| unquote_surge_value(s)),
+        replace_regex: tokens.get(offset + 4).map(|s| unquote_surge_value(s)),
         weight,
     });
 }
@@ -473,6 +475,7 @@ fn parse_map_local_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) 
     };
 
     let mut data_type: Option<MapLocalDataType> = None;
+    let mut is_json_shorthand = false;
     let mut data: Option<String> = None;
     let mut status_code: Option<u16> = None;
     let mut header: Option<String> = None;
@@ -481,15 +484,17 @@ fn parse_map_local_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) 
         if let Some((k, raw_v)) = split_kv(tok) {
             let v = unquote_surge_value(raw_v);
             match k {
-                "data-type" => {
-                    data_type = match v.as_str() {
-                        "text" => Some(MapLocalDataType::Text),
-                        "tiny-gif" => Some(MapLocalDataType::TinyGif),
-                        "base64" => Some(MapLocalDataType::Base64),
-                        "file" => Some(MapLocalDataType::File),
-                        _ => None,
-                    };
-                }
+                "data-type" => match v.as_str() {
+                    "text" => data_type = Some(MapLocalDataType::Text),
+                    "json" => {
+                        data_type = Some(MapLocalDataType::Text);
+                        is_json_shorthand = true;
+                    }
+                    "tiny-gif" => data_type = Some(MapLocalDataType::TinyGif),
+                    "base64" => data_type = Some(MapLocalDataType::Base64),
+                    "file" => data_type = Some(MapLocalDataType::File),
+                    _ => data_type = None,
+                },
                 "data" => data = Some(v),
                 "status-code" => {
                     if let Ok(code) = v.parse::<u16>()
@@ -498,10 +503,21 @@ fn parse_map_local_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) 
                         status_code = Some(code);
                     }
                 }
-                "header" => header = Some(v),
+                "header" => {
+                    let normalized = if !v.contains(':') && v.contains('/') {
+                        format!("Content-Type: {v}")
+                    } else {
+                        v
+                    };
+                    header = Some(normalized);
+                }
                 _ => {}
             }
         }
+    }
+
+    if is_json_shorthand && header.is_none() {
+        header = Some("Content-Type: application/json; charset=utf-8".to_string());
     }
 
     let dt = data_type.unwrap_or(MapLocalDataType::File);
@@ -576,6 +592,9 @@ fn parse_script_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) {
     let (Some(st), Some(pat), Some(path)) = (script_type, pattern, script_path) else {
         return;
     };
+    if requires_body && max_size == Some(0) {
+        max_size = Some(-1);
+    }
 
     out.register_host_info(extract_hosts_from_regex(&pat));
     out.scripts.push(ScriptRule {

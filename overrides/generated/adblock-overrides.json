@@ -13,6 +13,21 @@
     },
     {
       "matchType": "exact",
+      "domain": "ocsp.apple.com",
+      "rationale": "Apple certificate revocation OCSP responder"
+    },
+    {
+      "matchType": "exact",
+      "domain": "crl.apple.com",
+      "rationale": "Apple certificate revocation CRL distribution"
+    },
+    {
+      "matchType": "exact",
+      "domain": "valid.apple.com",
+      "rationale": "Apple certificate transparency and validation endpoint"
+    },
+    {
+      "matchType": "exact",
       "domain": "msftconnecttest.com",
       "rationale": "Microsoft Windows NCSI connectivity check"
     },
@@ -23,8 +38,23 @@
     },
     {
       "matchType": "exact",
+      "domain": "msftncsi.com",
+      "rationale": "Microsoft Windows NCSI legacy connectivity check"
+    },
+    {
+      "matchType": "exact",
+      "domain": "www.msftncsi.com",
+      "rationale": "Microsoft Windows NCSI legacy connectivity check"
+    },
+    {
+      "matchType": "exact",
       "domain": "connectivitycheck.gstatic.com",
       "rationale": "Chromium and Android captive portal check"
+    },
+    {
+      "matchType": "exact",
+      "domain": "clients3.google.com",
+      "rationale": "Android / Chrome generate_204 captive portal and update check"
     },
     {
       "matchType": "exact",
@@ -48,6 +78,11 @@
     },
     {
       "matchType": "suffix",
+      "domain": "icloud.com.cn",
+      "rationale": "iCloud China GCBD sync endpoints"
+    },
+    {
+      "matchType": "suffix",
       "domain": "mzstatic.com",
       "rationale": "App Store and Apple Media static CDN"
     },
@@ -55,6 +90,21 @@
       "matchType": "suffix",
       "domain": "cdn-apple.com",
       "rationale": "Apple system software and App Store CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "mtalk.google.com",
+      "rationale": "Google Firebase Cloud Messaging (FCM) push socket"
+    },
+    {
+      "matchType": "exact",
+      "domain": "fcm.googleapis.com",
+      "rationale": "Google Firebase Cloud Messaging API"
+    },
+    {
+      "matchType": "exact",
+      "domain": "fcmconnection.googleapis.com",
+      "rationale": "Google Firebase Cloud Messaging device connection"
     },
     {
       "matchType": "exact",
@@ -73,6 +123,31 @@
     },
     {
       "matchType": "suffix",
+      "domain": "letsencrypt.org",
+      "rationale": "Let's Encrypt ACME certificate authority"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lencr.org",
+      "rationale": "Let's Encrypt OCSP and intermediate CA issuer"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "digicert.com",
+      "rationale": "DigiCert OCSP and CRL certificate validation"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sectigo.com",
+      "rationale": "Sectigo OCSP and CRL certificate validation"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pki.goog",
+      "rationale": "Google Trust Services OCSP and CRL validation"
+    },
+    {
+      "matchType": "suffix",
       "domain": "alipay.com",
       "rationale": "Alipay payment gateway and checkout"
     },
@@ -85,6 +160,56 @@
       "matchType": "suffix",
       "domain": "githubusercontent.com",
       "rationale": "GitHub raw assets and Surge module/script hosting"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "githubassets.com",
+      "rationale": "GitHub UI static assets"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "jsdelivr.net",
+      "rationale": "Open-source npm/GitHub frontend CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "unpkg.com",
+      "rationale": "Open-source npm package CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "cdnjs.cloudflare.com",
+      "rationale": "Cloudflare open-source JS library CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "npmjs.org",
+      "rationale": "Node.js package registry"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pypi.org",
+      "rationale": "Python Package Index"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pythonhosted.org",
+      "rationale": "PyPI wheel artifact CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "crates.io",
+      "rationale": "Rust Cargo package registry"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "docker.io",
+      "rationale": "Docker Hub container registry"
+    },
+    {
+      "matchType": "exact",
+      "domain": "ghcr.io",
+      "rationale": "GitHub Container Registry"
     },
     {
       "matchType": "exact",
@@ -100,6 +225,116 @@
       "matchType": "exact",
       "domain": "tinyurl.com",
       "rationale": "TinyURL link resolution"
+    },
+    {
+      "matchType": "exact",
+      "domain": "b23.tv",
+      "rationale": "Bilibili video share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "xhslink.com",
+      "rationale": "Xiaohongshu post share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "v.douyin.com",
+      "rationale": "Douyin video share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "tb.cn",
+      "rationale": "Taobao item share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "m.tb.cn",
+      "rationale": "Taobao mobile share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "3.cn",
+      "rationale": "JD item share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "u.jd.com",
+      "rationale": "JD share link resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "url.cn",
+      "rationale": "Tencent / WeChat shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "w.url.cn",
+      "rationale": "WeChat mobile shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "t.cn",
+      "rationale": "Weibo external shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "dwz.cn",
+      "rationale": "Baidu shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "youtu.be",
+      "rationale": "YouTube video share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "redd.it",
+      "rationale": "Reddit share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "lnkd.in",
+      "rationale": "LinkedIn share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "aka.ms",
+      "rationale": "Microsoft official documentation shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "goo.gl",
+      "rationale": "Google legacy shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "ow.ly",
+      "rationale": "Ow.ly shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "is.gd",
+      "rationale": "is.gd shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "buff.ly",
+      "rationale": "Buffer shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "rebrand.ly",
+      "rationale": "Rebrandly shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "rb.gy",
+      "rationale": "Rebrandly shortlink resolver"
+    },
+    {
+      "matchType": "exact",
+      "domain": "shorturl.at",
+      "rationale": "ShortURL link resolver"
     },
     {
       "matchType": "exact",
@@ -120,6 +355,111 @@
       "matchType": "exact",
       "domain": "cloudflare-dns.com",
       "rationale": "Cloudflare 1.1.1.1 DoH endpoint"
+    },
+    {
+      "matchType": "exact",
+      "domain": "one.one.one.one",
+      "rationale": "Cloudflare 1.1.1.1 DoH / DoT endpoint"
+    },
+    {
+      "matchType": "exact",
+      "domain": "dns.quad9.net",
+      "rationale": "Quad9 public DoH / DoT endpoint"
+    },
+    {
+      "matchType": "exact",
+      "domain": "doh.opendns.com",
+      "rationale": "Cisco OpenDNS DoH endpoint"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "telegram.org",
+      "rationale": "Telegram messaging and web client"
+    },
+    {
+      "matchType": "exact",
+      "domain": "t.me",
+      "rationale": "Telegram channel and invite links"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "whatsapp.com",
+      "rationale": "WhatsApp messaging and web client"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "whatsapp.net",
+      "rationale": "WhatsApp media and signaling CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "signal.org",
+      "rationale": "Signal encrypted messaging"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "discord.com",
+      "rationale": "Discord client and API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "discordapp.com",
+      "rationale": "Discord media and gateway CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "discord.gg",
+      "rationale": "Discord server invite shortlink"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "slack.com",
+      "rationale": "Slack workspace messaging"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zoom.us",
+      "rationale": "Zoom video conferencing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "steampowered.com",
+      "rationale": "Steam store and client API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "steamcommunity.com",
+      "rationale": "Steam community and auth"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "steamcontent.com",
+      "rationale": "Steam game download CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "steamstatic.com",
+      "rationale": "Steam UI static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "epicgames.com",
+      "rationale": "Epic Games Store and auth"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "playstation.net",
+      "rationale": "PlayStation Network services"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xboxlive.com",
+      "rationale": "Xbox Live multiplayer and auth"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "nintendo.net",
+      "rationale": "Nintendo Switch Online services"
     },
     {
       "matchType": "exact",
@@ -223,6 +563,16 @@
     },
     {
       "matchType": "exact",
+      "domain": "kyfw.12306.cn",
+      "rationale": "Railway 12306 core ticket booking API"
+    },
+    {
+      "matchType": "exact",
+      "domain": "applets.jtexpress.com.cn",
+      "rationale": "J&T Express WeChat mini-program parcel tracking gateway"
+    },
+    {
+      "matchType": "exact",
       "domain": "pan.baidu.com",
       "rationale": "Baidu Netdisk core API cleaned at path level by module"
     },
@@ -238,13 +588,28 @@
     },
     {
       "matchType": "suffix",
-      "domain": "oaistatsig.com",
-      "rationale": "OpenAI ChatGPT dedicated Statsig feature-flag endpoint"
+      "domain": "openai.com",
+      "rationale": "OpenAI API, Auth, and platform"
     },
     {
       "matchType": "suffix",
-      "domain": "statsig.anthropic.com",
-      "rationale": "Anthropic Claude feature-flag gateway"
+      "domain": "chatgpt.com",
+      "rationale": "OpenAI ChatGPT web and mobile app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "oaistatic.com",
+      "rationale": "ChatGPT static frontend assets"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "oaiusercontent.com",
+      "rationale": "ChatGPT user uploads and artifacts"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "oaistatsig.com",
+      "rationale": "OpenAI ChatGPT dedicated Statsig feature-flag endpoint"
     },
     {
       "matchType": "suffix",
@@ -252,9 +617,189 @@
       "rationale": "OpenAI feature-gate and experimentation service"
     },
     {
+      "matchType": "suffix",
+      "domain": "featureassets.org",
+      "rationale": "OpenAI Atlas / ChatGPT feature-flag assets"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "anthropic.com",
+      "rationale": "Anthropic API and console"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "claude.ai",
+      "rationale": "Anthropic Claude web and mobile app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "claudeusercontent.com",
+      "rationale": "Claude artifacts and sandbox assets"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "statsig.anthropic.com",
+      "rationale": "Anthropic Claude feature-flag gateway"
+    },
+    {
       "matchType": "exact",
       "domain": "cdn.growthbook.io",
       "rationale": "Claude Code GrowthBook feature-flag configuration CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "gemini.google.com",
+      "rationale": "Google Gemini web app"
+    },
+    {
+      "matchType": "exact",
+      "domain": "aistudio.google.com",
+      "rationale": "Google AI Studio console"
+    },
+    {
+      "matchType": "exact",
+      "domain": "notebooklm.google.com",
+      "rationale": "Google NotebookLM app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "deepseek.com",
+      "rationale": "DeepSeek chat and API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "perplexity.ai",
+      "rationale": "Perplexity AI search and API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pplx.ai",
+      "rationale": "Perplexity AI shortlink and static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cursor.com",
+      "rationale": "Cursor AI editor and API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cursor.sh",
+      "rationale": "Cursor AI backend endpoints"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cursorapi.com",
+      "rationale": "Cursor AI completion gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "grok.com",
+      "rationale": "xAI Grok web and app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "x.ai",
+      "rationale": "xAI API and console"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "huggingface.co",
+      "rationale": "Hugging Face Hub and models"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hf.co",
+      "rationale": "Hugging Face model/dataset short domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "openrouter.ai",
+      "rationale": "OpenRouter unified LLM gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "mistral.ai",
+      "rationale": "Mistral AI Le Chat and API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cohere.com",
+      "rationale": "Cohere LLM API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "groq.com",
+      "rationale": "Groq LPU inference cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "together.ai",
+      "rationale": "Together AI inference cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "fireworks.ai",
+      "rationale": "Fireworks AI inference cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "replicate.com",
+      "rationale": "Replicate model hosting"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "elevenlabs.io",
+      "rationale": "ElevenLabs voice AI"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "poe.com",
+      "rationale": "Quora Poe multi-bot platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "midjourney.com",
+      "rationale": "Midjourney image generation"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "suno.com",
+      "rationale": "Suno music generation"
+    },
+    {
+      "matchType": "exact",
+      "domain": "copilot.microsoft.com",
+      "rationale": "Microsoft Copilot web assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "githubcopilot.com",
+      "rationale": "GitHub Copilot IDE completion"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "doubao.com",
+      "rationale": "ByteDance Doubao AI assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "moonshot.cn",
+      "rationale": "Moonshot Kimi AI assistant"
+    },
+    {
+      "matchType": "exact",
+      "domain": "tongyi.aliyun.com",
+      "rationale": "Alibaba Qwen / Tongyi AI"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "chatglm.cn",
+      "rationale": "Zhipu ChatGLM AI assistant"
+    },
+    {
+      "matchType": "exact",
+      "domain": "yuanbao.tencent.com",
+      "rationale": "Tencent Yuanbao AI assistant"
     },
     {
       "matchType": "exact",
@@ -335,6 +880,11 @@
       "matchType": "suffix",
       "domain": "worldpay.com",
       "rationale": "Worldpay card payment processor"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wise.com",
+      "rationale": "Wise cross-border payment and banking"
     },
     {
       "matchType": "suffix",
@@ -490,6 +1040,71 @@
       "matchType": "suffix",
       "domain": "jumio.com",
       "rationale": "Jumio banking eKYC verification"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "volces.com",
+      "rationale": "ByteDance Volcengine Ark LLM API and Doubao infrastructure"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "volcengine.com",
+      "rationale": "ByteDance Volcengine cloud console and APIs"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "volcengineapi.com",
+      "rationale": "ByteDance Volcengine REST API gateway"
+    },
+    {
+      "matchType": "exact",
+      "domain": "api3-normal.zijieapi.com",
+      "rationale": "ByteDance Douyin/Toutiao production API cluster (suppresses broad -normal.zijieapi.com keyword)"
+    },
+    {
+      "matchType": "exact",
+      "domain": "api-fin.meituan.com",
+      "rationale": "Meituan Finance payment gateway (suppresses broad -fin.meituan.com keyword)"
+    },
+    {
+      "matchType": "exact",
+      "domain": "m.suning.com",
+      "rationale": "Suning mobile commerce storefront"
+    },
+    {
+      "matchType": "exact",
+      "domain": "p3.pstatp.com",
+      "rationale": "ByteDance Toutiao/Douyin article and avatar image CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "s1.pstatp.com",
+      "rationale": "ByteDance static JavaScript/CSS CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "s2.pstatp.com",
+      "rationale": "ByteDance static JavaScript/CSS CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "s3.pstatp.com",
+      "rationale": "ByteDance static JavaScript/CSS CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "a3.pstatp.com",
+      "rationale": "ByteDance Toutiao image CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "a3.bytecdn.cn",
+      "rationale": "ByteDance shared static asset CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "video-cn.snssdk.com",
+      "rationale": "Douyin/Xigua video playback dispatch API"
     }
   ],
   "protectedApexDomains": [
@@ -534,12 +1149,44 @@
       "rationale": "Microsoft 365 productivity apps"
     },
     {
+      "domain": "azureedge.net",
+      "rationale": "Multi-tenant Microsoft Azure CDN"
+    },
+    {
+      "domain": "azurefd.net",
+      "rationale": "Multi-tenant Azure Front Door"
+    },
+    {
       "domain": "github.com",
       "rationale": "Git hosting and release infrastructure"
     },
     {
+      "domain": "github.io",
+      "rationale": "Multi-tenant GitHub Pages hosting"
+    },
+    {
+      "domain": "gitlab.io",
+      "rationale": "Multi-tenant GitLab Pages hosting"
+    },
+    {
       "domain": "cloudflare.com",
       "rationale": "Cloudflare dashboard and edge services"
+    },
+    {
+      "domain": "workers.dev",
+      "rationale": "Multi-tenant Cloudflare Workers apex"
+    },
+    {
+      "domain": "pages.dev",
+      "rationale": "Multi-tenant Cloudflare Pages apex"
+    },
+    {
+      "domain": "vercel.app",
+      "rationale": "Multi-tenant Vercel deployment apex"
+    },
+    {
+      "domain": "netlify.app",
+      "rationale": "Multi-tenant Netlify deployment apex"
     },
     {
       "domain": "fastly.net",
@@ -548,6 +1195,22 @@
     {
       "domain": "akamaihd.net",
       "rationale": "Multi-tenant edge CDN"
+    },
+    {
+      "domain": "akamaized.net",
+      "rationale": "Multi-tenant Akamai CDN"
+    },
+    {
+      "domain": "edgekey.net",
+      "rationale": "Multi-tenant Akamai EdgeKey CDN"
+    },
+    {
+      "domain": "edgesuite.net",
+      "rationale": "Multi-tenant Akamai EdgeSuite CDN"
+    },
+    {
+      "domain": "cloudfront.net",
+      "rationale": "Multi-tenant AWS CloudFront CDN"
     },
     {
       "domain": "amazonaws.com",
@@ -560,6 +1223,26 @@
     {
       "domain": "scdn.co",
       "rationale": "Spotify audio and artwork CDN"
+    },
+    {
+      "domain": "x.com",
+      "rationale": "X / Twitter core web and API apex"
+    },
+    {
+      "domain": "twitter.com",
+      "rationale": "Twitter core web and API apex"
+    },
+    {
+      "domain": "twimg.com",
+      "rationale": "X / Twitter image and video CDN"
+    },
+    {
+      "domain": "reddit.com",
+      "rationale": "Reddit core community apex"
+    },
+    {
+      "domain": "redd.it",
+      "rationale": "Reddit media and shortlink apex"
     },
     {
       "domain": "qq.com",
@@ -614,6 +1297,10 @@
       "rationale": "Zhihu core web and API platform"
     },
     {
+      "domain": "zhimg.com",
+      "rationale": "Zhihu static image CDN"
+    },
+    {
       "domain": "xiaohongshu.com",
       "rationale": "Xiaohongshu core web and API platform"
     },
@@ -630,6 +1317,26 @@
       "rationale": "Douyin API gateway"
     },
     {
+      "domain": "byteimg.com",
+      "rationale": "ByteDance shared image CDN"
+    },
+    {
+      "domain": "pstatp.com",
+      "rationale": "ByteDance shared static CDN"
+    },
+    {
+      "domain": "snssdk.com",
+      "rationale": "ByteDance mobile app API apex"
+    },
+    {
+      "domain": "kuaishou.com",
+      "rationale": "Kuaishou core video platform"
+    },
+    {
+      "domain": "yximgs.com",
+      "rationale": "Kuaishou static media CDN"
+    },
+    {
       "domain": "taobao.com",
       "rationale": "Taobao commerce apex"
     },
@@ -640,6 +1347,14 @@
     {
       "domain": "alicdn.com",
       "rationale": "Alibaba e-commerce static CDN"
+    },
+    {
+      "domain": "tbcdn.cn",
+      "rationale": "Taobao static asset CDN"
+    },
+    {
+      "domain": "aliyuncs.com",
+      "rationale": "Multi-tenant Alibaba Cloud OSS and APIs"
     },
     {
       "domain": "jd.com",
@@ -662,8 +1377,24 @@
       "rationale": "Meituan local services apex"
     },
     {
+      "domain": "meituan.net",
+      "rationale": "Meituan API and media CDN"
+    },
+    {
       "domain": "dianping.com",
       "rationale": "Dianping reviews and local services apex"
+    },
+    {
+      "domain": "dpfile.com",
+      "rationale": "Dianping image and static CDN"
+    },
+    {
+      "domain": "ctrip.com",
+      "rationale": "Ctrip travel booking apex"
+    },
+    {
+      "domain": "c-ctrip.com",
+      "rationale": "Ctrip static asset CDN"
     },
     {
       "domain": "baidu.com",
@@ -684,6 +1415,62 @@
     {
       "domain": "12306.cn",
       "rationale": "China Railway 12306 ticketing apex"
+    },
+    {
+      "domain": "10086.cn",
+      "rationale": "China Mobile carrier service apex"
+    },
+    {
+      "domain": "10010.com",
+      "rationale": "China Unicom carrier service apex"
+    },
+    {
+      "domain": "189.cn",
+      "rationale": "China Telecom carrier service apex"
+    },
+    {
+      "domain": "mi.com",
+      "rationale": "Xiaomi store and IoT apex"
+    },
+    {
+      "domain": "xiaomi.com",
+      "rationale": "Xiaomi account and cloud apex"
+    },
+    {
+      "domain": "miui.com",
+      "rationale": "Xiaomi MIUI system services apex"
+    },
+    {
+      "domain": "huawei.com",
+      "rationale": "Huawei device and cloud apex"
+    },
+    {
+      "domain": "vmall.com",
+      "rationale": "Huawei Vmall commerce apex"
+    },
+    {
+      "domain": "dbankcloud.cn",
+      "rationale": "Huawei Mobile Services cloud apex"
+    },
+    {
+      "domain": "oppo.com",
+      "rationale": "OPPO system and store apex"
+    },
+    {
+      "domain": "vivo.com.cn",
+      "rationale": "vivo system and store apex"
+    },
+    {
+      "domain": "iqiyi.com",
+      "rationale": "iQIYI video platform apex"
+    },
+    {
+      "domain": "youku.com",
+      "rationale": "Youku video platform apex"
+    },
+    {
+      "domain": "mgtv.com",
+      "rationale": "Mango TV video platform apex"
     },
     {
       "domain": "ximalaya.com",
@@ -808,9 +1595,179 @@
       "rationale": "Google AdSense / syndication ad network"
     },
     {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "googleadservices.com",
+      "rationale": "Google Ads conversion & click-ad server"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adservice.google.com",
+      "rationale": "Google AdService ad auction endpoint"
+    },
+    {
       "kind": "DOMAIN",
       "value": "app-measurement.com",
       "rationale": "Firebase mobile analytics & attribution collector"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adsrvr.org",
+      "rationale": "The Trade Desk programmatic ad network"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adnxs.com",
+      "rationale": "Xandr / AppNexus programmatic ad exchange"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "criteo.com",
+      "rationale": "Criteo retargeting ad network"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "criteo.net",
+      "rationale": "Criteo retargeting ad delivery network"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "taboola.com",
+      "rationale": "Taboola sponsored content ad network"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "outbrain.com",
+      "rationale": "Outbrain sponsored content ad network"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "rubiconproject.com",
+      "rationale": "Magnite / Rubicon ad exchange"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "pubmatic.com",
+      "rationale": "PubMatic programmatic ad exchange"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "openx.net",
+      "rationale": "OpenX programmatic ad exchange"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "casalemedia.com",
+      "rationale": "Index Exchange ad network"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adsafeprotected.com",
+      "rationale": "Integral Ad Science ad verification beacon"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "moatads.com",
+      "rationale": "Oracle Moat ad measurement beacon"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "scorecardresearch.com",
+      "rationale": "Comscore audience tracking beacon"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "unityads.unity3d.com",
+      "rationale": "Unity Ads mobile game ad SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "applovin.com",
+      "rationale": "AppLovin mobile ad mediation SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "applvn.com",
+      "rationale": "AppLovin mobile ad asset delivery"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "vungle.com",
+      "rationale": "Liftoff / Vungle mobile video ad SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "inmobi.com",
+      "rationale": "InMobi mobile ad SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ironsrc.mobi",
+      "rationale": "ironSource mobile ad mediation SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "chartboost.com",
+      "rationale": "Chartboost mobile game ad SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adcolony.com",
+      "rationale": "AdColony mobile video ad SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adkwai.com",
+      "rationale": "Kuaishou magnetic engine ad SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adukwai.com",
+      "rationale": "Kuaishou overseas ad SDK"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "e.kuaishou.com",
+      "rationale": "Kuaishou commercial ad attribution gateway"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "pangolin-sdk-toutiao.com",
+      "rationale": "ByteDance Pangle / CSJ mobile ad SDK"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "pangolin-sdk-toutiao-b.com",
+      "rationale": "ByteDance Pangle / CSJ mobile ad SDK backup"
+    },
+    {
+      "kind": "DOMAIN-SUFFIX",
+      "value": "pglstatp-toutiao.com",
+      "rationale": "ByteDance Pangle static ad creative CDN"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "mi.gdt.qq.com",
+      "rationale": "Tencent Youlianghui mobile ad SDK"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "win.gdt.qq.com",
+      "rationale": "Tencent Youlianghui ad auction win notice"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "v.gdt.qq.com",
+      "rationale": "Tencent Youlianghui video ad endpoint"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "c.gdt.qq.com",
+      "rationale": "Tencent Youlianghui click ad endpoint"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "adsmind.gdtimg.com",
+      "rationale": "Tencent splash and OTT video ad creative CDN"
     },
     {
       "kind": "DOMAIN",
@@ -821,6 +1778,21 @@
       "kind": "DOMAIN",
       "value": "pos.baidu.com",
       "rationale": "Baidu ad slot placement endpoint"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "cpro.baidustatic.com",
+      "rationale": "Baidu Union ad script delivery"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "hm.baidu.com",
+      "rationale": "Baidu Tongji analytics beacon"
+    },
+    {
+      "kind": "DOMAIN",
+      "value": "als.baidu.com",
+      "rationale": "Baidu mobile splash ad dispatch"
     }
   ],
   "mitmExcludedHosts": [
@@ -833,8 +1805,16 @@
       "rationale": "Apple system services enforce TLS pinning"
     },
     {
+      "pattern": "apple.com",
+      "rationale": "Apple root domain enforces TLS pinning"
+    },
+    {
       "pattern": "*.icloud.com",
       "rationale": "iCloud sync enforces TLS pinning"
+    },
+    {
+      "pattern": "*.icloud.com.cn",
+      "rationale": "iCloud China GCBD sync enforces TLS pinning"
     },
     {
       "pattern": "*.mzstatic.com",
@@ -845,60 +1825,372 @@
       "rationale": "Apple OS update CDN enforces cert pinning"
     },
     {
+      "pattern": "weatherkit.apple.com",
+      "rationale": "Apple WeatherKit enforces strict TLS pinning"
+    },
+    {
       "pattern": "*.alipay.com",
-      "rationale": "Payment gateway requires end-to-end TLS integrity"
+      "rationale": "Alipay payment gateway requires end-to-end TLS"
     },
     {
       "pattern": "*.tenpay.com",
-      "rationale": "WeChat Pay gateway requires end-to-end TLS integrity"
+      "rationale": "WeChat Pay gateway requires end-to-end TLS"
     },
     {
       "pattern": "*.wechatpay.cn",
-      "rationale": "WeChat Pay API requires end-to-end TLS integrity"
+      "rationale": "WeChat Pay API requires end-to-end TLS"
+    },
+    {
+      "pattern": "payapp.weixin.qq.com",
+      "rationale": "WeChat Pay merchant settlement endpoint"
     },
     {
       "pattern": "*.unionpay.com",
-      "rationale": "UnionPay gateway requires end-to-end TLS integrity"
+      "rationale": "UnionPay gateway requires end-to-end TLS"
+    },
+    {
+      "pattern": "*.95516.com",
+      "rationale": "UnionPay Cloud QuickPass enforces TLS pinning"
     },
     {
       "pattern": "*.cmbchina.com",
-      "rationale": "Banking portal enforces certificate pinning"
+      "rationale": "China Merchants Bank enforces certificate pinning"
+    },
+    {
+      "pattern": "*.cmbimg.com",
+      "rationale": "China Merchants Bank static/app package verification"
     },
     {
       "pattern": "*.icbc.com.cn",
-      "rationale": "Banking portal enforces certificate pinning"
+      "rationale": "ICBC banking portal enforces certificate pinning"
     },
     {
       "pattern": "*.ccb.com",
-      "rationale": "Banking portal enforces certificate pinning"
+      "rationale": "China Construction Bank enforces certificate pinning"
     },
     {
       "pattern": "*.abchina.com",
-      "rationale": "Banking portal enforces certificate pinning"
+      "rationale": "Agricultural Bank of China enforces cert pinning"
     },
     {
       "pattern": "*.bankcomm.com",
-      "rationale": "Banking portal enforces certificate pinning"
+      "rationale": "Bank of Communications enforces certificate pinning"
     },
     {
       "pattern": "*.boc.cn",
-      "rationale": "Banking portal enforces certificate pinning"
+      "rationale": "Bank of China enforces certificate pinning"
     },
     {
       "pattern": "*.psbc.com",
-      "rationale": "Banking portal enforces certificate pinning"
+      "rationale": "Postal Savings Bank enforces certificate pinning"
+    },
+    {
+      "pattern": "*.spdb.com.cn",
+      "rationale": "Shanghai Pudong Development Bank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.spdbccc.com.cn",
+      "rationale": "SPDB Credit Card app enforces TLS pinning"
+    },
+    {
+      "pattern": "*.cib.com.cn",
+      "rationale": "Industrial Bank (CIB) enforces TLS pinning"
+    },
+    {
+      "pattern": "*.citicbank.com",
+      "rationale": "China CITIC Bank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.ecitic.com",
+      "rationale": "CITIC financial group enforces TLS pinning"
+    },
+    {
+      "pattern": "*.pingan.com",
+      "rationale": "Ping An Bank / Insurance enforces TLS pinning"
+    },
+    {
+      "pattern": "*.pingan.com.cn",
+      "rationale": "Ping An Pocket Bank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.cebbank.com",
+      "rationale": "China Everbright Bank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.cmbc.com.cn",
+      "rationale": "China Minsheng Bank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.cgbchina.com.cn",
+      "rationale": "China Guangfa Bank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.hxb.com.cn",
+      "rationale": "Hua Xia Bank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.bosc.cn",
+      "rationale": "Bank of Shanghai enforces TLS pinning"
+    },
+    {
+      "pattern": "*.mybank.cn",
+      "rationale": "MYbank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.webank.com",
+      "rationale": "WeBank enforces TLS pinning"
+    },
+    {
+      "pattern": "*.futunn.com",
+      "rationale": "Futu brokerage trading enforces TLS integrity"
+    },
+    {
+      "pattern": "*.itigerup.com",
+      "rationale": "Tiger Brokers trading enforces TLS integrity"
+    },
+    {
+      "pattern": "*.paypal.com",
+      "rationale": "PayPal checkout and auth require unmodified TLS"
+    },
+    {
+      "pattern": "*.paypalobjects.com",
+      "rationale": "PayPal SDK assets require unmodified TLS"
+    },
+    {
+      "pattern": "*.stripe.com",
+      "rationale": "Stripe PCI-DSS payment API requires unmodified TLS"
+    },
+    {
+      "pattern": "*.braintreegateway.com",
+      "rationale": "Braintree tokenization requires unmodified TLS"
+    },
+    {
+      "pattern": "*.adyen.com",
+      "rationale": "Adyen payment gateway requires unmodified TLS"
+    },
+    {
+      "pattern": "*.wise.com",
+      "rationale": "Wise banking app enforces TLS pinning"
+    },
+    {
+      "pattern": "*.revolut.com",
+      "rationale": "Revolut banking app enforces TLS pinning"
+    },
+    {
+      "pattern": "*.hsbc.com",
+      "rationale": "HSBC banking portal enforces TLS pinning"
+    },
+    {
+      "pattern": "*.chase.com",
+      "rationale": "Chase banking portal enforces TLS pinning"
+    },
+    {
+      "pattern": "*.citibank.com",
+      "rationale": "Citibank portal enforces TLS pinning"
+    },
+    {
+      "pattern": "*.citi.com",
+      "rationale": "Citi banking portal enforces TLS pinning"
+    },
+    {
+      "pattern": "*.bankofamerica.com",
+      "rationale": "Bank of America enforces TLS pinning"
+    },
+    {
+      "pattern": "*.wellsfargo.com",
+      "rationale": "Wells Fargo enforces TLS pinning"
+    },
+    {
+      "pattern": "*.americanexpress.com",
+      "rationale": "American Express enforces TLS pinning"
+    },
+    {
+      "pattern": "*.visa.com",
+      "rationale": "Visa 3DS and payment network require unmodified TLS"
+    },
+    {
+      "pattern": "*.mastercard.com",
+      "rationale": "Mastercard network requires unmodified TLS"
+    },
+    {
+      "pattern": "*.binance.com",
+      "rationale": "Binance app enforces strict certificate pinning"
+    },
+    {
+      "pattern": "*.okx.com",
+      "rationale": "OKX app enforces strict certificate pinning"
+    },
+    {
+      "pattern": "*.coinbase.com",
+      "rationale": "Coinbase app enforces strict certificate pinning"
     },
     {
       "pattern": "*.1password.com",
-      "rationale": "Password vault requires unmodified TLS"
+      "rationale": "1Password vault requires unmodified TLS"
     },
     {
       "pattern": "*.bitwarden.com",
-      "rationale": "Password vault requires unmodified TLS"
+      "rationale": "Bitwarden vault requires unmodified TLS"
+    },
+    {
+      "pattern": "*.dashlane.com",
+      "rationale": "Dashlane vault requires unmodified TLS"
+    },
+    {
+      "pattern": "*.lastpass.com",
+      "rationale": "LastPass vault requires unmodified TLS"
+    },
+    {
+      "pattern": "*.enpass.io",
+      "rationale": "Enpass vault requires unmodified TLS"
+    },
+    {
+      "pattern": "*.roboform.com",
+      "rationale": "RoboForm vault requires unmodified TLS"
+    },
+    {
+      "pattern": "*.proton.me",
+      "rationale": "Proton Mail/VPN enforces TLS certificate pinning"
+    },
+    {
+      "pattern": "*.protonmail.com",
+      "rationale": "Proton Mail enforces TLS certificate pinning"
+    },
+    {
+      "pattern": "*.protonvpn.com",
+      "rationale": "Proton VPN enforces TLS certificate pinning"
+    },
+    {
+      "pattern": "*.tutanota.com",
+      "rationale": "Tuta encrypted mail enforces TLS pinning"
+    },
+    {
+      "pattern": "*.fastmail.com",
+      "rationale": "Fastmail sensitive mail transport"
+    },
+    {
+      "pattern": "accounts.google.com",
+      "rationale": "Google OAuth/Passkey login (HttpsExclusions)"
+    },
+    {
+      "pattern": "console.cloud.google.com",
+      "rationale": "Google Cloud Console (HttpsExclusions)"
+    },
+    {
+      "pattern": "ssh.cloud.google.com",
+      "rationale": "Google Cloud Web SSH (HttpsExclusions)"
+    },
+    {
+      "pattern": "firestore.clients6.google.com",
+      "rationale": "Google Firestore gRPC/streaming breaks under MITM (HttpsExclusions)"
+    },
+    {
+      "pattern": "instantmessaging-pa.googleapis.com",
+      "rationale": "Google Messages pairing breaks under MITM (HttpsExclusions)"
+    },
+    {
+      "pattern": "login.microsoftonline.com",
+      "rationale": "Microsoft Entra ID OAuth/FIDO2 login"
+    },
+    {
+      "pattern": "login.live.com",
+      "rationale": "Microsoft account OAuth/Passkey login"
     },
     {
       "pattern": "*.github.com",
-      "rationale": "Developer authentication and Git SSH/HTTPS endpoints"
+      "rationale": "Developer authentication and Git HTTPS endpoints"
+    },
+    {
+      "pattern": "github.com",
+      "rationale": "GitHub web Passkey/2FA authentication"
+    },
+    {
+      "pattern": "auth.openai.com",
+      "rationale": "OpenAI OAuth login breaks under MITM"
+    },
+    {
+      "pattern": "sentinel.openai.com",
+      "rationale": "OpenAI anti-abuse attestation breaks under MITM"
+    },
+    {
+      "pattern": "chatgpt.com",
+      "rationale": "ChatGPT macOS/iOS Atlas app TLS compatibility"
+    },
+    {
+      "pattern": "chat.openai.com",
+      "rationale": "ChatGPT client TLS compatibility"
+    },
+    {
+      "pattern": "oaistatic.com",
+      "rationale": "ChatGPT client static bundle integrity"
+    },
+    {
+      "pattern": "*.anthropic.com",
+      "rationale": "Claude API and CLI require unmodified TLS streaming"
+    },
+    {
+      "pattern": "*.claude.ai",
+      "rationale": "Claude desktop/mobile app TLS compatibility"
+    },
+    {
+      "pattern": "web.whatsapp.com",
+      "rationale": "WhatsApp Web noise/TLS handshake"
+    },
+    {
+      "pattern": "*.whatsapp.net",
+      "rationale": "WhatsApp pinned transport"
+    },
+    {
+      "pattern": "*.signal.org",
+      "rationale": "Signal Messenger enforces strict TLS pinning"
+    },
+    {
+      "pattern": "*.telegram.org",
+      "rationale": "Telegram MTProto/HTTPS transport"
+    },
+    {
+      "pattern": "line.naver.jp",
+      "rationale": "LINE messaging transport (HttpsExclusions)"
+    },
+    {
+      "pattern": "accounts.kakao.com",
+      "rationale": "Kakao authentication (HttpsExclusions)"
+    },
+    {
+      "pattern": "kauth.kakao.com",
+      "rationale": "Kakao OAuth (HttpsExclusions)"
+    },
+    {
+      "pattern": "pay.naver.com",
+      "rationale": "Naver Pay (HttpsExclusions)"
+    },
+    {
+      "pattern": "*.syncthing.net",
+      "rationale": "Syncthing mutual-TLS device relay (HttpsExclusions)"
+    },
+    {
+      "pattern": "dns.alidns.com",
+      "rationale": "Public DoH resolver must not be MITM'd"
+    },
+    {
+      "pattern": "doh.pub",
+      "rationale": "Public DoH resolver must not be MITM'd"
+    },
+    {
+      "pattern": "dns.google",
+      "rationale": "Public DoH resolver must not be MITM'd"
+    },
+    {
+      "pattern": "cloudflare-dns.com",
+      "rationale": "Public DoH resolver must not be MITM'd"
+    },
+    {
+      "pattern": "one.one.one.one",
+      "rationale": "Public DoH resolver must not be MITM'd"
+    },
+    {
+      "pattern": "dns.quad9.net",
+      "rationale": "Public DoH resolver must not be MITM'd"
     },
     {
       "pattern": "*.biliapi.net",
@@ -917,12 +2209,8 @@
       "rationale": "Bilibili app API enforces TLS certificate pinning"
     },
     {
-      "pattern": "weatherkit.apple.com",
-      "rationale": "Apple WeatherKit enforces strict TLS pinning"
-    },
-    {
       "pattern": "www.xiaohongshu.com",
-      "rationale": "Xiaohongshu endpoints enforce TLS certificate pinning"
+      "rationale": "Xiaohongshu web/app endpoints enforce TLS certificate pinning"
     }
   ],
   "mitmAddedHosts": [],
@@ -938,7 +2226,35 @@
     "(?:app|api)\\.bilibili\\.com",
     "app\\.bilibili\\.com",
     "api\\.bilibili\\.com",
-    "www\\.xiaohongshu\\.com"
+    "www\\.xiaohongshu\\.com",
+    "gw\\.alicdn\\.com/mt/",
+    "gw\\.alicdn\\.com/tfs/",
+    "gw\\.alicdn\\.com/tps/",
+    "gw\\.alicdn\\.com\\/mt\\/",
+    "gw\\.alicdn\\.com\\/tfs\\/",
+    "gw\\.alicdn\\.com\\/tps\\/",
+    "applets\\.jtexpress\\.com\\.cn$",
+    "^https?:\\/\\/applets\\.jtexpress\\.com\\.cn$",
+    "githubusercontent\\.com",
+    "^https?:\\/\\/github\\.com\\/",
+    "cmbimg\\.com",
+    "cmbchina\\.com",
+    "cloud\\.ccb\\.com",
+    "icbc\\.com\\.cn",
+    "abchina\\.com",
+    "spdb\\.com\\.cn",
+    "spdbccc\\.com\\.cn",
+    "pingan\\.com",
+    "ecitic\\.com",
+    "cib\\.com\\.cn",
+    "DOMAIN-KEYWORD,volc",
+    "webcast100-ws-c-",
+    "api100-normal-quic-",
+    "api100-core-quic-",
+    "api100-quic-",
+    "frontier-aweme-",
+    "frontier100-aweme",
+    "DOMAIN-KEYWORD,-bjlgy"
   ],
   "urlRewrites": [],
   "mapLocals": [

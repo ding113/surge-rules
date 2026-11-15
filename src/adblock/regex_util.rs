@@ -15,8 +15,8 @@ pub fn normalize_surge_regex(raw: &str) -> Option<String> {
         return None;
     }
 
-    // Repair common upstream typos (`^http?:` -> `^https?:`) and unescape `\/` -> `/`
-    let mut normalized = trimmed.replace("\\/", "/");
+    // Repair common upstream typos (`^http?:` -> `^https?:`, `(>?` -> `(?:`) and unescape `\/` -> `/`
+    let mut normalized = trimmed.replace("\\/", "/").replace("(>?", "(?:");
     if let Some(rest) = normalized.strip_prefix("^http?://") {
         normalized = format!("^https?://{}", rest);
     }
@@ -25,7 +25,8 @@ pub fn normalize_surge_regex(raw: &str) -> Option<String> {
         return None;
     }
 
-    if !uses_pcre_lookaround_or_backref(&normalized) && Regex::new(&normalized).is_err() {
+    let syntax_probe = normalized.replace("(?>", "(?:");
+    if !uses_pcre_lookaround_or_backref(&syntax_probe) && Regex::new(&syntax_probe).is_err() {
         return None;
     }
 
@@ -227,6 +228,20 @@ pub fn extract_hosts_from_regex(pattern: &str) -> RegexHostInfo {
     let branches = split_top_level_alternations(host_expr);
 
     for branch in branches {
+        if let Some(opt_sub_rest) = branch
+            .trim()
+            .strip_prefix("(?:[^/?#]+\\.)?")
+            .or_else(|| branch.trim().strip_prefix("(?:[a-z0-9-]+\\.)*"))
+            && let Some((dom, true)) = regex_host_to_surge_pattern(opt_sub_rest)
+        {
+            mitm_patterns.push(dom.clone());
+            let wildcard = format!("*.{}", dom);
+            if is_valid_mitm_host(&wildcard) {
+                mitm_patterns.push(wildcard);
+            }
+            concrete_hosts.push(dom);
+            continue;
+        }
         if let Some((mitm_host, is_exact)) = regex_host_to_surge_pattern(branch) {
             mitm_patterns.push(mitm_host.clone());
             if is_exact && !mitm_host.contains(':') && is_valid_domain(&mitm_host) {
@@ -656,6 +671,111 @@ pub fn abp_url_pattern_to_surge_regex(pattern: &str) -> Option<(String, Option<S
     }
 
     None
+}
+
+/// Converts an ABP URL pattern for surgical modifiers (`$jsonprune`, `$replace`, `$hls`, `$xmlprune`, `$removeheader`)
+/// into `(surge_url_regex, concrete_hosts)`, supporting:
+/// 1. Standard host+path or `/regex/` patterns (`abp_url_pattern_to_surge_regex`).
+/// 2. Whole-host `||host^` patterns when `allow_whole_host` is true.
+/// 3. Path/extension patterns paired with positive `domain=d1|d2` scopes (up to 16 concrete domains).
+pub fn abp_surgical_pattern_to_surge_regex(
+    pattern: &str,
+    domain_scopes: Option<&[String]>,
+    allow_whole_host: bool,
+) -> Option<(String, Vec<String>)> {
+    if let Some((regex, host_opt)) = abp_url_pattern_to_surge_regex(pattern) {
+        let hosts = extract_hosts_from_regex(&regex);
+        let mut concrete = hosts.concrete_hosts;
+        if concrete.is_empty()
+            && let Some(h) = host_opt
+        {
+            concrete.push(h);
+        }
+        if !concrete.is_empty() || !hosts.mitm_patterns.is_empty() {
+            return Some((regex, concrete));
+        }
+    }
+
+    let raw = pattern.trim();
+
+    if allow_whole_host
+        && let Some(inner) = raw.strip_prefix("||")
+        && let Some(dom_raw) = inner.strip_suffix('^')
+    {
+        let dom = dom_raw.trim_end_matches('.').to_ascii_lowercase();
+        if is_valid_domain(&dom) {
+            let escaped = escape_literal_regex(&dom);
+            let full = format!("^https?://(?:[^/?#]+\\.)?{}(?::\\d+)?/", escaped);
+            let verified = normalize_surge_regex(&full)?;
+            return Some((verified, vec![dom]));
+        }
+    }
+
+    let domains = domain_scopes?;
+    if domains.is_empty() || domains.len() > 16 {
+        return None;
+    }
+    if raw.starts_with("||") || raw.starts_with('|') || raw.contains("://") {
+        return None;
+    }
+
+    let mut path_raw = raw;
+    let trailing_anchor = if let Some(rest) = path_raw.strip_suffix('|') {
+        path_raw = rest;
+        true
+    } else {
+        false
+    };
+
+    // Normalize patterns like `.com/watch?` paired with `domain=youtube.com|youtubekids.com`
+    if path_raw.starts_with('.')
+        && let Some(slash_idx) = path_raw.find('/')
+    {
+        let leading_tld = &path_raw[..slash_idx];
+        if domains.iter().all(|d| d.ends_with(leading_tld)) {
+            path_raw = &path_raw[slash_idx..];
+        }
+    }
+
+    let trimmed_path = path_raw.trim_start_matches('*');
+    if trimmed_path.len() < 3 {
+        return None;
+    }
+
+    let host_atoms: Vec<String> = domains
+        .iter()
+        .map(|d| format!("(?:[^/?#]+\\.)?{}", escape_literal_regex(d)))
+        .collect();
+    let host_group = format!("(?:{})", host_atoms.join("|"));
+
+    let tail_expr = if let Some(after_slash) = trimmed_path.strip_prefix('/') {
+        format!("/(?:[^?#]*/)?{}", abp_path_wildcard_to_regex(after_slash))
+    } else {
+        format!("/[^?#]*{}", abp_path_wildcard_to_regex(trimmed_path))
+    };
+    let suffix_anchor = if trailing_anchor { "$" } else { "" };
+    let full = format!(
+        "^https?://{}(?::\\d+)?{}{}",
+        host_group, tail_expr, suffix_anchor
+    );
+    let verified = normalize_surge_regex(&full)?;
+    Some((verified, domains.to_vec()))
+}
+
+fn abp_path_wildcard_to_regex(tail: &str) -> String {
+    let mut out = String::with_capacity(tail.len() * 2);
+    for ch in tail.chars() {
+        match ch {
+            '*' => out.push_str("[^?#]*"),
+            '^' => out.push_str("(?:[^\\w.%-]|$)"),
+            '.' | '+' | '?' | '$' | '(' | ')' | '[' | ']' | '{' | '}' | '|' | '\\' => {
+                out.push('\\');
+                out.push(ch);
+            }
+            _ => out.push(ch),
+        }
+    }
+    out
 }
 
 pub fn escape_literal_regex(s: &str) -> String {

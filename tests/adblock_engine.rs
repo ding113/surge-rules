@@ -7,6 +7,7 @@ use tempfile::TempDir;
 
 use surge_rules::adblock::compiler::{
     DomainTrie, compile_adblock, overlaps_reserved_v4, overlaps_reserved_v6,
+    overlaps_shared_cdn_or_dns_v4, overlaps_shared_cdn_or_dns_v6,
 };
 use surge_rules::adblock::config::{
     AdblockOverrides, AdblockPlatformScope, AdblockSourceCatalog, AdblockSourceConfig,
@@ -15,7 +16,8 @@ use surge_rules::adblock::config::{
 };
 use surge_rules::adblock::jq_transpile::transpile_jsonprune_to_jq;
 use surge_rules::adblock::model::{
-    BodyRewriteKind, ParsedAdblockSource, RemoveParamRule, ScriptRule, ScriptType, UrlRewriteMode,
+    BodyRewriteKind, MapLocalDataType, ParsedAdblockSource, RemoveParamRule, ScriptRule,
+    ScriptType, UrlRewriteMode,
 };
 use surge_rules::adblock::parsers::parse_adblock_source;
 use surge_rules::adblock::regex_util::{
@@ -254,6 +256,9 @@ http-request ^https?:\/\/api\.video\.example\.com\/ header-del X-Ad-Token
 [Body Rewrite]
 http-response-jq ^https?:\/\/api\.video\.example\.com\/v2\/feed 'del(.data?.ad_info?)'
 
+[Map Local]
+^https?:\/\/api\.video\.example\.com\/splash$ data-type=json data="{}" status-code=200
+
 [Script]
 feed_cleaner = type=http-response,pattern=^https?://api\.video\.example\.com/v2/feed$,requires-body=1,script-path=https://raw.githubusercontent.com/example/feed.js
 
@@ -275,8 +280,18 @@ hostname = %APPEND% api.video.example.com, *.googlevideo.com, *.com
     assert_eq!(parsed.header_rewrites.len(), 1);
     assert_eq!(parsed.header_rewrites[0].field, "X-Ad-Token");
 
-    // reject-200 / reject-dict / reject-img upgraded to Map Local; standard reject stays in URL Rewrite
-    assert_eq!(parsed.map_locals.len(), 3);
+    // reject-200 / reject-dict / reject-img + data-type=json normalized to Map Local; standard reject stays in URL Rewrite
+    assert_eq!(parsed.map_locals.len(), 4);
+    let json_ml = parsed
+        .map_locals
+        .iter()
+        .find(|m| m.pattern.contains("splash$"))
+        .expect("data-type=json Map Local should be normalized");
+    assert_eq!(json_ml.data_type, MapLocalDataType::Text);
+    assert_eq!(
+        json_ml.header.as_deref(),
+        Some("Content-Type: application/json; charset=utf-8")
+    );
     assert_eq!(parsed.url_rewrites.len(), 1);
     assert_eq!(parsed.url_rewrites[0].mode, UrlRewriteMode::Reject);
 
@@ -383,6 +398,12 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         .ruleset_cidrs_v4
         .insert("8.8.4.0/24".parse::<Ipv4Net>().unwrap());
     fallback_src
+        .ruleset_cidrs_v4
+        .insert("104.16.0.0/12".parse::<Ipv4Net>().unwrap());
+    fallback_src
+        .ruleset_cidrs_v4
+        .insert("45.33.32.0/24".parse::<Ipv4Net>().unwrap());
+    fallback_src
         .ruleset_cidrs_v6
         .insert("fd7a:115c:a1e0::/48".parse::<Ipv6Net>().unwrap());
 
@@ -415,14 +436,16 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         !compiled.ruleset_text.contains("100.64.0.0")
             && !compiled.ruleset_text.contains("192.168.1.0")
             && !compiled.ruleset_text.contains("198.51.100.0")
+            && !compiled.ruleset_text.contains("8.8.4.0")
+            && !compiled.ruleset_text.contains("104.16.0.0")
             && !compiled.ruleset_text.contains("fd7a:115c:a1e0"),
-        "reserved/LAN/Tailscale/documentation CIDRs must be stripped"
+        "reserved/LAN/Tailscale/documentation and shared-CDN/public-DNS CIDRs must be stripped"
     );
     assert!(
         compiled
             .ruleset_text
-            .contains("IP-CIDR,8.8.4.0/24,no-resolve\n"),
-        "public IP-CIDR should remain with no-resolve"
+            .contains("IP-CIDR,45.33.32.0/24,no-resolve\n"),
+        "public non-CDN IP-CIDR should remain with no-resolve"
     );
 
     // Module assertions
@@ -755,6 +778,168 @@ fn removeparam_separates_safe_global_and_scoped_webview_scripts() {
     assert!(scoped_line.contains("shop.example.com=id"));
 }
 
+#[test]
+fn adguard_corelibs_modifiers_compile_and_fallback_prunes_already_blocked_hosts() {
+    assert!(overlaps_shared_cdn_or_dns_v4(
+        "104.16.0.0/12".parse().unwrap()
+    ));
+    assert!(overlaps_shared_cdn_or_dns_v4("1.1.1.0/24".parse().unwrap()));
+    assert!(overlaps_shared_cdn_or_dns_v4("8.8.8.0/24".parse().unwrap()));
+    assert!(overlaps_shared_cdn_or_dns_v6(
+        "2606:4700::/32".parse().unwrap()
+    ));
+
+    let complex_cfg = dummy_adblock_source(
+        "corelibs_complex",
+        AdblockSourceRole::ComplexFirst,
+        AdblockSourceFormat::AbpFilter,
+        145,
+    );
+    let complex_raw = r#"
+example.com#%#//scriptlet('set-constant', 'ads', 'false')
+example.com#@%#//scriptlet('set-constant', 'ads', 'false')
+||api.stream.example.com/v1/manifest$jsonprune=\$..[ad_pods\, ad_slots]
+||api.stream.example.com/v1/config$jsonprune=\$.experiments["ad/banner"].enabled
+||cdn.stream.example.com/app.js$replace=/("ad_enabled"\s*:\s*)true/\$1false/i
+||live.stream.example.com/playlist.m3u8$hls=/#UPLYNK-SEGMENT:.*\,ad/t
+||dash.stream.example.com/mpd$xmlprune=//*[name()="Period"][.//*[@value="Ad"]] | //*[name()="Period"]/@start[boolean(//*[@value="Ad"])]
+||api.stream.example.com/v1/init$removeheader=request:X-Ad-Client
+||api.stream.example.com/v1/init$removeheader=Set-Cookie
+$removeparam=/^utm_[a-z0-9_]+$/i
+||shop.stream.example.com^$removeparam=/^spm_[a-z0-9_]+$/i
+@@||exempt.stream.example.com^$removeparam
+"#;
+    let parsed_complex =
+        parse_adblock_source(&complex_cfg, complex_raw.as_bytes()).expect("corelibs complex parse");
+    assert!(parsed_complex.ruleset_domains.is_empty());
+    assert!(parsed_complex.ruleset_suffixes.is_empty());
+    assert_eq!(parsed_complex.header_rewrites.len(), 2);
+    assert!(
+        parsed_complex
+            .body_rewrites
+            .iter()
+            .any(|b| b.expression == r#"del(.experiments?["ad/banner"]?.enabled?)"#),
+        "bracketed key jsonprune should transpile to native jq Body Rewrite"
+    );
+    assert_eq!(
+        parsed_complex.adguard_transforms.len(),
+        4,
+        "recursive jsonprune + multiline/backref replace + hls + xmlprune should emit AdguardTransformRule"
+    );
+
+    // RulesetFallback source:
+    // 1. `googlesyndication.com` is ALSO blocked as `||googlesyndication.com^` -> fallback redirect MUST be pruned!
+    // 2. `player.mixed-site.org` is NOT blocked in Adblock.list -> fallback $hls rule MUST survive into Adblock.sgmodule!
+    let fallback_cfg = dummy_adblock_source(
+        "corelibs_fallback",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::AbpFilter,
+        95,
+    );
+    let fallback_raw = r#"
+||googlesyndication.com^
+||googlesyndication.com/pagead/js/adsbygoogle.js$redirect=googlesyndication-adsbygoogle
+||player.mixed-site.org/live/*.m3u8$hls=/#EXT-X-CUE-OUT/
+"#;
+    let parsed_fallback = parse_adblock_source(&fallback_cfg, fallback_raw.as_bytes())
+        .expect("corelibs fallback parse");
+
+    let overrides = AdblockOverrides::empty();
+    let compiled = compile_adblock(&[parsed_complex, parsed_fallback], &overrides, 2, 2);
+
+    verify_module_text(&compiled.module_text).expect("CoreLibs compiled module must pass verifier");
+
+    assert!(
+        !compiled.module_text.contains("googlesyndication"),
+        "fallback redirect on already-blocked googlesyndication.com must be pruned from module & MITM"
+    );
+    assert!(
+        compiled.module_text.contains("player\\.mixed-site\\.org")
+            && compiled.module_text.contains("player.mixed-site.org"),
+        "fallback $hls rule on unblocked mixed host must be promoted into module & MITM"
+    );
+    assert!(
+        compiled.module_text.contains("surge-adguard-1 =")
+            && compiled
+                .module_text
+                .contains("https://rule-set.ygxz.de/surge-adguard.js")
+            && compiled.module_text.contains("argument=\"u:"),
+        "expected surge-adguard webview runtime scripts with percent-encoded JSON ops"
+    );
+    assert!(
+        compiled
+            .module_text
+            .contains("-exempt.stream.example.com=*"),
+        "expected @@$removeparam exemption in surge-removeparam argument"
+    );
+}
+
+#[test]
+fn four_tier_precedence_protects_canaries_from_noisy_upstream_allowlists() {
+    let mut overrides = AdblockOverrides::empty();
+    // P0a: Human Allow ALWAYS wins (even over P0b Force)
+    overrides.allow_domains.push(AllowDomainOverride {
+        match_type: AllowDomainMatchType::Suffix,
+        domain: "openai.com".to_string(),
+        rationale: "AI service domain must never be blocked in Adblock.list".to_string(),
+    });
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        kind: "DOMAIN-SUFFIX".to_string(),
+        value: "openai.com".to_string(),
+        rationale: "Verify P0a Human Allow beats P0b Force".to_string(),
+    });
+    // P0b: Human Force beats P1 Upstream Allowlist (e.g. affiliate allowlist unblocking doubleclick)
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        kind: "DOMAIN-SUFFIX".to_string(),
+        value: "doubleclick.net".to_string(),
+        rationale: "Pure ad canary must stay blocked".to_string(),
+    });
+
+    let mut noisy_upstream_allow = ParsedAdblockSource::default();
+    noisy_upstream_allow
+        .allow_suffix_domains
+        .insert("doubleclick.net".to_string());
+    noisy_upstream_allow
+        .allow_suffix_domains
+        .insert("legit-cdn.example.net".to_string());
+
+    let mut upstream_block = ParsedAdblockSource::default();
+    upstream_block
+        .ruleset_suffixes
+        .insert("openai.com".to_string());
+    upstream_block
+        .ruleset_suffixes
+        .insert("doubleclick.net".to_string());
+    upstream_block
+        .ruleset_suffixes
+        .insert("legit-cdn.example.net".to_string());
+    upstream_block
+        .ruleset_suffixes
+        .insert("ad-tracker.example.org".to_string());
+
+    let compiled = compile_adblock(&[noisy_upstream_allow, upstream_block], &overrides, 2, 2);
+    assert!(
+        !compiled.ruleset_text.contains("openai.com"),
+        "P0a Human Allow must beat P0b Force and P3 Upstream Block"
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,doubleclick.net\n"),
+        "P0b Human Force must beat noisy P1 Upstream Allowlist"
+    );
+    assert!(
+        !compiled.ruleset_text.contains("legit-cdn.example.net"),
+        "P1 Upstream Allowlist must suppress P3 Upstream Block"
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,ad-tracker.example.org\n"),
+        "P3 Upstream Block must remain active when uncontested"
+    );
+}
+
 fn arb_label() -> impl Strategy<Value = String> {
     "[a-z][a-z0-9-]{1,7}".prop_filter("no trailing dash", |s| !s.ends_with('-'))
 }
@@ -1083,6 +1268,103 @@ proptest! {
                 "expected non-wildcard host '{}' in [MITM]",
                 host
             );
+        }
+    }
+
+    // Property 6: 4-tier precedence (`Human Allow [P0a] > Human Force [P0b] > Upstream Allow [P1] > Upstream Block [P3]`)
+    // and AdGuard CoreLibs modifier compilation always produce Surge-valid rulesets and modules.
+    #[test]
+    fn prop_four_tier_precedence_and_adguard_transforms_verify(
+        human_allows in prop::collection::vec(arb_domain(), 1..8),
+        human_forces in prop::collection::vec(arb_domain(), 1..8),
+        upstream_allows in prop::collection::vec(arb_domain(), 1..8),
+        upstream_blocks in prop::collection::vec(arb_domain(), 1..15),
+        transform_hosts in prop::collection::vec(arb_domain(), 1..6),
+        fields in prop::collection::vec(arb_field(), 1..6),
+    ) {
+        let mut overrides = AdblockOverrides::empty();
+        for ha in &human_allows {
+            overrides.allow_domains.push(AllowDomainOverride {
+                match_type: AllowDomainMatchType::Suffix,
+                domain: ha.clone(),
+                rationale: "pbt human allow".to_string(),
+            });
+        }
+        for hf in &human_forces {
+            overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+                kind: "DOMAIN-SUFFIX".to_string(),
+                value: hf.clone(),
+                rationale: "pbt human force".to_string(),
+            });
+        }
+
+        let cfg = dummy_adblock_source(
+            "pbt_corelibs",
+            AdblockSourceRole::ComplexFirst,
+            AdblockSourceFormat::AbpFilter,
+            140,
+        );
+        let mut raw_lines = Vec::new();
+        for (h, f) in transform_hosts.iter().zip(fields.iter()) {
+            raw_lines.push(format!(r"||{}/api$jsonprune=\$..{}", h, f));
+            raw_lines.push(format!(r"||{}/live.m3u8$hls=/#UPLYNK-SEGMENT:.*\,{}/t", h, f));
+            raw_lines.push(format!(r"||{}/app.js$replace=/({}=)true/\$1false/i", h, f));
+        }
+        let mut parsed = parse_adblock_source(&cfg, raw_lines.join("\n").as_bytes()).unwrap();
+        for ua in &upstream_allows {
+            parsed.allow_suffix_domains.insert(ua.clone());
+        }
+        for ub in &upstream_blocks {
+            parsed.ruleset_suffixes.insert(ub.clone());
+        }
+
+        let compiled = compile_adblock(&[parsed], &overrides, 1, 1);
+        prop_assert!(
+            verify_module_text(&compiled.module_text).is_ok(),
+            "CoreLibs PBT module failed verifier:\n{}",
+            compiled.module_text
+        );
+
+        let mut trie = DomainTrie::default();
+        for line in compiled.ruleset_text.lines() {
+            if let Some(d) = line.strip_prefix("DOMAIN,") {
+                trie.insert_exact(d);
+            } else if let Some(s) = line.strip_prefix("DOMAIN-SUFFIX,") {
+                trie.insert_suffix(s);
+            }
+        }
+
+        // P0a: Human Allow never matches compiled ruleset (even if also in Human Force)
+        for ha in &human_allows {
+            prop_assert!(!trie.matches_domain(ha));
+        }
+
+        // P0b: Human Force always matches unless overridden by P0a Human Allow
+        for hf in &human_forces {
+            let covered_by_human_allow = human_allows
+                .iter()
+                .any(|ha| hf == ha || hf.ends_with(&format!(".{}", ha)) || ha.ends_with(&format!(".{}", hf)));
+            if !covered_by_human_allow {
+                prop_assert!(
+                    trie.matches_domain(hf),
+                    "P0b forced domain '{}' should be blocked even if in upstream allowlist",
+                    hf
+                );
+            }
+        }
+
+        // P1: Upstream Allow never matches unless overridden by P0b Human Force
+        for ua in &upstream_allows {
+            let covered_by_force = human_forces
+                .iter()
+                .any(|hf| ua == hf || ua.ends_with(&format!(".{}", hf)));
+            if !covered_by_force {
+                prop_assert!(
+                    !trie.matches_domain(ua),
+                    "P1 upstream allow '{}' leaked into ruleset without P0b force",
+                    ua
+                );
+            }
         }
     }
 }

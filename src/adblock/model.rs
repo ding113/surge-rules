@@ -328,6 +328,35 @@ pub struct RemoveParamRule {
     pub weight: u16,
 }
 
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, serde::Serialize)]
+#[serde(tag = "op", rename_all = "lowercase")]
+pub enum AdguardTransformOp {
+    Replace {
+        pat: String,
+        rep: String,
+        #[serde(skip_serializing_if = "String::is_empty")]
+        flags: String,
+    },
+    Hls {
+        pat: String,
+        #[serde(skip_serializing_if = "String::is_empty")]
+        flags: String,
+    },
+    XmlPrune {
+        expr: String,
+    },
+    JsonPrune {
+        expr: String,
+    },
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct AdguardTransformRule {
+    pub pattern: String,
+    pub op: AdguardTransformOp,
+    pub weight: u16,
+}
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub struct ModuleGeneralHostItem {
     pub key: String,
@@ -352,8 +381,14 @@ pub struct ParsedAdblockSource {
     pub url_rewrites: Vec<UrlRewriteRule>,
     pub map_locals: Vec<MapLocalRule>,
     pub body_rewrites: Vec<BodyRewriteRule>,
+    pub adguard_transforms: Vec<AdguardTransformRule>,
+    pub fallback_header_rewrites: Vec<HeaderRewriteRule>,
+    pub fallback_map_locals: Vec<MapLocalRule>,
+    pub fallback_body_rewrites: Vec<BodyRewriteRule>,
+    pub fallback_adguard_transforms: Vec<AdguardTransformRule>,
     pub scripts: Vec<ScriptRule>,
     pub remove_params: Vec<RemoveParamRule>,
+    pub removeparam_exceptions: Vec<(String, String)>,
     pub ruleset_domains: FxHashSet<String>,
     pub ruleset_suffixes: FxHashSet<String>,
     pub ruleset_keywords: FxHashSet<String>,
