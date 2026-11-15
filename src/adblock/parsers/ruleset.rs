@@ -218,13 +218,38 @@ pub fn parse_hosts(text: &str, src: &AdblockSourceConfig, out: &mut ParsedAdbloc
 
 pub fn parse_domain_list(text: &str, src: &AdblockSourceConfig, out: &mut ParsedAdblockSource) {
     let is_allow = src.role == AdblockSourceRole::Allowlist;
+    // Detect explicit `# Syntax:` header declarations (e.g. HaGeZi `Domains (without subdomains)` vs `Domains (wildcards)`)
+    let header_declares_exact_only = text
+        .lines()
+        .take(30)
+        .any(|l| l.to_ascii_lowercase().contains("without subdomains"));
+    let default_bare_is_suffix = !header_declares_exact_only
+        && (src.id.contains("pro_domains")
+            || src.id.contains("wildcards")
+            || src.endpoints.iter().any(|e| {
+                matches!(
+                    e,
+                    crate::config::EndpointConfig::Direct { url }
+                        if url.contains("/wildcard/")
+                            || url.ends_with("-onlydomains.txt")
+                            || url.ends_with(".wildcards")
+                )
+            }));
+
     for raw_line in text.lines() {
         let line = strip_inline_comment(raw_line.trim_start_matches('\u{feff}'));
-        if is_comment_or_empty(line) {
+        if is_comment_or_empty(line) || (line.starts_with('[') && line.ends_with(']')) {
             continue;
         }
-        // Loyalsoldier `reject-need-to-remove.txt` and HaGeZi wildcard lists use optional `full:` / `*.` prefixes
-        let (is_suffix, raw_dom) = if let Some(rest) = line.strip_prefix("full:") {
+        // Support `full:`, `domain:`, `*.`, `.`, and `||domain^` / `@@||domain^` prefixes cleanly
+        let (is_suffix, raw_dom) = if let Some(rest) = line.strip_prefix("@@||") {
+            (true, rest.trim_end_matches('^'))
+        } else if let Some(rest) = line.strip_prefix("||") {
+            if rest.contains('/') || rest.contains('$') || rest.contains('*') {
+                continue;
+            }
+            (true, rest.trim_end_matches('^'))
+        } else if let Some(rest) = line.strip_prefix("full:") {
             (false, rest)
         } else if let Some(rest) = line.strip_prefix("domain:") {
             (true, rest)
@@ -232,20 +257,8 @@ pub fn parse_domain_list(text: &str, src: &AdblockSourceConfig, out: &mut Parsed
             (true, rest)
         } else if let Some(rest) = line.strip_prefix('.') {
             (true, rest)
-        } else if src.id.contains("pro_domains")
-            || src.id.contains("wildcards")
-            || src.endpoints.iter().any(|e| {
-                matches!(
-                    e,
-                    crate::config::EndpointConfig::Direct { url }
-                        if url.contains("/wildcard/") || url.ends_with("-onlydomains.txt")
-                )
-            })
-        {
-            // HaGeZi *-onlydomains.txt / 1Hosts wildcards match domains as suffixes
-            (true, line)
         } else {
-            (false, line)
+            (default_bare_is_suffix, line)
         };
 
         let dom = raw_dom.trim().trim_end_matches('.').to_ascii_lowercase();

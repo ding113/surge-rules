@@ -13,8 +13,11 @@ use crate::adblock::compiler::{
     overlaps_shared_cdn_or_dns_v6,
 };
 use crate::adblock::config::AdblockOverrides;
+use crate::adblock::model::{MAX_BINARY_SCRIPT_MAX_SIZE, MAX_SCRIPT_TIMEOUT_SECS};
 use crate::adblock::parsers::surge_module::{split_surge_script_params, unquote_surge_value};
-use crate::adblock::regex_util::{is_valid_domain, is_valid_domain_wildcard, is_valid_mitm_host};
+use crate::adblock::regex_util::{
+    has_balanced_delimiters, is_valid_domain, is_valid_domain_wildcard, is_valid_mitm_host,
+};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct AdblockFileSummary {
@@ -523,6 +526,9 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                 let mut spattern = None;
                 let mut spath = None;
                 let mut sengine = None;
+                let mut srequires_body = false;
+                let mut smax_size: Option<i64> = None;
+                let mut stimeout: Option<u32> = None;
                 for p in params {
                     let Some((k, raw_v)) = p.split_once('=') else {
                         bail!(
@@ -537,6 +543,29 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                         "pattern" => spattern = Some(val),
                         "script-path" => spath = Some(val),
                         "engine" => sengine = Some(val),
+                        "requires-body" => {
+                            srequires_body = matches!(val.as_str(), "true" | "1");
+                        }
+                        "max-size" => {
+                            let parsed = val.parse::<i64>().with_context(|| {
+                                format!(
+                                    "Adblock.sgmodule line {} [Script] invalid max-size '{}'",
+                                    line_no + 1,
+                                    val
+                                )
+                            })?;
+                            smax_size = Some(parsed);
+                        }
+                        "timeout" => {
+                            let parsed = val.parse::<u32>().with_context(|| {
+                                format!(
+                                    "Adblock.sgmodule line {} [Script] invalid timeout '{}'",
+                                    line_no + 1,
+                                    val
+                                )
+                            })?;
+                            stimeout = Some(parsed);
+                        }
                         _ => {}
                     }
                 }
@@ -547,14 +576,44 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                         line
                     );
                 };
-                if (clean_name.starts_with("surge-removeparam")
-                    || clean_name.starts_with("surge-adguard"))
-                    && sengine.as_deref() != Some("webview")
+                if sengine.as_deref() != Some("jsc") {
+                    bail!(
+                        "Adblock.sgmodule line {} [Script] '{}' must specify engine=jsc (got {:?}) to prevent WKWebView memory spikes",
+                        line_no + 1,
+                        clean_name,
+                        sengine
+                    );
+                }
+                if srequires_body {
+                    match smax_size {
+                        Some(sz) if (1..=MAX_BINARY_SCRIPT_MAX_SIZE).contains(&sz) => {}
+                        other => bail!(
+                            "Adblock.sgmodule line {} [Script] '{}' requires-body=true must have bounded positive max-size <= {} (got {:?})",
+                            line_no + 1,
+                            clean_name,
+                            MAX_BINARY_SCRIPT_MAX_SIZE,
+                            other
+                        ),
+                    }
+                } else if let Some(sz) = smax_size
+                    && !(1..=MAX_BINARY_SCRIPT_MAX_SIZE).contains(&sz)
                 {
                     bail!(
-                        "Adblock.sgmodule line {} built-in runtime script '{}' must specify engine=webview",
+                        "Adblock.sgmodule line {} [Script] '{}' invalid max-size={}",
                         line_no + 1,
-                        clean_name
+                        clean_name,
+                        sz
+                    );
+                }
+                if let Some(t) = stimeout
+                    && !(1..=MAX_SCRIPT_TIMEOUT_SECS).contains(&t)
+                {
+                    bail!(
+                        "Adblock.sgmodule line {} [Script] '{}' timeout={} exceeds safe ceiling {}s",
+                        line_no + 1,
+                        clean_name,
+                        t,
+                        MAX_SCRIPT_TIMEOUT_SECS
                     );
                 }
                 if !matches!(st.as_str(), "http-request" | "http-response")
@@ -569,6 +628,7 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                 let rust_probe = sp.replace("(?>", "(?:");
                 if sp.is_empty()
                     || !sp.is_ascii()
+                    || !has_balanced_delimiters(&sp)
                     || (!sp.contains("(?=")
                         && !sp.contains("(?!")
                         && !sp.contains("(?<=")

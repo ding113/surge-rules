@@ -500,7 +500,7 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         "RULE-SET with policy column must fail verifier"
     );
 
-    // Corrupting Adblock.sgmodule with unsafe wildcard / %APPEND% / unquoted comma / jsc must fail verifier
+    // Corrupting Adblock.sgmodule with unsafe wildcard / %APPEND% / unquoted comma / webview / max-size=-1 / timeout=60 must fail verifier
     assert!(verify_module_text("[MITM]\nhostname = %INSERT% *\n").is_err());
     assert!(verify_module_text("[MITM]\nhostname = %APPEND% api.example.com\n").is_err());
     assert!(
@@ -508,13 +508,25 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
     );
     assert!(
         verify_module_text(
-            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nbad = type=http-response,pattern=^https://a\\.example\\.com/v{1,4}$,script-path=https://example.com/s.js\n[MITM]\nhostname = %INSERT% a.example.com\n"
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nbad = type=http-response,pattern=^https://a\\.example\\.com/v{1,4}$,script-path=https://example.com/s.js,requires-body=true,max-size=524288,engine=jsc\n[MITM]\nhostname = %INSERT% a.example.com\n"
         )
         .is_err()
     );
     assert!(
         verify_module_text(
-            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nsurge-removeparam = type=http-request,pattern=^https?://[^?#]+\\?(?:[^#]*&)?(?:utm_source)=,script-path=https://example.com/rp.js,engine=jsc\n[MITM]\nhostname = %INSERT% a.example.com\n"
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nsurge-removeparam = type=http-request,pattern=^https?://[^?#]+\\?(?:[^#]*&)?(?:utm_source)=,script-path=https://example.com/rp.js,engine=webview\n[MITM]\nhostname = %INSERT% a.example.com\n"
+        )
+        .is_err()
+    );
+    assert!(
+        verify_module_text(
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nunbounded = type=http-response,pattern=^https://a\\.example\\.com/v1$,script-path=https://example.com/s.js,requires-body=true,max-size=-1,engine=jsc\n[MITM]\nhostname = %INSERT% a.example.com\n"
+        )
+        .is_err()
+    );
+    assert!(
+        verify_module_text(
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[Script]\nslow = type=http-response,pattern=^https://a\\.example\\.com/v1$,script-path=https://example.com/s.js,requires-body=true,max-size=524288,timeout=60,engine=jsc\n[MITM]\nhostname = %INSERT% a.example.com\n"
         )
         .is_err()
     );
@@ -763,7 +775,7 @@ fn removeparam_separates_safe_global_and_scoped_webview_scripts() {
         .copied()
         .find(|l| l.starts_with("surge-removeparam ="))
         .expect("missing surge-removeparam");
-    assert!(global_line.contains("engine=webview"));
+    assert!(global_line.contains("engine=jsc"));
     assert!(global_line.contains("utm_source"));
     assert!(!global_line.contains("from"));
     assert!(!global_line.contains("*=id"));
@@ -773,7 +785,7 @@ fn removeparam_separates_safe_global_and_scoped_webview_scripts() {
         .copied()
         .find(|l| l.starts_with("surge-removeparam-scoped ="))
         .expect("missing surge-removeparam-scoped");
-    assert!(scoped_line.contains("engine=webview"));
+    assert!(scoped_line.contains("engine=jsc"));
     assert!(scoped_line.contains("shop\\.example\\.com"));
     assert!(scoped_line.contains("shop.example.com=id"));
 }
@@ -938,6 +950,120 @@ fn four_tier_precedence_protects_canaries_from_noisy_upstream_allowlists() {
             .contains("DOMAIN-SUFFIX,ad-tracker.example.org\n"),
         "P3 Upstream Block must remain active when uncontested"
     );
+}
+
+#[test]
+fn round2_script_performance_subsumption_and_dialect_guards() {
+    // 1. Generic host regex & multipart public suffix MITM wildcard must be rejected
+    assert!(
+        normalize_surge_regex(
+            r"^https?://[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+){1,3}(:\d+)?/api/v\d/movie/index_recommend"
+        )
+        .is_none()
+    );
+    assert!(!is_valid_mitm_host("*.com.cn"));
+    assert!(!is_valid_mitm_host("*.co.uk"));
+
+    // 2. Surge module parser: drops engine=webview, clamps max-size=-1/0 and timeout=60, preserves {1,4} comma regex
+    let mod_src = dummy_adblock_source(
+        "perf_mod",
+        AdblockSourceRole::ComplexFirst,
+        AdblockSourceFormat::SurgeModule,
+        94,
+    );
+    let mod_raw = r#"
+#!name=Perf Test
+[Map Local]
+^https?://api\.zhihu\.com/commercial_api/real_time_launch_v2 data-type=text data="{}" status-code=200
+
+[Script]
+webview_heavy = type=http-response,pattern=^https?://api\.heavy\.example\.com/v1/feed$,requires-body=1,engine=webview,script-path=https://example.com/heavy.js
+unbounded_json = type=http-response,pattern=^https?://api\.feed\.example\.com/v\d{1,4}/plaza\?,requires-body=1,max-size=-1,timeout=60,script-path=https://example.com/plaza_high.js
+unbounded_proto = type=http-response,pattern=^https://proto\.feed\.example\.com/v1/(browse|next),requires-body=1,binary-body-mode=1,max-size=0,timeout=45,script-path=https://example.com/proto.js
+shadowed_by_maplocal = type=http-response,pattern=^https://api\.zhihu\.com/commercial_api/real_time_launch_v2,requires-body=1,max-size=-1,script-path=https://example.com/launch.js
+"#;
+    let parsed_high = parse_adblock_source(&mod_src, mod_raw.as_bytes()).unwrap();
+    assert_eq!(
+        parsed_high.scripts.len(),
+        3,
+        "engine=webview script must be dropped at parse time"
+    );
+
+    // Lower-weight aggregator module with near-duplicate / narrower scripts
+    let low_mod_src = dummy_adblock_source(
+        "agg_mod",
+        AdblockSourceRole::ComplexFirst,
+        AdblockSourceFormat::SurgeModule,
+        85,
+    );
+    let low_mod_raw = r#"
+#!name=Agg Test
+[Script]
+dup_plaza = type=http-response,pattern=^https://api\.feed\.example\.com/v1/plaza\?,requires-body=1,max-size=0,script-path=https://example.com/plaza_low.js
+broader_proto = type=http-response,pattern=^https?://proto\.feed\.example\.com/v1/(browse|next|player|search),requires-body=1,binary-body-mode=1,max-size=-1,script-path=https://example.com/proto_all.js
+"#;
+    let parsed_low = parse_adblock_source(&low_mod_src, low_mod_raw.as_bytes()).unwrap();
+
+    let compiled = compile_adblock(&[parsed_high, parsed_low], &AdblockOverrides::empty(), 2, 2);
+    verify_module_text(&compiled.module_text).expect("optimized module must pass strict verifier");
+    assert!(!compiled.module_text.contains("max-size=-1"));
+    assert!(!compiled.module_text.contains("max-size=0"));
+    assert!(!compiled.module_text.contains("timeout=60"));
+    assert!(!compiled.module_text.contains("engine=webview"));
+    assert!(compiled.module_text.contains("max-size=524288"));
+    assert!(compiled.module_text.contains("max-size=1048576"));
+    assert!(compiled.module_text.contains("timeout=10"));
+    assert!(
+        !compiled.module_text.contains("dup_plaza ="),
+        "narrower lower-weight v1/plaza script must be subsumed by v\\d{{1,4}}/plaza"
+    );
+    assert!(
+        !compiled.module_text.contains("shadowed_by_maplocal ="),
+        "http-response script shadowed by equal/higher-weight Map Local must be pruned"
+    );
+    assert!(
+        compiled.module_text.contains("broader_proto ="),
+        "lower-weight script with extra un-matched branches (player|search) must remain reachable"
+    );
+
+    // 3. Domain list `# Syntax: Domains (without subdomains)` & ABP first-party `$domain=` allowlist
+    let mut tif_src = dummy_adblock_source(
+        "tif_mini",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::DomainList,
+        90,
+    );
+    tif_src.endpoints = vec![EndpointConfig::Direct {
+        url: "https://example.com/wildcard/tif.mini-onlydomains.txt".to_string(),
+    }];
+    let tif_raw = "# Syntax: Domains (without subdomains)\nsub.sharedhost.example.org\n*.wholebad.example.org\n";
+    let parsed_tif = parse_adblock_source(&tif_src, tif_raw.as_bytes()).unwrap();
+    assert!(
+        parsed_tif
+            .ruleset_domains
+            .contains("sub.sharedhost.example.org")
+    );
+    assert!(
+        !parsed_tif
+            .ruleset_suffixes
+            .contains("sub.sharedhost.example.org")
+    );
+    assert!(parsed_tif.ruleset_suffixes.contains("wholebad.example.org"));
+
+    let allow_src = dummy_adblock_source(
+        "cn_allow",
+        AdblockSourceRole::Allowlist,
+        AdblockSourceFormat::AbpFilter,
+        96,
+    );
+    let allow_raw = "@@||console.bce.baidu.com^$domain=console.bce.baidu.com\n@@||coolapk.com\n";
+    let parsed_allow = parse_adblock_source(&allow_src, allow_raw.as_bytes()).unwrap();
+    assert!(
+        parsed_allow
+            .allow_exact_domains
+            .contains("console.bce.baidu.com")
+    );
+    assert!(parsed_allow.allow_suffix_domains.contains("coolapk.com"));
 }
 
 fn arb_label() -> impl Strategy<Value = String> {
@@ -1236,7 +1362,7 @@ proptest! {
         prop_assert!(script_lines[2].starts_with("surge-removeparam-scoped ="));
 
         let global_line = script_lines[1];
-        prop_assert!(global_line.contains("engine=webview"));
+        prop_assert!(global_line.contains("engine=jsc"));
         for p in &safe_globals {
             prop_assert!(global_line.contains(p.as_str()));
         }
@@ -1255,7 +1381,7 @@ proptest! {
         }
 
         let scoped_line = script_lines[2];
-        prop_assert!(scoped_line.contains("engine=webview"));
+        prop_assert!(scoped_line.contains("engine=jsc"));
         for (host, param, _) in &scoped_rules {
             prop_assert!(
                 scoped_line.contains(param.as_str()),

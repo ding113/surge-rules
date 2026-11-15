@@ -1,6 +1,6 @@
 use crate::adblock::model::{
     MapLocalDataType, MapLocalRule, ParsedAdblockSource, ScriptRule, ScriptType, UrlRewriteMode,
-    UrlRewriteRule,
+    UrlRewriteRule, normalize_script_limits,
 };
 use crate::adblock::parsers::surge_module::sanitize_script_name;
 use crate::adblock::regex_util::{
@@ -133,6 +133,7 @@ pub fn parse_qx_rewrite(text: &str, weight: u16, out: &mut ParsedAdblockSource) 
                     .next()
                     .unwrap_or("qx_script")
                     .trim_end_matches(".js");
+                let (max_size, timeout) = normalize_script_limits(requires_body, false, None, None);
                 script_idx += 1;
                 out.scripts.push(ScriptRule {
                     name: format!("qx_{}_{}", sanitize_script_name(base), script_idx),
@@ -141,10 +142,10 @@ pub fn parse_qx_rewrite(text: &str, weight: u16, out: &mut ParsedAdblockSource) 
                     script_path: (*script_url).to_string(),
                     requires_body,
                     binary_body_mode: false,
-                    max_size: Some(-1),
-                    timeout: None,
+                    max_size,
+                    timeout,
                     argument: None,
-                    engine: None,
+                    engine: Some("jsc".to_string()),
                     weight,
                 });
             }

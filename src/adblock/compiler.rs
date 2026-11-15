@@ -3,6 +3,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use ipnet::{Ipv4Net, Ipv6Net};
+use regex::Regex;
 use rustc_hash::FxHashSet;
 
 use crate::adblock::config::AllowDomainMatchType;
@@ -12,7 +13,10 @@ use crate::adblock::model::{
     HeaderDirection, HeaderRewriteRule, MapLocalDataType, MapLocalRule, ParsedAdblockSource,
     RemoveParamRule, ScriptRule, ScriptType, UrlRewriteMode, UrlRewriteRule,
 };
-use crate::adblock::regex_util::{extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host};
+use crate::adblock::regex_util::{
+    canonical_url_pattern_key, extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host,
+    sample_urls_for_regex_subsumption,
+};
 
 #[derive(Default)]
 struct DomainTrieNode {
@@ -622,7 +626,24 @@ pub fn compile_adblock(
     script_candidates.extend(build_adguard_transform_scripts(adguard_transforms));
 
     // 6. Deduplicate scripts while enforcing Surge's 1-script-per-(type, pattern) precedence
-    let mut final_scripts = resolve_script_conflicts(script_candidates);
+    //    and pruning shadowed scripts already short-circuited by [Map Local] / [URL Rewrite] or broader higher-weight scripts.
+    let mut short_circuit_response_keys: HashMap<String, u16> = HashMap::new();
+    for ml in map_local_map.values() {
+        let entry = short_circuit_response_keys
+            .entry(canonical_url_pattern_key(&ml.pattern))
+            .or_insert(0);
+        *entry = (*entry).max(ml.weight);
+    }
+    for ur in url_map.values() {
+        if ur.mode != UrlRewriteMode::Header {
+            let entry = short_circuit_response_keys
+                .entry(canonical_url_pattern_key(&ur.pattern))
+                .or_insert(0);
+            *entry = (*entry).max(ur.weight);
+        }
+    }
+    let mut final_scripts =
+        resolve_script_conflicts(script_candidates, &short_circuit_response_keys);
 
     // 7. Filter MITM hosts against `-` exclusions and prune HTTPS-only module rules targeting excluded hosts
     mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
@@ -642,6 +663,9 @@ pub fn compile_adblock(
         &final_suffix_trie,
         &compressed_domains,
     ));
+    for s in &mut final_scripts {
+        s.normalize_runtime_bounds();
+    }
 
     // Enforce `-` exclusions again in case small-scale removeparam rules introduced MITM hosts
     mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
@@ -934,7 +958,7 @@ fn build_adguard_transform_scripts(mut rules: Vec<AdguardTransformRule>) -> Vec<
             max_size: Some(524_288),
             timeout: Some(5),
             argument: Some(argument),
-            engine: Some("webview".to_string()),
+            engine: Some("jsc".to_string()),
             weight,
         });
     }
@@ -942,7 +966,14 @@ fn build_adguard_transform_scripts(mut rules: Vec<AdguardTransformRule>) -> Vec<
     out
 }
 
-fn resolve_script_conflicts(mut candidates: Vec<ScriptRule>) -> Vec<ScriptRule> {
+fn resolve_script_conflicts(
+    mut candidates: Vec<ScriptRule>,
+    short_circuit_response_keys: &HashMap<String, u16>,
+) -> Vec<ScriptRule> {
+    for c in &mut candidates {
+        c.normalize_runtime_bounds();
+    }
+
     candidates.sort_by(|a, b| {
         b.weight
             .cmp(&a.weight)
@@ -951,12 +982,52 @@ fn resolve_script_conflicts(mut candidates: Vec<ScriptRule>) -> Vec<ScriptRule> 
             .then_with(|| a.name.cmp(&b.name))
     });
 
-    let mut seen_triggers: FxHashSet<(ScriptType, String)> = FxHashSet::default();
-    let mut kept = Vec::new();
+    let mut seen_triggers: HashMap<(ScriptType, String), usize> = HashMap::new();
+    let mut accepted_req_regexes: Vec<Regex> = Vec::new();
+    let mut accepted_resp_regexes: Vec<Regex> = Vec::new();
+    let mut kept: Vec<ScriptRule> = Vec::new();
+
     for s in candidates {
-        if seen_triggers.insert(s.trigger_key()) {
-            kept.push(s);
+        let tkey = s.trigger_key();
+        if s.script_type == ScriptType::HttpResponse
+            && short_circuit_response_keys
+                .get(&tkey.1)
+                .is_some_and(|&sc_w| sc_w >= s.weight)
+        {
+            continue;
         }
+        if let Some(&winner_idx) = seen_triggers.get(&tkey) {
+            if s.pattern.starts_with("^https?://")
+                && let Some(rest) = kept[winner_idx].pattern.strip_prefix("^https://")
+            {
+                kept[winner_idx].pattern = format!("^https?://{}", rest);
+            }
+            continue;
+        }
+
+        let prior_regexes = match s.script_type {
+            ScriptType::HttpRequest => &accepted_req_regexes,
+            ScriptType::HttpResponse => &accepted_resp_regexes,
+        };
+        let samples = sample_urls_for_regex_subsumption(&s.pattern);
+        if !samples.is_empty()
+            && !prior_regexes.is_empty()
+            && samples
+                .iter()
+                .all(|url| prior_regexes.iter().any(|re| re.is_match(url)))
+        {
+            continue;
+        }
+
+        let probe = s.pattern.replace("(?>", "(?:");
+        if let Ok(re) = Regex::new(&probe) {
+            match s.script_type {
+                ScriptType::HttpRequest => accepted_req_regexes.push(re),
+                ScriptType::HttpResponse => accepted_resp_regexes.push(re),
+            }
+        }
+        seen_triggers.insert(tkey, kept.len());
+        kept.push(s);
     }
 
     // Sort output stably by (weight desc, name, pattern) so higher-authority scripts evaluate first
@@ -1247,7 +1318,7 @@ fn build_removeparam_scripts(
                 max_size: None,
                 timeout: Some(5),
                 argument: Some(arg_parts.join(";")),
-                engine: Some("webview".to_string()),
+                engine: Some("jsc".to_string()),
                 weight: 1,
             });
         }
@@ -1373,7 +1444,7 @@ fn build_removeparam_scripts(
                 max_size: None,
                 timeout: Some(5),
                 argument: Some(arg_chunks.join(";")),
-                engine: Some("webview".to_string()),
+                engine: Some("jsc".to_string()),
                 weight: 1,
             });
         }

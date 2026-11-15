@@ -398,16 +398,18 @@ fn parse_exception_line(exc: &str, out: &mut ParsedAdblockSource) {
         Some((p, m)) => (p, Some(m)),
         None => (exc, None),
     };
+    let Some(dom) = extract_exact_abp_domain(pat) else {
+        return;
+    };
     if let Some(mods) = mods_opt {
-        for m in split_abp_modifiers(mods) {
-            if m.starts_with("domain=")
-                || m.starts_with("from=")
-                || m.starts_with("removeparam")
+        let mod_tokens = split_abp_modifiers(mods);
+        for m in &mod_tokens {
+            if m.starts_with("removeparam")
                 || m.starts_with("redirect")
                 || m.starts_with("replace=")
                 || m.starts_with("jsonprune=")
                 || matches!(
-                    m,
+                    *m,
                     "elemhide"
                         | "generichide"
                         | "specifichide"
@@ -418,20 +420,25 @@ fn parse_exception_line(exc: &str, out: &mut ParsedAdblockSource) {
             {
                 return;
             }
+            if m.starts_with("domain=") || m.starts_with("from=") {
+                // Only accept `$domain=` exceptions when they are first-party self-unbreaks
+                // (e.g. `@@||console.bce.baidu.com^$domain=console.bce.baidu.com`).
+                match extract_domain_option(&mod_tokens) {
+                    DomainOption::Positive(pos_doms)
+                        if pos_doms
+                            .iter()
+                            .any(|pd| dom == *pd || dom.ends_with(&format!(".{}", pd))) => {}
+                    _ => return,
+                }
+            }
+        }
+        if mod_tokens.iter().any(|t| matches!(*t, "document" | "doc")) {
+            out.allow_suffix_domains.insert(dom);
+            return;
         }
     }
-    if let Some(dom) = extract_exact_abp_domain(pat) {
-        if mods_opt.is_some_and(|m| {
-            split_abp_modifiers(m)
-                .into_iter()
-                .any(|t| matches!(t, "document" | "doc"))
-        }) {
-            out.allow_suffix_domains.insert(dom);
-        } else {
-            out.allow_exact_domains.insert(dom.clone());
-            out.allow_suffix_domains.insert(dom);
-        }
-    }
+    out.allow_exact_domains.insert(dom.clone());
+    out.allow_suffix_domains.insert(dom);
 }
 
 enum DomainOption {
@@ -813,7 +820,8 @@ fn parse_fallback_domain_rule(pat: &str, mods: &str, out: &mut ParsedAdblockSour
 }
 
 fn extract_exact_abp_domain(pat: &str) -> Option<String> {
-    let inner = pat.strip_prefix("||")?.strip_suffix('^')?;
+    let after_anchor = pat.strip_prefix("||")?;
+    let inner = after_anchor.strip_suffix('^').unwrap_or(after_anchor);
     if inner.contains(['/', '*', '?', ':', '|', '$']) {
         return None;
     }

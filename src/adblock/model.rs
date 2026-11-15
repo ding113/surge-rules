@@ -1,6 +1,8 @@
 use ipnet::{Ipv4Net, Ipv6Net};
 use rustc_hash::FxHashSet;
 
+use crate::adblock::regex_util::canonical_url_pattern_key;
+
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum HeaderDirection {
     HttpRequest,
@@ -50,7 +52,7 @@ impl HeaderRewriteRule {
     pub fn dedup_key(&self) -> (HeaderDirection, String, HeaderAction, String) {
         (
             self.direction,
-            self.pattern.clone(),
+            canonical_url_pattern_key(&self.pattern),
             self.action,
             self.field.to_ascii_lowercase(),
         )
@@ -119,7 +121,7 @@ pub struct UrlRewriteRule {
 
 impl UrlRewriteRule {
     pub fn dedup_key(&self) -> (String, UrlRewriteMode) {
-        (self.pattern.clone(), self.mode)
+        (canonical_url_pattern_key(&self.pattern), self.mode)
     }
 
     pub fn to_surge_line(&self) -> String {
@@ -167,7 +169,7 @@ pub struct MapLocalRule {
 
 impl MapLocalRule {
     pub fn dedup_key(&self) -> String {
-        self.pattern.clone()
+        canonical_url_pattern_key(&self.pattern)
     }
 
     pub fn to_surge_line(&self) -> String {
@@ -222,7 +224,11 @@ pub struct BodyRewriteRule {
 
 impl BodyRewriteRule {
     pub fn dedup_key(&self) -> (BodyRewriteKind, String, String) {
-        (self.kind, self.pattern.clone(), self.expression.clone())
+        (
+            self.kind,
+            canonical_url_pattern_key(&self.pattern),
+            self.expression.clone(),
+        )
     }
 
     pub fn to_surge_line(&self) -> String {
@@ -279,13 +285,74 @@ pub struct ScriptRule {
     pub weight: u16,
 }
 
+pub const DEFAULT_TEXT_SCRIPT_MAX_SIZE: i64 = 524_288;
+pub const MAX_BINARY_SCRIPT_MAX_SIZE: i64 = 1_048_576;
+pub const MIN_EXPLICIT_SCRIPT_MAX_SIZE: i64 = 16_384;
+pub const DEFAULT_SCRIPT_TIMEOUT_SECS: u32 = 5;
+pub const MIN_SCRIPT_TIMEOUT_SECS: u32 = 3;
+pub const MAX_SCRIPT_TIMEOUT_SECS: u32 = 10;
+
+pub fn normalize_script_limits(
+    requires_body: bool,
+    binary_body_mode: bool,
+    raw_max_size: Option<i64>,
+    raw_timeout: Option<u32>,
+) -> (Option<i64>, Option<u32>) {
+    let max_size = if !requires_body {
+        None
+    } else if binary_body_mode {
+        Some(match raw_max_size {
+            Some(sz)
+                if (MIN_EXPLICIT_SCRIPT_MAX_SIZE..=MAX_BINARY_SCRIPT_MAX_SIZE).contains(&sz) =>
+            {
+                sz
+            }
+            _ => MAX_BINARY_SCRIPT_MAX_SIZE,
+        })
+    } else {
+        Some(match raw_max_size {
+            Some(sz)
+                if (MIN_EXPLICIT_SCRIPT_MAX_SIZE..=DEFAULT_TEXT_SCRIPT_MAX_SIZE).contains(&sz) =>
+            {
+                sz
+            }
+            _ => DEFAULT_TEXT_SCRIPT_MAX_SIZE,
+        })
+    };
+    let timeout = Some(
+        raw_timeout
+            .unwrap_or(DEFAULT_SCRIPT_TIMEOUT_SECS)
+            .clamp(MIN_SCRIPT_TIMEOUT_SECS, MAX_SCRIPT_TIMEOUT_SECS),
+    );
+    (max_size, timeout)
+}
+
 impl ScriptRule {
     pub fn trigger_key(&self) -> (ScriptType, String) {
-        (self.script_type, self.pattern.clone())
+        (self.script_type, canonical_url_pattern_key(&self.pattern))
+    }
+
+    /// Enforces iOS PacketTunnelProvider memory & concurrency invariants:
+    /// - `engine=jsc` (prevents WKWebView ~40 MB memory spikes on iOS NE)
+    /// - Bounded `max-size` (`<= 512 KiB` for JSON/text, `<= 1 MiB` for binary protobuf; never `-1` or `0`)
+    /// - Bounded `timeout` (`3..=10` seconds)
+    pub fn normalize_runtime_bounds(&mut self) {
+        let (max_size, timeout) = normalize_script_limits(
+            self.requires_body,
+            self.binary_body_mode,
+            self.max_size,
+            self.timeout,
+        );
+        self.max_size = max_size;
+        self.timeout = timeout;
+        self.engine = Some("jsc".to_string());
     }
 
     pub fn to_surge_line(&self, unique_name: &str) -> String {
-        let pattern_param = if self.pattern.contains(',') || self.pattern.contains('"') {
+        let pattern_param = if self.pattern.contains(',')
+            || self.pattern.contains('"')
+            || self.pattern.chars().any(char::is_whitespace)
+        {
             format!("pattern=\"{}\"", escape_quoted_value(&self.pattern))
         } else {
             format!("pattern={}", self.pattern)

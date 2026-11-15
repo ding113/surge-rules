@@ -39,10 +39,9 @@ FINAL,Proxy,dns-failed
 ## 数据源
 
 <details>
-<summary>去广告模块与高级重写数据源（共 36 项）</summary>
+<summary>去广告模块与高级重写数据源（共 38 项）</summary>
 
 ```text
-Biliverse BiliBili ADBlock Module, https://github.com/Biliverse/ADBlock/releases/latest
 app2smile YouTube Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/youtube.sgmodule
 Walvez Surge StartUp Ads Module, https://raw.githubusercontent.com/Walvez/surge-startup-ads/main/dist/StartUpAds_Selected.sgmodule
 app2smile Spotify Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/spotify.module
@@ -53,11 +52,14 @@ app2smile Qidian Reader Adblock Module, https://raw.githubusercontent.com/app2sm
 ddgksf2013 Weibo Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/WeiboAds.conf
 ddgksf2013 Amap Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/AmapAds.conf
 AdGuard URL Tracking Protection Filter (CoreLibs), https://filters.adtidy.org/windows/filters/17.txt
+uBlock Origin Privacy Query Parameter Stripping ($removeparam), https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt
 AdGuard Spyware Filter General Extensions ($removeparam / $removeheader), https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/general_extensions.txt
+AdGuard Legitimate URL Shortener Filter ($removeparam Pre-Compiled), https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_251_LegitimateURLShortener/filter.txt
 Dandelion Sprout ClearURLs ($removeparam), https://raw.githubusercontent.com/DandelionSprout/adfilt/master/ClearURLs%20for%20uBo/clear_urls_uboified.txt
+AdGuard Dandelion Sprout Annoyances ($removeparam Pre-Compiled), https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_250_DandelionSproutAnnoyances/filter.txt
+RU AdList Counter & Parameter Block ($removeparam), https://raw.githubusercontent.com/easylist/ruadlist/master/cntblock.txt
 app2smile Tencent News Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/qqnews.sgmodule
 Maasea Keep Adblock Module, https://raw.githubusercontent.com/Maasea/sgmodule/master/KeepAds.sgmodule
-ddgksf2013 Xiaohongshu Adblock Module, https://raw.githubusercontent.com/ifflagged/Romeo/main/Modules/Surge/ddgksf2013/XiaoHongShuAds.sgmodule
 app2smile Google AdSense Module, https://raw.githubusercontent.com/app2smile/rules/master/module/adsense.sgmodule
 fmz200 X (Twitter) Web Adblock Module, https://raw.githubusercontent.com/fmz200/wool_scripts/main/Surge/module/XWebAds.module
 ddgksf2013 Ximalaya Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/Ximalaya.conf
@@ -83,7 +85,7 @@ fmz200 Wool Scripts BlockAds Module, https://raw.githubusercontent.com/fmz200/wo
 </details>
 
 <details>
-<summary>去广告与隐私安全拦截数据源（共 102 项）</summary>
+<summary>去广告与隐私安全拦截数据源（共 126 项）</summary>
 
 ```text
 AdGuard Mobile Ads Filter (CoreLibs), https://filters.adtidy.org/windows/filters/11.txt
@@ -96,12 +98,24 @@ AdGuard Online Malicious URL Blocklist (CoreLibs), https://filters.adtidy.org/wi
 AdGuard DNS Filter, https://filters.adtidy.org/windows/filters/15.txt
 AdGuard DNS Popup Hosts Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_59.txt
 AdGuard CNAME Disguised Ads List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_ads.txt
-uBlock Origin Built-in Filters, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt
-uBlock Origin Privacy Filters, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt
-uBlock Origin Badware Risks, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt
+AdGuard CNAME Disguised Trackers List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_trackers.txt
+AdGuard CNAME Disguised Clickthroughs List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_clickthroughs.txt
+AdGuard Japanese Filter (CoreLibs), https://filters.adtidy.org/windows/filters/7.txt
+List-KR Korean Filter (AdGuard CoreLibs), https://filters.adtidy.org/windows/filters/227.txt
+AdGuard German Filter (CoreLibs), https://filters.adtidy.org/windows/filters/6.txt
+AdGuard French Filter (CoreLibs), https://filters.adtidy.org/windows/filters/16.txt
+AdGuard Russian Filter (CoreLibs), https://filters.adtidy.org/windows/filters/1.txt
+AdGuard Spanish/Portuguese Filter (CoreLibs), https://filters.adtidy.org/windows/filters/9.txt
+AdGuard Turkish Filter (CoreLibs), https://filters.adtidy.org/windows/filters/13.txt
+AdGuard Dutch Filter (CoreLibs), https://filters.adtidy.org/windows/filters/8.txt
+uBlock Origin Built-in Filters (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/filters.min.txt
+uBlock Origin Privacy Filters (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt
+uBlock Origin Badware Risks (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/badware.min.txt
 uBlock Origin Resource Abuse Filter, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt
 uBlock Origin Cookie Notices Filter, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/annoyances-cookies.txt
 uBlock Origin Annoyances Filter, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/annoyances-others.txt
+Brave First-Party Adblock Filters, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty.txt
+Brave First-Party Regional Adblock Filters, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-regional.txt
 Brave First-Party CNAME Cloaking Trackers, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-cname.txt
 Brave Specific Adblock Rules, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-specific.txt
 Brave iOS Specific Adblock Rules, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-ios-specific.txt
@@ -109,6 +123,8 @@ EasyPrivacy Official, https://easylist.to/easylist/easyprivacy.txt
 EasyList Official, https://easylist.to/easylist/easylist.txt
 EasyList China, https://raw.githubusercontent.com/easylist/easylistchina/master/easylistchina.txt
 Fanboy's Annoyance List, https://secure.fanboy.co.nz/fanboy-annoyance.txt
+EasyList / Fanboy Cookie Monster (uBO), https://secure.fanboy.co.nz/fanboy-cookiemonster_ubo.txt
+Fanboy Mobile App Promo & Notifications Blocker, https://secure.fanboy.co.nz/fanboy-mobile-notifications.txt
 ABP Anti-Circumvention Filter List, https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/english.txt
 Anti-Adblock Killer / EasyList Anti-Adblock Filters, https://raw.githubusercontent.com/easylist/antiadblockfilters/master/antiadblockfilters/antiadblock_english.txt
 AWAvenue Ads Rule (Surge RULE-SET), https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-RULE-SET.list
@@ -135,6 +151,7 @@ ACL4SSR BanProgramAD, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/C
 ACL4SSR BanAD, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanAD.list
 geekdada Surge Ads List, https://raw.githubusercontent.com/geekdada/surge-list/master/ads.list
 Yuki2718 Japanese Filters Plus, https://raw.githubusercontent.com/Yuki2718/adblock2/main/japanese/jpf-plus.txt
+Yuki2718 Japanese Filters Plus (AdGuard Modifiers), https://raw.githubusercontent.com/Yuki2718/adblock2/main/japanese/jpfp-ag.txt
 YousList Korean Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_15.txt
 HaGeZi Multi Pro++ DNS Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt
 HaGeZi Anti-Pop-Up Ads Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt
@@ -153,7 +170,16 @@ HaGeZi Native Tracker Blocklist (Amazon), https://raw.githubusercontent.com/hage
 HaGeZi Native Tracker Blocklist (LG webOS), https://adguardteam.github.io/HostlistsRegistry/assets/filter_72.txt
 HaGeZi Native Tracker Blocklist (Roku), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.roku.txt
 OISD Blocklist Big, https://big.oisd.nl/
-1Hosts (Lite), https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.wildcards
+1Hosts (Lite), https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/adblock.txt
+Disconnect Simple Ad Filter List, https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
+Disconnect Simple Malvertising List, https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt
+wBlock Ad and Tracking Hosts, https://raw.githubusercontent.com/0xCUB3/wBlock/main/filters/ad-tracking-hosts.txt
+WindowsSpyBlocker Telemetry & Spy Hosts, https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt
+KADhosts Polish Ad & Fraud Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_14.txt
+ABPVN Vietnamese Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_16.txt
+ABPindo Indonesian Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_22.txt
+Dandelion Sprout Nordic Filters, https://adguardteam.github.io/HostlistsRegistry/assets/filter_13.txt
+Frellwit's Swedish Hosts Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_17.txt
 StevenBlack Unified Hosts, https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
 AdAway Official Mobile Adblock Hosts, https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt
 Peter Lowe's Ad and Tracking Server List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_3.txt
@@ -193,29 +219,53 @@ zachlagden Custom Malicious Domains, https://raw.githubusercontent.com/zachlagde
 </details>
 
 <details>
-<summary>去广告防误伤白名单数据源（共 36 项）</summary>
+<summary>去广告防误伤白名单数据源（共 60 项）</summary>
 
 ```text
-uBlock Origin Unbreak Allowlist, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt
-uBlock Origin Quick Fixes, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt
+uBlock Origin Unbreak Allowlist, https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt
+uBlock Origin Quick Fixes, https://ublockorigin.github.io/uAssetsCDN/filters/quick-fixes.min.txt
 Brave Adblock Unbreak List, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-unbreak.txt
 AdGuard DNS Filter Exceptions, https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exceptions.txt
 AdGuard DNS Filter Exclusions, https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt
 AdGuard Base Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/BaseFilter/sections/allowlist.txt
+AdGuard Base Stealth Protection Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/BaseFilter/sections/allowlist_stealth.txt
 AdGuard Tracking Protection Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/allowlist.txt
+AdGuard Mobile Tracking Protection Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/mobile_allowlist.txt
+AdGuard URL Tracking Protection Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/TrackParamFilter/sections/allowlist.txt
+AdGuard Mobile Ads App Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/MobileFilter/sections/allowlist_app.txt
+AdGuard Mobile Ads Web Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/MobileFilter/sections/allowlist_web.txt
 AdGuard Chinese Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/ChineseFilter/sections/allowlist.txt
-Loyalsoldier Reject False-Positive Removals, https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/hidden/reject-need-to-remove.txt
+AdGuard Social Media Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SocialFilter/sections/allowlist.txt
+AdGuard Cookie Notices Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/AnnoyancesFilter/Cookies/sections/cookies_allowlist.txt
+AdGuard Tracking Protection Cookies Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/cookies_allowlist.txt
+AdGuard Japanese Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/JapaneseFilter/sections/allowlist.txt
+AdGuard German Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/GermanFilter/sections/allowlist.txt
+AdGuard French Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/FrenchFilter/sections/allowlist.txt
+AdGuard Russian Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/RussianFilter/sections/allowlist.txt
+AdGuard Spanish/Portuguese Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpanishFilter/sections/allowlist.txt
+AdGuard Turkish Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/TurkishFilter/sections/allowlist.txt
+AdGuard Dutch Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/DutchFilter/sections/allowlist.txt
+AdGuard Ukrainian Filter Allowlist, https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/UkrainianFilter/sections/allowlist.txt
+EasyList Official Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/easylist/easylist_allowlist.txt
+EasyPrivacy Official Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_allowlist.txt
+EasyPrivacy International Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_allowlist_international.txt
+EasyList Cookie Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/easylist_cookie/easylist_cookie_allowlist.txt
+List-KR Shared Allowlist, https://raw.githubusercontent.com/List-KR/List-KR/master/filterslists/adblocking/filters-share/allowlist.txt
+Cats-Team AdRules DNS Allowlist, https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/dns-allowlist.txt
 8680 GOODBYEADS Allow Rules, https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/allow.txt
 8680 GOODBYEADS Curated Mod Whitelist, https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/mod/whitelist.txt
-Cats-Team AdRules DNS Allowlist, https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/dns-allowlist.txt
-Cats-Team AdRules False-Positive Removals, https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/adblock-need-remove.txt
 045200 ad-filter Curated Mod Whitelist, https://raw.githubusercontent.com/045200/ad-filter/multi/data/mod/whitelist.txt
 Yuki2718 Japanese DNS Unbreak, https://raw.githubusercontent.com/Yuki2718/adblock2/main/japanese/dns-unbreak.txt
 HaGeZi Legitimate URL Shortener Allowlist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-urlshortener.txt
+HaGeZi Referral & Affiliate Tracking Unbreak Allowlist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral.txt
+HaGeZi Native Referral Unbreak Allowlist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral-native.txt
 HaGeZi Abused TLDs Legitimate Allowlist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/spam-tlds-adblock-allow.txt
 Dandelion Sprout Legitimate URL Shorteners, https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt
-anudeepND Curated Domain Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt
+Dandelion Sprout Legitimate URL Shortener Affiliate Allowlist, https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener-AffiliateTagAllowlist.txt
 zachlagden Pi-hole Optimized Whitelist, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/whitelist.txt
+1Hosts Global Exclusion Allowlist, https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_all.txt
+1Hosts Mini & Lite Exclusion Allowlist, https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_mini_Lite_only.txt
+anudeepND Curated Domain Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt
 SystemJargon DNS Allowlist, https://raw.githubusercontent.com/SystemJargon/filters/main/allowlist.txt
 Ealenn AdGuard Home Service Allowlist, https://raw.githubusercontent.com/Ealenn/AdGuard-Home-List/master/allowlist/concat/allowlist.external.adguard.list
 BadBlock Apple Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/apple_whitelist.txt

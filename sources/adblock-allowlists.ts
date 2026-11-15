@@ -5,7 +5,7 @@ import type { AdblockSourceEntry } from "./adblock-schema.ts";
  * evaluated above all upstream blocklists (Tier P3) and beneath human overrides (Tier P0a/P0b).
  */
 export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
-  // Official Adblock Engine Unbreak & Exception Lists
+  // Official Adblock Engine Unbreak & Exception Lists (ranked by authority & 2026-11 file freshness)
   {
     id: "ubo_unbreak",
     name: "uBlock Origin Unbreak Allowlist",
@@ -13,16 +13,16 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "ubo_uassets",
-    weight: 98,
+    weight: 99,
     core: true,
     endpoints: [
       {
         kind: "direct",
-        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt",
+        url: "https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt",
       },
       {
         kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/unbreak.txt",
+        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt",
       },
     ],
   },
@@ -33,16 +33,16 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "ubo_uassets",
-    weight: 96,
+    weight: 97,
     core: false,
     endpoints: [
       {
         kind: "direct",
-        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt",
+        url: "https://ublockorigin.github.io/uAssetsCDN/filters/quick-fixes.min.txt",
       },
       {
         kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/quick-fixes.txt",
+        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt",
       },
     ],
   },
@@ -73,7 +73,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "adguard_dns",
-    weight: 98,
+    weight: 99,
     core: true,
     endpoints: [
       {
@@ -113,7 +113,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "adguard_filters",
-    weight: 97,
+    weight: 98,
     core: false,
     endpoints: [
       {
@@ -127,13 +127,33 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
+    id: "adguard_stealth_allowlist",
+    name: "AdGuard Base Stealth Protection Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 97,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/BaseFilter/sections/allowlist_stealth.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/BaseFilter/sections/allowlist_stealth.txt",
+      },
+    ],
+  },
+  {
     id: "adguard_spyware_allowlist",
     name: "AdGuard Tracking Protection Allowlist",
     role: "allowlist",
     format: "abp_filter",
     platform: "universal",
     lineage: "adguard_filters",
-    weight: 97,
+    weight: 98,
     core: false,
     endpoints: [
       {
@@ -147,13 +167,93 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
+    id: "adguard_spyware_mobile_allowlist",
+    name: "AdGuard Mobile Tracking Protection Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "mobile",
+    lineage: "adguard_filters",
+    weight: 98,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/mobile_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SpywareFilter/sections/mobile_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_trackparam_allowlist",
+    name: "AdGuard URL Tracking Protection Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 98,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/TrackParamFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/TrackParamFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_mobile_app_allowlist",
+    name: "AdGuard Mobile Ads App Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "mobile",
+    lineage: "adguard_filters",
+    weight: 98,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/MobileFilter/sections/allowlist_app.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/MobileFilter/sections/allowlist_app.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_mobile_web_allowlist",
+    name: "AdGuard Mobile Ads Web Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "mobile",
+    lineage: "adguard_filters",
+    weight: 98,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/MobileFilter/sections/allowlist_web.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/MobileFilter/sections/allowlist_web.txt",
+      },
+    ],
+  },
+  {
     id: "adguard_chinese_allowlist",
     name: "AdGuard Chinese Filter Allowlist",
     role: "allowlist",
     format: "abp_filter",
     platform: "universal",
     lineage: "adguard_filters",
-    weight: 97,
+    weight: 98,
     core: false,
     endpoints: [
       {
@@ -166,25 +266,345 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
       },
     ],
   },
-
-  // Chinese & East Asian False-Positive Whitelists
   {
-    id: "loyalsoldier_reject_remove",
-    name: "Loyalsoldier Reject False-Positive Removals",
+    id: "adguard_social_allowlist",
+    name: "AdGuard Social Media Filter Allowlist",
     role: "allowlist",
-    format: "domain_list",
+    format: "abp_filter",
     platform: "universal",
-    lineage: "loyalsoldier_v2ray",
+    lineage: "adguard_filters",
     weight: 96,
     core: false,
     endpoints: [
       {
         kind: "direct",
-        url: "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/hidden/reject-need-to-remove.txt",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SocialFilter/sections/allowlist.txt",
       },
       {
         kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@hidden/reject-need-to-remove.txt",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SocialFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_cookies_allowlist",
+    name: "AdGuard Cookie Notices Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/AnnoyancesFilter/Cookies/sections/cookies_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/AnnoyancesFilter/Cookies/sections/cookies_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_spyware_cookies_allowlist",
+    name: "AdGuard Tracking Protection Cookies Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 97,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/cookies_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SpywareFilter/sections/cookies_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_japanese_allowlist",
+    name: "AdGuard Japanese Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/JapaneseFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/JapaneseFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_german_allowlist",
+    name: "AdGuard German Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/GermanFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/GermanFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_french_allowlist",
+    name: "AdGuard French Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/FrenchFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/FrenchFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_russian_allowlist",
+    name: "AdGuard Russian Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/RussianFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/CyrillicFilters/RussianFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_spanish_allowlist",
+    name: "AdGuard Spanish/Portuguese Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpanishFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SpanishFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_turkish_allowlist",
+    name: "AdGuard Turkish Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/TurkishFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/TurkishFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_dutch_allowlist",
+    name: "AdGuard Dutch Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/DutchFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/DutchFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_ukrainian_allowlist",
+    name: "AdGuard Ukrainian Filter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "adguard_filters",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/UkrainianFilter/sections/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/CyrillicFilters/UkrainianFilter/sections/allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "easylist_allowlist",
+    name: "EasyList Official Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 97,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylist/master/easylist/easylist_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easylist/easylist_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "easyprivacy_allowlist",
+    name: "EasyPrivacy Official Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 97,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easyprivacy/easyprivacy_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "easyprivacy_intl_allowlist",
+    name: "EasyPrivacy International Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_allowlist_international.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easyprivacy/easyprivacy_allowlist_international.txt",
+      },
+    ],
+  },
+  {
+    id: "easylist_cookie_allowlist",
+    name: "EasyList Cookie Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylist/master/easylist_cookie/easylist_cookie_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easylist_cookie/easylist_cookie_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "list_kr_allowlist",
+    name: "List-KR Shared Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "list_kr",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/List-KR/List-KR/master/filterslists/adblocking/filters-share/allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/List-KR/List-KR@master/filterslists/adblocking/filters-share/allowlist.txt",
+      },
+    ],
+  },
+
+  // Chinese & East Asian False-Positive Whitelists
+  {
+    id: "cats_dns_allowlist",
+    name: "Cats-Team AdRules DNS Allowlist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "cats_adrules",
+    weight: 95,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/dns-allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/Cats-Team/AdRules@main/mod/rules/dns-allowlist.txt",
       },
     ],
   },
@@ -195,7 +615,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "goodbyeads",
-    weight: 95,
+    weight: 94,
     core: false,
     endpoints: [
       {
@@ -215,7 +635,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "goodbyeads",
-    weight: 96,
+    weight: 93,
     core: false,
     endpoints: [
       {
@@ -225,46 +645,6 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
       {
         kind: "direct",
         url: "https://cdn.jsdelivr.net/gh/8680/GOODBYEADS@master/data/mod/whitelist.txt",
-      },
-    ],
-  },
-  {
-    id: "cats_dns_allowlist",
-    name: "Cats-Team AdRules DNS Allowlist",
-    role: "allowlist",
-    format: "abp_filter",
-    platform: "universal",
-    lineage: "cats_adrules",
-    weight: 95,
-    core: false,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/dns-allowlist.txt",
-      },
-      {
-        kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/Cats-Team/AdRules@main/mod/rules/dns-allowlist.txt",
-      },
-    ],
-  },
-  {
-    id: "cats_adblock_need_remove",
-    name: "Cats-Team AdRules False-Positive Removals",
-    role: "allowlist",
-    format: "domain_list",
-    platform: "universal",
-    lineage: "cats_adrules",
-    weight: 95,
-    core: false,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/adblock-need-remove.txt",
-      },
-      {
-        kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/Cats-Team/AdRules@main/mod/rules/adblock-need-remove.txt",
       },
     ],
   },
@@ -295,7 +675,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "yuki2718_adblock2",
-    weight: 93,
+    weight: 94,
     core: false,
     endpoints: [
       {
@@ -309,7 +689,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
 
-  // Global DNS, Shortener, System & Functional Service Whitelists
+  // Global DNS, Referral, Shortener, System & Functional Service Whitelists
   {
     id: "hagezi_urlshortener_allow",
     name: "HaGeZi Legitimate URL Shortener Allowlist",
@@ -327,6 +707,46 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
       {
         kind: "direct",
         url: "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/whitelist-urlshortener.txt",
+      },
+    ],
+  },
+  {
+    id: "hagezi_referral_allow",
+    name: "HaGeZi Referral & Affiliate Tracking Unbreak Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "hagezi_dns",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://adguardteam.github.io/HostlistsRegistry/assets/filter_45.txt",
+      },
+    ],
+  },
+  {
+    id: "hagezi_referral_native_allow",
+    name: "HaGeZi Native Referral Unbreak Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "hagezi_dns",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral-native.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/whitelist-referral-native.txt",
       },
     ],
   },
@@ -371,22 +791,22 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
-    id: "anudeep_whitelist",
-    name: "anudeepND Curated Domain Whitelist",
+    id: "dandelion_shortener_affiliate_allow",
+    name: "Dandelion Sprout Legitimate URL Shortener Affiliate Allowlist",
     role: "allowlist",
-    format: "domain_list",
+    format: "abp_filter",
     platform: "universal",
-    lineage: "anudeep_whitelist",
+    lineage: "dandelion_adfilt",
     weight: 95,
     core: false,
     endpoints: [
       {
         kind: "direct",
-        url: "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt",
+        url: "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener-AffiliateTagAllowlist.txt",
       },
       {
         kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/whitelist.txt",
+        url: "https://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/LegitimateURLShortener-AffiliateTagAllowlist.txt",
       },
     ],
   },
@@ -397,7 +817,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "domain_list",
     platform: "universal",
     lineage: "zachlagden_pihole",
-    weight: 94,
+    weight: 95,
     core: false,
     endpoints: [
       {
@@ -411,13 +831,73 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
+    id: "onehosts_exclude_all",
+    name: "1Hosts Global Exclusion Allowlist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "onehosts",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_all.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/badmojr/1Hosts@master/-data/lists/exclude_for_all.txt",
+      },
+    ],
+  },
+  {
+    id: "onehosts_exclude_mini_lite",
+    name: "1Hosts Mini & Lite Exclusion Allowlist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "onehosts",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_mini_Lite_only.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/badmojr/1Hosts@master/-data/lists/exclude_for_mini_Lite_only.txt",
+      },
+    ],
+  },
+  {
+    id: "anudeep_whitelist",
+    name: "anudeepND Curated Domain Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "anudeep_whitelist",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/whitelist.txt",
+      },
+    ],
+  },
+  {
     id: "systemjargon_allowlist",
     name: "SystemJargon DNS Allowlist",
     role: "allowlist",
     format: "abp_filter",
     platform: "universal",
     lineage: "systemjargon",
-    weight: 93,
+    weight: 92,
     core: false,
     endpoints: [
       {
@@ -437,7 +917,7 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     format: "abp_filter",
     platform: "universal",
     lineage: "ealenn_agh",
-    weight: 93,
+    weight: 92,
     core: false,
     endpoints: [
       {

@@ -8,16 +8,16 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
-      "weight": 98,
+      "weight": 99,
       "core": true,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt"
+          "url": "https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/unbreak.txt"
+          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt"
         }
       ]
     },
@@ -28,16 +28,16 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
-      "weight": 96,
+      "weight": 97,
       "core": false,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt"
+          "url": "https://ublockorigin.github.io/uAssetsCDN/filters/quick-fixes.min.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/quick-fixes.txt"
+          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt"
         }
       ]
     },
@@ -68,7 +68,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_dns",
-      "weight": 98,
+      "weight": 99,
       "core": true,
       "endpoints": [
         {
@@ -108,7 +108,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
-      "weight": 97,
+      "weight": 98,
       "core": false,
       "endpoints": [
         {
@@ -122,13 +122,33 @@
       ]
     },
     {
+      "id": "adguard_stealth_allowlist",
+      "name": "AdGuard Base Stealth Protection Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 97,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/BaseFilter/sections/allowlist_stealth.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/BaseFilter/sections/allowlist_stealth.txt"
+        }
+      ]
+    },
+    {
       "id": "adguard_spyware_allowlist",
       "name": "AdGuard Tracking Protection Allowlist",
       "role": "allowlist",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
-      "weight": 97,
+      "weight": 98,
       "core": false,
       "endpoints": [
         {
@@ -142,13 +162,93 @@
       ]
     },
     {
+      "id": "adguard_spyware_mobile_allowlist",
+      "name": "AdGuard Mobile Tracking Protection Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "adguard_filters",
+      "weight": 98,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/mobile_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SpywareFilter/sections/mobile_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_trackparam_allowlist",
+      "name": "AdGuard URL Tracking Protection Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 98,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/TrackParamFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/TrackParamFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_mobile_app_allowlist",
+      "name": "AdGuard Mobile Ads App Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "adguard_filters",
+      "weight": 98,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/MobileFilter/sections/allowlist_app.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/MobileFilter/sections/allowlist_app.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_mobile_web_allowlist",
+      "name": "AdGuard Mobile Ads Web Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "adguard_filters",
+      "weight": 98,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/MobileFilter/sections/allowlist_web.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/MobileFilter/sections/allowlist_web.txt"
+        }
+      ]
+    },
+    {
       "id": "adguard_chinese_allowlist",
       "name": "AdGuard Chinese Filter Allowlist",
       "role": "allowlist",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
-      "weight": 97,
+      "weight": 98,
       "core": false,
       "endpoints": [
         {
@@ -162,22 +262,342 @@
       ]
     },
     {
-      "id": "loyalsoldier_reject_remove",
-      "name": "Loyalsoldier Reject False-Positive Removals",
+      "id": "adguard_social_allowlist",
+      "name": "AdGuard Social Media Filter Allowlist",
       "role": "allowlist",
-      "format": "domain_list",
+      "format": "abp_filter",
       "platform": "universal",
-      "lineage": "loyalsoldier_v2ray",
+      "lineage": "adguard_filters",
       "weight": 96,
       "core": false,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/hidden/reject-need-to-remove.txt"
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SocialFilter/sections/allowlist.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@hidden/reject-need-to-remove.txt"
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SocialFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_cookies_allowlist",
+      "name": "AdGuard Cookie Notices Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/AnnoyancesFilter/Cookies/sections/cookies_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/AnnoyancesFilter/Cookies/sections/cookies_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_spyware_cookies_allowlist",
+      "name": "AdGuard Tracking Protection Cookies Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 97,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/cookies_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SpywareFilter/sections/cookies_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_japanese_allowlist",
+      "name": "AdGuard Japanese Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/JapaneseFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/JapaneseFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_german_allowlist",
+      "name": "AdGuard German Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/GermanFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/GermanFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_french_allowlist",
+      "name": "AdGuard French Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/FrenchFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/FrenchFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_russian_allowlist",
+      "name": "AdGuard Russian Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/RussianFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/CyrillicFilters/RussianFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_spanish_allowlist",
+      "name": "AdGuard Spanish/Portuguese Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpanishFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/SpanishFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_turkish_allowlist",
+      "name": "AdGuard Turkish Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/TurkishFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/TurkishFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_dutch_allowlist",
+      "name": "AdGuard Dutch Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/DutchFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/DutchFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_ukrainian_allowlist",
+      "name": "AdGuard Ukrainian Filter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/CyrillicFilters/UkrainianFilter/sections/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/AdguardFilters@master/CyrillicFilters/UkrainianFilter/sections/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "easylist_allowlist",
+      "name": "EasyList Official Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 97,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/easylist/master/easylist/easylist_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easylist/easylist_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "easyprivacy_allowlist",
+      "name": "EasyPrivacy Official Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 97,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easyprivacy/easyprivacy_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "easyprivacy_intl_allowlist",
+      "name": "EasyPrivacy International Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/easylist/master/easyprivacy/easyprivacy_allowlist_international.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easyprivacy/easyprivacy_allowlist_international.txt"
+        }
+      ]
+    },
+    {
+      "id": "easylist_cookie_allowlist",
+      "name": "EasyList Cookie Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/easylist/master/easylist_cookie/easylist_cookie_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/easylist/easylist@master/easylist_cookie/easylist_cookie_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "list_kr_allowlist",
+      "name": "List-KR Shared Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "list_kr",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/List-KR/List-KR/master/filterslists/adblocking/filters-share/allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/List-KR/List-KR@master/filterslists/adblocking/filters-share/allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "cats_dns_allowlist",
+      "name": "Cats-Team AdRules DNS Allowlist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "cats_adrules",
+      "weight": 95,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/dns-allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Cats-Team/AdRules@main/mod/rules/dns-allowlist.txt"
         }
       ]
     },
@@ -188,7 +608,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "goodbyeads",
-      "weight": 95,
+      "weight": 94,
       "core": false,
       "endpoints": [
         {
@@ -208,7 +628,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "goodbyeads",
-      "weight": 96,
+      "weight": 93,
       "core": false,
       "endpoints": [
         {
@@ -218,46 +638,6 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/8680/GOODBYEADS@master/data/mod/whitelist.txt"
-        }
-      ]
-    },
-    {
-      "id": "cats_dns_allowlist",
-      "name": "Cats-Team AdRules DNS Allowlist",
-      "role": "allowlist",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "cats_adrules",
-      "weight": 95,
-      "core": false,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/dns-allowlist.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/Cats-Team/AdRules@main/mod/rules/dns-allowlist.txt"
-        }
-      ]
-    },
-    {
-      "id": "cats_adblock_need_remove",
-      "name": "Cats-Team AdRules False-Positive Removals",
-      "role": "allowlist",
-      "format": "domain_list",
-      "platform": "universal",
-      "lineage": "cats_adrules",
-      "weight": 95,
-      "core": false,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Cats-Team/AdRules/main/mod/rules/adblock-need-remove.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/Cats-Team/AdRules@main/mod/rules/adblock-need-remove.txt"
         }
       ]
     },
@@ -288,7 +668,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "yuki2718_adblock2",
-      "weight": 93,
+      "weight": 94,
       "core": false,
       "endpoints": [
         {
@@ -318,6 +698,46 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/whitelist-urlshortener.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_referral_allow",
+      "name": "HaGeZi Referral & Affiliate Tracking Unbreak Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_45.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_referral_native_allow",
+      "name": "HaGeZi Native Referral Unbreak Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/whitelist-referral-native.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/whitelist-referral-native.txt"
         }
       ]
     },
@@ -362,22 +782,22 @@
       ]
     },
     {
-      "id": "anudeep_whitelist",
-      "name": "anudeepND Curated Domain Whitelist",
+      "id": "dandelion_shortener_affiliate_allow",
+      "name": "Dandelion Sprout Legitimate URL Shortener Affiliate Allowlist",
       "role": "allowlist",
-      "format": "domain_list",
+      "format": "abp_filter",
       "platform": "universal",
-      "lineage": "anudeep_whitelist",
+      "lineage": "dandelion_adfilt",
       "weight": 95,
       "core": false,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt"
+          "url": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener-AffiliateTagAllowlist.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/whitelist.txt"
+          "url": "https://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/LegitimateURLShortener-AffiliateTagAllowlist.txt"
         }
       ]
     },
@@ -388,7 +808,7 @@
       "format": "domain_list",
       "platform": "universal",
       "lineage": "zachlagden_pihole",
-      "weight": 94,
+      "weight": 95,
       "core": false,
       "endpoints": [
         {
@@ -402,13 +822,73 @@
       ]
     },
     {
+      "id": "onehosts_exclude_all",
+      "name": "1Hosts Global Exclusion Allowlist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "onehosts",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_all.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/badmojr/1Hosts@master/-data/lists/exclude_for_all.txt"
+        }
+      ]
+    },
+    {
+      "id": "onehosts_exclude_mini_lite",
+      "name": "1Hosts Mini & Lite Exclusion Allowlist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "onehosts",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_mini_Lite_only.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/badmojr/1Hosts@master/-data/lists/exclude_for_mini_Lite_only.txt"
+        }
+      ]
+    },
+    {
+      "id": "anudeep_whitelist",
+      "name": "anudeepND Curated Domain Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "anudeep_whitelist",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/whitelist.txt"
+        }
+      ]
+    },
+    {
       "id": "systemjargon_allowlist",
       "name": "SystemJargon DNS Allowlist",
       "role": "allowlist",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "systemjargon",
-      "weight": 93,
+      "weight": 92,
       "core": false,
       "endpoints": [
         {
@@ -428,7 +908,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ealenn_agh",
-      "weight": 93,
+      "weight": 92,
       "core": false,
       "endpoints": [
         {
@@ -722,27 +1202,6 @@
       ]
     },
     {
-      "id": "biliverse_bilibili_adblock",
-      "name": "Biliverse BiliBili ADBlock Module",
-      "role": "complex_first",
-      "format": "surge_module",
-      "platform": "universal",
-      "lineage": "biliverse_adblock",
-      "weight": 97,
-      "core": false,
-      "endpoints": [
-        {
-          "kind": "github_release",
-          "repo": "Biliverse/ADBlock",
-          "assetPattern": "^BiliBili\\.ADBlock\\.sgmodule$"
-        },
-        {
-          "kind": "direct",
-          "url": "https://github.com/Biliverse/ADBlock/releases/latest/download/BiliBili.ADBlock.sgmodule"
-        }
-      ]
-    },
-    {
       "id": "app2smile_youtube",
       "name": "app2smile YouTube Adblock Module",
       "role": "complex_first",
@@ -933,6 +1392,28 @@
       ]
     },
     {
+      "id": "ubo_privacy_removeparam",
+      "name": "uBlock Origin Privacy Query Parameter Stripping ($removeparam)",
+      "role": "complex_first",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "ubo_uassets",
+      "weight": 93,
+      "core": true,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/privacy-removeparam.txt"
+        }
+      ]
+    },
+    {
       "id": "adguard_spyware_general_extensions",
       "name": "AdGuard Spyware Filter General Extensions ($removeparam / $removeheader)",
       "role": "complex_first",
@@ -955,6 +1436,28 @@
       ]
     },
     {
+      "id": "adguard_dandelion_shorteners",
+      "name": "AdGuard Legitimate URL Shortener Filter ($removeparam Pre-Compiled)",
+      "role": "complex_first",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "dandelion_adfilt",
+      "weight": 92,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_251_LegitimateURLShortener/filter.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/FiltersRegistry@master/filters/ThirdParty/filter_251_LegitimateURLShortener/filter.txt"
+        }
+      ]
+    },
+    {
       "id": "dandelion_clearurls_ubo",
       "name": "Dandelion Sprout ClearURLs ($removeparam)",
       "role": "complex_first",
@@ -969,6 +1472,50 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/ClearURLs%20for%20uBo/clear_urls_uboified.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_dandelion_annoyances",
+      "name": "AdGuard Dandelion Sprout Annoyances ($removeparam Pre-Compiled)",
+      "role": "complex_first",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "dandelion_adfilt",
+      "weight": 91,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_250_DandelionSproutAnnoyances/filter.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/FiltersRegistry@master/filters/ThirdParty/filter_250_DandelionSproutAnnoyances/filter.txt"
+        }
+      ]
+    },
+    {
+      "id": "ruadlist_cntblock",
+      "name": "RU AdList Counter & Parameter Block ($removeparam)",
+      "role": "complex_first",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/ruadlist/master/cntblock.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://easylist-downloads.adblockplus.org/cntblock.txt"
         }
       ]
     },
@@ -1001,22 +1548,6 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/KeepAds.sgmodule"
-        }
-      ]
-    },
-    {
-      "id": "ddgksf_xiaohongshu_ads",
-      "name": "ddgksf2013 Xiaohongshu Adblock Module",
-      "role": "complex_first",
-      "format": "surge_module",
-      "platform": "mobile",
-      "lineage": "ddgksf2013_rewrite",
-      "weight": 92,
-      "core": false,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/ifflagged/Romeo/main/Modules/Surge/ddgksf2013/XiaoHongShuAds.sgmodule"
         }
       ]
     },
@@ -1517,7 +2048,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_cname",
-      "weight": 91,
+      "weight": 92,
       "core": false,
       "extractComplexNetworkRules": false,
       "extractFallbackDomainRules": true,
@@ -1533,8 +2064,200 @@
       ]
     },
     {
+      "id": "adguard_cname_trackers",
+      "name": "AdGuard CNAME Disguised Trackers List",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_cname",
+      "weight": 92,
+      "core": true,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_trackers.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/cname-trackers@master/data/combined_disguised_trackers.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_cname_clickthroughs",
+      "name": "AdGuard CNAME Disguised Clickthroughs List",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_cname",
+      "weight": 91,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_clickthroughs.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/cname-trackers@master/data/combined_disguised_clickthroughs.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_japanese",
+      "name": "AdGuard Japanese Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 91,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/7.txt"
+        }
+      ]
+    },
+    {
+      "id": "list_kr_adguard",
+      "name": "List-KR Korean Filter (AdGuard CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "list_kr",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/227.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_25.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_german",
+      "name": "AdGuard German Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/6.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_french",
+      "name": "AdGuard French Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/16.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_russian",
+      "name": "AdGuard Russian Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/1.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_spanish_portuguese",
+      "name": "AdGuard Spanish/Portuguese Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/9.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_turkish",
+      "name": "AdGuard Turkish Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/13.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_dutch",
+      "name": "AdGuard Dutch Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/8.txt"
+        }
+      ]
+    },
+    {
       "id": "ubo_filters",
-      "name": "uBlock Origin Built-in Filters",
+      "name": "uBlock Origin Built-in Filters (Pre-Expanded)",
       "role": "ruleset_fallback",
       "format": "abp_filter",
       "platform": "universal",
@@ -1546,17 +2269,17 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt"
+          "url": "https://ublockorigin.github.io/uAssetsCDN/filters/filters.min.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/filters.txt"
+          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/filters.min.txt"
         }
       ]
     },
     {
       "id": "ubo_privacy",
-      "name": "uBlock Origin Privacy Filters",
+      "name": "uBlock Origin Privacy Filters (Pre-Expanded)",
       "role": "ruleset_fallback",
       "format": "abp_filter",
       "platform": "universal",
@@ -1568,17 +2291,17 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt"
+          "url": "https://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/privacy.txt"
+          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/privacy.min.txt"
         }
       ]
     },
     {
       "id": "ubo_badware",
-      "name": "uBlock Origin Badware Risks",
+      "name": "uBlock Origin Badware Risks (Pre-Expanded)",
       "role": "ruleset_fallback",
       "format": "abp_filter",
       "platform": "universal",
@@ -1590,7 +2313,7 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt"
+          "url": "https://ublockorigin.github.io/uAssetsCDN/filters/badware.min.txt"
         },
         {
           "kind": "direct",
@@ -1657,6 +2380,50 @@
       ]
     },
     {
+      "id": "brave_firstparty",
+      "name": "Brave First-Party Adblock Filters",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "brave_adblock",
+      "weight": 91,
+      "core": true,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/brave/adblock-lists@master/brave-lists/brave-firstparty.txt"
+        }
+      ]
+    },
+    {
+      "id": "brave_firstparty_regional",
+      "name": "Brave First-Party Regional Adblock Filters",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "brave_adblock",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-regional.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/brave/adblock-lists@master/brave-lists/brave-firstparty-regional.txt"
+        }
+      ]
+    },
+    {
       "id": "brave_firstparty_cname",
       "name": "Brave First-Party CNAME Cloaking Trackers",
       "role": "ruleset_fallback",
@@ -1693,6 +2460,10 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-specific.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/brave/adblock-lists@master/brave-lists/brave-specific.txt"
         }
       ]
     },
@@ -1711,6 +2482,10 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-ios-specific.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/brave/adblock-lists@master/brave-lists/brave-ios-specific.txt"
         }
       ]
     },
@@ -1779,7 +2554,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
-      "weight": 87,
+      "weight": 88,
       "core": false,
       "extractComplexNetworkRules": true,
       "extractFallbackDomainRules": true,
@@ -1787,6 +2562,42 @@
         {
           "kind": "direct",
           "url": "https://secure.fanboy.co.nz/fanboy-annoyance.txt"
+        }
+      ]
+    },
+    {
+      "id": "fanboy_cookiemonster",
+      "name": "EasyList / Fanboy Cookie Monster (uBO)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://secure.fanboy.co.nz/fanboy-cookiemonster_ubo.txt"
+        }
+      ]
+    },
+    {
+      "id": "fanboy_mobile_notifications",
+      "name": "Fanboy Mobile App Promo & Notifications Blocker",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "easylist_official",
+      "weight": 88,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://secure.fanboy.co.nz/fanboy-mobile-notifications.txt"
         }
       ]
     },
@@ -2269,7 +3080,7 @@
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "yuki2718_adblock2",
-      "weight": 87,
+      "weight": 88,
       "core": false,
       "extractComplexNetworkRules": true,
       "extractFallbackDomainRules": true,
@@ -2277,6 +3088,32 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/Yuki2718/adblock2/main/japanese/jpf-plus.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Yuki2718/adblock2@main/japanese/jpf-plus.txt"
+        }
+      ]
+    },
+    {
+      "id": "yuki2718_jpfp_ag",
+      "name": "Yuki2718 Japanese Filters Plus (AdGuard Modifiers)",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "yuki2718_adblock2",
+      "weight": 88,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Yuki2718/adblock2/main/japanese/jpfp-ag.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Yuki2718/adblock2@main/japanese/jpfp-ag.txt"
         }
       ]
     },
@@ -2675,20 +3512,188 @@
       "id": "onehosts_lite",
       "name": "1Hosts (Lite)",
       "role": "ruleset_fallback",
-      "format": "domain_list",
+      "format": "abp_filter",
       "platform": "universal",
       "lineage": "onehosts",
       "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/adblock.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_24.txt"
+        }
+      ]
+    },
+    {
+      "id": "disconnect_simple_ad",
+      "name": "Disconnect Simple Ad Filter List",
+      "role": "ruleset_fallback",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "disconnect_me",
+      "weight": 89,
       "core": false,
       "extractFallbackDomainRules": true,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.wildcards"
+          "url": "https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt"
+        }
+      ]
+    },
+    {
+      "id": "disconnect_simple_malvertising",
+      "name": "Disconnect Simple Malvertising List",
+      "role": "ruleset_fallback",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "disconnect_me",
+      "weight": 89,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt"
+        }
+      ]
+    },
+    {
+      "id": "wblock_ad_tracking",
+      "name": "wBlock Ad and Tracking Hosts",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "wblock",
+      "weight": 88,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/0xCUB3/wBlock/main/filters/ad-tracking-hosts.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/badmojr/1Hosts@master/Lite/domains.wildcards"
+          "url": "https://cdn.jsdelivr.net/gh/0xCUB3/wBlock@main/filters/ad-tracking-hosts.txt"
+        }
+      ]
+    },
+    {
+      "id": "windowsspyblocker_spy",
+      "name": "WindowsSpyBlocker Telemetry & Spy Hosts",
+      "role": "ruleset_fallback",
+      "format": "hosts",
+      "platform": "desktop",
+      "lineage": "windowsspyblocker",
+      "weight": 88,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/crazy-max/WindowsSpyBlocker@master/data/hosts/spy.txt"
+        }
+      ]
+    },
+    {
+      "id": "kadhosts_polish",
+      "name": "KADhosts Polish Ad & Fraud Blocklist",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "kadhosts",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_14.txt"
+        }
+      ]
+    },
+    {
+      "id": "abpvn_vietnam",
+      "name": "ABPVN Vietnamese Adblock Filter",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "abpvn",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_16.txt"
+        }
+      ]
+    },
+    {
+      "id": "abpindo_indonesia",
+      "name": "ABPindo Indonesian Adblock Filter",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "abpindo",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_22.txt"
+        }
+      ]
+    },
+    {
+      "id": "dandelion_nordic",
+      "name": "Dandelion Sprout Nordic Filters",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "dandelion_adfilt",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_13.txt"
+        }
+      ]
+    },
+    {
+      "id": "frellwit_swedish",
+      "name": "Frellwit's Swedish Hosts Filter",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "frellwit",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_17.txt"
         }
       ]
     },

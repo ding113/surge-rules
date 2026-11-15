@@ -271,7 +271,7 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
   {
     matchType: "exact",
     domain: "edith.xiaohongshu.com",
-    rationale: "Xiaohongshu feed API cleaned by module script",
+    rationale: "Xiaohongshu core feed API (TLS-pinned, must never be domain-blocked)",
   },
   { matchType: "exact", domain: "www.zhihu.com", rationale: "Zhihu web and question endpoints" },
   {
@@ -724,6 +724,183 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     matchType: "exact",
     domain: "video-cn.snssdk.com",
     rationale: "Douyin/Xigua video playback dispatch API",
+  },
+
+  // Verified community & upstream unbreak false-positive overrides (Round 2 audit ledger)
+  {
+    matchType: "exact",
+    domain: "c.y.qq.com",
+    rationale: "QQ Music web login and song share gateway",
+  },
+  {
+    matchType: "exact",
+    domain: "tracker.ai.xiaomi.com",
+    rationale: "Xiaomi XiaoAI smart speaker pairing and setup",
+  },
+  {
+    matchType: "exact",
+    domain: "app.chat.xiaomi.net",
+    rationale: "Xiaomi MiPush persistent push notification socket",
+  },
+  {
+    matchType: "exact",
+    domain: "cn.app.chat.xiaomi.net",
+    rationale: "Xiaomi MiPush mainland push notification socket",
+  },
+  {
+    matchType: "exact",
+    domain: "resolver.msg.xiaomi.net",
+    rationale: "Xiaomi MiPush push server dispatch resolver",
+  },
+  {
+    matchType: "exact",
+    domain: "register.xmpush.xiaomi.com",
+    rationale: "Xiaomi MiPush device token registration",
+  },
+  {
+    matchType: "exact",
+    domain: "puui.qpic.cn",
+    rationale: "Tencent Video cover and user avatar image CDN",
+  },
+  {
+    matchType: "suffix",
+    domain: "qlogo.cn",
+    rationale: "WeChat and QQ user avatar image CDN",
+  },
+  {
+    matchType: "exact",
+    domain: "inews.gtimg.com",
+    rationale: "Tencent News article illustration image CDN",
+  },
+  {
+    matchType: "exact",
+    domain: "fp-it.fengkongcloud.com",
+    rationale: "Shumei anti-fraud device verification required by app logins",
+  },
+  {
+    matchType: "exact",
+    domain: "gia.jd.com",
+    rationale: "JD account login and checkout risk-control verification",
+  },
+  {
+    matchType: "exact",
+    domain: "cnlogin.cainiao.com",
+    rationale: "Cainiao parcel mini-program authentication",
+  },
+  {
+    matchType: "exact",
+    domain: "webzjcaptcha.reg.163.com",
+    rationale: "NetEase account login CAPTCHA verification",
+  },
+  {
+    matchType: "exact",
+    domain: "dl.reg.163.com",
+    rationale: "NetEase account login SDK assets",
+  },
+  {
+    matchType: "exact",
+    domain: "fp-upload.dun.163.com",
+    rationale: "NetEase Yidun security verification",
+  },
+  {
+    matchType: "exact",
+    domain: "cstaticdun.126.net",
+    rationale: "NetEase Yidun CAPTCHA widget static assets",
+  },
+  {
+    matchType: "exact",
+    domain: "console.bce.baidu.com",
+    rationale: "Baidu AI Cloud management console",
+  },
+  {
+    matchType: "exact",
+    domain: "login.bce.baidu.com",
+    rationale: "Baidu AI Cloud authentication portal",
+  },
+  {
+    matchType: "exact",
+    domain: "newvector.map.baidu.com",
+    rationale: "Baidu Maps vector map tile rendering",
+  },
+  {
+    matchType: "exact",
+    domain: "sv.map.baidu.com",
+    rationale: "Baidu Maps street-view panorama service",
+  },
+  {
+    matchType: "exact",
+    domain: "tags.tiqcdn.com",
+    rationale: "Tealium tag bundle required by UPS.com parcel tracking and checkout",
+  },
+  {
+    matchType: "exact",
+    domain: "fonts.gstatic.com",
+    rationale: "Google Fonts static webfont delivery CDN",
+  },
+  {
+    matchType: "exact",
+    domain: "fonts.googleapis.com",
+    rationale: "Google Fonts stylesheet API",
+  },
+  {
+    matchType: "suffix",
+    domain: "resend.com",
+    rationale: "Resend developer transactional email service",
+  },
+  {
+    matchType: "exact",
+    domain: "links1.resend-dns.com",
+    rationale: "Resend transactional auth/verification email link resolver",
+  },
+  {
+    matchType: "suffix",
+    domain: "ai21.com",
+    rationale: "AI21 Labs LLM API and studio",
+  },
+  {
+    matchType: "suffix",
+    domain: "greptile.com",
+    rationale: "Greptile AI codebase search and review API",
+  },
+  {
+    matchType: "suffix",
+    domain: "rupt.dev",
+    rationale: "Rupt account security SDK",
+  },
+  {
+    matchType: "suffix",
+    domain: "open-std.org",
+    rationale: "ISO/IEC JTC1 programming language standards portal",
+  },
+  {
+    matchType: "suffix",
+    domain: "haxe.org",
+    rationale: "Haxe programming language portal and package library",
+  },
+  {
+    matchType: "exact",
+    domain: "wl.spotify.com",
+    rationale: "Spotify account verification and login email resolver",
+  },
+  {
+    matchType: "exact",
+    domain: "telegra.ph",
+    rationale: "Telegram Telegraph instant-view publishing platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "ctrip.com",
+    rationale: "Ctrip travel, flight, and hotel booking platform",
+  },
+  {
+    matchType: "exact",
+    domain: "tv.sohu.com",
+    rationale: "Sohu Video main streaming portal",
+  },
+  {
+    matchType: "exact",
+    domain: "img.alibaba.com",
+    rationale: "Alibaba B2B product image CDN",
   },
 ];
 

@@ -142,6 +142,7 @@ fn authority_has_concrete_domain_or_ip(host_expr: &str) -> bool {
         }
         let labels: Vec<&str> = seg.split('.').filter(|l| !l.is_empty()).collect();
         labels.len() >= 2
+            && !is_bare_multipart_public_suffix(&labels)
             && labels.iter().all(|l| {
                 !l.starts_with('-')
                     && !l.ends_with('-')
@@ -151,6 +152,315 @@ fn authority_has_concrete_domain_or_ip(host_expr: &str) -> bool {
                 .last()
                 .is_some_and(|tld| tld.len() >= 2 && tld.chars().all(|c| c.is_ascii_alphabetic()))
     })
+}
+
+fn is_bare_multipart_public_suffix(labels: &[&str]) -> bool {
+    if labels.len() != 2 {
+        return false;
+    }
+    let joined = format!(
+        "{}.{}",
+        labels[0].to_ascii_lowercase(),
+        labels[1].to_ascii_lowercase()
+    );
+    matches!(
+        joined.as_str(),
+        "com.cn"
+            | "net.cn"
+            | "org.cn"
+            | "gov.cn"
+            | "edu.cn"
+            | "ac.cn"
+            | "co.uk"
+            | "org.uk"
+            | "ac.uk"
+            | "gov.uk"
+            | "co.jp"
+            | "ne.jp"
+            | "or.jp"
+            | "ac.jp"
+            | "com.hk"
+            | "com.tw"
+            | "org.tw"
+            | "com.au"
+            | "net.au"
+            | "co.kr"
+            | "or.kr"
+            | "com.sg"
+            | "com.my"
+            | "com.br"
+            | "co.in"
+            | "com.ru"
+    )
+}
+
+/// Computes a canonical deduplication signature for Surge URL regex patterns so semantically
+/// identical patterns across upstream modules (`^https://` vs `^https?://`, `(?>` vs `(?:` vs `(`,
+/// leading `(?i)`) resolve cleanly by source weight rather than coexisting as duplicates.
+pub fn canonical_url_pattern_key(pattern: &str) -> String {
+    let mut s = pattern.trim();
+    if let Some(rest) = s.strip_prefix("(?i)") {
+        s = rest;
+    }
+    s = s.trim_start_matches('^');
+    let normalized_scheme = for_scheme_normalization(s);
+    normalized_scheme.replace("(?>", "(").replace("(?:", "(")
+}
+
+fn for_scheme_normalization(s: &str) -> String {
+    for prefix in [
+        "https?://",
+        "http(s)?://",
+        "(https|http)://",
+        "(http|https)://",
+        "https://",
+    ] {
+        if let Some(rest) = s.strip_prefix(prefix) {
+            return format!("https?://{}", rest);
+        }
+    }
+    s.to_string()
+}
+
+/// Generates concrete sample URLs covering top-level alternation branches of a URL regex
+/// so the compiler can detect when a lower-weight `[Script]` is 100% shadowed by an already
+/// accepted higher-weight `[Script]` of the same type.
+pub fn sample_urls_for_regex_subsumption(pattern: &str) -> Vec<String> {
+    let mut s = pattern.trim();
+    if let Some(rest) = s.strip_prefix("(?i)") {
+        s = rest;
+    }
+    let has_end_anchor = s.ends_with('$');
+    let body = s.trim_start_matches('^').trim_end_matches('$');
+    let Some(after_scheme) = strip_regex_scheme_prefix(body) else {
+        return Vec::new();
+    };
+    let scheme = if body.starts_with("http://") {
+        "http://"
+    } else {
+        "https://"
+    };
+
+    let expanded = expand_regex_branches(after_scheme, 16);
+    if expanded.is_empty() || expanded.len() > 16 {
+        return Vec::new();
+    }
+
+    let mut urls = Vec::with_capacity(expanded.len());
+    for branch in expanded {
+        let Some(mut concrete) = instantiate_regex_branch(&branch) else {
+            return Vec::new();
+        };
+        if !has_end_anchor && concrete.ends_with('?') {
+            concrete.push_str("k=1");
+        }
+        urls.push(format!("{}{}", scheme, concrete));
+    }
+    urls
+}
+
+fn expand_regex_branches(expr: &str, max_branches: usize) -> Vec<String> {
+    let bytes = expr.as_bytes();
+    let mut paren = 0i32;
+    let mut in_class = false;
+    let mut escaped = false;
+    let mut group_span: Option<(usize, usize, usize)> = None;
+    let mut group_start = 0usize;
+
+    for (idx, ch) in expr.char_indices() {
+        if escaped {
+            escaped = false;
+            continue;
+        }
+        if ch == '\\' {
+            escaped = true;
+            continue;
+        }
+        if in_class {
+            if ch == ']' {
+                in_class = false;
+            }
+            continue;
+        }
+        match ch {
+            '[' => in_class = true,
+            '(' => {
+                if paren == 0 {
+                    group_start = idx;
+                }
+                paren += 1;
+            }
+            ')' => {
+                paren -= 1;
+                if paren == 0 {
+                    let inner_start = if expr[group_start..].starts_with("(?:")
+                        || expr[group_start..].starts_with("(?>")
+                    {
+                        group_start + 3
+                    } else if expr[group_start..].starts_with("(?") {
+                        return Vec::new();
+                    } else {
+                        group_start + 1
+                    };
+                    let inner = &expr[inner_start..idx];
+                    // Check if followed by `?` optional quantifier
+                    let next_b = bytes.get(idx + 1).copied();
+                    if matches!(next_b, Some(b'*') | Some(b'+') | Some(b'{')) {
+                        return Vec::new();
+                    }
+                    let alts = split_top_level_alternations(inner);
+                    if alts.len() > 1 || next_b == Some(b'?') {
+                        let end_after = if next_b == Some(b'?') {
+                            idx + 2
+                        } else {
+                            idx + 1
+                        };
+                        group_span = Some((group_start, idx, end_after));
+                        break;
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+
+    let Some((g_start, g_close, g_after)) = group_span else {
+        let top_alts = split_top_level_alternations(expr);
+        if top_alts.len() > 1 {
+            if top_alts.len() > max_branches {
+                return Vec::new();
+            }
+            return top_alts.into_iter().map(str::to_string).collect();
+        }
+        return vec![expr.to_string()];
+    };
+
+    let inner_start = if expr[g_start..].starts_with("(?:") || expr[g_start..].starts_with("(?>") {
+        g_start + 3
+    } else {
+        g_start + 1
+    };
+    let inner = &expr[inner_start..g_close];
+    let mut alts: Vec<&str> = split_top_level_alternations(inner);
+    if g_after == g_close + 2 {
+        alts.push("");
+    }
+    if alts.len() > max_branches {
+        return Vec::new();
+    }
+
+    let prefix = &expr[..g_start];
+    let suffix = &expr[g_after..];
+    let mut out = Vec::new();
+    for alt in alts {
+        let combined = format!("{}{}{}", prefix, alt, suffix);
+        let sub = expand_regex_branches(&combined, max_branches.saturating_sub(out.len()));
+        if sub.is_empty() || out.len() + sub.len() > max_branches {
+            return Vec::new();
+        }
+        out.extend(sub);
+    }
+    out
+}
+
+fn instantiate_regex_branch(expr: &str) -> Option<String> {
+    let mut out = String::with_capacity(expr.len());
+    let mut chars = expr.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            '\\' => {
+                let next = chars.next()?;
+                let sample = match next {
+                    'd' => "1",
+                    'w' => "a",
+                    '.' => ".",
+                    '?' => "?",
+                    '-' => "-",
+                    '/' => "/",
+                    '_' => "_",
+                    _ => return None,
+                };
+                out.push_str(sample);
+                consume_simple_quantifier(&mut chars, &mut out, sample)?;
+            }
+            '[' => {
+                let mut cls = String::new();
+                let mut closed = false;
+                for ch in chars.by_ref() {
+                    if ch == ']' {
+                        closed = true;
+                        break;
+                    }
+                    cls.push(ch);
+                }
+                if !closed || cls.starts_with('^') {
+                    return None;
+                }
+                let sample_ch = if cls.contains('a') || cls.contains("a-z") {
+                    "a"
+                } else if cls.contains('0') || cls.contains("0-9") {
+                    "1"
+                } else {
+                    return None;
+                };
+                out.push_str(sample_ch);
+                consume_simple_quantifier(&mut chars, &mut out, sample_ch)?;
+            }
+            '(' | ')' | '|' | '.' | '*' | '+' | '{' | '}' | '^' | '$' => return None,
+            '?' => {
+                // Optional preceding literal char — keep the literal char as instantiated
+            }
+            lit => {
+                let mut buf = [0u8; 4];
+                let s = lit.encode_utf8(&mut buf);
+                out.push_str(s);
+                consume_simple_quantifier(&mut chars, &mut out, s)?;
+            }
+        }
+    }
+    if out.contains('/') && out.contains('.') {
+        Some(out)
+    } else {
+        None
+    }
+}
+
+fn consume_simple_quantifier(
+    chars: &mut std::iter::Peekable<std::str::Chars<'_>>,
+    out: &mut String,
+    unit: &str,
+) -> Option<()> {
+    match chars.peek().copied() {
+        Some('+') | Some('*') | Some('?') => {
+            chars.next();
+            Some(())
+        }
+        Some('{') => {
+            chars.next();
+            let mut q = String::new();
+            let mut closed = false;
+            for ch in chars.by_ref() {
+                if ch == '}' {
+                    closed = true;
+                    break;
+                }
+                q.push(ch);
+            }
+            if !closed {
+                return None;
+            }
+            let min_str = q.split(',').next()?.trim();
+            let min_n: usize = min_str.parse().ok()?;
+            if min_n == 0 || min_n > 16 {
+                return None;
+            }
+            for _ in 1..min_n {
+                out.push_str(unit);
+            }
+            Some(())
+        }
+        _ => Some(()),
+    }
 }
 
 pub fn has_balanced_delimiters(pat: &str) -> bool {
@@ -595,12 +905,17 @@ pub fn is_valid_mitm_host(raw: &str) -> bool {
     }
 
     let bare = host_part.trim_start_matches("*.").trim_start_matches('.');
-    // Require at least two domain labels after wildcard strip (never allow `*.com` or `*.net`)
+    // Require at least two domain labels after wildcard strip (never allow `*.com`, `*.net`, or `*.com.cn`)
     let non_wild_labels: Vec<&str> = host_part
         .split('.')
         .filter(|seg| !seg.is_empty() && *seg != "*" && *seg != "?")
         .collect();
     if non_wild_labels.len() < 2 && bare.split('.').count() < 2 {
+        return false;
+    }
+    if (host_part.contains('*') || host_part.contains('?'))
+        && is_bare_multipart_public_suffix(&non_wild_labels)
+    {
         return false;
     }
     host_part

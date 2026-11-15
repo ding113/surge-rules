@@ -7,27 +7,6 @@ import type { AdblockSourceEntry } from "./adblock-schema.ts";
  */
 export const ADBLOCK_COMPLEX_SOURCES: readonly AdblockSourceEntry[] = [
   {
-    id: "biliverse_bilibili_adblock",
-    name: "Biliverse BiliBili ADBlock Module",
-    role: "complex_first",
-    format: "surge_module",
-    platform: "universal",
-    lineage: "biliverse_adblock",
-    weight: 97,
-    core: false,
-    endpoints: [
-      {
-        kind: "github_release",
-        repo: "Biliverse/ADBlock",
-        assetPattern: "^BiliBili\\.ADBlock\\.sgmodule$",
-      },
-      {
-        kind: "direct",
-        url: "https://github.com/Biliverse/ADBlock/releases/latest/download/BiliBili.ADBlock.sgmodule",
-      },
-    ],
-  },
-  {
     id: "app2smile_youtube",
     name: "app2smile YouTube Adblock Module",
     role: "complex_first",
@@ -218,6 +197,28 @@ export const ADBLOCK_COMPLEX_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
+    id: "ubo_privacy_removeparam",
+    name: "uBlock Origin Privacy Query Parameter Stripping ($removeparam)",
+    role: "complex_first",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "ubo_uassets",
+    weight: 93,
+    core: true,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssets@master/filters/privacy-removeparam.txt",
+      },
+    ],
+  },
+  {
     id: "adguard_spyware_general_extensions",
     name: "AdGuard Spyware Filter General Extensions ($removeparam / $removeheader)",
     role: "complex_first",
@@ -240,6 +241,28 @@ export const ADBLOCK_COMPLEX_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
+    id: "adguard_dandelion_shorteners",
+    name: "AdGuard Legitimate URL Shortener Filter ($removeparam Pre-Compiled)",
+    role: "complex_first",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "dandelion_adfilt",
+    weight: 92,
+    core: false,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_251_LegitimateURLShortener/filter.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/FiltersRegistry@master/filters/ThirdParty/filter_251_LegitimateURLShortener/filter.txt",
+      },
+    ],
+  },
+  {
     id: "dandelion_clearurls_ubo",
     name: "Dandelion Sprout ClearURLs ($removeparam)",
     role: "complex_first",
@@ -254,6 +277,50 @@ export const ADBLOCK_COMPLEX_SOURCES: readonly AdblockSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/ClearURLs%20for%20uBo/clear_urls_uboified.txt",
+      },
+    ],
+  },
+  {
+    id: "adguard_dandelion_annoyances",
+    name: "AdGuard Dandelion Sprout Annoyances ($removeparam Pre-Compiled)",
+    role: "complex_first",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "dandelion_adfilt",
+    weight: 91,
+    core: false,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_250_DandelionSproutAnnoyances/filter.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/AdguardTeam/FiltersRegistry@master/filters/ThirdParty/filter_250_DandelionSproutAnnoyances/filter.txt",
+      },
+    ],
+  },
+  {
+    id: "ruadlist_cntblock",
+    name: "RU AdList Counter & Parameter Block ($removeparam)",
+    role: "complex_first",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 89,
+    core: false,
+    extractComplexNetworkRules: true,
+    extractFallbackDomainRules: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/ruadlist/master/cntblock.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://easylist-downloads.adblockplus.org/cntblock.txt",
       },
     ],
   },
@@ -286,22 +353,6 @@ export const ADBLOCK_COMPLEX_SOURCES: readonly AdblockSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/Maasea/sgmodule/master/KeepAds.sgmodule",
-      },
-    ],
-  },
-  {
-    id: "ddgksf_xiaohongshu_ads",
-    name: "ddgksf2013 Xiaohongshu Adblock Module",
-    role: "complex_first",
-    format: "surge_module",
-    platform: "mobile",
-    lineage: "ddgksf2013_rewrite",
-    weight: 92,
-    core: false,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/ifflagged/Romeo/main/Modules/Surge/ddgksf2013/XiaoHongShuAds.sgmodule",
       },
     ],
   },

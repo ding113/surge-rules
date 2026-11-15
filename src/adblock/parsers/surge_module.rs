@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::adblock::model::{
     BodyRewriteKind, BodyRewriteRule, HeaderAction, HeaderDirection, HeaderRewriteRule,
     MapLocalDataType, MapLocalRule, ModuleGeneralHostItem, ModuleRuleLine, ParsedAdblockSource,
-    ScriptRule, ScriptType, UrlRewriteMode, UrlRewriteRule,
+    ScriptRule, ScriptType, UrlRewriteMode, UrlRewriteRule, normalize_script_limits,
 };
 use crate::adblock::parsers::ruleset::{insert_ruleset_entry, parse_canonical_cidr};
 use crate::adblock::regex_util::{
@@ -592,9 +592,15 @@ fn parse_script_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) {
     let (Some(st), Some(pat), Some(path)) = (script_type, pattern, script_path) else {
         return;
     };
-    if requires_body && max_size == Some(0) {
-        max_size = Some(-1);
+    // Skip upstream scripts that explicitly require WebView/WebKit WebAPIs to prevent iOS PacketTunnelProvider memory spikes
+    if matches!(
+        engine.as_deref().map(str::to_ascii_lowercase).as_deref(),
+        Some("webview" | "webkit")
+    ) {
+        return;
     }
+    let (norm_max_size, norm_timeout) =
+        normalize_script_limits(requires_body, binary_body_mode, max_size, timeout);
 
     out.register_host_info(extract_hosts_from_regex(&pat));
     out.scripts.push(ScriptRule {
@@ -604,10 +610,10 @@ fn parse_script_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) {
         script_path: path,
         requires_body,
         binary_body_mode,
-        max_size,
-        timeout,
+        max_size: norm_max_size,
+        timeout: norm_timeout,
         argument,
-        engine,
+        engine: Some("jsc".to_string()),
         weight,
     });
 }

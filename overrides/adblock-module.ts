@@ -138,8 +138,16 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   { pattern: "api.bilibili.com", rationale: "Bilibili REST API enforces TLS certificate pinning" },
   { pattern: "app.bilibili.com", rationale: "Bilibili app API enforces TLS certificate pinning" },
   {
-    pattern: "www.xiaohongshu.com",
-    rationale: "Xiaohongshu web/app endpoints enforce TLS certificate pinning",
+    pattern: "*.xiaohongshu.com",
+    rationale: "Xiaohongshu app/API endpoints (edith, rec, www) enforce TLS certificate pinning",
+  },
+  {
+    pattern: "xiaohongshu.com",
+    rationale: "Xiaohongshu root domain enforces TLS certificate pinning",
+  },
+  {
+    pattern: "*.xhscdn.com",
+    rationale: "Xiaohongshu media CDN enforces strict TLS validation",
   },
 ];
 
@@ -160,7 +168,10 @@ export const DISABLED_URL_PATTERNS: readonly string[] = [
   "(?:app|api)\\.bilibili\\.com",
   "app\\.bilibili\\.com",
   "api\\.bilibili\\.com",
-  "www\\.xiaohongshu\\.com",
+  // Strip Xiaohongshu / Redbook HTTPS MITM scripts & rewrites (TLS-pinned + heavy response payloads)
+  "xiaohongshu\\.com",
+  "xhscdn\\.com",
+  "redbook",
   // Prevent Kelee broad Alibaba CDN image-dimension regexes from breaking Taobao/Alipay UI icons
   "gw\\.alicdn\\.com/mt/",
   "gw\\.alicdn\\.com/tfs/",
