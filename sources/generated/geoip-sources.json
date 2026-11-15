@@ -1,0 +1,1565 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "id": "geofeed_harvester",
+      "tier": "tier1_geofeed",
+      "format": "geofeed_parquet",
+      "lineage": "operator_geofeed",
+      "countryWeight": 96,
+      "cityWeight": 92,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "ipanalytics/GeoFeed-Harvester",
+          "assetPattern": "^geofeed\\.parquet$"
+        }
+      ]
+    },
+    {
+      "id": "opengeofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "operator_geofeed",
+      "countryWeight": 96,
+      "cityWeight": 92,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://opengeofeed.org/feed/public.csv"
+        }
+      ]
+    },
+    {
+      "id": "ntt_gin_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "operator_geofeed",
+      "countryWeight": 96,
+      "cityWeight": 92,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://geo.ip.gin.ntt.net/geofeeds/geofeeds.csv"
+        }
+      ]
+    },
+    {
+      "id": "lacnic_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "operator_geofeed",
+      "countryWeight": 96,
+      "cityWeight": 92,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://milacnic.lacnic.net/lacnic/geofeeds/geofeeds.csv"
+        }
+      ]
+    },
+    {
+      "id": "aws_ip_ranges",
+      "tier": "tier1_geofeed",
+      "format": "aws_ip_ranges_json",
+      "lineage": "aws_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isHosting": true,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ip-ranges.amazonaws.com/ip-ranges.json"
+        }
+      ]
+    },
+    {
+      "id": "aws_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "aws_official",
+      "countryWeight": 100,
+      "cityWeight": 99,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ip-ranges.amazonaws.com/geo-ip-feed.csv"
+        }
+      ]
+    },
+    {
+      "id": "gcp_cloud_ranges",
+      "tier": "tier1_geofeed",
+      "format": "gcp_cloud_json",
+      "lineage": "google_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isHosting": true,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.gstatic.com/ipranges/cloud.json"
+        }
+      ]
+    },
+    {
+      "id": "gcp_cloud_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "google_official",
+      "countryWeight": 100,
+      "cityWeight": 99,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.gstatic.com/ipranges/cloud_geofeed"
+        }
+      ]
+    },
+    {
+      "id": "google_corp_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "google_official",
+      "countryWeight": 99,
+      "cityWeight": 96,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.gstatic.com/geofeed/corp_external"
+        }
+      ]
+    },
+    {
+      "id": "google_vpn_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "google_official",
+      "countryWeight": 98,
+      "cityWeight": 95,
+      "isVpn": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.gstatic.com/vpn/geofeed"
+        }
+      ]
+    },
+    {
+      "id": "cloudflare_local_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "cloudflare_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isCdn": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://api.cloudflare.com/local-ip-ranges.csv"
+        }
+      ]
+    },
+    {
+      "id": "cloudflare_warp_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "cloudflare_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isVpn": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://api.cloudflare.com/warp-egress-ip-ranges.csv"
+        }
+      ]
+    },
+    {
+      "id": "apple_icloud_private_relay",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "apple_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isAnonymousProxy": true,
+      "isIcloudRelay": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://mask-api.icloud.com/egress-ip-ranges.csv"
+        }
+      ]
+    },
+    {
+      "id": "oracle_cloud_ranges",
+      "tier": "tier1_geofeed",
+      "format": "oracle_cloud_json",
+      "lineage": "oracle_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json"
+        }
+      ]
+    },
+    {
+      "id": "digitalocean_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "digitalocean_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://digitalocean.com/geo/google.csv"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/jonhadfield/cloud-ips/main/digitalocean.csv"
+        }
+      ]
+    },
+    {
+      "id": "akamai_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "akamai_official",
+      "countryWeight": 100,
+      "cityWeight": 97,
+      "isCdn": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ipgeo.akamai.com/akamai-geofeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "linode_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "akamai_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ipgeo.akamai.com/linode-geofeed.csv"
+        },
+        {
+          "kind": "direct",
+          "url": "https://geoip.linode.com/"
+        }
+      ]
+    },
+    {
+      "id": "hetzner_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "hetzner_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.hetzner.com/geofeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "vultr_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "vultr_official",
+      "countryWeight": 100,
+      "cityWeight": 98,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://geofeed.constant.com/"
+        }
+      ]
+    },
+    {
+      "id": "starlink_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "starlink_official",
+      "countryWeight": 100,
+      "cityWeight": 97,
+      "isSatellite": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://geoip.starlinkisp.net/feed.csv"
+        }
+      ]
+    },
+    {
+      "id": "viasat_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "viasat_official",
+      "countryWeight": 99,
+      "cityWeight": 96,
+      "isSatellite": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Viasat/geofeed/main/geofeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "netflix_openconnect_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "netflix_official",
+      "countryWeight": 99,
+      "cityWeight": 96,
+      "isCdn": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Netflix/nflx-geofeed/main/geofeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "upcloud_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "upcloud_official",
+      "countryWeight": 99,
+      "cityWeight": 97,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://upcloud.com/geofeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "cherryservers_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "cherryservers_official",
+      "countryWeight": 99,
+      "cityWeight": 97,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://geofeed.cherryservers.com/geofeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "hostinger_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "hostinger_official",
+      "countryWeight": 99,
+      "cityWeight": 97,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hostinger/geofeed/main/geofeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "exoscale_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "exoscale_official",
+      "countryWeight": 99,
+      "cityWeight": 97,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://exoscale-prefixes.sos.exo.io/exoscale_geofeed"
+        }
+      ]
+    },
+    {
+      "id": "clouvider_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "clouvider_official",
+      "countryWeight": 99,
+      "cityWeight": 97,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://clouvider.com/geoipfeed.csv"
+        }
+      ]
+    },
+    {
+      "id": "tmobile_us_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "tmobile_official",
+      "countryWeight": 99,
+      "cityWeight": 96,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/tmobile/tmus-geofeed/main/tmus-geo-ip.txt"
+        }
+      ]
+    },
+    {
+      "id": "verizon_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "verizon_official",
+      "countryWeight": 99,
+      "cityWeight": 96,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Verizon/verizon-geofeed/main/feed_5Ghome.csv"
+        }
+      ]
+    },
+    {
+      "id": "microsoft_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "microsoft_official",
+      "countryWeight": 99,
+      "cityWeight": 96,
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://download.microsoft.com/download/0b9dc6ca-68f9-43b2-b094-da4f6d509bc3/geoloc-Microsoft.csv"
+        }
+      ]
+    },
+    {
+      "id": "ip2region_v4",
+      "tier": "tier2a_cn",
+      "format": "xdb",
+      "lineage": "ip2region",
+      "countryWeight": 70,
+      "cnWeight": 90,
+      "cityWeight": 92,
+      "ispWeight": 92,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v4.xdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/lionsoul2014/ip2region@master/data/ip2region_v4.xdb"
+        }
+      ]
+    },
+    {
+      "id": "ip2region_v6",
+      "tier": "tier2a_cn",
+      "format": "xdb",
+      "lineage": "ip2region",
+      "countryWeight": 70,
+      "cnWeight": 88,
+      "cityWeight": 90,
+      "ispWeight": 90,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v6.xdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/lionsoul2014/ip2region@master/data/ip2region_v6.xdb"
+        }
+      ]
+    },
+    {
+      "id": "cz88_qqwry",
+      "tier": "tier2a_cn",
+      "format": "qqwry_dat",
+      "lineage": "cz88_qqwry",
+      "countryWeight": 65,
+      "cnWeight": 88,
+      "cityWeight": 88,
+      "ispWeight": 90,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "metowolf/qqwry.dat",
+          "assetPattern": "^qqwry\\.dat$"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/nmgliangwei/qqwry/main/qqwry.dat"
+        }
+      ]
+    },
+    {
+      "id": "openipdb",
+      "tier": "tier2a_cn",
+      "format": "ipdb",
+      "lineage": "openipdb",
+      "countryWeight": 68,
+      "cnWeight": 89,
+      "cityWeight": 91,
+      "ispWeight": 90,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "npm_tarball",
+          "package": "openipdb.ipdb",
+          "memberPath": "package/openipdb.ipdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://unpkg.com/openipdb.ipdb/openipdb.ipdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/npm/openipdb.ipdb@2026.7.26/openipdb.ipdb"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_china_v4",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "gaoyifan_bgp_rir",
+      "cnWeight": 90,
+      "fixedCountry": "CN",
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://gaoyifan.github.io/china-operator-ip/china.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_china_v6",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "gaoyifan_bgp_rir",
+      "cnWeight": 90,
+      "fixedCountry": "CN",
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://gaoyifan.github.io/china-operator-ip/china6.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_chinanet_v4",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "China Telecom",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_chinanet_v6",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "China Telecom",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet6.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_unicom_v4",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "China Unicom",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_unicom_v6",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "China Unicom",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_cmcc_v4",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "China Mobile",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_cmcc_v6",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "China Mobile",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_cernet",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "CERNET",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet46.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_cstnet",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "CSTNET",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet46.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_drpeng",
+      "tier": "tier2a_cn",
+      "format": "cidr_isp",
+      "lineage": "gaoyifan_bgp_rir",
+      "ispWeight": 94,
+      "fixedIsp": "Dr.Peng",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng46.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt"
+        }
+      ]
+    },
+    {
+      "id": "metowolf_china",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "openipdb",
+      "cnWeight": 88,
+      "fixedCountry": "CN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://metowolf.github.io/iplist/data/special/china.txt"
+        }
+      ]
+    },
+    {
+      "id": "sukkaw_chnroutes2",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "chnroutes2",
+      "cnWeight": 88,
+      "fixedCountry": "CN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://chnroutes2.cdn.skk.moe/reversed-chnroutes.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt"
+        }
+      ]
+    },
+    {
+      "id": "sukkaw_china_ipv6",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "chnroutes2",
+      "cnWeight": 88,
+      "fixedCountry": "CN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt"
+        }
+      ]
+    },
+    {
+      "id": "ipip_17mon_china",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "ipip_17mon",
+      "cnWeight": 86,
+      "fixedCountry": "CN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+        }
+      ]
+    },
+    {
+      "id": "hackl0us_geoip2_cn",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "ipip_17mon",
+      "cnWeight": 85,
+      "fixedCountry": "CN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ip-cidr.txt"
+        }
+      ]
+    },
+    {
+      "id": "chanthmiao_cn_v4",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "chanthmiao_cn",
+      "cnWeight": 84,
+      "fixedCountry": "CN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ChanthMiao/China-IPv4-List/release/cn.txt"
+        }
+      ]
+    },
+    {
+      "id": "chanthmiao_cn_v6",
+      "tier": "tier2a_cn",
+      "format": "cidr_country",
+      "lineage": "chanthmiao_cn",
+      "cnWeight": 84,
+      "fixedCountry": "CN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt"
+        }
+      ]
+    },
+    {
+      "id": "ipinfo_lite",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "ipinfo",
+      "countryWeight": 82,
+      "asnWeight": 82,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "Alice39s/ipinfo-csv-lite",
+          "assetPattern": "^ipinfo-lite\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "NetworkCats/IPinfoLite-Download",
+          "assetPattern": "^ipinfo_lite\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "gen0sec/geoip-databases",
+          "assetPattern": "^ipinfo_lite\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "8bitsaver/ipinfo-geoip",
+          "assetPattern": "^country_asn\\.mmdb$"
+        }
+      ]
+    },
+    {
+      "id": "maxmind_geolite2_city",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "maxmind",
+      "countryWeight": 75,
+      "cityWeight": 84,
+      "registeredCountryWeight": 85,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "Skiddle-ID/geoip2-mirror",
+          "assetPattern": "^GeoLite2-City\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "gen0sec/geoip-databases",
+          "assetPattern": "^GeoLite2-City\\.mmdb$"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/wyot1/GeoLite2-Unwalled/downloads/CITY/MMDB/GeoLite2-City.mmdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-City.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "maxmind_geolite2_country",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "maxmind",
+      "countryWeight": 75,
+      "registeredCountryWeight": 85,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "Skiddle-ID/geoip2-mirror",
+          "assetPattern": "^GeoLite2-Country\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "KoNEW/geoip2-mirror",
+          "assetPattern": "^GeoLite2-Country\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "P3TERX/GeoLite.mmdb",
+          "assetPattern": "^GeoLite2-Country\\.mmdb$"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-Country.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "dbip_city_lite",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "dbip",
+      "countryWeight": 77,
+      "cityWeight": 80,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/npm/dbip-city-lite/dbip-city-lite.mmdb.gz"
+        }
+      ]
+    },
+    {
+      "id": "dbip_country_lite",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "dbip",
+      "countryWeight": 77,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/sapics/ip-location-db/releases/download/latest/dbip-country.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "ip2location_db11",
+      "tier": "tier2b_global",
+      "format": "ip2location_bin",
+      "lineage": "ip2location",
+      "countryWeight": 78,
+      "cityWeight": 82,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "renfei/ip2location",
+          "assetPattern": "^IP2LOCATION-LITE-DB11\\.IPV6\\.BIN$"
+        }
+      ]
+    },
+    {
+      "id": "ip2location_db1_official",
+      "tier": "tier2b_global",
+      "format": "ip2location_csv",
+      "lineage": "ip2location",
+      "countryWeight": 78,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP"
+        }
+      ]
+    },
+    {
+      "id": "ipfire_libloc",
+      "tier": "tier2b_global",
+      "format": "libloc",
+      "lineage": "ipfire_libloc",
+      "countryWeight": 74,
+      "asnWeight": 86,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://location.ipfire.org/databases/1/location.db.xz"
+        }
+      ]
+    },
+    {
+      "id": "sapics_user_country",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "sapics_composite",
+      "countryWeight": 68,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://github.com/sapics/ip-location-db/releases/download/latest/user-country.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "iplocate_country",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "iplocate",
+      "countryWeight": 66,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://media.githubusercontent.com/media/iplocate/ip-address-databases/HEAD/ip-to-country/ip-to-country.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "ipscope_lite",
+      "tier": "tier2b_global",
+      "format": "ipscope_csv",
+      "lineage": "ipscope",
+      "countryWeight": 65,
+      "asnWeight": 72,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://api.ipscope.io/v1/lite/ipscope-lite.csv.gz"
+        }
+      ]
+    },
+    {
+      "id": "ip66_mmdb",
+      "tier": "tier2b_global",
+      "format": "mmdb",
+      "lineage": "ip66",
+      "countryWeight": 64,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://downloads.ip66.dev/db/ip66.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "sypex_geo_country",
+      "tier": "tier2b_global",
+      "format": "sypex_dat",
+      "lineage": "sypexgeo",
+      "countryWeight": 62,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://sypexgeo.net/files/SxGeoCountry.zip"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_table",
+      "tier": "tier3_bgp_rir",
+      "format": "bgptools_table",
+      "lineage": "bgptools",
+      "asnWeight": 96,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://bgp.tools/table.jsonl"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/table/table-original.jsonl.gz"
+        },
+        {
+          "kind": "direct",
+          "url": "https://bgp.tools/table.txt"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_asns",
+      "tier": "tier3_bgp_rir",
+      "format": "bgptools_asns_csv",
+      "lineage": "bgptools",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://bgp.tools/asns.csv"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/asns/asns.csv.gz"
+        }
+      ]
+    },
+    {
+      "id": "ipverse_as_metadata",
+      "tier": "tier3_bgp_rir",
+      "format": "ipverse_as_csv",
+      "lineage": "ipverse_as",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ipverse/as-metadata/master/as.csv"
+        }
+      ]
+    },
+    {
+      "id": "iptoasn_combined",
+      "tier": "tier3_bgp_rir",
+      "format": "iptoasn_tsv",
+      "lineage": "iptoasn",
+      "countryWeight": 35,
+      "asnWeight": 84,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://iptoasn.com/data/ip2asn-combined.tsv.gz"
+        }
+      ]
+    },
+    {
+      "id": "sapics_origin_asn",
+      "tier": "tier3_bgp_rir",
+      "format": "mmdb",
+      "lineage": "sapics_bgp",
+      "asnWeight": 83,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://github.com/sapics/ip-location-db/releases/download/latest/origin-asn.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "maxmind_geolite2_asn",
+      "tier": "tier3_bgp_rir",
+      "format": "mmdb",
+      "lineage": "maxmind",
+      "asnWeight": 78,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "Skiddle-ID/geoip2-mirror",
+          "assetPattern": "^GeoLite2-ASN\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "KoNEW/geoip2-mirror",
+          "assetPattern": "^GeoLite2-ASN\\.mmdb$"
+        },
+        {
+          "kind": "github_release",
+          "repo": "P3TERX/GeoLite.mmdb",
+          "assetPattern": "^GeoLite2-ASN\\.mmdb$"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-ASN.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "dbip_asn_lite",
+      "tier": "tier3_bgp_rir",
+      "format": "mmdb",
+      "lineage": "dbip",
+      "asnWeight": 75,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/sapics/ip-location-db/releases/download/latest/dbip-asn.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "iplocate_asn",
+      "tier": "tier3_bgp_rir",
+      "format": "mmdb",
+      "lineage": "iplocate",
+      "asnWeight": 70,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://media.githubusercontent.com/media/iplocate/ip-address-databases/HEAD/ip-to-asn/ip-to-asn.mmdb"
+        }
+      ]
+    },
+    {
+      "id": "rir_apnic",
+      "tier": "tier3_bgp_rir",
+      "format": "rir_delegated",
+      "lineage": "iana_rir",
+      "countryWeight": 28,
+      "registeredCountryWeight": 100,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest"
+        },
+        {
+          "kind": "direct",
+          "url": "https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest"
+        },
+        {
+          "kind": "direct",
+          "url": "https://ftp.ripe.net/pub/stats/apnic/delegated-apnic-extended-latest"
+        }
+      ]
+    },
+    {
+      "id": "rir_arin",
+      "tier": "tier3_bgp_rir",
+      "format": "rir_delegated",
+      "lineage": "iana_rir",
+      "countryWeight": 28,
+      "registeredCountryWeight": 100,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
+        },
+        {
+          "kind": "direct",
+          "url": "https://ftp.ripe.net/pub/stats/arin/delegated-arin-extended-latest"
+        }
+      ]
+    },
+    {
+      "id": "rir_ripencc",
+      "tier": "tier3_bgp_rir",
+      "format": "rir_delegated",
+      "lineage": "iana_rir",
+      "countryWeight": 28,
+      "registeredCountryWeight": 100,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
+        }
+      ]
+    },
+    {
+      "id": "rir_lacnic",
+      "tier": "tier3_bgp_rir",
+      "format": "rir_delegated",
+      "lineage": "iana_rir",
+      "countryWeight": 28,
+      "registeredCountryWeight": 100,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
+        },
+        {
+          "kind": "direct",
+          "url": "https://ftp.ripe.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
+        }
+      ]
+    },
+    {
+      "id": "rir_afrinic",
+      "tier": "tier3_bgp_rir",
+      "format": "rir_delegated",
+      "lineage": "iana_rir",
+      "countryWeight": 28,
+      "registeredCountryWeight": 100,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ftp.afrinic.net/stats/afrinic/delegated-afrinic-extended-latest"
+        },
+        {
+          "kind": "direct",
+          "url": "https://ftp.ripe.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_anycast_v4",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "bgptools_anycast",
+      "isAnycast": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/bgptools/anycast-prefixes/master/anycatch-v4-prefixes.txt"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_anycast_v6",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "bgptools_anycast",
+      "isAnycast": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/bgptools/anycast-prefixes/master/anycatch-v6-prefixes.txt"
+        }
+      ]
+    },
+    {
+      "id": "cloudflare_edge_v4",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "cloudflare_official",
+      "isCdn": true,
+      "isAnycast": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.cloudflare.com/ips-v4"
+        }
+      ]
+    },
+    {
+      "id": "cloudflare_edge_v6",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "cloudflare_official",
+      "isCdn": true,
+      "isAnycast": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.cloudflare.com/ips-v6/"
+        }
+      ]
+    },
+    {
+      "id": "fastly_edge",
+      "tier": "trait_overlay",
+      "format": "fastly_json",
+      "lineage": "fastly_official",
+      "isCdn": true,
+      "isAnycast": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://api.fastly.com/public-ip-list"
+        }
+      ]
+    },
+    {
+      "id": "gcore_edge",
+      "tier": "trait_overlay",
+      "format": "gcore_json",
+      "lineage": "gcore_official",
+      "isHosting": true,
+      "isCdn": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://api.gcore.com/cdn/public-ip-list"
+        }
+      ]
+    },
+    {
+      "id": "github_meta",
+      "tier": "trait_overlay",
+      "format": "github_meta_json",
+      "lineage": "github_official",
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://api.github.com/meta"
+        }
+      ]
+    },
+    {
+      "id": "hexydec_crawlers",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "hexydec_crawlers",
+      "isCrawler": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hexydec/ip-ranges/main/output/crawlers.txt"
+        }
+      ]
+    },
+    {
+      "id": "tor_bulk_exits",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "tor_official",
+      "isAnonymousProxy": true,
+      "isTorExit": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://check.torproject.org/torbulkexitlist"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/SecOps-Institute/Tor-IP-Addresses/master/tor-exit-nodes.lst"
+        }
+      ]
+    },
+    {
+      "id": "tor_onionoo",
+      "tier": "trait_overlay",
+      "format": "onionoo_json",
+      "lineage": "tor_official",
+      "isAnonymousProxy": true,
+      "isTorExit": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://onionoo.torproject.org/summary?flag=Exit&running=true"
+        }
+      ]
+    },
+    {
+      "id": "x4bnet_vpn_v4",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "x4bnet_vpn",
+      "isVpn": true,
+      "isAnonymousProxy": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt"
+        }
+      ]
+    },
+    {
+      "id": "x4bnet_datacenter_v4",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "x4bnet_datacenter",
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt"
+        }
+      ]
+    },
+    {
+      "id": "josephrocca_vpn_v6",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "josephrocca_vpn",
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/josephrocca/is-vpn/main/vpn-or-datacenter-ipv6-ranges.txt"
+        }
+      ]
+    },
+    {
+      "id": "openproxydb",
+      "tier": "trait_overlay",
+      "format": "openproxydb_csv",
+      "lineage": "openproxydb",
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "NetworkCats/OpenProxyDB",
+          "assetPattern": "^proxy_blocks\\.csv$"
+        }
+      ]
+    },
+    {
+      "id": "jhassine_datacenters",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "jhassine_dc",
+      "isHosting": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/jhassine/server-ip-addresses/master/data/datacenters.txt"
+        }
+      ]
+    },
+    {
+      "id": "sat_geoip_prefixes",
+      "tier": "trait_overlay",
+      "format": "sat_geoip_jsonl",
+      "lineage": "sat_geoip",
+      "isSatellite": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ipanalytics/Sat-geoip/main/outputs/sat-geoip-prefixes.jsonl"
+        }
+      ]
+    },
+    {
+      "id": "sat_geoip_asns",
+      "tier": "trait_overlay",
+      "format": "sat_asns_csv",
+      "lineage": "sat_geoip",
+      "isSatellite": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ipanalytics/Sat-geoip/main/outputs/satellite-asns.csv"
+        }
+      ]
+    },
+    {
+      "id": "spamhaus_drop_v4",
+      "tier": "trait_overlay",
+      "format": "spamhaus_drop",
+      "lineage": "spamhaus_drop",
+      "isMalware": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.spamhaus.org/drop/drop_v4.json"
+        },
+        {
+          "kind": "direct",
+          "url": "https://www.spamhaus.org/drop/drop.txt"
+        }
+      ]
+    },
+    {
+      "id": "spamhaus_drop_v6",
+      "tier": "trait_overlay",
+      "format": "spamhaus_drop",
+      "lineage": "spamhaus_drop",
+      "isMalware": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.spamhaus.org/drop/drop_v6.json"
+        }
+      ]
+    },
+    {
+      "id": "abusech_feodo",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "abusech",
+      "isMalware": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt"
+        }
+      ]
+    }
+  ]
+}

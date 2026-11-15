@@ -1,0 +1,7 @@
+/target/
+/.cache/
+/dist/
+/node_modules/
+/.local/
+.DS_Store
+*.swp

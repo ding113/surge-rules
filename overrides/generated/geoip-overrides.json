@@ -1,0 +1,926 @@
+{
+  "schemaVersion": 1,
+  "specialNetworks": [
+    {
+      "cidr": "0.0.0.0/8",
+      "networkType": "this_network",
+      "organization": "IANA This-Network",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 791 / RFC 6890"
+    },
+    {
+      "cidr": "10.0.0.0/8",
+      "networkType": "private_lan",
+      "organization": "RFC 1918 Private Network",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 1918"
+    },
+    {
+      "cidr": "127.0.0.0/8",
+      "networkType": "loopback",
+      "organization": "IANA Loopback",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 1122"
+    },
+    {
+      "cidr": "169.254.0.0/16",
+      "networkType": "link_local",
+      "organization": "RFC 3927 Link-Local",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 3927"
+    },
+    {
+      "cidr": "172.16.0.0/12",
+      "networkType": "private_lan",
+      "organization": "RFC 1918 Private Network",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 1918"
+    },
+    {
+      "cidr": "192.0.0.0/24",
+      "networkType": "ietf_protocol",
+      "organization": "IETF Protocol Assignments",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 6890"
+    },
+    {
+      "cidr": "192.0.2.0/24",
+      "networkType": "documentation",
+      "organization": "TEST-NET-1 Documentation",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 5737"
+    },
+    {
+      "cidr": "192.88.99.0/24",
+      "networkType": "tunnel_6to4",
+      "organization": "Deprecated 6to4 Relay Anycast",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 7526"
+    },
+    {
+      "cidr": "192.168.0.0/16",
+      "networkType": "private_lan",
+      "organization": "RFC 1918 Private Network",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 1918"
+    },
+    {
+      "cidr": "198.51.100.0/24",
+      "networkType": "documentation",
+      "organization": "TEST-NET-2 Documentation",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 5737"
+    },
+    {
+      "cidr": "203.0.113.0/24",
+      "networkType": "documentation",
+      "organization": "TEST-NET-3 Documentation",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 5737"
+    },
+    {
+      "cidr": "224.0.0.0/4",
+      "networkType": "multicast",
+      "organization": "IPv4 Multicast",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 5771"
+    },
+    {
+      "cidr": "240.0.0.0/4",
+      "networkType": "reserved",
+      "organization": "IANA Reserved & Limited Broadcast",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 1112 / RFC 6890"
+    },
+    {
+      "cidr": "198.18.0.0/15",
+      "networkType": "fake_ip",
+      "virtualNetwork": "surge_vif",
+      "organization": "Surge Enhanced Mode Fake-IP / RFC 2544",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Surge Manual / RFC 2544"
+    },
+    {
+      "cidr": "198.18.0.2/32",
+      "networkType": "virtual_mesh_dns",
+      "virtualNetwork": "surge_vif",
+      "organization": "Surge VIF Internal DNS",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Surge Manual"
+    },
+    {
+      "cidr": "100.64.0.0/10",
+      "networkType": "virtual_mesh",
+      "virtualNetwork": "tailscale",
+      "organization": "Tailscale Mesh / RFC 6598 Shared Space",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "RFC 6598 / Tailscale KB"
+    },
+    {
+      "cidr": "100.100.100.100/32",
+      "networkType": "virtual_mesh_dns",
+      "virtualNetwork": "tailscale",
+      "organization": "Tailscale MagicDNS (Quad100)",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Tailscale MagicDNS"
+    },
+    {
+      "cidr": "100.96.0.0/12",
+      "networkType": "virtual_mesh",
+      "virtualNetwork": "cloudflare_mesh",
+      "organization": "Cloudflare Zero Trust / WARP Virtual Mesh",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Cloudflare Zero Trust WARP Virtual IP"
+    },
+    {
+      "cidr": "100.112.0.0/16",
+      "networkType": "virtual_mesh",
+      "virtualNetwork": "cloudflare_mesh",
+      "organization": "Cloudflare Zero Trust Service VIPs",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Cloudflare Zero Trust Private Network"
+    },
+    {
+      "cidr": "172.16.0.1/32",
+      "networkType": "virtual_mesh_dns",
+      "virtualNetwork": "cloudflare_mesh",
+      "organization": "Cloudflare WARP Local DNS Resolver",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Cloudflare WARP Client"
+    },
+    {
+      "cidr": "172.16.0.2/32",
+      "networkType": "virtual_mesh",
+      "virtualNetwork": "cloudflare_mesh",
+      "organization": "Cloudflare WARP Local Tunnel Interface",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Cloudflare WARP Client"
+    },
+    {
+      "cidr": "::/128",
+      "networkType": "this_network",
+      "organization": "IPv6 Unspecified Address",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 4291"
+    },
+    {
+      "cidr": "::1/128",
+      "networkType": "loopback",
+      "organization": "IPv6 Loopback Address",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 4291"
+    },
+    {
+      "cidr": "64:ff9b::/96",
+      "networkType": "nat64_translation",
+      "organization": "NAT64 Well-Known Prefix",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 6052"
+    },
+    {
+      "cidr": "64:ff9b:1::/48",
+      "networkType": "nat64_translation",
+      "organization": "NAT64 Local-Use Translation Prefix",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 8215"
+    },
+    {
+      "cidr": "100::/64",
+      "networkType": "discard",
+      "organization": "IPv6 Discard-Only Prefix",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 6666"
+    },
+    {
+      "cidr": "2001:2::/48",
+      "networkType": "benchmarking",
+      "organization": "IPv6 Benchmarking",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 5180"
+    },
+    {
+      "cidr": "2001:db8::/32",
+      "networkType": "documentation",
+      "organization": "IPv6 Documentation Prefix",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 3849"
+    },
+    {
+      "cidr": "2002::/16",
+      "networkType": "tunnel_6to4",
+      "organization": "6to4 Addressing Prefix",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 3056"
+    },
+    {
+      "cidr": "fc00::/7",
+      "networkType": "private_lan",
+      "organization": "RFC 4193 Unique Local Unicast (ULA)",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 4193"
+    },
+    {
+      "cidr": "fc00::/8",
+      "networkType": "virtual_mesh",
+      "virtualNetwork": "zerotier",
+      "organization": "ZeroTier 6plane / RFC 4193 ULA",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "RFC 4193 / ZeroTier 6plane"
+    },
+    {
+      "cidr": "fd7a:115c:a1e0::/48",
+      "networkType": "virtual_mesh",
+      "virtualNetwork": "tailscale",
+      "organization": "Tailscale IPv6 Mesh Network",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Tailscale IPv6 ULA"
+    },
+    {
+      "cidr": "fd7a:115c:a1e0::53/128",
+      "networkType": "virtual_mesh_dns",
+      "virtualNetwork": "tailscale",
+      "organization": "Tailscale IPv6 MagicDNS",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Tailscale MagicDNS"
+    },
+    {
+      "cidr": "fd01:db8:1111::/48",
+      "networkType": "virtual_mesh",
+      "virtualNetwork": "cloudflare_mesh",
+      "organization": "Cloudflare Zero Trust / WARP IPv6 Mesh",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": true,
+      "rfcOrDoc": "Cloudflare WARP Virtual IPv6"
+    },
+    {
+      "cidr": "fe80::/10",
+      "networkType": "link_local",
+      "organization": "IPv6 Link-Local Unicast",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 4291"
+    },
+    {
+      "cidr": "ff00::/8",
+      "networkType": "multicast",
+      "organization": "IPv6 Multicast",
+      "isBogon": true,
+      "isPrivate": true,
+      "isVirtualMesh": false,
+      "rfcOrDoc": "RFC 4291"
+    }
+  ],
+  "countryOverrides": [
+    {
+      "cidr": "114.24.0.0/14",
+      "isoCode": "TW",
+      "registeredIsoCode": "TW",
+      "isp": "Chunghwa Telecom",
+      "organization": "Chunghwa Telecom Co., Ltd.",
+      "rationale": "AS3462 HiNet Taiwan residential/broadband pool; separate from ISO CN"
+    },
+    {
+      "cidr": "168.95.0.0/16",
+      "isoCode": "TW",
+      "registeredIsoCode": "TW",
+      "isp": "Chunghwa Telecom",
+      "organization": "Chunghwa Telecom Co., Ltd.",
+      "rationale": "AS3462 HiNet DNS (168.95.1.1 / 168.95.192.1) and backbone space"
+    },
+    {
+      "cidr": "119.29.29.0/24",
+      "isoCode": "CN",
+      "registeredIsoCode": "CN",
+      "isp": "Tencent Cloud",
+      "organization": "DNSPod Public DNS",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "DNSPod Public DNS (119.29.29.29) mainland China anycast"
+    },
+    {
+      "cidr": "182.254.116.0/22",
+      "isoCode": "CN",
+      "registeredIsoCode": "CN",
+      "isp": "Tencent Cloud",
+      "organization": "DNSPod / Tencent HTTPDNS",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Tencent HTTPDNS (182.254.116.116 / 182.254.118.119) mainland anycast"
+    },
+    {
+      "cidr": "223.5.5.0/24",
+      "isoCode": "CN",
+      "registeredIsoCode": "CN",
+      "isp": "Alibaba Cloud",
+      "organization": "Alibaba AliDNS",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "AliDNS primary IPv4 anycast block (223.5.5.5)"
+    },
+    {
+      "cidr": "223.6.6.0/24",
+      "isoCode": "CN",
+      "registeredIsoCode": "CN",
+      "isp": "Alibaba Cloud",
+      "organization": "Alibaba AliDNS",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "AliDNS secondary IPv4 anycast block (223.6.6.6)"
+    },
+    {
+      "cidr": "2400:3200::/32",
+      "isoCode": "CN",
+      "registeredIsoCode": "CN",
+      "isp": "Alibaba Cloud",
+      "organization": "Alibaba AliDNS IPv6",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "AliDNS IPv6 anycast block (2400:3200::1)"
+    },
+    {
+      "cidr": "114.114.114.0/24",
+      "isoCode": "CN",
+      "registeredIsoCode": "CN",
+      "isp": "Nanjing Xinfeng",
+      "organization": "114DNS Public Resolver",
+      "isAnycast": true,
+      "rationale": "114DNS mainland public resolver"
+    },
+    {
+      "cidr": "180.76.76.0/24",
+      "isoCode": "CN",
+      "registeredIsoCode": "CN",
+      "isp": "Baidu",
+      "organization": "Baidu Public DNS",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Baidu Public DNS (180.76.76.76)"
+    },
+    {
+      "cidr": "1.1.1.0/24",
+      "isoCode": "AU",
+      "registeredIsoCode": "AU",
+      "isp": "Cloudflare",
+      "organization": "APNIC and Cloudflare DNS Resolver project",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Cloudflare 1.1.1.1 global anycast (APNIC research delegation)"
+    },
+    {
+      "cidr": "1.0.0.0/24",
+      "isoCode": "AU",
+      "registeredIsoCode": "AU",
+      "isp": "Cloudflare",
+      "organization": "Cloudflare, Inc.",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Cloudflare 1.0.0.1 global anycast"
+    },
+    {
+      "cidr": "8.8.8.0/24",
+      "isoCode": "US",
+      "registeredIsoCode": "US",
+      "isp": "Google",
+      "organization": "Google Public DNS",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Google Public DNS 8.8.8.8 global anycast"
+    },
+    {
+      "cidr": "8.8.4.0/24",
+      "isoCode": "US",
+      "registeredIsoCode": "US",
+      "isp": "Google",
+      "organization": "Google Public DNS",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Google Public DNS 8.8.4.4 global anycast"
+    },
+    {
+      "cidr": "2001:4860:4860::/48",
+      "isoCode": "US",
+      "registeredIsoCode": "US",
+      "isp": "Google",
+      "organization": "Google Public DNS IPv6",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Google Public DNS IPv6 global anycast"
+    },
+    {
+      "cidr": "2606:4700:4700::/48",
+      "isoCode": "US",
+      "registeredIsoCode": "US",
+      "isp": "Cloudflare",
+      "organization": "Cloudflare 1.1.1.1 IPv6",
+      "isAnycast": true,
+      "clearCity": true,
+      "rationale": "Cloudflare 2606:4700:4700::1111 global anycast"
+    },
+    {
+      "cidr": "91.108.4.0/22",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC2/DC4 Amsterdam deployment"
+    },
+    {
+      "cidr": "91.108.8.0/22",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC4 Amsterdam deployment"
+    },
+    {
+      "cidr": "91.108.12.0/22",
+      "isoCode": "US",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC1/DC3 Miami deployment"
+    },
+    {
+      "cidr": "91.108.16.0/22",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC2/DC4 Amsterdam deployment"
+    },
+    {
+      "cidr": "91.108.20.0/22",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram Amsterdam deployment"
+    },
+    {
+      "cidr": "91.108.56.0/22",
+      "isoCode": "SG",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC5 Singapore deployment"
+    },
+    {
+      "cidr": "91.105.192.0/23",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram Amsterdam deployment"
+    },
+    {
+      "cidr": "149.154.160.0/21",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC2/DC4 Amsterdam deployment"
+    },
+    {
+      "cidr": "149.154.168.0/22",
+      "isoCode": "SG",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC5 Singapore deployment"
+    },
+    {
+      "cidr": "149.154.172.0/22",
+      "isoCode": "US",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC1/DC3 Miami deployment"
+    },
+    {
+      "cidr": "185.76.151.0/24",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram Amsterdam deployment"
+    },
+    {
+      "cidr": "2001:b28:f23d::/48",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC2 Amsterdam IPv6"
+    },
+    {
+      "cidr": "2001:b28:f23f::/48",
+      "isoCode": "US",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC3 Miami IPv6"
+    },
+    {
+      "cidr": "2001:67c:4e8::/48",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC4 Amsterdam IPv6"
+    },
+    {
+      "cidr": "2001:b28:f23c::/48",
+      "isoCode": "SG",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram DC5 Singapore IPv6"
+    },
+    {
+      "cidr": "2a0a:f280::/32",
+      "isoCode": "NL",
+      "organization": "Telegram Messenger Inc.",
+      "rationale": "Telegram global IPv6 allocation"
+    }
+  ],
+  "cnExclusions": [
+    {
+      "cidr": "202.165.96.0/21",
+      "fallbackIsoCode": "US",
+      "asn": 10310,
+      "rationale": "AS10310 Yahoo/Oath overseas block historically mislisted in legacy CN CIDR sets"
+    },
+    {
+      "cidr": "202.165.104.0/22",
+      "fallbackIsoCode": "US",
+      "asn": 10310,
+      "rationale": "AS10310 Yahoo/Oath overseas block historically mislisted in legacy CN CIDR sets"
+    },
+    {
+      "cidr": "202.165.110.0/23",
+      "fallbackIsoCode": "US",
+      "asn": 10310,
+      "rationale": "AS10310 Yahoo/Oath overseas block historically mislisted in legacy CN CIDR sets"
+    },
+    {
+      "cidr": "103.10.124.0/23",
+      "fallbackIsoCode": "SG",
+      "asn": 32590,
+      "rationale": "Valve Steam APAC edge block outside Mainland China"
+    },
+    {
+      "cidr": "103.28.54.0/23",
+      "fallbackIsoCode": "HK",
+      "asn": 32590,
+      "rationale": "Valve Steam Hong Kong edge block outside Mainland China"
+    }
+  ],
+  "asnOverrides": [
+    {
+      "asn": 4134,
+      "organization": "Chinanet",
+      "isp": "China Telecom",
+      "domain": "chinatelecom.com.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 4809,
+      "organization": "China Telecom Next Generation Carrier Network (CN2)",
+      "isp": "China Telecom",
+      "domain": "chinatelecom.com.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 4812,
+      "organization": "China Telecom Shanghai",
+      "isp": "China Telecom",
+      "domain": "chinatelecom.com.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "上海市"
+    },
+    {
+      "asn": 4837,
+      "organization": "CHINA UNICOM China169 Backbone",
+      "isp": "China Unicom",
+      "domain": "chinaunicom.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 9929,
+      "organization": "China Unicom Industrial Internet Backbone (CUII)",
+      "isp": "China Unicom",
+      "domain": "chinaunicom.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 4808,
+      "organization": "China Unicom Beijing Province Network",
+      "isp": "China Unicom",
+      "domain": "chinaunicom.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "北京市"
+    },
+    {
+      "asn": 17621,
+      "organization": "China Unicom Shanghai Network",
+      "isp": "China Unicom",
+      "domain": "chinaunicom.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "上海市"
+    },
+    {
+      "asn": 17623,
+      "organization": "China Unicom Shenzhen Network",
+      "isp": "China Unicom",
+      "domain": "chinaunicom.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "广东省"
+    },
+    {
+      "asn": 9808,
+      "organization": "China Mobile Communications Group Co., Ltd.",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 58453,
+      "organization": "China Mobile International Limited (CMI)",
+      "isp": "China Mobile",
+      "domain": "cmi.chinamobile.com"
+    },
+    {
+      "asn": 24400,
+      "organization": "Shanghai Mobile Communications Co., Ltd.",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "上海市"
+    },
+    {
+      "asn": 24444,
+      "organization": "Shandong Mobile Communications Co., Ltd.",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "山东省"
+    },
+    {
+      "asn": 132525,
+      "organization": "Heilongjiang Mobile Communication Company Limited",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "黑龙江省"
+    },
+    {
+      "asn": 56040,
+      "organization": "China Mobile Guangdong",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "广东省"
+    },
+    {
+      "asn": 56041,
+      "organization": "China Mobile Zhejiang",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "浙江省"
+    },
+    {
+      "asn": 56046,
+      "organization": "China Mobile Jiangsu",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "江苏省"
+    },
+    {
+      "asn": 56047,
+      "organization": "China Mobile Hunan",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "湖南省"
+    },
+    {
+      "asn": 56048,
+      "organization": "China Mobile Beijing",
+      "isp": "China Mobile",
+      "domain": "10086.cn",
+      "countryHint": "CN",
+      "provinceHintZhCn": "北京市"
+    },
+    {
+      "asn": 7641,
+      "organization": "China Broadcasting Network Corporation Ltd.",
+      "isp": "China Broadnet",
+      "domain": "10099.com.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 4538,
+      "organization": "China Education and Research Network Center (CERNET)",
+      "isp": "CERNET",
+      "domain": "edu.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 7497,
+      "organization": "Computer Network Information Center (CSTNET)",
+      "isp": "CSTNET",
+      "domain": "cstnet.cn",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 17964,
+      "organization": "Beijing Dian-Xin-Tong Network Technologies Co., Ltd. (Dr.Peng)",
+      "isp": "Dr.Peng",
+      "domain": "btte.net",
+      "countryHint": "CN"
+    },
+    {
+      "asn": 37963,
+      "organization": "Hangzhou Alibaba Advertising Co., Ltd.",
+      "isp": "Alibaba Cloud",
+      "domain": "alibabacloud.com",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 45102,
+      "organization": "Alibaba (US) Technology Co., Ltd.",
+      "isp": "Alibaba Cloud",
+      "domain": "alibabacloud.com",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 45090,
+      "organization": "Shenzhen Tencent Computer Systems Company Limited",
+      "isp": "Tencent Cloud",
+      "domain": "cloud.tencent.com",
+      "countryHint": "CN",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 132203,
+      "organization": "Tencent Building, Kejizhongyi Avenue (Aceville / Tencent Cloud)",
+      "isp": "Tencent Cloud",
+      "domain": "tencent.com",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 55990,
+      "organization": "Huawei Cloud Service data center",
+      "isp": "Huawei Cloud",
+      "domain": "huaweicloud.com",
+      "countryHint": "CN",
+      "isHosting": true
+    },
+    {
+      "asn": 136907,
+      "organization": "Huawei Cloud Service data center",
+      "isp": "Huawei Cloud",
+      "domain": "huaweicloud.com",
+      "isHosting": true
+    },
+    {
+      "asn": 38365,
+      "organization": "Beijing Baidu Netcom Science and Technology Co., Ltd.",
+      "isp": "Baidu Cloud",
+      "domain": "baidu.com",
+      "countryHint": "CN",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 139609,
+      "organization": "Beijing Volcano Engine Technology Co., Ltd.",
+      "isp": "Volcano Engine",
+      "domain": "volcengine.com",
+      "countryHint": "CN",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 3462,
+      "organization": "Data Communication Business Group (Chunghwa Telecom)",
+      "isp": "Chunghwa Telecom",
+      "domain": "hinet.net",
+      "countryHint": "TW"
+    },
+    {
+      "asn": 13335,
+      "organization": "Cloudflare, Inc.",
+      "isp": "Cloudflare",
+      "domain": "cloudflare.com",
+      "isHosting": true,
+      "isCdn": true,
+      "isAnycast": true
+    },
+    {
+      "asn": 15169,
+      "organization": "Google LLC",
+      "isp": "Google",
+      "domain": "google.com",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 396982,
+      "organization": "Google Cloud Platform",
+      "isp": "Google Cloud",
+      "domain": "cloud.google.com",
+      "isHosting": true
+    },
+    {
+      "asn": 16509,
+      "organization": "Amazon.com, Inc.",
+      "isp": "Amazon Web Services",
+      "domain": "aws.amazon.com",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 14618,
+      "organization": "Amazon.com, Inc.",
+      "isp": "Amazon Web Services",
+      "domain": "aws.amazon.com",
+      "isHosting": true
+    },
+    {
+      "asn": 8075,
+      "organization": "Microsoft Corporation",
+      "isp": "Microsoft Azure",
+      "domain": "microsoft.com",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 54113,
+      "organization": "Fastly, Inc.",
+      "isp": "Fastly",
+      "domain": "fastly.com",
+      "isHosting": true,
+      "isCdn": true,
+      "isAnycast": true
+    },
+    {
+      "asn": 20940,
+      "organization": "Akamai International B.V.",
+      "isp": "Akamai",
+      "domain": "akamai.com",
+      "isHosting": true,
+      "isCdn": true
+    },
+    {
+      "asn": 14593,
+      "organization": "Space Exploration Technologies Corporation (Starlink)",
+      "isp": "Starlink",
+      "domain": "starlink.com"
+    }
+  ]
+}
