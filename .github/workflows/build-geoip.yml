@@ -83,7 +83,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          bun run sync:metadata
+          bun run sync:metadata -- --fallback-existing
           bun run verify:metadata
 
       - name: Run release test suite

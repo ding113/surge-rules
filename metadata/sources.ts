@@ -105,7 +105,7 @@ export const METADATA_UPSTREAMS: readonly MetadataUpstreamSource[] = [
     id: "aws_geofeed",
     repoOrSite: "ip-ranges.amazonaws.com",
     description: "AWS official RFC 8805 geofeed mapping prefixes to countries and cities",
-    urls: ["https://ip-ranges.amazonaws.com/aws-ip-ranges.csv"],
+    urls: ["https://ip-ranges.amazonaws.com/geo-ip-feed.csv"],
   },
   {
     id: "jsonmaur_aws_regions",

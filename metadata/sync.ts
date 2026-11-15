@@ -1508,74 +1508,89 @@ async function main(): Promise<void> {
     return;
   }
 
+  const fallbackExisting = process.argv.includes("--fallback-existing");
   const maxAgeSecs = parseMaxCacheAgeSecs();
-  const payloadEntries = await Promise.all(
-    METADATA_UPSTREAMS.map(async (src) => {
-      const text = await fetchUpstreamText(src, repoRoot, maxAgeSecs);
-      return [src.id, text] as const;
-    }),
-  );
-  const payloads = new Map<string, string>(payloadEntries);
-  const getPayload = (id: string): string => {
-    const v = payloads.get(id);
-    if (v === undefined) throw new Error(`Missing fetched payload '${id}'`);
-    return v;
-  };
 
-  const cities = parseCities5000(getPayload("geonames_cities5000"));
-  const dr5hnStates = parseDr5hnStates(getPayload("dr5hn_states"));
-  const debianIso3166_2 = parseDebianIso3166_2(getPayload("debian_iso_3166_2"));
+  try {
+    const payloadEntries = await Promise.all(
+      METADATA_UPSTREAMS.map(async (src) => {
+        const text = await fetchUpstreamText(src, repoRoot, maxAgeSecs);
+        return [src.id, text] as const;
+      }),
+    );
+    const payloads = new Map<string, string>(payloadEntries);
+    const getPayload = (id: string): string => {
+      const v = payloads.get(id);
+      if (v === undefined) throw new Error(`Missing fetched payload '${id}'`);
+      return v;
+    };
 
-  const countries = buildCountries(
-    getPayload("geonames_country_info"),
-    getPayload("mledoze_countries"),
-    getPayload("cldr_country_zh_cn"),
-    getPayload("cldr_country_en"),
-    getPayload("eu_membership"),
-    getPayload("iana_zone1970"),
-    cities,
-  );
+    const cities = parseCities5000(getPayload("geonames_cities5000"));
+    const dr5hnStates = parseDr5hnStates(getPayload("dr5hn_states"));
+    const debianIso3166_2 = parseDebianIso3166_2(getPayload("debian_iso_3166_2"));
 
-  const cnDivisions = buildCnDivisions(
-    getPayload("modood_cn_pca"),
-    getPayload("areacity_cn_level3"),
-    dr5hnStates,
-    debianIso3166_2,
-    cities,
-  );
+    const countries = buildCountries(
+      getPayload("geonames_country_info"),
+      getPayload("mledoze_countries"),
+      getPayload("cldr_country_zh_cn"),
+      getPayload("cldr_country_en"),
+      getPayload("eu_membership"),
+      getPayload("iana_zone1970"),
+      cities,
+    );
 
-  const cloudRegions = buildCloudRegions(
-    getPayload("aws_ip_ranges"),
-    getPayload("aws_geofeed"),
-    getPayload("jsonmaur_aws_regions"),
-    getPayload("gcp_cloud_ranges"),
-    getPayload("gcp_cloud_geofeed"),
-    getPayload("oracle_cloud_ranges"),
-    getPayload("azure_regions"),
-    countries,
-    dr5hnStates,
-    cities,
-  );
+    const cnDivisions = buildCnDivisions(
+      getPayload("modood_cn_pca"),
+      getPayload("areacity_cn_level3"),
+      dr5hnStates,
+      debianIso3166_2,
+      cities,
+    );
 
-  const bundle: CompiledMetadataBundle = {
-    schemaVersion: 1,
-    upstreams: METADATA_UPSTREAMS.map((s) => `${s.id}:${s.repoOrSite}`),
-    countries,
-    cnDivisions,
-    cloudRegions,
-  };
+    const cloudRegions = buildCloudRegions(
+      getPayload("aws_ip_ranges"),
+      getPayload("aws_geofeed"),
+      getPayload("jsonmaur_aws_regions"),
+      getPayload("gcp_cloud_ranges"),
+      getPayload("gcp_cloud_geofeed"),
+      getPayload("oracle_cloud_ranges"),
+      getPayload("azure_regions"),
+      countries,
+      dr5hnStates,
+      cities,
+    );
 
-  validateMetadataBundle(bundle);
-  const serialized = `${JSON.stringify(bundle, null, 2)}\n`;
-  await mkdir(dirname(outPath), { recursive: true });
-  await writeFile(outPath, serialized, "utf8");
+    const bundle: CompiledMetadataBundle = {
+      schemaVersion: 1,
+      upstreams: METADATA_UPSTREAMS.map((s) => `${s.id}:${s.repoOrSite}`),
+      countries,
+      cnDivisions,
+      cloudRegions,
+    };
 
-  const l1 = cnDivisions.filter((d) => d.level === 1).length;
-  const l2 = cnDivisions.filter((d) => d.level === 2).length;
-  const l3 = cnDivisions.filter((d) => d.level === 3).length;
-  console.log(
-    `Wrote ${outPath} (${countries.length} countries, CN=${l1}/${l2}/${l3} divisions, ${cloudRegions.length} cloud regions).`,
-  );
+    validateMetadataBundle(bundle);
+    const serialized = `${JSON.stringify(bundle, null, 2)}\n`;
+    await mkdir(dirname(outPath), { recursive: true });
+    await writeFile(outPath, serialized, "utf8");
+
+    const l1 = cnDivisions.filter((d) => d.level === 1).length;
+    const l2 = cnDivisions.filter((d) => d.level === 2).length;
+    const l3 = cnDivisions.filter((d) => d.level === 3).length;
+    console.log(
+      `Wrote ${outPath} (${countries.length} countries, CN=${l1}/${l2}/${l3} divisions, ${cloudRegions.length} cloud regions).`,
+    );
+  } catch (err) {
+    if (fallbackExisting && existsSync(outPath)) {
+      const existingRaw = await readFile(outPath, "utf8");
+      const existingBundle = JSON.parse(existingRaw) as CompiledMetadataBundle;
+      validateMetadataBundle(existingBundle);
+      console.warn(
+        `Live metadata sync failed (${String(err)}); retaining verified checked-in bundle ${outPath}.`,
+      );
+      return;
+    }
+    throw err;
+  }
 }
 
 await main();
