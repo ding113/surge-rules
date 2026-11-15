@@ -456,7 +456,6 @@ fn verify_shared_infra_safety(
         "www.apple.com",
         "auth0.com",
         "sentry.io",
-        "stripe.com",
     ] {
         if ai_idx.covers_domain(non_ai_host) {
             bail!(
@@ -648,12 +647,18 @@ fn run_production_canaries(
 ) -> Result<usize> {
     let mut checked = 0usize;
 
-    // 1. Direct domains (Mainland services, CN-only services, domestic AI, CN CDN endpoints)
+    // 1. Direct domains (Mainland services, domestic streaming, domestic AI, CN CDN endpoints)
     for dom in [
         "www.baidu.com",
         "www.qq.com",
         "www.taobao.com",
+        "www.alipay.com",
         "www.bilibili.com",
+        "www.iqiyi.com",
+        "v.qq.com",
+        "www.youku.com",
+        "www.mgtv.com",
+        "music.163.com",
         "www.12306.cn",
         "www.cnki.net",
         "chat.deepseek.com",
@@ -689,7 +694,7 @@ fn run_production_canaries(
         checked += 2;
     }
 
-    // 2. Overseas AI & region-restricted platforms (must match BOTH AI.list AND Proxy.list)
+    // 2. Overseas AI, overseas banking, PayPal, risk-control & telemetry (must match BOTH AI.list AND Proxy.list)
     for dom in [
         "chatgpt.com",
         "api.openai.com",
@@ -721,13 +726,28 @@ fn run_production_canaries(
         "api.together.xyz",
         "oaistatsig.com",
         "statsig.anthropic.com",
+        "prodregistryv2.org",
         "challenges.cloudflare.com",
-        "www.netflix.com",
-        "www.disneyplus.com",
-        "www.youtube.com",
-        "open.spotify.com",
-        "www.tiktok.com",
-        "ani.gamer.com.tw",
+        "www.paypal.com",
+        "www.paypalobjects.com",
+        "api.stripe.com",
+        "m.stripe.network",
+        "wise.com",
+        "www.revolut.com",
+        "www.hsbc.com.hk",
+        "www.bochk.com",
+        "www.zabank.com",
+        "www.chase.com",
+        "www.citi.com",
+        "www.americanexpress.com",
+        "www.interactivebrokers.com",
+        "h.online-metrix.net",
+        "songbird.cardinalcommerce.com",
+        "api.sift.com",
+        "cdn.riskified.com",
+        "api.fpjs.io",
+        "client-api.arkoselabs.com",
+        "hcaptcha.com",
     ] {
         if !ai_idx.covers_domain(dom) {
             bail!("canary failed: AI.list does not match '{}'", dom);
@@ -744,7 +764,44 @@ fn run_production_canaries(
         checked += 3;
     }
 
-    // 3. Overseas Proxy domains (non-AI general overseas services must match Proxy.list and NOT Direct.list)
+    // 3. Overseas streaming & overseas editions of domestic media (must match Proxy.list, NOT AI.list, NOT Direct.list)
+    for dom in [
+        "www.netflix.com",
+        "www.disneyplus.com",
+        "www.youtube.com",
+        "open.spotify.com",
+        "www.tiktok.com",
+        "ani.gamer.com.tw",
+        "abema.tv",
+        "www.bilibili.tv",
+        "www.biliintl.com",
+        "p.bstarstatic.com",
+        "www.iq.com",
+        "wetv.vip",
+        "www.joox.com",
+    ] {
+        if !proxy_idx.covers_domain(dom) {
+            bail!(
+                "canary failed: Proxy.list does not match streaming domain '{}'",
+                dom
+            );
+        }
+        if ai_idx.covers_domain_exact_or_suffix(dom) {
+            bail!(
+                "canary failed: AI.list must NOT match streaming domain '{}'",
+                dom
+            );
+        }
+        if direct_idx.covers_domain_exact_or_suffix(dom) {
+            bail!(
+                "canary failed: Direct.list must NOT match overseas streaming domain '{}'",
+                dom
+            );
+        }
+        checked += 3;
+    }
+
+    // 4. General overseas Proxy domains (must match Proxy.list and NOT Direct.list)
     for dom in [
         "www.google.com",
         "github.com",

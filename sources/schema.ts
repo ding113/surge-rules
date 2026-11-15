@@ -25,6 +25,7 @@ export type SourceFormat =
   | "sypex_dat"
   | "bgptools_table"
   | "bgptools_asns_csv"
+  | "bgptools_tag_csv"
   | "ipverse_as_csv"
   | "iptoasn_tsv"
   | "rir_delegated"

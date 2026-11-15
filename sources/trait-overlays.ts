@@ -31,6 +31,42 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
+    id: "bgptools_tags_vpsh",
+    tier: "trait_overlay",
+    format: "bgptools_tag_csv",
+    lineage: "bgptools_tags",
+    isHosting: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpsh/tags-vpsh.csv",
+      },
+      {
+        kind: "github_release",
+        repo: "Alice39s/BGP.Tools-OpenDB",
+        assetPattern: "^tags-vpsh-.*\\.csv\\.gz$",
+      },
+    ],
+  },
+  {
+    id: "bgptools_tags_cdn",
+    tier: "trait_overlay",
+    format: "bgptools_tag_csv",
+    lineage: "bgptools_tags",
+    isCdn: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/cdn/tags-cdn.csv",
+      },
+      {
+        kind: "github_release",
+        repo: "Alice39s/BGP.Tools-OpenDB",
+        assetPattern: "^tags-cdn-.*\\.csv\\.gz$",
+      },
+    ],
+  },
+  {
     id: "cloudflare_edge_v4",
     tier: "trait_overlay",
     format: "cidr_trait",

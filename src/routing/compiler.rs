@@ -444,6 +444,16 @@ pub fn compile_routing(
         conflicts_resolved += 1;
     }
 
+    // Remove non-forced Direct entries overridden by Proxy forced entries (e.g., overseas editions of domestic media).
+    direct_map.retain(|k, c| {
+        if !c.forced && proxy_forced.matches_key(k) && !direct_forced.matches_key(k) {
+            conflicts_resolved += 1;
+            false
+        } else {
+            true
+        }
+    });
+
     // Remove non-forced Proxy entries overridden by Direct forced entries (e.g., CN CDN endpoints).
     proxy_map.retain(|k, c| {
         if !c.forced && direct_forced.matches_key(k) && !proxy_forced.matches_key(k) {

@@ -208,14 +208,236 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale: "Cloudflare Turnstile human verification required by AI web logins",
   },
   {
-    matchType: "exact",
-    domain: "client-api.arkoselabs.com",
-    rationale: "Arkose Labs challenge client required by OpenAI login flows",
+    matchType: "suffix",
+    domain: "arkoselabs.com",
+    rationale: "Arkose Labs FunCaptcha verification required by OpenAI, PayPal, and banks",
   },
   {
-    matchType: "exact",
-    domain: "openai-api.arkoselabs.com",
-    rationale: "OpenAI dedicated Arkose Labs verification API",
+    matchType: "suffix",
+    domain: "funcaptcha.com",
+    rationale: "Arkose Labs FunCaptcha verification assets",
+  },
+  {
+    matchType: "suffix",
+    domain: "hcaptcha.com",
+    rationale: "hCaptcha human verification required by overseas logins and checkouts",
+  },
+  {
+    matchType: "suffix",
+    domain: "prodregistryv2.org",
+    rationale: "Statsig alias experimentation gateway used by OpenAI and Anthropic clients",
+  },
+  {
+    matchType: "suffix",
+    domain: "beyondwickedmapping.org",
+    rationale: "Statsig alias feature-flag gateway used by AI clients",
+  },
+
+  // Overseas payment gateways, 3-D Secure, and financial fraud / risk-control beacons
+  {
+    matchType: "suffix",
+    domain: "paypal.com",
+    rationale: "PayPal checkout, login, and risk verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "paypalobjects.com",
+    rationale: "PayPal static checkout SDKs and scripts",
+  },
+  {
+    matchType: "suffix",
+    domain: "braintreegateway.com",
+    rationale: "Braintree card tokenization gateway",
+  },
+  {
+    matchType: "suffix",
+    domain: "braintree-api.com",
+    rationale: "Braintree payment API",
+  },
+  {
+    matchType: "suffix",
+    domain: "stripe.com",
+    rationale: "Stripe payment Elements, Billing, and checkout",
+  },
+  {
+    matchType: "suffix",
+    domain: "stripe.network",
+    rationale: "Stripe Radar device fraud check required during card checkout",
+  },
+  {
+    matchType: "suffix",
+    domain: "stripecdn.com",
+    rationale: "Stripe checkout static assets",
+  },
+  {
+    matchType: "suffix",
+    domain: "adyen.com",
+    rationale: "Adyen global card payment gateway",
+  },
+  {
+    matchType: "suffix",
+    domain: "checkout.com",
+    rationale: "Checkout.com payment gateway",
+  },
+  {
+    matchType: "suffix",
+    domain: "worldpay.com",
+    rationale: "Worldpay card payment processor",
+  },
+  {
+    matchType: "suffix",
+    domain: "online-metrix.net",
+    rationale: "LexisNexis ThreatMetrix risk check required by PayPal, HSBC, Chase, and Stripe",
+  },
+  {
+    matchType: "suffix",
+    domain: "threatmetrix.com",
+    rationale: "LexisNexis ThreatMetrix banking fraud prevention",
+  },
+  {
+    matchType: "suffix",
+    domain: "iesnare.com",
+    rationale: "TransUnion iovation device risk check used by overseas banks and brokerages",
+  },
+  {
+    matchType: "suffix",
+    domain: "iovation.com",
+    rationale: "TransUnion iovation banking risk verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "cardinalcommerce.com",
+    rationale: "Visa CardinalCommerce 3-D Secure (3DS) OTP card verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "cybersource.com",
+    rationale: "Visa CyberSource payment checkout fraud screening",
+  },
+  {
+    matchType: "suffix",
+    domain: "accertify.com",
+    rationale: "Accertify payment risk verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "arcot.com",
+    rationale: "Broadcom Arcot 3-D Secure card issuer verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "3dsecure.io",
+    rationale: "3-D Secure card authentication",
+  },
+  {
+    matchType: "suffix",
+    domain: "kount.com",
+    rationale: "Equifax Kount payment fraud check",
+  },
+  {
+    matchType: "suffix",
+    domain: "sift.com",
+    rationale: "Sift payment fraud prevention",
+  },
+  {
+    matchType: "suffix",
+    domain: "siftscience.com",
+    rationale: "Sift checkout risk SDK",
+  },
+  {
+    matchType: "suffix",
+    domain: "forter.com",
+    rationale: "Forter e-commerce checkout anti-fraud",
+  },
+  {
+    matchType: "suffix",
+    domain: "riskified.com",
+    rationale: "Riskified checkout fraud screening",
+  },
+  {
+    matchType: "suffix",
+    domain: "signifyd.com",
+    rationale: "Signifyd payment fraud screening",
+  },
+  {
+    matchType: "suffix",
+    domain: "sardine.ai",
+    rationale: "Sardine fintech and banking fraud prevention",
+  },
+  {
+    matchType: "suffix",
+    domain: "castle.io",
+    rationale: "Castle account-takeover risk check",
+  },
+  {
+    matchType: "suffix",
+    domain: "seon.io",
+    rationale: "SEON fintech risk check",
+  },
+  {
+    matchType: "suffix",
+    domain: "socure.com",
+    rationale: "Socure banking KYC risk verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "fpjs.io",
+    rationale: "FingerprintJS Pro banking and fintech risk API",
+  },
+  {
+    matchType: "suffix",
+    domain: "fingerprint.com",
+    rationale: "Fingerprint Pro fraud prevention",
+  },
+  {
+    matchType: "suffix",
+    domain: "datadome.co",
+    rationale: "DataDome anti-bot verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "perimeterx.net",
+    rationale: "HUMAN (PerimeterX) checkout and login anti-bot verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "px-cdn.net",
+    rationale: "HUMAN (PerimeterX) verification script CDN",
+  },
+  {
+    matchType: "suffix",
+    domain: "px-cloud.net",
+    rationale: "HUMAN (PerimeterX) risk verification collector",
+  },
+  {
+    matchType: "suffix",
+    domain: "kasada.io",
+    rationale: "Kasada anti-bot verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "withpersona.com",
+    rationale: "Persona KYC identity verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "sumsub.com",
+    rationale: "Sumsub KYC/AML identity verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "veriff.com",
+    rationale: "Veriff KYC identity verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "onfido.com",
+    rationale: "Onfido KYC identity verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "jumio.com",
+    rationale: "Jumio banking eKYC verification",
   },
 ];
 

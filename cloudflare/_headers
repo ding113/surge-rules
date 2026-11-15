@@ -1,0 +1,19 @@
+/*
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
+
+/*.list
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=1800, stale-while-revalidate=86400
+
+/*.sgmodule
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=1800, stale-while-revalidate=86400
+
+/*.mmdb
+  Content-Type: application/octet-stream
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/install.html
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: public, max-age=600

@@ -6,76 +6,76 @@
 
 | 产物 | 说明 | 下载链接 | 最新更新 |
 | :--- | :--- | :--- | :--- |
-| `Country.mmdb` | 全球双栈全量 GeoIP 库（含省市、ASN、ISP 及内网/组网标记） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `Country-only.mmdb` | 全球双栈精简国家库（仅含 IP 与 `country` 字段） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-only.mmdb) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Country-only.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `Country-cn.mmdb` | 中国大陆（`CN`）专属双栈 GeoIP 库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-cn.mmdb) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Country-cn.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `ASN.mmdb` | 全球公网自治系统（ASN）库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/ASN.mmdb) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/ASN.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `Adblock.sgmodule` | 去广告与隐私净化模块（重写、脚本、Map Local 与 HTTPDNS 拦截） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Adblock.sgmodule) · <kbd>[一键导入](https://ding113.github.io/surge-rules/install.html)</kbd> | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `Adblock.list` | 广告与跟踪域名/IP 兜底拦截规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.list) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Adblock.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `Direct.list` | 中国大陆服务、国产 AI 及境外服务国内 CDN 直连规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Direct.list) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Direct.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `AI.list` | 境外 AI 服务与地区限制流媒体规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/AI.list) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/AI.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
-| `Proxy.list` | 境外服务全量代理规则集（已包含 `AI.list`） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Proxy.list) · [jsDelivr](https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Proxy.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `Country.mmdb` | 全球双栈全量 GeoIP 库（含省市、ASN、ISP 及内网/组网标记） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `Country-only.mmdb` | 全球双栈精简国家库（仅含 IP 与 `country` 字段） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-only.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country-only.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `Country-cn.mmdb` | 中国大陆（`CN`）专属双栈 GeoIP 库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Country-cn.mmdb) · [Cloudflare](https://rule-set.ygxz.de/Country-cn.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `ASN.mmdb` | 全球公网自治系统（ASN）库 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/ASN.mmdb) · [Cloudflare](https://rule-set.ygxz.de/ASN.mmdb) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `Adblock.sgmodule` | 去广告与隐私净化模块（重写、脚本、Map Local 与 HTTPDNS 拦截） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule) · [Cloudflare](https://rule-set.ygxz.de/Adblock.sgmodule) · <kbd>[一键导入](https://rule-set.ygxz.de/install.html)</kbd> | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `Adblock.list` | 广告与跟踪域名/IP 兜底拦截规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Adblock.list) · [Cloudflare](https://rule-set.ygxz.de/Adblock.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `Direct.list` | 中国大陆服务、国内流媒体、国产 AI 及境外服务国内 CDN 直连规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Direct.list) · [Cloudflare](https://rule-set.ygxz.de/Direct.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `AI.list` | 境外 AI、境外银行支付、PayPal、风控与遥测规则集 | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/AI.list) · [Cloudflare](https://rule-set.ygxz.de/AI.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
+| `Proxy.list` | 境外服务与海外流媒体全量代理规则集（已包含 `AI.list`） | [GitHub](https://github.com/ding113/surge-rules/releases/latest/download/Proxy.list) · [Cloudflare](https://rule-set.ygxz.de/Proxy.list) | <!-- updated-at -->2026-11-15 22:55<!-- /updated-at --> |
 
 ## Surge 配置示例
 
-导入 [`Adblock.sgmodule`](https://ding113.github.io/surge-rules/install.html) 模块后，可在主配置中按需引用规则集与 GeoIP 数据库：
+导入 [`Adblock.sgmodule`](https://rule-set.ygxz.de/install.html) 模块后，可在主配置中按需引用规则集与 GeoIP 数据库：
 
 ```ini
 [General]
-geoip-maxmind-url = https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Country-only.mmdb
+geoip-maxmind-url = https://rule-set.ygxz.de/Country-only.mmdb
 disable-geoip-db-auto-update = false
 
 [Rule]
-RULE-SET,https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Adblock.list,REJECT,extended-matching
-RULE-SET,https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Direct.list,DIRECT
-RULE-SET,https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/AI.list,AI,extended-matching
-RULE-SET,https://cdn.jsdelivr.net/gh/ding113/surge-rules@release/Proxy.list,Proxy
+RULE-SET,https://rule-set.ygxz.de/Adblock.list,REJECT,extended-matching
+RULE-SET,https://rule-set.ygxz.de/Direct.list,DIRECT
+RULE-SET,https://rule-set.ygxz.de/AI.list,AI,extended-matching
+RULE-SET,https://rule-set.ygxz.de/Proxy.list,Proxy
 GEOIP,CN,DIRECT
 FINAL,Proxy,dns-failed
 ```
 
-> 如需完整省市、运营商及局域网/虚拟组网识别（配合 `GEOIP,UNKNOWN,DIRECT,no-resolve`），可将 `geoip-maxmind-url` 替换为 [`Country.mmdb`](https://github.com/ding113/surge-rules/releases/latest/download/Country.mmdb)。
+> 如需完整省市、运营商及局域网/虚拟组网识别（配合 `GEOIP,UNKNOWN,DIRECT,no-resolve`），可将 `geoip-maxmind-url` 替换为 [`Country.mmdb`](https://rule-set.ygxz.de/Country.mmdb)。
 
 ## 数据源
 
 <details>
-<summary>展开查看全部上游数据源（共 265 项）</summary>
+<summary>展开查看全部上游数据源（共 277 项）</summary>
 
 ```text
-ipanalytics GeoFeed Harvester, https://github.com/ipanalytics/GeoFeed-Harvester/releases/latest/download/geofeed.parquet
-OpenGeofeed Public Feed, https://opengeofeed.org/feed/public.csv
+Geofeed Harvester, https://github.com/ipanalytics/GeoFeed-Harvester/releases/latest
+Opengeofeed, https://opengeofeed.org/feed/public.csv
 NTT GIN Geofeed, https://geo.ip.gin.ntt.net/geofeeds/geofeeds.csv
 LACNIC Geofeed, https://milacnic.lacnic.net/lacnic/geofeeds/geofeeds.csv
 AWS Official IP Ranges, https://ip-ranges.amazonaws.com/ip-ranges.json
-AWS Official Geofeed, https://ip-ranges.amazonaws.com/geo-ip-feed.csv
-Google Cloud IP Ranges, https://www.gstatic.com/ipranges/cloud.json
+Aws Geofeed, https://ip-ranges.amazonaws.com/geo-ip-feed.csv
+Gcp Cloud Ranges, https://www.gstatic.com/ipranges/cloud.json
 Google Cloud Geofeed, https://www.gstatic.com/ipranges/cloud_geofeed
-Google External Geofeed, https://www.gstatic.com/geofeed/corp_external
+Google Corp Geofeed, https://www.gstatic.com/geofeed/corp_external
 Google VPN Geofeed, https://www.gstatic.com/vpn/geofeed
-Cloudflare Local IP Ranges, https://api.cloudflare.com/local-ip-ranges.csv
-Cloudflare WARP Egress Geofeed, https://api.cloudflare.com/warp-egress-ip-ranges.csv
+Cloudflare Local Geofeed, https://api.cloudflare.com/local-ip-ranges.csv
+Cloudflare Warp Geofeed, https://api.cloudflare.com/warp-egress-ip-ranges.csv
 Apple iCloud Private Relay Ranges, https://mask-api.icloud.com/egress-ip-ranges.csv
-Oracle Cloud Public IP Ranges, https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json
+Oracle Cloud Ranges, https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json
 DigitalOcean Geofeed, https://digitalocean.com/geo/google.csv
 Akamai Geofeed, https://ipgeo.akamai.com/akamai-geofeed.csv
 Akamai Linode Geofeed, https://ipgeo.akamai.com/linode-geofeed.csv
 Hetzner Geofeed, https://www.hetzner.com/geofeed.csv
-Vultr Constant Geofeed, https://geofeed.constant.com/
-Starlink ISP Geofeed, https://geoip.starlinkisp.net/feed.csv
+Vultr Geofeed, https://geofeed.constant.com/
+Starlink Geofeed, https://geoip.starlinkisp.net/feed.csv
 Viasat Geofeed, https://raw.githubusercontent.com/Viasat/geofeed/main/geofeed.csv
-Netflix Open Connect Geofeed, https://raw.githubusercontent.com/Netflix/nflx-geofeed/main/geofeed.csv
+Netflix Openconnect Geofeed, https://raw.githubusercontent.com/Netflix/nflx-geofeed/main/geofeed.csv
 UpCloud Geofeed, https://upcloud.com/geofeed.csv
 Cherry Servers Geofeed, https://geofeed.cherryservers.com/geofeed.csv
 Hostinger Geofeed, https://raw.githubusercontent.com/hostinger/geofeed/main/geofeed.csv
 Exoscale Geofeed, https://exoscale-prefixes.sos.exo.io/exoscale_geofeed
 Clouvider Geofeed, https://clouvider.com/geoipfeed.csv
 T-Mobile US Geofeed, https://raw.githubusercontent.com/tmobile/tmus-geofeed/main/tmus-geo-ip.txt
-Verizon 5G Home Geofeed, https://raw.githubusercontent.com/Verizon/verizon-geofeed/main/feed_5Ghome.csv
-Microsoft Azure & Public Geofeed, https://download.microsoft.com/download/0b9dc6ca-68f9-43b2-b094-da4f6d509bc3/geoloc-Microsoft.csv
+Verizon Geofeed, https://raw.githubusercontent.com/Verizon/verizon-geofeed/main/feed_5Ghome.csv
+Microsoft Geofeed, https://download.microsoft.com/download/0b9dc6ca-68f9-43b2-b094-da4f6d509bc3/geoloc-Microsoft.csv
 lionsoul2014 ip2region IPv4, https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v4.xdb
 lionsoul2014 ip2region IPv6, https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v6.xdb
-CZ88 QQWry Pure IP Database, https://github.com/metowolf/qqwry.dat/releases/latest/download/qqwry.dat
-OpenIPDB China IP Database, https://www.npmjs.com/package/openipdb.ipdb
+Cz88 Qqwry, https://github.com/metowolf/qqwry.dat/releases/latest
+Openipdb, https://www.npmjs.com/package/openipdb.ipdb
 gaoyifan china-operator-ip China IPv4, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt
 gaoyifan china-operator-ip China IPv6, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt
 gaoyifan china-operator-ip ChinaNet IPv4, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt
@@ -87,41 +87,43 @@ gaoyifan china-operator-ip CMCC IPv6, https://raw.githubusercontent.com/gaoyifan
 gaoyifan china-operator-ip CERNET, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet46.txt
 gaoyifan china-operator-ip CSTNET, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet46.txt
 gaoyifan china-operator-ip Dr.Peng, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng46.txt
-metowolf iplist China, https://metowolf.github.io/iplist/data/special/china.txt
+Metowolf China, https://metowolf.github.io/iplist/data/special/china.txt
 SukkaW chnroutes2, https://chnroutes2.cdn.skk.moe/reversed-chnroutes.txt
-SukkaW China IPv6 List, https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt
-17mon IPIP China IP List, https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt
+Sukkaw China Ipv6, https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt
+Ipip 17Mon China, https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt
 Hackl0us GeoIP2-CN, https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ip-cidr.txt
-ChanthMiao China IPv4 List, https://raw.githubusercontent.com/ChanthMiao/China-IPv4-List/release/cn.txt
-ChanthMiao China IPv6 List, https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt
-IPinfo Lite Country & ASN, https://github.com/Alice39s/ipinfo-csv-lite/releases/latest/download/ipinfo-lite.mmdb
-MaxMind GeoLite2 City, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest/download/GeoLite2-City.mmdb
-MaxMind GeoLite2 Country, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest/download/GeoLite2-Country.mmdb
+Chanthmiao Cn V4, https://raw.githubusercontent.com/ChanthMiao/China-IPv4-List/release/cn.txt
+Chanthmiao Cn V6, https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt
+IPinfo Lite Country & ASN, https://github.com/Alice39s/ipinfo-csv-lite/releases/latest
+MaxMind GeoLite2 City, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest
+MaxMind GeoLite2 Country, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest
 DB-IP City Lite, https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb
 DB-IP Country Lite, https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb
-IP2Location LITE DB11, https://github.com/renfei/ip2location/releases/latest/download/IP2LOCATION-LITE-DB11.IPV6.BIN
-IP2Location LITE DB1, https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP
+Ip2Location Db11, https://github.com/renfei/ip2location/releases/latest
+Ip2Location Db1 Official, https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP
 IPFire Location Database, https://location.ipfire.org/databases/1/location.db.xz
-sapics ip-location-db Country, https://github.com/sapics/ip-location-db/releases/download/latest/user-country.mmdb
+Sapics User Country, https://github.com/sapics/ip-location-db/releases/download/latest/user-country.mmdb
 IPLocate IP-to-Country, https://media.githubusercontent.com/media/iplocate/ip-address-databases/HEAD/ip-to-country/ip-to-country.mmdb
 IPScope Lite, https://api.ipscope.io/v1/lite/ipscope-lite.csv.gz
 ip66.dev GeoIP Database, https://downloads.ip66.dev/db/ip66.mmdb
 Sypex Geo Country, https://sypexgeo.net/files/SxGeoCountry.zip
-bgp.tools Routing Table, https://bgp.tools/table.jsonl
-bgp.tools ASN Registry, https://bgp.tools/asns.csv
+bgp.tools Routing Table (with Alice39s/BGP.Tools-OpenDB mirror), https://bgp.tools/table.jsonl
+bgp.tools ASN Registry (with Alice39s/BGP.Tools-OpenDB mirror), https://bgp.tools/asns.csv
 ipverse AS Metadata, https://raw.githubusercontent.com/ipverse/as-metadata/master/as.csv
 IPtoASN Combined Database, https://iptoasn.com/data/ip2asn-combined.tsv.gz
-sapics ip-location-db Origin ASN, https://github.com/sapics/ip-location-db/releases/download/latest/origin-asn.mmdb
-MaxMind GeoLite2 ASN, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest/download/GeoLite2-ASN.mmdb
+Sapics Origin Asn, https://github.com/sapics/ip-location-db/releases/download/latest/origin-asn.mmdb
+MaxMind GeoLite2 ASN, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest
 DB-IP ASN Lite, https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb
 IPLocate IP-to-ASN, https://media.githubusercontent.com/media/iplocate/ip-address-databases/HEAD/ip-to-asn/ip-to-asn.mmdb
-APNIC Delegated Extended Stats, https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest
-ARIN Delegated Extended Stats, https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest
-RIPE NCC Delegated Extended Stats, https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest
-LACNIC Delegated Extended Stats, https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest
-AFRINIC Delegated Extended Stats, https://ftp.afrinic.net/stats/afrinic/delegated-afrinic-extended-latest
+Rir Apnic, https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest
+Rir Arin, https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest
+Rir Ripencc, https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest
+Rir Lacnic, https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest
+Rir Afrinic, https://ftp.afrinic.net/stats/afrinic/delegated-afrinic-extended-latest
 bgp.tools Anycast Prefixes IPv4, https://raw.githubusercontent.com/bgptools/anycast-prefixes/master/anycatch-v4-prefixes.txt
 bgp.tools Anycast Prefixes IPv6, https://raw.githubusercontent.com/bgptools/anycast-prefixes/master/anycatch-v6-prefixes.txt
+Alice39s BGP.Tools-OpenDB VPS & Hosting ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpsh/tags-vpsh.csv
+Alice39s BGP.Tools-OpenDB CDN ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/cdn/tags-cdn.csv
 Cloudflare Edge IPv4, https://www.cloudflare.com/ips-v4
 Cloudflare Edge IPv6, https://www.cloudflare.com/ips-v6/
 Fastly Public IP List, https://api.fastly.com/public-ip-list
@@ -133,7 +135,7 @@ Tor Project Onionoo Exit Summary, https://onionoo.torproject.org/summary?flag=Ex
 X4BNet VPN IPv4 List, https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt
 X4BNet Datacenter IPv4 List, https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt
 josephrocca VPN & Datacenter IPv6, https://raw.githubusercontent.com/josephrocca/is-vpn/main/vpn-or-datacenter-ipv6-ranges.txt
-NetworkCats OpenProxyDB, https://github.com/NetworkCats/OpenProxyDB/releases/latest/download/proxy_blocks.csv
+NetworkCats OpenProxyDB, https://github.com/NetworkCats/OpenProxyDB/releases/latest
 jhassine Server & Datacenter IPs, https://raw.githubusercontent.com/jhassine/server-ip-addresses/master/data/datacenters.txt
 ipanalytics Sat-geoip Prefixes, https://raw.githubusercontent.com/ipanalytics/Sat-geoip/main/outputs/sat-geoip-prefixes.jsonl
 ipanalytics Sat-geoip Satellite ASNs, https://raw.githubusercontent.com/ipanalytics/Sat-geoip/main/outputs/satellite-asns.csv
@@ -153,58 +155,58 @@ dr5hn Countries States Cities Database, https://github.com/dr5hn/countries-state
 Debian iso-codes ISO 3166-2, https://salsa.debian.org/iso-codes-team/iso-codes/-/raw/main/data/iso_3166-2.json
 jsonmaur AWS Regions, https://raw.githubusercontent.com/jsonmaur/aws-regions/master/regions.json
 Green Software Foundation Azure Regions, https://raw.githubusercontent.com/Green-Software-Foundation/carbon-aware-sdk/dev/src/data/location-sources/azure-regions.json
-uBlock Origin Unbreak, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt
-uBlock Origin Quick Fixes, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt
-Loyalsoldier v2ray-rules-dat Unbreak, https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/hidden/reject-need-to-remove.txt
-Biliverse Bilibili ADBlock Module, https://github.com/Biliverse/ADBlock/releases/latest/download/BiliBili.ADBlock.sgmodule
-app2smile YouTube Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/youtube.sgmodule
-Walvez Surge Startup Ads Module, https://raw.githubusercontent.com/Walvez/surge-startup-ads/main/dist/StartUpAds_Selected.sgmodule
-app2smile Spotify Module, https://raw.githubusercontent.com/app2smile/rules/master/module/spotify.module
-app2smile Zhihu Module, https://raw.githubusercontent.com/app2smile/rules/master/module/zhihu.sgmodule
-app2smile Tieba Module, https://raw.githubusercontent.com/app2smile/rules/master/module/tieba.sgmodule
-ddgksf2013 Weibo Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/WeiboAds.conf
-ddgksf2013 Amap Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/AmapAds.conf
-AdGuard URL Tracking Protection, https://filters.adtidy.org/extension/ublock/filters/17.txt
-app2smile QQNews Module, https://raw.githubusercontent.com/app2smile/rules/master/module/qqnews.sgmodule
-Maasea Keep Ads Module, https://raw.githubusercontent.com/Maasea/sgmodule/master/KeepAds.sgmodule
-ddgksf2013 XiaoHongShu Ads Module, https://raw.githubusercontent.com/ifflagged/Romeo/main/Modules/Surge/ddgksf2013/XiaoHongShuAds.sgmodule
-app2smile AdSense Module, https://raw.githubusercontent.com/app2smile/rules/master/module/adsense.sgmodule
-ddgksf2013 Ximalaya Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/Ximalaya.conf
-ddgksf2013 Cainiao Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf
-ddgksf2013 SMZDM Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/SmzdmAds.conf
-ddgksf2013 Goofish Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/GoofishAds.conf
-ddgksf2013 WeChat Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/WeChat.conf
-ddgksf2013 Netease Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/NeteaseAds.conf
-QingRex HTTPDNS Block Module, https://raw.githubusercontent.com/QingRex/LoonKissSurge/main/Surge/Beta/%E6%8B%A6%E6%88%AAHTTPDNS.beta.sgmodule
-ddgksf2013 Mini-Program Ads Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/Applet.conf
-fmz200 wool_scripts BlockAds Module, https://raw.githubusercontent.com/fmz200/wool_scripts/main/Surge/module/blockAds.module
-AWAvenue Ads Rule Surge RULE-SET, https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-RULE-SET.list
-SukkaW Reject Ruleset, https://ruleset.skk.moe/Clash/non_ip/reject.txt
-SukkaW Reject Drop Ruleset, https://ruleset.skk.moe/Clash/non_ip/reject-drop.txt
-SukkaW Reject Domainset, https://ruleset.skk.moe/List/domainset/reject.conf
-SukkaW Reject IP Ruleset, https://ruleset.skk.moe/List/ip/reject.conf
-AdGuard Mobile Ads Filter, https://filters.adtidy.org/extension/ublock/filters/11.txt
-uBlock Origin Filters, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt
-AdGuard Base Filter, https://filters.adtidy.org/extension/ublock/filters/2.txt
-AdGuard Chinese Filter, https://filters.adtidy.org/extension/ublock/filters/224.txt
-uBlock Origin Privacy, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt
-AdGuard Tracking Protection, https://filters.adtidy.org/extension/ublock/filters/3.txt
-mieqq In-App Tracker List, https://raw.githubusercontent.com/mieqq/mieqq/master/In-AppTracker.txt
-uBlock Origin Badware Risks, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt
-Peter Lowe Ad & Tracking Server List, https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=1&mimetype=plaintext
-AdGuard DNS Filter, https://filters.adtidy.org/windows/filters/15.txt
-EasyPrivacy, https://easylist.to/easylist/easyprivacy.txt
-HaGeZi Multi PRO Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro-onlydomains.txt
-Hackl0us SS-Rule-Snippet Video Ad, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Custom/video-ad.list
-EasyList, https://easylist.to/easylist/easylist.txt
-EasyList China, https://raw.githubusercontent.com/easylist/easylistchina/master/easylistchina.txt
-OISD Big Blocklist, https://big.oisd.nl/
-ACL4SSR BanProgramAD, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanProgramAD.list
-ACL4SSR BanAD, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanAD.list
-1Hosts Lite, https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.wildcards
-Cats-Team AdRules Domainset, https://raw.githubusercontent.com/Cats-Team/AdRules/main/adrules_surge_domainset.txt
-anti-AD Surge List, https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt
-StevenBlack Unified Hosts, https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+Ubo Unbreak, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt
+Ubo Quick Fixes, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt
+Loyalsoldier Reject Remove, https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/hidden/reject-need-to-remove.txt
+Biliverse Bilibili Adblock, https://github.com/Biliverse/ADBlock/releases/latest
+App2Smile Youtube, https://raw.githubusercontent.com/app2smile/rules/master/module/youtube.sgmodule
+Walvez Startup Ads, https://raw.githubusercontent.com/Walvez/surge-startup-ads/main/dist/StartUpAds_Selected.sgmodule
+App2Smile Spotify, https://raw.githubusercontent.com/app2smile/rules/master/module/spotify.module
+App2Smile Zhihu, https://raw.githubusercontent.com/app2smile/rules/master/module/zhihu.sgmodule
+App2Smile Tieba, https://raw.githubusercontent.com/app2smile/rules/master/module/tieba.sgmodule
+Ddgksf Weibo Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/WeiboAds.conf
+Ddgksf Amap Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/AmapAds.conf
+Adguard Url Tracking, https://filters.adtidy.org/extension/ublock/filters/17.txt
+App2Smile Qqnews, https://raw.githubusercontent.com/app2smile/rules/master/module/qqnews.sgmodule
+Maasea Keep Ads, https://raw.githubusercontent.com/Maasea/sgmodule/master/KeepAds.sgmodule
+Ddgksf Xiaohongshu Ads, https://raw.githubusercontent.com/ifflagged/Romeo/main/Modules/Surge/ddgksf2013/XiaoHongShuAds.sgmodule
+App2Smile Adsense, https://raw.githubusercontent.com/app2smile/rules/master/module/adsense.sgmodule
+Ddgksf Ximalaya Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/Ximalaya.conf
+Ddgksf Cainiao Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf
+Ddgksf Smzdm Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/SmzdmAds.conf
+Ddgksf Goofish Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/GoofishAds.conf
+Ddgksf Wechat Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/WeChat.conf
+Ddgksf Netease Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/NeteaseAds.conf
+Qingrex Httpdns Block, https://raw.githubusercontent.com/QingRex/LoonKissSurge/main/Surge/Beta/%E6%8B%A6%E6%88%AAHTTPDNS.beta.sgmodule
+Ddgksf Applet Ads, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/Applet.conf
+Fmz200 Blockads Module, https://raw.githubusercontent.com/fmz200/wool_scripts/main/Surge/module/blockAds.module
+Awavenue Ads Surge, https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-RULE-SET.list
+Sukka Reject Ruleset, https://ruleset.skk.moe/Clash/non_ip/reject.txt
+Sukka Reject Drop, https://ruleset.skk.moe/Clash/non_ip/reject-drop.txt
+Sukka Reject Domainset, https://ruleset.skk.moe/List/domainset/reject.conf
+Sukka Reject Ip, https://ruleset.skk.moe/List/ip/reject.conf
+Adguard Mobile Ads, https://filters.adtidy.org/extension/ublock/filters/11.txt
+Ubo Filters, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt
+Adguard Base, https://filters.adtidy.org/extension/ublock/filters/2.txt
+Adguard Chinese, https://filters.adtidy.org/extension/ublock/filters/224.txt
+Ubo Privacy, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt
+Adguard Tracking, https://filters.adtidy.org/extension/ublock/filters/3.txt
+Mieqq In App Tracker, https://raw.githubusercontent.com/mieqq/mieqq/master/In-AppTracker.txt
+Ubo Badware, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt
+Peter Lowe, https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=1&mimetype=plaintext
+Adguard Dns Filter, https://filters.adtidy.org/windows/filters/15.txt
+Easyprivacy, https://easylist.to/easylist/easyprivacy.txt
+Hagezi Pro Domains, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro-onlydomains.txt
+Hackl0Us Video Ad, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Custom/video-ad.list
+Easylist, https://easylist.to/easylist/easylist.txt
+Easylist China, https://raw.githubusercontent.com/easylist/easylistchina/master/easylistchina.txt
+Oisd Big, https://big.oisd.nl/
+Acl4Ssr Ban Program Ad, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanProgramAD.list
+Acl4Ssr Ban Ad, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanAD.list
+Onehosts Lite, https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.wildcards
+Cats Adrules Domainset, https://raw.githubusercontent.com/Cats-Team/AdRules/main/adrules_surge_domainset.txt
+Anti Ad Surge, https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt
+Stevenblack Hosts, https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
 Loyalsoldier surge-rules direct ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/direct.txt
 MetaCubeX meta-rules-dat geolocation-cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/geolocation-cn.list
 MetaCubeX category-ai-cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ai-cn.list
@@ -267,18 +269,16 @@ max1874 funnysurge Apple Intelligence rules, https://raw.githubusercontent.com/m
 blankmagic Surge AI list, https://raw.githubusercontent.com/blankmagic/Surge/main/rule/ai.list
 ACL4SSR AI ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AI.list
 Repcz Tool AI Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/AI.list
-blackmatrix7 GlobalMedia Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/GlobalMedia/GlobalMedia.list
-ACL4SSR ProxyMedia ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyMedia.list
-ACL4SSR TikTok ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/TikTok.list
-ACL4SSR Netflix ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Netflix.list
-ACL4SSR DisneyPlus ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/DisneyPlus.list
-ACL4SSR Bahamut ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Bahamut.list
-ACL4SSR AbemaTV ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AbemaTV.list
-ACL4SSR DMM ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Dmm.list
-ACL4SSR MyTVSuper ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/MyTVSuper.list
-ACL4SSR ViuTV ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ViuTV.list
-Repcz Tool ProxyMedia Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ProxyMedia.list
-LM-Firefly GlobalMedia Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/GlobalMedia.list
+blackmatrix7 PayPal Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PayPal/PayPal.list
+blackmatrix7 Stripe Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Stripe/Stripe.list
+MetaCubeX paypal, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal.list
+MetaCubeX stripe, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/stripe.list
+MetaCubeX wise, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wise.list
+MetaCubeX hsbc, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hsbc.list
+MetaCubeX visa, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/visa.list
+MetaCubeX mastercard, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/mastercard.list
+MetaCubeX intuit, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/intuit.list
+MetaCubeX hcaptcha, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hcaptcha.list
 TannayeJ AI Global Vendor Rules, https://raw.githubusercontent.com/TannayeJ/ai-vendor-rules/main/generated/clash/all-ai-global.yaml
 NSZA156 Surge GeoX category-ai-!cn, https://raw.githubusercontent.com/NSZA156/surge-geox-rules/release/geo/geosite/category-ai-!cn.conf
 qianchongyang OpenClash AI Rules, https://raw.githubusercontent.com/qianchongyang/openclash-ai-rules/main/Rules/AI.list
@@ -307,6 +307,18 @@ Hackl0us SS-Rule-Snippet Apple-proxy, https://raw.githubusercontent.com/Hackl0us
 Hackl0us SS-Rule-Snippet academic-proxy, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Custom/academic-proxy.list
 LM-Firefly PROXY Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/PROXY.list
 LM-Firefly CCC-Global Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/CCC-Global.list
+blackmatrix7 GlobalMedia Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/GlobalMedia/GlobalMedia.list
+ACL4SSR ProxyMedia ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyMedia.list
+ACL4SSR TikTok ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/TikTok.list
+ACL4SSR Netflix ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Netflix.list
+ACL4SSR DisneyPlus ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/DisneyPlus.list
+ACL4SSR Bahamut ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Bahamut.list
+ACL4SSR AbemaTV ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AbemaTV.list
+ACL4SSR DMM ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Dmm.list
+ACL4SSR MyTVSuper ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/MyTVSuper.list
+ACL4SSR ViuTV ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ViuTV.list
+Repcz Tool ProxyMedia Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ProxyMedia.list
+LM-Firefly GlobalMedia Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/GlobalMedia.list
 ```
 
 </details>

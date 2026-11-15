@@ -39,6 +39,7 @@ pub enum SourceFormat {
     SypexDat,
     BgptoolsTable,
     BgptoolsAsnsCsv,
+    BgptoolsTagCsv,
     IpverseAsCsv,
     IptoasnTsv,
     RirDelegated,

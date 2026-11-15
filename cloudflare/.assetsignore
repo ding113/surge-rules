@@ -1,0 +1,13 @@
+.git
+.build
+.wrangler
+.cloudflare
+.nojekyll
+wrangler.jsonc
+cloudflare.config.ts
+wrangler.config.ts
+.assetsignore
+package.json
+package-lock.json
+bun.lock
+node_modules

@@ -74,8 +74,8 @@ fn catalog_metadata_and_overrides_are_valid_and_complete() {
 
     assert_eq!(
         catalog.sources.len(),
-        98,
-        "expected 98 upstream sources in catalog, got {}",
+        100,
+        "expected 100 upstream sources in catalog, got {}",
         catalog.sources.len()
     );
     for s in &catalog.sources {
@@ -272,6 +272,28 @@ fn parsers_decode_rfc8805_aws_bgp_rir_and_trait_formats() {
     );
     let parsed_drop = parse_source_bytes(&src_drop, drop_raw, &metadata).unwrap();
     assert_eq!(parsed_drop.v4.len(), 2);
+
+    // 6. BGP.Tools OpenDB ASN-Tag CSV (`AS<num>,<name>`)
+    let tag_raw = b"AS174,\"\"\"Cogent Communications\", LLC\"\nAS209,Lumen (ex. Qwest)\n";
+    let mut src_tag = dummy_source(
+        "test_bgptools_tag",
+        SourceTier::TraitOverlay,
+        SourceFormat::BgptoolsTagCsv,
+        "bgptools_tags",
+    );
+    src_tag.is_hosting = true;
+    let parsed_tag = parse_source_bytes(&src_tag, tag_raw, &metadata).unwrap();
+    assert_eq!(parsed_tag.asn_meta.len(), 2);
+    assert_eq!(parsed_tag.asn_meta[0].asn, 174);
+    assert_eq!(
+        parsed_tag.asn_meta[0].organization,
+        "Cogent Communications, LLC"
+    );
+    assert!(
+        parsed_tag.asn_meta[0]
+            .traits
+            .contains(TraitFlags::IS_HOSTING)
+    );
 }
 
 #[test]

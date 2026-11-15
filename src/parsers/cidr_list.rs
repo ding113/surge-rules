@@ -357,6 +357,40 @@ pub fn parse_sat_asns_csv(src: &SourceConfig, bytes: &[u8]) -> Result<ParsedSour
     Ok(out)
 }
 
+pub fn parse_bgptools_tag_csv(src: &SourceConfig, bytes: &[u8]) -> Result<ParsedSource> {
+    let mut out = ParsedSource::new(&src.id);
+    let traits = src.base_traits();
+    if traits.is_empty() {
+        return Ok(out);
+    }
+
+    let text = String::from_utf8_lossy(bytes);
+    for raw_line in text.lines() {
+        let line = raw_line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let Some((asn_col, name_col)) = line.split_once(',') else {
+            continue;
+        };
+        let asn = parse_asn_str(asn_col.trim());
+        if !is_public_asn(asn) {
+            continue;
+        }
+        let cleaned_org = name_col.replace('"', "").trim().to_string();
+        out.asn_meta.push(AsnMetaObs {
+            asn,
+            organization: cleaned_org,
+            domain: None,
+            country: None,
+            traits,
+            weight: 65,
+        });
+    }
+
+    Ok(out)
+}
+
 #[derive(Deserialize)]
 struct SpamhausDropLine {
     #[serde(default)]

@@ -242,22 +242,6 @@
       "rationale": "Shared Clerk development auth namespace"
     },
     {
-      "domain": "arkoselabs.com",
-      "rationale": "Multi-tenant Arkose CAPTCHA infrastructure"
-    },
-    {
-      "domain": "stripe.com",
-      "rationale": "Global payment gateway used across non-AI commerce"
-    },
-    {
-      "domain": "stripe.network",
-      "rationale": "Global Stripe fraud and checkout telemetry"
-    },
-    {
-      "domain": "paddle.com",
-      "rationale": "Global merchant-of-record payment processor"
-    },
-    {
       "domain": "intercom.io",
       "rationale": "Multi-tenant customer support chat"
     },
@@ -1691,318 +1675,976 @@
     },
     {
       "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "paypal.com",
+      "extendedMatching": true,
+      "rationale": "PayPal global checkout, web wallet, and REST APIs"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "paypalobjects.com",
+      "extendedMatching": true,
+      "rationale": "PayPal static SDKs, checkout assets, and scripts"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "paypal.me",
+      "extendedMatching": true,
+      "rationale": "PayPal peer-to-peer payment links"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "paypal-mktg.com",
+      "extendedMatching": true,
+      "rationale": "PayPal regional marketing and onboarding assets"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "venmo.com",
+      "extendedMatching": true,
+      "rationale": "PayPal Venmo US digital wallet"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "braintreegateway.com",
+      "extendedMatching": true,
+      "rationale": "PayPal Braintree card tokenization gateway"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "braintree-api.com",
+      "extendedMatching": true,
+      "rationale": "PayPal Braintree GraphQL payment API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "stripe.com",
+      "extendedMatching": true,
+      "rationale": "Stripe global checkout, Elements, Billing, and API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "stripe.network",
+      "extendedMatching": true,
+      "rationale": "Stripe Radar device fingerprinting and fraud telemetry"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "stripecdn.com",
+      "extendedMatching": true,
+      "rationale": "Stripe static checkout and dashboard CDN"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "link.com",
+      "extendedMatching": true,
+      "rationale": "Stripe Link one-click payment authentication"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adyen.com",
+      "extendedMatching": true,
+      "rationale": "Adyen global card acquiring and payment gateway"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "adyenpayments.com",
+      "extendedMatching": true,
+      "rationale": "Adyen checkout session endpoint"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "checkout.com",
+      "extendedMatching": true,
+      "rationale": "Checkout.com global payment processor"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "worldpay.com",
+      "extendedMatching": true,
+      "rationale": "Worldpay global merchant card processor"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "paddle.com",
+      "extendedMatching": true,
+      "rationale": "Paddle SaaS merchant-of-record checkout"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "lemonsqueezy.com",
+      "extendedMatching": true,
+      "rationale": "Lemon Squeezy SaaS billing and checkout"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "polar.sh",
+      "extendedMatching": true,
+      "rationale": "Polar open-source developer billing platform"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "gumroad.com",
+      "extendedMatching": true,
+      "rationale": "Gumroad digital creator checkout"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "wise.com",
+      "extendedMatching": true,
+      "rationale": "Wise multi-currency cross-border account and transfers"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "transferwise.com",
+      "extendedMatching": true,
+      "rationale": "Wise legacy API and banking domain"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "revolut.com",
+      "extendedMatching": true,
+      "rationale": "Revolut global digital banking and cards"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "payoneer.com",
+      "extendedMatching": true,
+      "rationale": "Payoneer cross-border settlement platform"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "airwallex.com",
+      "extendedMatching": true,
+      "rationale": "Airwallex cross-border business account and cards"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "mercury.com",
+      "extendedMatching": true,
+      "rationale": "Mercury US startup banking platform"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "brex.com",
+      "extendedMatching": true,
+      "rationale": "Brex corporate card and spend platform"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ramp.com",
+      "extendedMatching": true,
+      "rationale": "Ramp corporate card and finance platform"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "plaid.com",
+      "extendedMatching": true,
+      "rationale": "Plaid open-banking account linking gateway"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "klarna.com",
+      "extendedMatching": true,
+      "rationale": "Klarna buy-now-pay-later checkout"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "affirm.com",
+      "extendedMatching": true,
+      "rationale": "Affirm installment payment gateway"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "afterpay.com",
+      "extendedMatching": true,
+      "rationale": "Afterpay global checkout"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "squareup.com",
+      "extendedMatching": true,
+      "rationale": "Block Square payment gateway"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "cash.app",
+      "extendedMatching": true,
+      "rationale": "Block Cash App wallet"
+    },
+    {
+      "target": "ai",
       "kind": "DOMAIN",
-      "value": "js.stripe.com",
+      "value": "apple-pay-gateway.apple.com",
       "extendedMatching": true,
-      "rationale": "Stripe Elements required by ChatGPT, Claude, and Cursor billing"
+      "rationale": "Apple Pay overseas card tokenization gateway"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hsbc.com",
+      "extendedMatching": true,
+      "rationale": "HSBC Group global banking portal"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hsbc.com.hk",
+      "extendedMatching": true,
+      "rationale": "HSBC Hong Kong personal and Premier banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hsbc.co.uk",
+      "extendedMatching": true,
+      "rationale": "HSBC UK banking portal"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hsbc.com.sg",
+      "extendedMatching": true,
+      "rationale": "HSBC Singapore banking portal"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hsbcnet.com",
+      "extendedMatching": true,
+      "rationale": "HSBC corporate and institutional treasury portal"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hangseng.com",
+      "extendedMatching": true,
+      "rationale": "Hang Seng Bank Hong Kong"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bochk.com",
+      "extendedMatching": true,
+      "rationale": "Bank of China (Hong Kong) overseas banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "za.group",
+      "extendedMatching": true,
+      "rationale": "ZA International financial group"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "zabank.com",
+      "extendedMatching": true,
+      "rationale": "ZA Bank Hong Kong virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "mox.com",
+      "extendedMatching": true,
+      "rationale": "Mox Bank Hong Kong virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "livi.com.hk",
+      "extendedMatching": true,
+      "rationale": "livi Bank Hong Kong virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "livibank.com",
+      "extendedMatching": true,
+      "rationale": "livi Bank Hong Kong mobile API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "welab.bank",
+      "extendedMatching": true,
+      "rationale": "WeLab Bank Hong Kong virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "antbank.hk",
+      "extendedMatching": true,
+      "rationale": "Ant Bank (Hong Kong) virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "fusionbank.com",
+      "extendedMatching": true,
+      "rationale": "Fusion Bank Hong Kong virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "airstarbank.com",
+      "extendedMatching": true,
+      "rationale": "Airstar Bank Hong Kong virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "pao-bank.com",
+      "extendedMatching": true,
+      "rationale": "PAObank Hong Kong virtual bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "sc.com",
+      "extendedMatching": true,
+      "rationale": "Standard Chartered global and HK/SG banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dbs.com",
+      "extendedMatching": true,
+      "rationale": "DBS Bank Singapore and Hong Kong"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dbs.com.sg",
+      "extendedMatching": true,
+      "rationale": "DBS Bank Singapore"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dbs.com.hk",
+      "extendedMatching": true,
+      "rationale": "DBS Bank Hong Kong"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ocbc.com",
+      "extendedMatching": true,
+      "rationale": "OCBC Bank Singapore and Hong Kong"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "uobgroup.com",
+      "extendedMatching": true,
+      "rationale": "United Overseas Bank Singapore"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "citi.com",
+      "extendedMatching": true,
+      "rationale": "Citibank US and global consumer banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "citibank.com",
+      "extendedMatching": true,
+      "rationale": "Citibank global online banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "citibank.com.hk",
+      "extendedMatching": true,
+      "rationale": "Citibank Hong Kong banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "citigroup.com",
+      "extendedMatching": true,
+      "rationale": "Citigroup institutional platform"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "chase.com",
+      "extendedMatching": true,
+      "rationale": "JPMorgan Chase US banking and credit cards"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "jpmorgan.com",
+      "extendedMatching": true,
+      "rationale": "J.P. Morgan private and institutional banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "jpmorganchase.com",
+      "extendedMatching": true,
+      "rationale": "JPMorgan Chase corporate portal"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bankofamerica.com",
+      "extendedMatching": true,
+      "rationale": "Bank of America consumer banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bofa.com",
+      "extendedMatching": true,
+      "rationale": "Bank of America mobile and card services"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "wellsfargo.com",
+      "extendedMatching": true,
+      "rationale": "Wells Fargo US banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "capitalone.com",
+      "extendedMatching": true,
+      "rationale": "Capital One US banking and cards"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "americanexpress.com",
+      "extendedMatching": true,
+      "rationale": "American Express global card services"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "aexp-static.com",
+      "extendedMatching": true,
+      "rationale": "American Express static security and UI assets"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "discover.com",
+      "extendedMatching": true,
+      "rationale": "Discover card and banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "usbank.com",
+      "extendedMatching": true,
+      "rationale": "U.S. Bank consumer banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "sofi.com",
+      "extendedMatching": true,
+      "rationale": "SoFi US digital bank and brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ally.com",
+      "extendedMatching": true,
+      "rationale": "Ally Bank US online banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "chime.com",
+      "extendedMatching": true,
+      "rationale": "Chime US fintech banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "barclays.co.uk",
+      "extendedMatching": true,
+      "rationale": "Barclays UK retail banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "barclays.com",
+      "extendedMatching": true,
+      "rationale": "Barclays global banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "lloydsbank.com",
+      "extendedMatching": true,
+      "rationale": "Lloyds Bank UK"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "natwest.com",
+      "extendedMatching": true,
+      "rationale": "NatWest UK banking"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "monzo.com",
+      "extendedMatching": true,
+      "rationale": "Monzo UK digital bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "starlingbank.com",
+      "extendedMatching": true,
+      "rationale": "Starling Bank UK"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "n26.com",
+      "extendedMatching": true,
+      "rationale": "N26 European digital bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bunq.com",
+      "extendedMatching": true,
+      "rationale": "bunq European digital bank"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "visa.com",
+      "extendedMatching": true,
+      "rationale": "Visa global card network and Click to Pay"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "mastercard.com",
+      "extendedMatching": true,
+      "rationale": "Mastercard global card network"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "interactivebrokers.com",
+      "extendedMatching": true,
+      "rationale": "Interactive Brokers global brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ibkr.com",
+      "extendedMatching": true,
+      "rationale": "Interactive Brokers Client Portal and TWS API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "schwab.com",
+      "extendedMatching": true,
+      "rationale": "Charles Schwab US and International brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "fidelity.com",
+      "extendedMatching": true,
+      "rationale": "Fidelity Investments brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "robinhood.com",
+      "extendedMatching": true,
+      "rationale": "Robinhood brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "etrade.com",
+      "extendedMatching": true,
+      "rationale": "E*TRADE brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "firstrade.com",
+      "extendedMatching": true,
+      "rationale": "Firstrade US brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tastytrade.com",
+      "extendedMatching": true,
+      "rationale": "tastytrade US options brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "webull.com",
+      "extendedMatching": true,
+      "rationale": "Webull overseas brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "futuhk.com",
+      "extendedMatching": true,
+      "rationale": "Futu Bull Hong Kong brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "moomoo.com",
+      "extendedMatching": true,
+      "rationale": "Moomoo overseas brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "longbridgeapp.com",
+      "extendedMatching": true,
+      "rationale": "Longbridge Hong Kong/Singapore brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tigerbrokers.com",
+      "extendedMatching": true,
+      "rationale": "Tiger Brokers overseas brokerage"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "online-metrix.net",
+      "extendedMatching": true,
+      "rationale": "LexisNexis ThreatMetrix device risk profiling used by PayPal and banks"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "threatmetrix.com",
+      "extendedMatching": true,
+      "rationale": "LexisNexis ThreatMetrix fraud prevention service"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "iesnare.com",
+      "extendedMatching": true,
+      "rationale": "TransUnion iovation device intelligence beacon"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "iovation.com",
+      "extendedMatching": true,
+      "rationale": "TransUnion iovation banking fraud detection"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "cardinalcommerce.com",
+      "extendedMatching": true,
+      "rationale": "Visa CardinalCommerce 3-D Secure (3DS) card authentication"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "cybersource.com",
+      "extendedMatching": true,
+      "rationale": "Visa CyberSource payment fraud and checkout risk engine"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "accertify.com",
+      "extendedMatching": true,
+      "rationale": "Accertify payment chargeback and fraud screening"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "arcot.com",
+      "extendedMatching": true,
+      "rationale": "Broadcom Arcot 3-D Secure issuer authentication"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "3dsecure.io",
+      "extendedMatching": true,
+      "rationale": "3-D Secure EMVCo verification service"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "kount.com",
+      "extendedMatching": true,
+      "rationale": "Equifax Kount payment fraud prevention"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "sift.com",
+      "extendedMatching": true,
+      "rationale": "Sift payment fraud and account-takeover detection"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "siftscience.com",
+      "extendedMatching": true,
+      "rationale": "Sift JavaScript risk telemetry SDK"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "forter.com",
+      "extendedMatching": true,
+      "rationale": "Forter e-commerce checkout fraud decisioning"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "riskified.com",
+      "extendedMatching": true,
+      "rationale": "Riskified e-commerce payment risk beacon"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "signifyd.com",
+      "extendedMatching": true,
+      "rationale": "Signifyd payment fraud protection"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "sardine.ai",
+      "extendedMatching": true,
+      "rationale": "Sardine fintech/banking device intelligence and fraud API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "castle.io",
+      "extendedMatching": true,
+      "rationale": "Castle account-takeover risk API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "seon.io",
+      "extendedMatching": true,
+      "rationale": "SEON financial fraud prevention"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "socure.com",
+      "extendedMatching": true,
+      "rationale": "Socure banking KYC and identity risk verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "fpjs.io",
+      "extendedMatching": true,
+      "rationale": "FingerprintJS Pro browser risk identification API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "fingerprint.com",
+      "extendedMatching": true,
+      "rationale": "Fingerprint Pro fraud detection platform"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "arkoselabs.com",
+      "extendedMatching": true,
+      "rationale": "Arkose Labs FunCaptcha risk challenges for OpenAI, PayPal, and banks"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "funcaptcha.com",
+      "extendedMatching": true,
+      "rationale": "Arkose Labs FunCaptcha verification assets"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hcaptcha.com",
+      "extendedMatching": true,
+      "rationale": "hCaptcha anti-bot human verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "datadome.co",
+      "extendedMatching": true,
+      "rationale": "DataDome bot and fraud protection"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "perimeterx.net",
+      "extendedMatching": true,
+      "rationale": "HUMAN (PerimeterX) bot and checkout risk verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "px-cdn.net",
+      "extendedMatching": true,
+      "rationale": "HUMAN (PerimeterX) sensor script CDN"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "px-cloud.net",
+      "extendedMatching": true,
+      "rationale": "HUMAN (PerimeterX) risk telemetry collector"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "kasada.io",
+      "extendedMatching": true,
+      "rationale": "Kasada anti-automation risk verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "incapsula.com",
+      "extendedMatching": true,
+      "rationale": "Imperva Incapsula WAF challenge verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "imperva.com",
+      "extendedMatching": true,
+      "rationale": "Imperva security verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "withpersona.com",
+      "extendedMatching": true,
+      "rationale": "Persona KYC identity verification used by OpenAI and fintechs"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "sumsub.com",
+      "extendedMatching": true,
+      "rationale": "Sumsub KYC/AML identity verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "veriff.com",
+      "extendedMatching": true,
+      "rationale": "Veriff identity verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "veriff.me",
+      "extendedMatching": true,
+      "rationale": "Veriff live KYC session endpoint"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "onfido.com",
+      "extendedMatching": true,
+      "rationale": "Entrust Onfido identity verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "jumio.com",
+      "extendedMatching": true,
+      "rationale": "Jumio bank/fintech eKYC verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "id.me",
+      "extendedMatching": true,
+      "rationale": "ID.me digital identity verification"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "prodregistryv2.org",
+      "extendedMatching": true,
+      "rationale": "Statsig alias telemetry & feature-gate gateway used by OpenAI/Claude"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "beyondwickedmapping.org",
+      "extendedMatching": true,
+      "rationale": "Statsig alias experimentation gateway used by AI clients"
     },
     {
       "target": "ai",
       "kind": "DOMAIN",
-      "value": "m.stripe.network",
+      "value": "events.statsigapi.net",
       "extendedMatching": true,
-      "rationale": "Stripe fraud detection telemetry required during AI subscription checkout"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "netflix.com",
-      "extendedMatching": true,
-      "rationale": "Netflix streaming catalog and web portal"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "nflxvideo.net",
-      "extendedMatching": true,
-      "rationale": "Netflix Open Connect video CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "nflximg.net",
-      "extendedMatching": true,
-      "rationale": "Netflix artwork and thumbnail CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "nflxso.net",
-      "extendedMatching": true,
-      "rationale": "Netflix streaming service CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "nflxext.com",
-      "extendedMatching": true,
-      "rationale": "Netflix edge auxiliary domain"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "disneyplus.com",
-      "extendedMatching": true,
-      "rationale": "Disney+ streaming service"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "disney-plus.net",
-      "extendedMatching": true,
-      "rationale": "Disney+ regional alias"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "dssott.com",
-      "extendedMatching": true,
-      "rationale": "Disney Streaming Services OTT CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "bamgrid.com",
-      "extendedMatching": true,
-      "rationale": "Disney+ BAMTech auth and playback API"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "tiktok.com",
-      "extendedMatching": true,
-      "rationale": "TikTok international video platform"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "tiktokv.com",
-      "extendedMatching": true,
-      "rationale": "TikTok international API transport"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "tiktokcdn.com",
-      "extendedMatching": true,
-      "rationale": "TikTok international media CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "musical.ly",
-      "extendedMatching": true,
-      "rationale": "TikTok legacy API and deep links"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "byteoversea.com",
-      "extendedMatching": true,
-      "rationale": "ByteDance overseas services gateway"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "ibytedtos.com",
-      "extendedMatching": true,
-      "rationale": "TikTok international object storage CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "ibyteimg.com",
-      "extendedMatching": true,
-      "rationale": "TikTok international image CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "capcut.com",
-      "extendedMatching": true,
-      "rationale": "CapCut international video editor"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "spotify.com",
-      "extendedMatching": true,
-      "rationale": "Spotify streaming and authentication"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "scdn.co",
-      "extendedMatching": true,
-      "rationale": "Spotify audio and artwork CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "youtube.com",
-      "extendedMatching": true,
-      "rationale": "YouTube web and Music portal"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "youtu.be",
-      "extendedMatching": true,
-      "rationale": "YouTube share links"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "googlevideo.com",
-      "extendedMatching": true,
-      "rationale": "YouTube adaptive video stream CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "ytimg.com",
-      "extendedMatching": true,
-      "rationale": "YouTube thumbnail and player script CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "hbo.com",
-      "extendedMatching": true,
-      "rationale": "HBO streaming domain"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "hbomax.com",
-      "extendedMatching": true,
-      "rationale": "HBO Max region-locked streaming"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "max.com",
-      "extendedMatching": true,
-      "rationale": "Max streaming platform"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "hulu.com",
-      "extendedMatching": true,
-      "rationale": "Hulu US-locked streaming"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "hulustream.com",
-      "extendedMatching": true,
-      "rationale": "Hulu video delivery CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "primevideo.com",
-      "extendedMatching": true,
-      "rationale": "Amazon Prime Video streaming"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "bahamut.com.tw",
-      "extendedMatching": true,
-      "rationale": "Bahamut Anime Crazy Taiwan-locked streaming"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "gamer.com.tw",
-      "extendedMatching": true,
-      "rationale": "Bahamut Gamer auth and anime portal"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "abema.io",
-      "extendedMatching": true,
-      "rationale": "AbemaTV Japan-locked API"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "abema.tv",
-      "extendedMatching": true,
-      "rationale": "AbemaTV Japan-locked web streaming"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "dmm.com",
-      "extendedMatching": true,
-      "rationale": "DMM Japan-locked portal"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "dmm.co.jp",
-      "extendedMatching": true,
-      "rationale": "DMM Japan-locked media CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "nicovideo.jp",
-      "extendedMatching": true,
-      "rationale": "Niconico Japan video platform"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "nimg.jp",
-      "extendedMatching": true,
-      "rationale": "Niconico media CDN"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "viu.tv",
-      "extendedMatching": true,
-      "rationale": "ViuTV Hong Kong region-locked streaming"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "mytvsuper.com",
-      "extendedMatching": true,
-      "rationale": "myTV SUPER Hong Kong region-locked streaming"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "bilibili.tv",
-      "extendedMatching": true,
-      "rationale": "Bilibili International Southeast Asia portal"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "biliintl.com",
-      "extendedMatching": true,
-      "rationale": "Bilibili International API"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "iq.com",
-      "extendedMatching": true,
-      "rationale": "iQIYI International overseas edition"
-    },
-    {
-      "target": "ai",
-      "kind": "DOMAIN-SUFFIX",
-      "value": "wetv.vip",
-      "extendedMatching": true,
-      "rationale": "WeTV International overseas edition"
+      "rationale": "Statsig client event telemetry endpoint"
     },
     {
       "target": "ai",
@@ -2166,6 +2808,12 @@
     {
       "target": "ai",
       "kind": "AND",
+      "value": "((DOMAIN-SUFFIX,sentry.io),(PROCESS-NAME,Cursor))",
+      "rationale": "Sentry crash/telemetry reporting restricted to AI desktop/CLI processes"
+    },
+    {
+      "target": "ai",
+      "kind": "AND",
       "value": "((DOMAIN-SUFFIX,sentry.io),(PROCESS-NAME,claude))",
       "rationale": "Sentry crash/telemetry reporting restricted to AI desktop/CLI processes"
     },
@@ -2178,20 +2826,56 @@
     {
       "target": "ai",
       "kind": "AND",
-      "value": "((DOMAIN-SUFFIX,stripe.com),(PROCESS-NAME,ChatGPT))",
-      "rationale": "Stripe billing flows restricted to AI desktop processes"
+      "value": "((DOMAIN-SUFFIX,sentry.io),(PROCESS-NAME,cursor))",
+      "rationale": "Sentry crash/telemetry reporting restricted to AI desktop/CLI processes"
     },
     {
       "target": "ai",
       "kind": "AND",
-      "value": "((DOMAIN-SUFFIX,stripe.com),(PROCESS-NAME,Claude))",
-      "rationale": "Stripe billing flows restricted to AI desktop processes"
+      "value": "((DOMAIN-SUFFIX,datadoghq.com),(PROCESS-NAME,ChatGPT))",
+      "rationale": "Datadog RUM/telemetry intake restricted to AI desktop/CLI processes"
     },
     {
       "target": "ai",
       "kind": "AND",
-      "value": "((DOMAIN-SUFFIX,stripe.com),(PROCESS-NAME,Codex))",
-      "rationale": "Stripe billing flows restricted to AI desktop processes"
+      "value": "((DOMAIN-SUFFIX,datadoghq.com),(PROCESS-NAME,Claude))",
+      "rationale": "Datadog RUM/telemetry intake restricted to AI desktop/CLI processes"
+    },
+    {
+      "target": "ai",
+      "kind": "AND",
+      "value": "((DOMAIN-SUFFIX,datadoghq.com),(PROCESS-NAME,Cursor))",
+      "rationale": "Datadog RUM/telemetry intake restricted to AI desktop/CLI processes"
+    },
+    {
+      "target": "ai",
+      "kind": "AND",
+      "value": "((DOMAIN-SUFFIX,datadoghq.com),(PROCESS-NAME,claude))",
+      "rationale": "Datadog RUM/telemetry intake restricted to AI desktop/CLI processes"
+    },
+    {
+      "target": "ai",
+      "kind": "AND",
+      "value": "((DOMAIN-SUFFIX,datadoghq.com),(PROCESS-NAME,codex))",
+      "rationale": "Datadog RUM/telemetry intake restricted to AI desktop/CLI processes"
+    },
+    {
+      "target": "ai",
+      "kind": "AND",
+      "value": "((DOMAIN-SUFFIX,browser-intake-datadoghq.com),(PROCESS-NAME,ChatGPT))",
+      "rationale": "Datadog browser telemetry restricted to AI desktop processes"
+    },
+    {
+      "target": "ai",
+      "kind": "AND",
+      "value": "((DOMAIN-SUFFIX,browser-intake-datadoghq.com),(PROCESS-NAME,Claude))",
+      "rationale": "Datadog browser telemetry restricted to AI desktop processes"
+    },
+    {
+      "target": "ai",
+      "kind": "AND",
+      "value": "((DOMAIN-SUFFIX,browser-intake-datadoghq.com),(PROCESS-NAME,Cursor))",
+      "rationale": "Datadog browser telemetry restricted to AI desktop processes"
     },
     {
       "target": "ai",
@@ -2768,6 +3452,60 @@
       "kind": "DOMAIN-SUFFIX",
       "value": "biliapi.net",
       "rationale": "Bilibili mobile gRPC API"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "iqiyi.com",
+      "rationale": "iQIYI Mainland China domestic streaming"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "qiyi.com",
+      "rationale": "iQIYI Mainland China legacy & CDN domain"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "iqiyipic.com",
+      "rationale": "iQIYI Mainland China artwork CDN"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "youku.com",
+      "rationale": "Youku Mainland China domestic streaming"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ykimg.com",
+      "rationale": "Youku Mainland China static CDN"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "mgtv.com",
+      "rationale": "MangoTV Mainland China domestic streaming"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hunantv.com",
+      "rationale": "HunanTV / MangoTV domestic media domain"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "kugou.com",
+      "rationale": "KuGou Mainland China domestic music streaming"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ximalaya.com",
+      "rationale": "Ximalaya Mainland China domestic audio platform"
     },
     {
       "target": "direct",
@@ -3537,9 +4275,735 @@
       "kind": "PROCESS-NAME",
       "value": "Discord",
       "rationale": "Discord macOS desktop application"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "netflix.com",
+      "extendedMatching": true,
+      "rationale": "Netflix streaming catalog and web portal"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflxvideo.net",
+      "extendedMatching": true,
+      "rationale": "Netflix Open Connect video CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflximg.net",
+      "extendedMatching": true,
+      "rationale": "Netflix artwork and thumbnail CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflxso.net",
+      "extendedMatching": true,
+      "rationale": "Netflix streaming service CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflxext.com",
+      "extendedMatching": true,
+      "rationale": "Netflix edge auxiliary domain"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "disneyplus.com",
+      "extendedMatching": true,
+      "rationale": "Disney+ streaming service"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "disney-plus.net",
+      "extendedMatching": true,
+      "rationale": "Disney+ regional alias"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dssott.com",
+      "extendedMatching": true,
+      "rationale": "Disney Streaming Services OTT CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bamgrid.com",
+      "extendedMatching": true,
+      "rationale": "Disney+ BAMTech auth and playback API"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tiktok.com",
+      "extendedMatching": true,
+      "rationale": "TikTok international video platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tiktokv.com",
+      "extendedMatching": true,
+      "rationale": "TikTok international API transport"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tiktokcdn.com",
+      "extendedMatching": true,
+      "rationale": "TikTok international media CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "musical.ly",
+      "extendedMatching": true,
+      "rationale": "TikTok legacy API and deep links"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "byteoversea.com",
+      "extendedMatching": true,
+      "rationale": "ByteDance overseas services gateway"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ibytedtos.com",
+      "extendedMatching": true,
+      "rationale": "TikTok international object storage CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ibyteimg.com",
+      "extendedMatching": true,
+      "rationale": "TikTok international image CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "capcut.com",
+      "extendedMatching": true,
+      "rationale": "CapCut international video editor"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "spotify.com",
+      "extendedMatching": true,
+      "rationale": "Spotify streaming and authentication"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "scdn.co",
+      "extendedMatching": true,
+      "rationale": "Spotify audio and artwork CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "youtube.com",
+      "extendedMatching": true,
+      "rationale": "YouTube web and Music portal"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "youtu.be",
+      "extendedMatching": true,
+      "rationale": "YouTube share links"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "googlevideo.com",
+      "extendedMatching": true,
+      "rationale": "YouTube adaptive video stream CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ytimg.com",
+      "extendedMatching": true,
+      "rationale": "YouTube thumbnail and player script CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "twitch.tv",
+      "extendedMatching": true,
+      "rationale": "Twitch live streaming platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ttvnw.net",
+      "extendedMatching": true,
+      "rationale": "Twitch live video delivery CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "jtvnw.net",
+      "extendedMatching": true,
+      "rationale": "Twitch static assets CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hbo.com",
+      "extendedMatching": true,
+      "rationale": "HBO streaming domain"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hbomax.com",
+      "extendedMatching": true,
+      "rationale": "HBO Max region-locked streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "max.com",
+      "extendedMatching": true,
+      "rationale": "Max streaming platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hulu.com",
+      "extendedMatching": true,
+      "rationale": "Hulu US-locked streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hulustream.com",
+      "extendedMatching": true,
+      "rationale": "Hulu video delivery CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "primevideo.com",
+      "extendedMatching": true,
+      "rationale": "Amazon Prime Video streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "aiv-cdn.net",
+      "extendedMatching": true,
+      "rationale": "Amazon Prime Video delivery CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "peacocktv.com",
+      "extendedMatching": true,
+      "rationale": "Peacock US streaming platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "paramountplus.com",
+      "extendedMatching": true,
+      "rationale": "Paramount+ streaming platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dazn.com",
+      "extendedMatching": true,
+      "rationale": "DAZN sports streaming platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "crunchyroll.com",
+      "extendedMatching": true,
+      "rationale": "Crunchyroll anime streaming platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bahamut.com.tw",
+      "extendedMatching": true,
+      "rationale": "Bahamut Anime Crazy Taiwan-locked streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "gamer.com.tw",
+      "extendedMatching": true,
+      "rationale": "Bahamut Gamer auth and anime portal"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "abema.io",
+      "extendedMatching": true,
+      "rationale": "AbemaTV Japan-locked API"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "abema.tv",
+      "extendedMatching": true,
+      "rationale": "AbemaTV Japan-locked web streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dmm.com",
+      "extendedMatching": true,
+      "rationale": "DMM Japan-locked portal"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dmm.co.jp",
+      "extendedMatching": true,
+      "rationale": "DMM Japan-locked media CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tver.jp",
+      "extendedMatching": true,
+      "rationale": "TVer Japan catch-up streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "unext.jp",
+      "extendedMatching": true,
+      "rationale": "U-NEXT Japan streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nicovideo.jp",
+      "extendedMatching": true,
+      "rationale": "Niconico Japan video platform"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nimg.jp",
+      "extendedMatching": true,
+      "rationale": "Niconico media CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "viu.com",
+      "extendedMatching": true,
+      "rationale": "Viu regional OTT streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "viu.tv",
+      "extendedMatching": true,
+      "rationale": "ViuTV Hong Kong region-locked streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "mytvsuper.com",
+      "extendedMatching": true,
+      "rationale": "myTV SUPER Hong Kong region-locked streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nowe.com",
+      "extendedMatching": true,
+      "rationale": "Now E Hong Kong streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "kktv.me",
+      "extendedMatching": true,
+      "rationale": "KKTV Taiwan streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "linetv.tw",
+      "extendedMatching": true,
+      "rationale": "LINE TV Taiwan streaming"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bilibili.tv",
+      "extendedMatching": true,
+      "rationale": "Bilibili International Southeast Asia portal"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "biliintl.com",
+      "extendedMatching": true,
+      "rationale": "Bilibili International API"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bstarstatic.com",
+      "extendedMatching": true,
+      "rationale": "Bilibili International media and static CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "iq.com",
+      "extendedMatching": true,
+      "rationale": "iQIYI International overseas edition"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "wetv.vip",
+      "extendedMatching": true,
+      "rationale": "Tencent WeTV International overseas edition"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "wetvinfo.com",
+      "extendedMatching": true,
+      "rationale": "Tencent WeTV International API and CDN"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "joox.com",
+      "extendedMatching": true,
+      "rationale": "Tencent JOOX overseas music streaming"
     }
   ],
   "excludeEntries": [
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "netflix.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflxvideo.net",
+      "rationale": "Overseas streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflximg.net",
+      "rationale": "Overseas streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflxso.net",
+      "rationale": "Overseas streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nflxext.com",
+      "rationale": "Overseas streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "disneyplus.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "disney-plus.net",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dssott.com",
+      "rationale": "Overseas streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bamgrid.com",
+      "rationale": "Overseas streaming API belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "youtube.com",
+      "rationale": "Overseas video streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "youtu.be",
+      "rationale": "Overseas video streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "googlevideo.com",
+      "rationale": "Overseas video streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ytimg.com",
+      "rationale": "Overseas video streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "spotify.com",
+      "rationale": "Overseas music streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "scdn.co",
+      "rationale": "Overseas music streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tiktok.com",
+      "rationale": "Overseas short-video streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tiktokv.com",
+      "rationale": "Overseas short-video API belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tiktokcdn.com",
+      "rationale": "Overseas short-video CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tiktokcdn-us.com",
+      "rationale": "Overseas short-video CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "byteoversea.com",
+      "rationale": "TikTok / ByteDance overseas gateway belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ibytedtos.com",
+      "rationale": "TikTok / ByteDance overseas static CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ibyteimg.com",
+      "rationale": "TikTok / ByteDance overseas image CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "muscdn.com",
+      "rationale": "TikTok media CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ttwstatic.com",
+      "rationale": "TikTok web static CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "musical.ly",
+      "rationale": "Overseas short-video domain belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hbo.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hbomax.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "max.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hulu.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hulustream.com",
+      "rationale": "Overseas streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "primevideo.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "twitch.tv",
+      "rationale": "Overseas live streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ttvnw.net",
+      "rationale": "Overseas live streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bahamut.com.tw",
+      "rationale": "Overseas anime streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "gamer.com.tw",
+      "rationale": "Overseas anime portal belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "abema.io",
+      "rationale": "Overseas streaming API belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "abema.tv",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dmm.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "dmm.co.jp",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nicovideo.jp",
+      "rationale": "Overseas video streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "nimg.jp",
+      "rationale": "Overseas video streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "viu.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "viu.tv",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "mytvsuper.com",
+      "rationale": "Overseas streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bilibili.tv",
+      "rationale": "Overseas edition of domestic streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "biliintl.com",
+      "rationale": "Overseas edition of domestic streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bstarstatic.com",
+      "rationale": "Overseas edition of domestic streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "iq.com",
+      "rationale": "Overseas edition of domestic streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "wetv.vip",
+      "rationale": "Overseas edition of domestic streaming belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "wetvinfo.com",
+      "rationale": "Overseas edition of domestic streaming CDN belongs in Proxy.list"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "joox.com",
+      "rationale": "Overseas edition of domestic music streaming belongs in Proxy.list"
+    },
     {
       "target": "direct",
       "kind": "DOMAIN-SUFFIX",
@@ -3593,6 +5057,72 @@
       "kind": "DOMAIN-SUFFIX",
       "value": "wetv.vip",
       "rationale": "WeTV International overseas edition"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bstarstatic.com",
+      "rationale": "Bilibili International overseas CDN"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "wetvinfo.com",
+      "rationale": "WeTV International overseas API and CDN"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "joox.com",
+      "rationale": "Tencent JOOX overseas music streaming"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "bochk.com",
+      "rationale": "Bank of China (Hong Kong) overseas banking"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "zabank.com",
+      "rationale": "ZA Bank Hong Kong virtual bank"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hsbc.com.hk",
+      "rationale": "HSBC Hong Kong overseas banking"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "hangseng.com",
+      "rationale": "Hang Seng Bank Hong Kong overseas banking"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "futuhk.com",
+      "rationale": "Futu Hong Kong overseas brokerage"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "moomoo.com",
+      "rationale": "Moomoo overseas brokerage"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "longbridgeapp.com",
+      "rationale": "Longbridge overseas brokerage"
+    },
+    {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "tigerbrokers.com",
+      "rationale": "Tiger Brokers overseas brokerage"
     },
     {
       "target": "direct",
@@ -3989,6 +5519,30 @@
       "kind": "DOMAIN-SUFFIX",
       "value": "bilibili.com",
       "rationale": "Domestic Bilibili site"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "iqiyi.com",
+      "rationale": "Domestic iQIYI streaming site"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "youku.com",
+      "rationale": "Domestic Youku streaming site"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "mgtv.com",
+      "rationale": "Domestic MangoTV streaming site"
+    },
+    {
+      "target": "proxy",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "163.com",
+      "rationale": "Domestic NetEase Cloud Music and Mail"
     },
     {
       "target": "proxy",

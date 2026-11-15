@@ -439,11 +439,15 @@ pub fn compile_adblock(
             .any(|dom| dom.contains(kw.as_str()))
     });
     candidate_wildcards.retain(|wc| {
-        !allow_exact_set
-            .iter()
-            .chain(allow_suffix_set.iter())
-            .chain(complex_host_set.iter())
-            .any(|dom| wildcard_matches_domain(wc, dom))
+        let static_tail = wildcard_static_suffix(wc);
+        let covered_by_allow_suffix =
+            static_tail.is_some_and(|tail| allow_suffix_trie.has_suffix_ancestor_or_eq(tail));
+        !covered_by_allow_suffix
+            && !allow_exact_set
+                .iter()
+                .chain(allow_suffix_set.iter())
+                .chain(complex_host_set.iter())
+                .any(|dom| wildcard_matches_domain(wc, dom))
     });
 
     // Exclude RFC 6890 private / LAN / Surge Fake-IP / CGNAT / Tailscale / Cloudflare Mesh / bogons before aggregating CIDRs
@@ -1219,6 +1223,23 @@ fn order_host_list(vals: &BTreeSet<String>) -> Vec<String> {
     }
     neg.extend(pos);
     neg
+}
+
+fn wildcard_static_suffix(wc: &str) -> Option<&str> {
+    let labels: Vec<&str> = wc.split('.').collect();
+    let mut first_static = labels.len();
+    while first_static > 0 {
+        let lbl = labels[first_static - 1];
+        if lbl.is_empty() || lbl.contains('*') || lbl.contains('?') {
+            break;
+        }
+        first_static -= 1;
+    }
+    if labels.len().saturating_sub(first_static) < 2 {
+        return None;
+    }
+    let byte_offset: usize = labels[..first_static].iter().map(|l| l.len() + 1).sum();
+    wc.get(byte_offset..)
 }
 
 #[allow(clippy::too_many_arguments)]

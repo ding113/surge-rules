@@ -42,6 +42,7 @@ pub fn parse_source_bytes(
         SourceFormat::SypexDat => sypex::parse_sypex(src, bytes, metadata),
         SourceFormat::BgptoolsTable => bgp_rir::parse_bgptools_table(src, bytes),
         SourceFormat::BgptoolsAsnsCsv => bgp_rir::parse_bgptools_asns_csv(src, bytes, metadata),
+        SourceFormat::BgptoolsTagCsv => cidr_list::parse_bgptools_tag_csv(src, bytes),
         SourceFormat::IpverseAsCsv => bgp_rir::parse_ipverse_as_csv(src, bytes, metadata),
         SourceFormat::IptoasnTsv => bgp_rir::parse_iptoasn_tsv(src, bytes, metadata),
         SourceFormat::RirDelegated => bgp_rir::parse_rir_delegated(src, bytes, metadata),

@@ -14,6 +14,7 @@ on:
       - "sources/**"
       - "overrides/**"
       - "scripts/**"
+      - "cloudflare/**"
       - "package.json"
       - "bun.lock"
       - "Cargo.toml"
@@ -177,6 +178,10 @@ jobs:
           TMP_INDEX="$(mktemp)"
           rm -f "${TMP_INDEX}"
           touch "${STAGE_DIR}/.nojekyll"
+          cp cloudflare/wrangler.jsonc "${STAGE_DIR}/wrangler.jsonc"
+          cp cloudflare/.assetsignore "${STAGE_DIR}/.assetsignore"
+          cp cloudflare/_headers "${STAGE_DIR}/_headers"
+          cp cloudflare/_redirects "${STAGE_DIR}/_redirects"
           cp scripts/install.html "${STAGE_DIR}/install.html"
           MIRROR_FILES=(
             Country-only.mmdb
@@ -202,9 +207,6 @@ jobs:
           )"
           git push --force origin "${COMMIT_SHA}:refs/heads/release"
           rm -rf "${STAGE_DIR}" "${TMP_INDEX}"
-          for f in "${MIRROR_FILES[@]}"; do
-            curl -fsSL "https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@release/${f}" >/dev/null || true
-          done
 
       - name: Update latest build timestamp in README.md
         env:

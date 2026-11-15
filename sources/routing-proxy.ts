@@ -1,8 +1,9 @@
 import type { RoutingSourceEntry } from "./routing-schema.ts";
 
 /**
- * Upstream sources for dist/Proxy.list covering global overseas services,
- * GFW/GreatFire blocked lists, non-CN TLD/geolocation baselines, and Telegram/CDN infrastructure.
+ * Upstream sources for dist/Proxy.list covering global overseas services, overseas streaming media
+ * (including overseas editions of domestic media platforms), GFW/GreatFire blocked lists,
+ * non-CN TLD/geolocation baselines, and Telegram/CDN infrastructure.
  * Compiled Proxy.list also strictly includes 100% of compiled AI.list rules.
  */
 export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
@@ -553,6 +554,271 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://cdn.jsdelivr.net/gh/LM-Firefly/Rules@master/CCC-Global.list",
+      },
+    ],
+  },
+  // Overseas streaming media & overseas editions of domestic streaming platforms
+  {
+    id: "blackmatrix7_globalmedia",
+    name: "blackmatrix7 GlobalMedia Surge ruleset",
+    target: "proxy",
+    lineage: "blackmatrix7",
+    format: "surge_ruleset",
+    weight: 90,
+    core: true,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/blackmatrix7/ios_rule_script",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/GlobalMedia/GlobalMedia.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/GlobalMedia/GlobalMedia.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_proxymedia",
+    name: "ACL4SSR ProxyMedia ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 88,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyMedia.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/ProxyMedia.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_tiktok",
+    name: "ACL4SSR TikTok ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 90,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/TikTok.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/TikTok.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_netflix",
+    name: "ACL4SSR Netflix ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 90,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Netflix.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/Netflix.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_disneyplus",
+    name: "ACL4SSR DisneyPlus ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 90,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/DisneyPlus.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/DisneyPlus.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_bahamut",
+    name: "ACL4SSR Bahamut ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 88,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Bahamut.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/Bahamut.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_abematv",
+    name: "ACL4SSR AbemaTV ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 88,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AbemaTV.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/AbemaTV.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_dmm",
+    name: "ACL4SSR DMM ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 88,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Dmm.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/Dmm.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_mytvsuper",
+    name: "ACL4SSR MyTVSuper ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 88,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/MyTVSuper.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/MyTVSuper.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_viutv",
+    name: "ACL4SSR ViuTV ruleset",
+    target: "proxy",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 88,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ViuTV.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/ViuTV.list",
+      },
+    ],
+  },
+  {
+    id: "repcz_proxymedia",
+    name: "Repcz Tool ProxyMedia Surge ruleset",
+    target: "proxy",
+    lineage: "repcz",
+    format: "surge_ruleset",
+    weight: 88,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/Repcz/Tool",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ProxyMedia.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Surge/Rules/ProxyMedia.list",
+      },
+    ],
+  },
+  {
+    id: "lm_firefly_globalmedia",
+    name: "LM-Firefly GlobalMedia Surge ruleset",
+    target: "proxy",
+    lineage: "lm_firefly",
+    format: "surge_ruleset",
+    weight: 86,
+    core: false,
+    updateCadence: "weekly",
+    license: "MIT",
+    homepage: "https://github.com/LM-Firefly/Rules",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/LM-Firefly/Rules/master/GlobalMedia.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/LM-Firefly/Rules@master/GlobalMedia.list",
       },
     ],
   },

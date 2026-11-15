@@ -13,7 +13,7 @@ import { FORCE_RULESET_ENTRIES } from "./adblock-ruleset.ts";
 import type { AdblockOverridesBundle } from "./adblock-schema.ts";
 import { ASN_OVERRIDES } from "./geoip-asn.ts";
 import { CN_EXCLUSIONS, COUNTRY_OVERRIDES } from "./geoip-country.ts";
-import { AI_FORCE_ENTRIES, SHARED_INFRA_ROOTS } from "./routing-ai.ts";
+import { AI_EXCLUDE_ENTRIES, AI_FORCE_ENTRIES, SHARED_INFRA_ROOTS } from "./routing-ai.ts";
 import { DIRECT_EXCLUDE_ENTRIES, DIRECT_FORCE_ENTRIES } from "./routing-direct.ts";
 import { PROXY_EXCLUDE_ENTRIES, PROXY_FORCE_ENTRIES } from "./routing-proxy.ts";
 import type { RoutingOverridesBundle } from "./routing-schema.ts";
@@ -47,7 +47,7 @@ export const ROUTING_OVERRIDES: RoutingOverridesBundle = {
   schemaVersion: 1,
   sharedInfraRoots: SHARED_INFRA_ROOTS,
   forceEntries: [...AI_FORCE_ENTRIES, ...DIRECT_FORCE_ENTRIES, ...PROXY_FORCE_ENTRIES],
-  excludeEntries: [...DIRECT_EXCLUDE_ENTRIES, ...PROXY_EXCLUDE_ENTRIES],
+  excludeEntries: [...AI_EXCLUDE_ENTRIES, ...DIRECT_EXCLUDE_ENTRIES, ...PROXY_EXCLUDE_ENTRIES],
 };
 
 export * from "./adblock-allowlist.ts";

@@ -1,0 +1,14 @@
+{
+  "name": "surge-rules",
+  "account_id": "199c831f9865b14c47f24f2f8b0c8ce6",
+  "compatibility_date": "2026-04-01",
+  "routes": [
+    {
+      "pattern": "rule-set.ygxz.de",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": "."
+  }
+}
