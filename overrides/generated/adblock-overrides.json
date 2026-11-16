@@ -5660,6 +5660,14 @@
     {
       "pattern": "snssdk.com",
       "rationale": "ByteDance mobile app API root domain enforces TLS certificate pinning"
+    },
+    {
+      "pattern": "*.amemv.com",
+      "rationale": "Douyin (ByteDance) API endpoints enforce TLS certificate pinning; MITM breaks Douyin local services"
+    },
+    {
+      "pattern": "amemv.com",
+      "rationale": "Douyin (ByteDance) API root domain enforces TLS certificate pinning"
     }
   ],
   "mitmAddedHosts": [],
@@ -5687,6 +5695,7 @@
     "\\.snssdk.com/",
     "^https?://is\\.snssdk\\.com/",
     "^https?://is.snssdk.com/",
+    "amemv\\.com",
     "gw\\.alicdn\\.com/mt/",
     "gw\\.alicdn\\.com/tfs/",
     "gw\\.alicdn\\.com/tps/",

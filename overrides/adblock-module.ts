@@ -169,6 +169,15 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
     pattern: "snssdk.com",
     rationale: "ByteDance mobile app API root domain enforces TLS certificate pinning",
   },
+  {
+    pattern: "*.amemv.com",
+    rationale:
+      "Douyin (ByteDance) API endpoints enforce TLS certificate pinning; MITM breaks Douyin local services",
+  },
+  {
+    pattern: "amemv.com",
+    rationale: "Douyin (ByteDance) API root domain enforces TLS certificate pinning",
+  },
 ];
 
 export const MITM_ADDED_HOSTS: readonly MitmHostEntry[] = [];
@@ -202,6 +211,7 @@ export const DISABLED_URL_PATTERNS: readonly string[] = [
   "\\.snssdk.com/",
   "^https?://is\\.snssdk\\.com/",
   "^https?://is.snssdk.com/",
+  "amemv\\.com",
   // Prevent Kelee broad Alibaba CDN image-dimension regexes from breaking Taobao/Alipay UI icons
   "gw\\.alicdn\\.com/mt/",
   "gw\\.alicdn\\.com/tfs/",
