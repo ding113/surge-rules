@@ -617,7 +617,7 @@ hostsVN Overseas Gambling Extension, https://raw.githubusercontent.com/bigdargon
 </details>
 
 <details>
-<summary>GeoIP、ASN 与行政区划元数据数据源（共 115 项）</summary>
+<summary>GeoIP、ASN 与行政区划元数据数据源（共 113 项）</summary>
 
 ```text
 Geofeed Harvester, https://github.com/ipanalytics/GeoFeed-Harvester/releases/latest
@@ -701,8 +701,6 @@ bgp.tools Anycast Prefixes IPv6, https://raw.githubusercontent.com/bgptools/anyc
 Alice39s BGP.Tools-OpenDB VPS & Hosting ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpsh/tags-vpsh.csv
 Alice39s BGP.Tools-OpenDB CDN ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/cdn/tags-cdn.csv
 Alice39s BGP.Tools-OpenDB Anycast ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/anycast/tags-anycast.csv
-Alice39s BGP.Tools-OpenDB Commercial VPN ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpn/tags-vpn.csv
-Alice39s BGP.Tools-OpenDB Tor Provider ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/tor/tags-tor.csv
 Alice39s BGP.Tools-OpenDB Satellite Network ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/satnet/tags-satnet.csv
 Cloudflare Edge IPv4, https://www.cloudflare.com/ips-v4
 Cloudflare Edge IPv6, https://www.cloudflare.com/ips-v6/

@@ -74,8 +74,8 @@ fn catalog_metadata_and_overrides_are_valid_and_complete() {
 
     assert_eq!(
         catalog.sources.len(),
-        104,
-        "expected 104 upstream sources in catalog, got {}",
+        102,
+        "expected 102 upstream sources in catalog, got {}",
         catalog.sources.len()
     );
     for s in &catalog.sources {

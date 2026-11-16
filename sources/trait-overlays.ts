@@ -79,34 +79,10 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
       },
     ],
   },
-  {
-    id: "bgptools_tags_vpn",
-    tier: "trait_overlay",
-    format: "bgptools_tag_csv",
-    lineage: "bgptools_tags",
-    isVpn: true,
-    isAnonymousProxy: true,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpn/tags-vpn.csv",
-      },
-    ],
-  },
-  {
-    id: "bgptools_tags_tor",
-    tier: "trait_overlay",
-    format: "bgptools_tag_csv",
-    lineage: "bgptools_tags",
-    isTorExit: true,
-    isAnonymousProxy: true,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/tor/tags-tor.csv",
-      },
-    ],
-  },
+  // NOTE: bgp.tools `vpn` / `tor` tags are intentionally NOT ingested. They are ASN-wide
+  // "hosts such services" labels (e.g. AS37963/AS45102 Alibaba, Hetzner, OVH), so applying
+  // them to every originated prefix flags whole clouds/ISPs (incl. 223.5.5.5 AliDNS) as
+  // VPN/anonymous-proxy/Tor. Per-IP feeds (x4bnet, josephrocca, Tor exits, OpenProxyDB) cover these traits.
   {
     id: "bgptools_tags_satnet",
     tier: "trait_overlay",
