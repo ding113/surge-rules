@@ -58,7 +58,6 @@
       font-size: 14px;
     }
     a.btn-primary { background: var(--primary); color: var(--primary-fg); }
-    a.btn-secondary { background: var(--secondary); color: var(--text); border: 1px solid var(--border); }
   </style>
 </head>
 <body>
@@ -66,16 +65,12 @@
     <h1>导入 Adblock.sgmodule</h1>
     <p>正在唤起 Surge 安装模块；若未自动跳转，请点击下方按钮手动唤起：</p>
     <div class="actions">
-      <a class="btn btn-primary" id="btn-cf" href="surge:///install-module?url=https%3A%2F%2Frule-set.ygxz.de%2FAdblock.sgmodule">通过 Cloudflare 镜像导入</a>
-      <a class="btn btn-secondary" id="btn-github" href="surge:///install-module?url=https%3A%2F%2Fgithub.com%2Fding113%2Fsurge-rules%2Freleases%2Flatest%2Fdownload%2FAdblock.sgmodule">通过 GitHub 链接导入</a>
+      <a class="btn btn-primary" id="btn-cf" href="surge:///install-module?url=https%3A%2F%2Frule-set.ygxz.de%2FAdblock.sgmodule">导入 Adblock.sgmodule</a>
     </div>
   </main>
   <script>
     (function () {
-      var cf = "https://rule-set.ygxz.de/Adblock.sgmodule";
-      var gh = "https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule";
-      var params = new URLSearchParams(window.location.search);
-      var target = params.get("source") === "github" ? gh : cf;
+      var target = "https://rule-set.ygxz.de/Adblock.sgmodule";
       window.location.replace("surge:///install-module?url=" + encodeURIComponent(target));
     })();
   </script>
