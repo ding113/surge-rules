@@ -3,6 +3,7 @@
 .wrangler
 .cloudflare
 .nojekyll
+README.md
 wrangler.jsonc
 cloudflare.config.ts
 wrangler.config.ts

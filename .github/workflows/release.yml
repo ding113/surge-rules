@@ -40,7 +40,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Verify TypeScript sources, overrides & runtime scripts
+      - name: Verify TypeScript sources, overrides, README & runtime scripts
         run: |
           bun install --frozen-lockfile
           bun run check
@@ -56,12 +56,14 @@ jobs:
         id: meta
         run: |
           UTC_TAG="$(date -u +'%Y%m%d-%H%M')"
+          UTC_ISO="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           UTC_HOUR="$(date -u +'%Y%m%d-%H')"
           UTC_DAY="$(date -u +'%Y%m%d')"
           UTC_TITLE="$(date -u +'%Y-%m-%d %H:%M UTC')"
           CN_TIME="$(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M')"
           {
             echo "tag=release-${UTC_TAG}"
+            echo "utc_iso=${UTC_ISO}"
             echo "hour=${UTC_HOUR}"
             echo "day=${UTC_DAY}"
             echo "title=Surge Rules ${UTC_TITLE}"
@@ -112,7 +114,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          bun run sync:metadata -- --fallback-existing
+          bun run sync:metadata -- --max-cache-age-secs 300 --fallback-existing
           bun run verify:metadata
 
       - name: Run release test suite
@@ -122,7 +124,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUST_LOG: info
-        run: cargo run --release -- geoip build --output dist
+        run: cargo run --release -- geoip build --max-cache-age-secs 300 --output dist
 
       - name: Verify generated MMDB artifacts
         run: cargo run --release -- geoip verify --dir dist
@@ -131,7 +133,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUST_LOG: info
-        run: cargo run --release -- adblock build --output dist
+        run: cargo run --release -- adblock build --max-cache-age-secs 300 --output dist
 
       - name: Verify generated Adblock artifacts
         run: cargo run --release -- adblock verify --dir dist
@@ -140,7 +142,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUST_LOG: info
-        run: cargo run --release -- routing build --output dist
+        run: cargo run --release -- routing build --max-cache-age-secs 300 --output dist
 
       - name: Verify generated Routing artifacts
         run: cargo run --release -- routing verify --dir dist
@@ -206,9 +208,11 @@ jobs:
             done
           fi
 
-      - name: Sync build artifacts to rolling release branch (retain latest 24)
+      - name: Sync build artifacts, badge & metadata to rolling release branch (retain latest 24)
         env:
           RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+          UTC_ISO: ${{ steps.meta.outputs.utc_iso }}
+          UPDATED_AT: ${{ steps.meta.outputs.updated_at }}
         run: |
           STAGE_DIR="$(mktemp -d)"
           TMP_INDEX="$(mktemp)"
@@ -218,9 +222,14 @@ jobs:
           cp cloudflare/.assetsignore "${STAGE_DIR}/.assetsignore"
           cp cloudflare/_headers "${STAGE_DIR}/_headers"
           cp cloudflare/_redirects "${STAGE_DIR}/_redirects"
-          cp scripts/install.html "${STAGE_DIR}/install.html"
-          cp scripts/surge-removeparam.js "${STAGE_DIR}/surge-removeparam.js"
-          cp scripts/surge-adguard.js "${STAGE_DIR}/surge-adguard.js"
+          if [ -n "$(tail -c 1 "${STAGE_DIR}/_redirects")" ]; then
+            printf '\n' >> "${STAGE_DIR}/_redirects"
+          fi
+          for script_file in scripts/*.html scripts/*.js; do
+            if [ -f "${script_file}" ]; then
+              cp "${script_file}" "${STAGE_DIR}/$(basename "${script_file}")"
+            fi
+          done
           MIRROR_FILES=(
             Country-only.mmdb
             Country-cn.mmdb
@@ -241,6 +250,7 @@ jobs:
               cp "dist/${f}" "${STAGE_DIR}/${f}"
             fi
           done
+          STAGE_DIR="${STAGE_DIR}" bun run scripts/build-release-meta.ts
           GIT_INDEX_FILE="${TMP_INDEX}" git --work-tree="${STAGE_DIR}" add --all
           TREE_SHA="$(GIT_INDEX_FILE="${TMP_INDEX}" git write-tree)"
           git fetch --no-tags --filter=blob:none --depth=25 origin refs/heads/release:refs/remotes/origin/release || true
@@ -300,31 +310,3 @@ jobs:
           fi
           git push --force origin "${COMMIT_SHA}:refs/heads/release"
           rm -rf "${STAGE_DIR}" "${TMP_INDEX}"
-
-      - name: Update latest build timestamp in README.md
-        env:
-          UPDATED_AT: ${{ steps.meta.outputs.updated_at }}
-        run: |
-          git checkout -- .
-          git fetch origin main
-          git checkout -B main origin/main
-          python3 -c '
-          import os, pathlib, re
-          p = pathlib.Path("README.md")
-          ts = os.environ["UPDATED_AT"]
-          old = p.read_text(encoding="utf-8")
-          new = re.sub(
-              r"<!-- updated-at -->.*?<!-- /updated-at -->",
-              f"<!-- updated-at -->{ts}<!-- /updated-at -->",
-              old,
-          )
-          if new != old:
-              p.write_text(new, encoding="utf-8")
-          '
-          if ! git diff --quiet -- README.md; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add README.md
-            git commit -m "chore(readme): update build timestamp (${UPDATED_AT}) [skip ci]"
-            git push origin HEAD:refs/heads/main
-          fi

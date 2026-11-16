@@ -7,14 +7,16 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check sources overrides metadata scripts package.json tsconfig.json biome.json",
     "format": "biome format --write sources overrides metadata scripts package.json tsconfig.json biome.json",
-    "build:sources": "bun run sources/build.ts",
+    "build:sources": "bun run sources/build.ts && bun run scripts/build-readme.ts",
     "verify:sources": "bun run sources/build.ts --check",
+    "build:readme": "bun run scripts/build-readme.ts",
+    "verify:readme": "bun run scripts/build-readme.ts --check",
     "build:overrides": "bun run overrides/build.ts",
     "verify:overrides": "bun run overrides/build.ts --check",
     "sync:metadata": "bun run metadata/sync.ts",
     "verify:metadata": "bun run metadata/verify.ts",
     "build:config": "bun run build:sources && bun run build:overrides",
-    "check": "bun run typecheck && bun run lint && bun run verify:sources && bun run verify:overrides && bun run verify:metadata"
+    "check": "bun run typecheck && bun run lint && bun run verify:sources && bun run verify:overrides && bun run verify:metadata && bun run verify:readme"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
