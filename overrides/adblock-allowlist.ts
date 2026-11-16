@@ -2704,6 +2704,13 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     domain: "zhongan.io",
     rationale: "ZhongAn / ZA Tech official international service and asset domain",
   },
+  // pay.ldxp.cn 为正常发卡商店域名，被广告规则误拦截会导致商店页面与下单支付流程无法打开
+  {
+    matchType: "suffix",
+    domain: "pay.ldxp.cn",
+    rationale:
+      "Legitimate digital-goods card shop storefront and checkout; blocking breaks shop pages and order payment",
+  },
 ];
 
 /**

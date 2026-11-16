@@ -4420,6 +4420,11 @@
       "matchType": "suffix",
       "domain": "zhongan.io",
       "rationale": "ZhongAn / ZA Tech official international service and asset domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pay.ldxp.cn",
+      "rationale": "Legitimate digital-goods card shop storefront and checkout; blocking breaks shop pages and order payment"
     }
   ],
   "protectedApexDomains": [
