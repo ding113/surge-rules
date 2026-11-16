@@ -160,6 +160,55 @@ jobs:
             cat dist/routing-notes.md
           } > dist/combined-notes.md
 
+      - name: Mirror all build artifacts, badge & metadata to Cloudflare R2 (latest only)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          R2_ENDPOINT: https://199c831f9865b14c47f24f2f8b0c8ce6.r2.cloudflarestorage.com
+          R2_BUCKET: surge-rules
+          RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+          UTC_ISO: ${{ steps.meta.outputs.utc_iso }}
+          UPDATED_AT: ${{ steps.meta.outputs.updated_at }}
+        run: |
+          if [ -z "${AWS_ACCESS_KEY_ID}" ] || [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then
+            echo "::error::R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY repository secrets are not configured"
+            exit 1
+          fi
+          # updated-at.svg, build-meta.json (public, R2) and README.md (release branch only).
+          mkdir -p dist/release-meta
+          STAGE_DIR=dist/release-meta bun run scripts/build-release-meta.ts
+          r2_put() {
+            echo "Uploading ${2} ($(wc -c < "${1}" | tr -d ' ') bytes) to r2://${R2_BUCKET}/${2}"
+            aws s3 cp "${1}" "s3://${R2_BUCKET}/${2}" \
+              --endpoint-url "${R2_ENDPOINT}" \
+              --content-type "${3}" \
+              --cache-control "${4}" \
+              --only-show-errors
+          }
+          ARTIFACTS=(Country.mmdb Country-only.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Adblock.sgmodule Direct.list AI.list Proxy.list)
+          for f in "${ARTIFACTS[@]}"; do
+            case "${f}" in
+              *.mmdb) r2_put "dist/${f}" "${f}" "application/octet-stream" "public, max-age=3600, stale-while-revalidate=86400" ;;
+              *) r2_put "dist/${f}" "${f}" "text/plain; charset=utf-8" "public, max-age=1800, stale-while-revalidate=86400" ;;
+            esac
+          done
+          # Metadata last, so it never advertises a build whose artifacts are not uploaded yet.
+          NO_CACHE="no-cache, no-store, max-age=0, s-maxage=0, must-revalidate"
+          r2_put dist/release-meta/build-meta.json build-meta.json "application/json; charset=utf-8" "${NO_CACHE}"
+          r2_put dist/release-meta/updated-at.svg updated-at.svg "image/svg+xml; charset=utf-8" "${NO_CACHE}"
+          # Keep only the latest build: drop any object that is not part of this release.
+          EXPECTED=" ${ARTIFACTS[*]} build-meta.json updated-at.svg "
+          aws s3api list-objects-v2 --bucket "${R2_BUCKET}" --endpoint-url "${R2_ENDPOINT}" \
+            --query 'Contents[].Key' --output text | tr '\t' '\n' | while IFS= read -r key; do
+            if [ -n "${key}" ] && [ "${key}" != "None" ] && [[ "${EXPECTED}" != *" ${key} "* ]]; then
+              echo "Deleting stale R2 object: ${key}"
+              aws s3 rm "s3://${R2_BUCKET}/${key}" --endpoint-url "${R2_ENDPOINT}" --only-show-errors
+            fi
+          done
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v3
         with:
@@ -208,11 +257,9 @@ jobs:
             done
           fi
 
-      - name: Sync build artifacts, badge & metadata to rolling release branch (retain latest 24)
+      - name: Sync Cloudflare Worker, static pages & release README to rolling release branch (retain latest 24)
         env:
           RELEASE_TAG: ${{ steps.meta.outputs.tag }}
-          UTC_ISO: ${{ steps.meta.outputs.utc_iso }}
-          UPDATED_AT: ${{ steps.meta.outputs.updated_at }}
         run: |
           STAGE_DIR="$(mktemp -d)"
           TMP_INDEX="$(mktemp)"
@@ -223,35 +270,13 @@ jobs:
           cp cloudflare/.assetsignore "${STAGE_DIR}/.assetsignore"
           cp cloudflare/_headers "${STAGE_DIR}/_headers"
           cp cloudflare/_redirects "${STAGE_DIR}/_redirects"
-          if [ -n "$(tail -c 1 "${STAGE_DIR}/_redirects")" ]; then
-            printf '\n' >> "${STAGE_DIR}/_redirects"
-          fi
           for script_file in scripts/*.html scripts/*.js; do
             if [ -f "${script_file}" ]; then
               cp "${script_file}" "${STAGE_DIR}/$(basename "${script_file}")"
             fi
           done
-          MIRROR_FILES=(
-            Country-only.mmdb
-            Country-cn.mmdb
-            ASN.mmdb
-            Adblock.list
-            Adblock.sgmodule
-            Direct.list
-            AI.list
-            Proxy.list
-          )
-          MAX_ASSET_BYTES=25690112
-          for f in "${MIRROR_FILES[@]}"; do
-            FILE_SIZE="$(wc -c < "dist/${f}" | tr -d ' ')"
-            if [ "${FILE_SIZE}" -gt "${MAX_ASSET_BYTES}" ]; then
-              echo "Asset ${f} (${FILE_SIZE} bytes) exceeds 24.5 MiB static limit; adding 302 redirect to GitHub Release"
-              printf '/%s https://github.com/%s/releases/latest/download/%s 302\n' "${f}" "${GITHUB_REPOSITORY}" "${f}" >> "${STAGE_DIR}/_redirects"
-            else
-              cp "dist/${f}" "${STAGE_DIR}/${f}"
-            fi
-          done
-          STAGE_DIR="${STAGE_DIR}" bun run scripts/build-release-meta.ts
+          # Build artifacts, updated-at.svg and build-meta.json are served from R2, not from this branch.
+          cp dist/release-meta/README.md "${STAGE_DIR}/README.md"
           GIT_INDEX_FILE="${TMP_INDEX}" git --work-tree="${STAGE_DIR}" add --all
           TREE_SHA="$(GIT_INDEX_FILE="${TMP_INDEX}" git write-tree)"
           git fetch --no-tags --filter=blob:none --depth=25 origin refs/heads/release:refs/remotes/origin/release || true
