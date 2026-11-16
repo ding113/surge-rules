@@ -17,6 +17,23 @@ function runSurgeAdguard(body: unknown, argument: string): Record<string, unknow
   return result;
 }
 
+function runSurgeAdguardFull(
+  req: Record<string, unknown> | undefined,
+  resp: Record<string, unknown> | undefined,
+  argument: string,
+): Record<string, unknown> {
+  let result: Record<string, unknown> | undefined;
+  const done = (obj?: Record<string, unknown>) => {
+    result = obj ?? {};
+  };
+  const runner = new Function("$request", "$response", "$argument", "$done", scriptSource);
+  runner(req, resp, argument, done);
+  if (result === undefined) {
+    throw new Error("Script failed to call $done()");
+  }
+  return result;
+}
+
 function encodeArg(ops: unknown): string {
   return `u:${encodeURIComponent(JSON.stringify(ops))}`;
 }
@@ -318,5 +335,147 @@ describe("surge-adguard runtime script", () => {
       // Idempotency invariant
       expect(runSurgeAdguard(first.body, arg)).toEqual({});
     }
+  });
+
+  it("suppresses $cookie in full-header-mode across request Cookie and duplicate response Set-Cookie while honoring @@ exceptions and omitting body", () => {
+    const arg = encodeArg([
+      {
+        op: "cookie",
+        exact: ["__obref", "OParams", "_ga"],
+        regexes: [["^_sp_id", ""]],
+        exc: {
+          "outlook.live.com": ["OParams"],
+          "proton.me": ["*"],
+        },
+      },
+    ]);
+
+    // 1. http-request strips __obref and _sp_id.1234, preserves session & exempted OParams on outlook.live.com
+    const reqOut = runSurgeAdguardFull(
+      {
+        url: "https://outlook.live.com/mail/0/",
+        headers: [
+          { field: "Host", value: "outlook.live.com" },
+          { field: "Cookie", value: "session=abc; __obref=xyz; OParams=keepme; _sp_id.1234=trk" },
+        ],
+      },
+      undefined,
+      arg,
+    );
+    expect(reqOut).toEqual({
+      headers: [
+        { field: "Host", value: "outlook.live.com" },
+        { field: "Cookie", value: "session=abc; OParams=keepme" },
+      ],
+    });
+    expect("body" in reqOut).toBe(false);
+
+    // 2. http-response without requires-body (body: undefined) preserves multiple benign Set-Cookie entries and never emits body
+    const respOut = runSurgeAdguardFull(
+      { url: "https://news.example.com/article", headers: [] },
+      {
+        status: 200,
+        headers: [
+          { field: "Set-Cookie", value: "sid=s1; Path=/; HttpOnly" },
+          { field: "Set-Cookie", value: "_ga=GA1.2.999; Path=/" },
+          { field: "Set-Cookie", value: "csrf=c2; Path=/; Secure" },
+          { field: "Set-Cookie", value: "_sp_id.abcd=tracker; Path=/" },
+        ],
+      },
+      arg,
+    );
+    expect(respOut).toEqual({
+      headers: [
+        { field: "Set-Cookie", value: "sid=s1; Path=/; HttpOnly" },
+        { field: "Set-Cookie", value: "csrf=c2; Path=/; Secure" },
+      ],
+    });
+    expect("body" in respOut).toBe(false);
+
+    // 3. Wildcard @@||proton.me^$cookie exempts all cookies on proton.me
+    const protonOut = runSurgeAdguardFull(
+      { url: "https://mail.proton.me/u/0/inbox", headers: [] },
+      {
+        status: 200,
+        headers: [{ field: "Set-Cookie", value: "_ga=123; Path=/" }],
+      },
+      arg,
+    );
+    expect(protonOut).toEqual({});
+  });
+
+  it("appends $csp and $permissions only on HTML documents without overwriting existing headers and respects URL/host exceptions", () => {
+    const arg = encodeArg([
+      {
+        op: "csp",
+        policies: ["script-src 'self'"],
+        hosts: ["news.example.com"],
+        exc: { "^https?://news\\.example\\.com/embed/": ["*"] },
+      },
+      {
+        op: "permissions",
+        policies: ["browsing-topics=()", "private-state-token-redemption=()"],
+        exc: {
+          "^https?://(?:[^/@]+\\.)?shopify\\.com/authentication/": [
+            "private-state-token-redemption=()",
+          ],
+        },
+      },
+    ]);
+
+    // HTML document on news.example.com gets appended CSP + Permissions-Policy while keeping existing CSP
+    const htmlOut = runSurgeAdguardFull(
+      {
+        url: "https://news.example.com/story",
+        headers: [{ field: "Sec-Fetch-Dest", value: "document" }],
+      },
+      {
+        status: 200,
+        headers: [
+          { field: "Content-Type", value: "text/html; charset=utf-8" },
+          { field: "Content-Security-Policy", value: "upgrade-insecure-requests" },
+        ],
+      },
+      arg,
+    );
+    expect(htmlOut).toEqual({
+      headers: [
+        { field: "Content-Type", value: "text/html; charset=utf-8" },
+        { field: "Content-Security-Policy", value: "upgrade-insecure-requests" },
+        { field: "Content-Security-Policy", value: "script-src 'self'" },
+        {
+          field: "Permissions-Policy",
+          value: "browsing-topics=(), private-state-token-redemption=()",
+        },
+      ],
+    });
+    expect("body" in htmlOut).toBe(false);
+
+    // Shopify authentication path exempts private-state-token-redemption=() while keeping browsing-topics=()
+    const shopifyOut = runSurgeAdguardFull(
+      { url: "https://shopify.com/authentication/login", headers: [] },
+      {
+        status: 200,
+        headers: [{ field: "Content-Type", value: "text/html" }],
+      },
+      arg,
+    );
+    expect(shopifyOut).toEqual({
+      headers: [
+        { field: "Content-Type", value: "text/html" },
+        { field: "Permissions-Policy", value: "browsing-topics=()" },
+      ],
+    });
+
+    // Non-HTML JSON API response is never touched by $csp / $permissions
+    const jsonOut = runSurgeAdguardFull(
+      { url: "https://news.example.com/api/v1/feed", headers: [] },
+      {
+        status: 200,
+        headers: [{ field: "Content-Type", value: "application/json" }],
+      },
+      arg,
+    );
+    expect(jsonOut).toEqual({});
   });
 });

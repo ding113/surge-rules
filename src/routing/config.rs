@@ -46,6 +46,8 @@ impl fmt::Display for RoutingTarget {
 pub enum RoutingSourceFormat {
     SurgeRuleset,
     DomainSet,
+    AbpFilter,
+    Hosts,
     ClashClassical,
     ClashYaml,
     Geosite,

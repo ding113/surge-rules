@@ -27,7 +27,12 @@ pub fn parse_domain_set(text: &str, out: &mut ParsedRoutingSource) {
         if cleaned.is_empty() {
             continue;
         }
-        if let Some(rest) = cleaned.strip_prefix("+.") {
+        if let Some(rest) = cleaned.strip_prefix("||") {
+            let inner = rest.strip_suffix('^').unwrap_or(rest);
+            if !inner.contains(['/', '$', '*', '?']) {
+                out.push_normalized(RoutingRuleKind::DomainSuffix, inner, false);
+            }
+        } else if let Some(rest) = cleaned.strip_prefix("+.") {
             out.push_normalized(RoutingRuleKind::DomainSuffix, rest, false);
         } else if let Some(rest) = cleaned.strip_prefix('.') {
             out.push_normalized(RoutingRuleKind::DomainSuffix, rest, false);
@@ -35,6 +40,108 @@ pub fn parse_domain_set(text: &str, out: &mut ParsedRoutingSource) {
             out.push_normalized(RoutingRuleKind::DomainWildcard, cleaned, false);
         } else {
             out.push_normalized(RoutingRuleKind::Domain, cleaned, false);
+        }
+    }
+}
+
+pub fn parse_abp_routing(text: &str, out: &mut ParsedRoutingSource) {
+    let mut badfiltered: rustc_hash::FxHashSet<String> = rustc_hash::FxHashSet::default();
+    let mut lines_buf: Vec<&str> = Vec::new();
+
+    for raw_line in text.lines() {
+        let line = raw_line.trim_start_matches('\u{feff}').trim();
+        if line.is_empty()
+            || line.starts_with('!')
+            || line.starts_with('#')
+            || line.starts_with('[')
+            || line.starts_with("@@")
+            || crate::adblock::parsers::abp::contains_cosmetic_or_scriptlet_syntax(line)
+        {
+            continue;
+        }
+        if let Some(stripped) = line.strip_suffix("$badfilter") {
+            badfiltered.insert(stripped.to_ascii_lowercase());
+            continue;
+        }
+        if let Some(stripped) = line.strip_suffix(",badfilter") {
+            badfiltered.insert(stripped.to_ascii_lowercase());
+            continue;
+        }
+        lines_buf.push(line);
+    }
+
+    for line in lines_buf {
+        if badfiltered.contains(&line.to_ascii_lowercase()) {
+            continue;
+        }
+        let pat = match line.split_once('$') {
+            Some((p, mods)) => {
+                // Skip context-scoped ABP rules (`domain=`, `image`, `script`, etc.)
+                let m_lower = mods.to_ascii_lowercase();
+                if !matches!(
+                    m_lower.as_str(),
+                    "" | "important" | "all" | "doc" | "document"
+                ) {
+                    continue;
+                }
+                p
+            }
+            None => line,
+        };
+        let Some(after) = pat.strip_prefix("||") else {
+            continue;
+        };
+        let inner = after.strip_suffix('^').unwrap_or(after);
+        if inner.contains(['/', '?', ':', '|', '$']) {
+            continue;
+        }
+        if inner.contains('*') && !inner.starts_with("*.") {
+            out.push_normalized(RoutingRuleKind::DomainWildcard, inner, false);
+        } else {
+            let clean = inner.strip_prefix("*.").unwrap_or(inner);
+            out.push_normalized(RoutingRuleKind::DomainSuffix, clean, false);
+        }
+    }
+}
+
+pub fn parse_hosts_routing(text: &str, out: &mut ParsedRoutingSource) {
+    for raw_line in text.lines() {
+        let line = strip_inline_comment(raw_line.trim_start_matches('\u{feff}')).trim();
+        if is_comment_or_empty(line) {
+            continue;
+        }
+        let mut parts = line.split_whitespace();
+        let Some(first) = parts.next() else {
+            continue;
+        };
+        if matches!(
+            first,
+            "0.0.0.0" | "127.0.0.1" | "::1" | "::" | "0:0:0:0:0:0:0:0"
+        ) {
+            for host in parts {
+                let h = host.trim().trim_end_matches('.').to_ascii_lowercase();
+                if matches!(
+                    h.as_str(),
+                    "" | "0.0.0.0"
+                        | "127.0.0.1"
+                        | "localhost"
+                        | "localhost.localdomain"
+                        | "local"
+                        | "broadcasthost"
+                        | "ip6-localhost"
+                        | "ip6-loopback"
+                        | "ip6-localnet"
+                        | "ip6-mcastprefix"
+                        | "ip6-allnodes"
+                        | "ip6-allrouters"
+                        | "ip6-allhosts"
+                ) {
+                    continue;
+                }
+                out.push_normalized(RoutingRuleKind::Domain, &h, false);
+            }
+        } else if !first.contains(':') && first.contains('.') {
+            out.push_normalized(RoutingRuleKind::Domain, first, false);
         }
     }
 }

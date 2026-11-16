@@ -88,7 +88,7 @@ fmz200 Wool Scripts BlockAds Module, https://raw.githubusercontent.com/fmz200/wo
 </details>
 
 <details>
-<summary>去广告与隐私安全拦截数据源（共 126 项）</summary>
+<summary>去广告与隐私安全拦截数据源（共 149 项）</summary>
 
 ```text
 AdGuard Mobile Ads Filter (CoreLibs), https://filters.adtidy.org/windows/filters/11.txt
@@ -141,7 +141,7 @@ mieqq In-App Tracker Ruleset, https://raw.githubusercontent.com/mieqq/mieqq/mast
 Hackl0us Video Ad Ruleset, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Custom/video-ad.list
 8680 GOODBYEADS Adblock Filter, https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/adblock.txt
 8680 GOODBYEADS DNS Blocklist, https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/dns.txt
-217heidai AdBlock Surge Lite, https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblocksurgelite.list
+217heidai AdBlock Surge Full, https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblocksurge.list
 Cats-Team AdRules Surge DomainSet, https://raw.githubusercontent.com/Cats-Team/AdRules/main/adrules_surge_domainset.txt
 Cats-Team / damengzhu jiekouAD Filter, https://raw.githubusercontent.com/Cats-Team/AdRules/main/rules/jiekouAD.txt
 anti-AD Surge Ruleset, https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt
@@ -156,11 +156,12 @@ geekdada Surge Ads List, https://raw.githubusercontent.com/geekdada/surge-list/m
 Yuki2718 Japanese Filters Plus, https://raw.githubusercontent.com/Yuki2718/adblock2/main/japanese/jpf-plus.txt
 Yuki2718 Japanese Filters Plus (AdGuard Modifiers), https://raw.githubusercontent.com/Yuki2718/adblock2/main/japanese/jpfp-ag.txt
 YousList Korean Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_15.txt
-HaGeZi Multi Pro++ DNS Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt
+HaGeZi Multi ULTIMATE DNS Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/ultimate.txt
 HaGeZi Anti-Pop-Up Ads Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt
 HaGeZi Fake Stores & Scam Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/fake.txt
 HaGeZi Badware Hoster Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/hoster.txt
-HaGeZi Threat Intelligence Feeds (Mini), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/tif.mini-onlydomains.txt
+HaGeZi Threat Intelligence Feeds (Full), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt
+HaGeZi Native Referral Tracker Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/blocklist-referral-native.txt
 HaGeZi Native Tracker Blocklist (Apple), https://adguardteam.github.io/HostlistsRegistry/assets/filter_67.txt
 HaGeZi Native Tracker Blocklist (Xiaomi), https://adguardteam.github.io/HostlistsRegistry/assets/filter_60.txt
 HaGeZi Native Tracker Blocklist (Huawei), https://adguardteam.github.io/HostlistsRegistry/assets/filter_73.txt
@@ -168,12 +169,20 @@ HaGeZi Native Tracker Blocklist (OPPO & Realme), https://adguardteam.github.io/H
 HaGeZi Native Tracker Blocklist (vivo), https://adguardteam.github.io/HostlistsRegistry/assets/filter_65.txt
 HaGeZi Native Tracker Blocklist (Samsung), https://adguardteam.github.io/HostlistsRegistry/assets/filter_61.txt
 HaGeZi Native Tracker Blocklist (Windows & Office), https://adguardteam.github.io/HostlistsRegistry/assets/filter_63.txt
-HaGeZi Native Tracker Blocklist (TikTok), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.txt
+HaGeZi Native Tracker Blocklist (TikTok Extended), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.extended.txt
 HaGeZi Native Tracker Blocklist (Amazon), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.amazon.txt
 HaGeZi Native Tracker Blocklist (LG webOS), https://adguardteam.github.io/HostlistsRegistry/assets/filter_72.txt
 HaGeZi Native Tracker Blocklist (Roku), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.roku.txt
-OISD Blocklist Big, https://big.oisd.nl/
-1Hosts (Lite), https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/adblock.txt
+OISD Blocklist Big, https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt
+1Hosts (Xtra), https://raw.githubusercontent.com/badmojr/1Hosts/master/Xtra/adblock.txt
+Developer Dan's Ads & Tracking Extended, https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt
+hBlock Unified Ad · Tracking & Malware Domains, https://hblock.molinero.dev/hosts_domains.txt
+NEO DEV HOST Adblocker, https://raw.githubusercontent.com/neodevpro/neodevhost/master/adblocker
+WindowsSpyBlocker Extra Telemetry Hosts, https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/extra.txt
+Frogeye First-Party Trackers Hosts, https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt
+Frogeye Multi-Party Trackers Hosts, https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt
+Quidsup NoTrack Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-blocklist.txt
+Quidsup NoTrack Malware Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-malware.txt
 Disconnect Simple Ad Filter List, https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
 Disconnect Simple Malvertising List, https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt
 wBlock Ad and Tracking Hosts, https://raw.githubusercontent.com/0xCUB3/wBlock/main/filters/ad-tracking-hosts.txt
@@ -209,11 +218,25 @@ Dandelion Sprout Anti-Malware List, https://adguardteam.github.io/HostlistsRegis
 mitchellkrogza Hacked Malware Web Sites, https://adguardteam.github.io/HostlistsRegistry/assets/filter_9.txt
 abuse.ch URLHaus Malicious URL Blocklist, https://malware-filter.gitlab.io/malware-filter/urlhaus-filter-agh-online.txt
 PhishTank & OpenPhish Phishing URL Blocklist, https://malware-filter.gitlab.io/malware-filter/phishing-filter-agh.txt
-Phishing Army Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_18.txt
+Phishing Army Extended Blocklist, https://phishing.army/download/phishing_army_blocklist_extended.txt
 CERT Polska Malicious & Phishing Domains, https://adguardteam.github.io/HostlistsRegistry/assets/filter_41.txt
 PhishDestroy Content-Verified Active Phishing Blocklist, https://raw.githubusercontent.com/phishdestroy/destroylist/main/dns/content_active.txt
 PhishIndex Malicious Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/Malicious%20Domains/adblock/phishindex_domains-adblock.txt
 PhishIndex IP Logger Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt
+The Block List Project Ads, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/ads-ags.txt
+The Block List Project Tracking, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/tracking-ags.txt
+The Block List Project Malware, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/malware-ags.txt
+The Block List Project Phishing, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/phishing-ags.txt
+The Block List Project Abuse, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/abuse-ags.txt
+The Block List Project Fraud, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/fraud-ags.txt
+PersianBlocker Regional Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_19.txt
+Macedonian Pi-hole Adblock List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_20.txt
+turk-adlist Turkish DNS Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_26.txt
+Hufilter Hungarian Adblock List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_35.txt
+EasyList Lithuania DNS Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_36.txt
+Turkish Ad Hosts Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_40.txt
+EasyList Hebrew DNS Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_43.txt
+Ukrainian Security & Phishing Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_62.txt
 The Block List Project Ransomware, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/ransomware-ags.txt
 The Block List Project Scam, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/scam-ags.txt
 zachlagden Custom Malicious Domains, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/malicious.txt
@@ -222,7 +245,7 @@ zachlagden Custom Malicious Domains, https://raw.githubusercontent.com/zachlagde
 </details>
 
 <details>
-<summary>去广告防误伤白名单数据源（共 60 项）</summary>
+<summary>去广告防误伤白名单数据源（共 75 项）</summary>
 
 ```text
 uBlock Origin Unbreak Allowlist, https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt
@@ -269,6 +292,21 @@ zachlagden Pi-hole Optimized Whitelist, https://raw.githubusercontent.com/zachla
 1Hosts Global Exclusion Allowlist, https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_all.txt
 1Hosts Mini & Lite Exclusion Allowlist, https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_mini_Lite_only.txt
 anudeepND Curated Domain Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt
+anudeepND Commonly Broken Optional Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/optional-list.txt
+anudeepND Referral & Link Unbreak Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/referral-sites.txt
+anti-AD Official Domain Whitelist, https://raw.githubusercontent.com/privacy-protection-tools/dead-horse/master/anti-ad-white-list.txt
+NEO DEV HOST Official Allowlist, https://raw.githubusercontent.com/neodevpro/neodevhost/master/allow
+VeleSila yhosts Official Whitelist, https://raw.githubusercontent.com/VeleSila/yhosts/master/whitelist.txt
+ShadowWhisperer Curated Whitelist, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist
+Ultimate Hosts Blacklist Official Whitelist, https://raw.githubusercontent.com/Ultimate-Hosts-Blacklist/whitelist/master/domains.list
+NoTracking Curated Hostnames Whitelist, https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt
+DNSlock Pi-hole Curated Whitelist, https://raw.githubusercontent.com/raghavdua1995/DNSlock-PiHole-whitelist/master/whitelist.list
+hg1978 AdGuard Home False-Positive Whitelist, https://raw.githubusercontent.com/hg1978/AdGuard-Home-Whitelist/master/whitelist.txt
+DevShubam DNS False-Positive Whitelist, https://raw.githubusercontent.com/DevShubam/Whitelist/master/whitelist.txt
+Dandelion Sprout Nordic Domains Allowlist, https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersDomainsAllowlist.txt
+EasyList Fanboy Social Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_social_allowlist.txt
+EasyList Fanboy Notifications Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_notifications_allowlist.txt
+EasyList Fanboy Newsletter Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_newsletter_allowlist.txt
 SystemJargon DNS Allowlist, https://raw.githubusercontent.com/SystemJargon/filters/main/allowlist.txt
 Ealenn AdGuard Home Service Allowlist, https://raw.githubusercontent.com/Ealenn/AdGuard-Home-List/master/allowlist/concat/allowlist.external.adguard.list
 BadBlock Apple Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/apple_whitelist.txt
@@ -381,7 +419,7 @@ qianchongyang OpenClash AI Rules, https://raw.githubusercontent.com/qianchongyan
 </details>
 
 <details>
-<summary>境外代理与流媒体数据源（Proxy.list）（共 37 项）</summary>
+<summary>境外代理与流媒体数据源（Proxy.list）（共 60 项）</summary>
 
 ```text
 Loyalsoldier surge-rules proxy ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/proxy.txt
@@ -421,6 +459,29 @@ ACL4SSR MyTVSuper ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/mas
 ACL4SSR ViuTV ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ViuTV.list
 Repcz Tool ProxyMedia Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ProxyMedia.list
 LM-Firefly GlobalMedia Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/GlobalMedia.list
+HaGeZi Encrypted DNS · VPN · TOR · Proxy Endpoints, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/doh-vpn-proxy-bypass.txt
+ShadowWhisperer VPN · Proxy & Tunnel Domains, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Tunnels
+The Block List Project Proxy & Redirectors, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/redirect-ags.txt
+HaGeZi Global Social Networks Inventory, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/social.txt
+NoGoogle Exhaustive Google Ecosystem Domains, https://adguardteam.github.io/HostlistsRegistry/assets/filter_37.txt
+Developer Dan Facebook & Meta Extended Domains, https://www.github.developerdan.com/hosts/lists/facebook-extended.txt
+anudeepND Facebook & Meta Domains, https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt
+StevenBlack Social Media Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/social-only/hosts
+The Block List Project Facebook & Instagram, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/facebook-ags.txt
+The Block List Project Twitter / X, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/twitter-ags.txt
+The Block List Project YouTube, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/youtube-ags.txt
+The Block List Project TikTok International, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/tiktok-ags.txt
+MetaCubeX Geosite Discord, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/discord.list
+The Block List Project WhatsApp, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/whatsapp-ags.txt
+MetaCubeX Geosite Twitch, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitch.list
+HaGeZi NSFW & Adult Platforms, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/nsfw.txt
+ShadowWhisperer Overseas Dating Platforms, https://adguardteam.github.io/HostlistsRegistry/assets/filter_57.txt
+StevenBlack Adult Media Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn-only/hosts
+StevenBlack Overseas Gambling Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling-only/hosts
+HaGeZi Overseas Gambling Platforms (Medium), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.medium.txt
+HaGeZi Anti-Piracy · Sci-Hub · LibGen · DDL & Streaming Mirrors, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/anti.piracy.txt
+The Block List Project Piracy & Mirrors, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/piracy-ags.txt
+The Block List Project BitTorrent & Trackers, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/torrent-ags.txt
 ```
 
 </details>

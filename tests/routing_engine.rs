@@ -1106,3 +1106,70 @@ proptest! {
         }
     }
 }
+
+#[test]
+fn non_adblock_abp_and_hosts_lists_route_to_proxy_while_protecting_direct_cn() {
+    let direct_cfg = dummy_source_cfg(
+        "direct_cn",
+        RoutingTarget::Direct,
+        "cn_core",
+        RoutingSourceFormat::SurgeRuleset,
+        None,
+        95,
+    );
+    let proxy_abp_cfg = dummy_source_cfg(
+        "hagezi_doh_proxy",
+        RoutingTarget::Proxy,
+        "hagezi_bypass",
+        RoutingSourceFormat::AbpFilter,
+        None,
+        85,
+    );
+    let proxy_hosts_cfg = dummy_source_cfg(
+        "social_hosts",
+        RoutingTarget::Proxy,
+        "stevenblack_social",
+        RoutingSourceFormat::Hosts,
+        None,
+        85,
+    );
+
+    let d_src = parse_routing_source(
+        b"DOMAIN-SUFFIX,alidns.com\nDOMAIN-SUFFIX,douyin.com\nIP-CIDR,223.5.5.5/32,no-resolve\n",
+        &direct_cfg,
+    )
+    .unwrap();
+    let p_abp = parse_routing_source(
+        b"||dns.google^\n||cloudflare-dns.com^\n||dns.alidns.com^\n||doh.360.cn^\n||doubleclick.net^\n",
+        &proxy_abp_cfg,
+    )
+    .unwrap();
+    let p_hosts = parse_routing_source(
+        b"0.0.0.0 www.facebook.com graph.facebook.com\n0.0.0.0 open.douyin.com\n0.0.0.0 exoclick.com\n",
+        &proxy_hosts_cfg,
+    )
+    .unwrap();
+
+    let compiled = compile_routing(
+        &[d_src, p_abp, p_hosts],
+        &RoutingOverrides::empty(),
+        &AdblockOverrides::empty(),
+        RoutingSourceCounts::default(),
+    );
+
+    // Overseas DoH & social hosts route to Proxy
+    assert!(compiled.proxy_text.contains("DOMAIN-SUFFIX,dns.google"));
+    assert!(
+        compiled
+            .proxy_text
+            .contains("DOMAIN-SUFFIX,cloudflare-dns.com")
+    );
+    assert!(compiled.proxy_text.contains("DOMAIN,www.facebook.com"));
+    // Domestic `.cn` and Direct-ancestor children (`dns.alidns.com`, `open.douyin.com`) NEVER leak into Proxy
+    assert!(!compiled.proxy_text.contains("alidns.com"));
+    assert!(!compiled.proxy_text.contains("360.cn"));
+    assert!(!compiled.proxy_text.contains("douyin.com"));
+    // Pure ad networks stripped from Proxy
+    assert!(!compiled.proxy_text.contains("doubleclick.net"));
+    assert!(!compiled.proxy_text.contains("exoclick.com"));
+}

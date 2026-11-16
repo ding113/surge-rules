@@ -5,8 +5,9 @@ use crate::adblock::config::{AdblockSourceConfig, AdblockSourceRole};
 use crate::adblock::jq_transpile::transpile_jsonprune_to_jq;
 use crate::adblock::model::{
     AdguardTransformOp, AdguardTransformRule, BodyRewriteKind, BodyRewriteRule, HeaderAction,
-    HeaderDirection, HeaderRewriteRule, MapLocalDataType, MapLocalRule, ParsedAdblockSource,
-    RemoveParamRule, UrlRewriteMode, UrlRewriteRule,
+    HeaderDirection, HeaderModException, HeaderModKind, HeaderModRule, HeaderRewriteRule,
+    MapLocalDataType, MapLocalRule, ParsedAdblockSource, RemoveParamRule, UrlRewriteMode,
+    UrlRewriteRule,
 };
 use crate::adblock::regex_util::{
     abp_surgical_pattern_to_surge_regex, abp_url_pattern_to_surge_regex, extract_hosts_from_regex,
@@ -97,6 +98,7 @@ pub fn parse_abp(text: &str, src: &AdblockSourceConfig, out: &mut ParsedAdblockS
     for line in candidate_lines {
         if let Some(exc) = line.strip_prefix("@@") {
             parse_removeparam_exception(exc, out);
+            parse_header_mod_exception(exc, out);
             if src.role == AdblockSourceRole::Allowlist || is_whole_domain_exception(exc) {
                 parse_exception_line(exc, out);
             }
@@ -210,6 +212,7 @@ fn starts_with_known_abp_modifier(suffix: &str) -> bool {
     let s = suffix.trim_start().trim_start_matches('~');
     const PREFIXES: &[&str] = &[
         "removeparam",
+        "cookie",
         "jsonprune=",
         "replace=",
         "hls=",
@@ -405,6 +408,10 @@ fn parse_exception_line(exc: &str, out: &mut ParsedAdblockSource) {
         let mod_tokens = split_abp_modifiers(mods);
         for m in &mod_tokens {
             if m.starts_with("removeparam")
+                || m.starts_with("cookie")
+                || m.starts_with("csp")
+                || m.starts_with("permissions")
+                || m.starts_with("removeheader")
                 || m.starts_with("redirect")
                 || m.starts_with("replace=")
                 || m.starts_with("jsonprune=")
@@ -461,7 +468,11 @@ fn extract_domain_option(mods: &[&str]) -> DomainOption {
                 }
                 if let Some(stripped) = item.strip_prefix('~') {
                     let dom = stripped.trim_end_matches('.').to_ascii_lowercase();
-                    if is_valid_domain(&dom) {
+                    if matches!(
+                        dom.as_str(),
+                        "localhost" | "local" | "127.0.0.1" | "0.0.0.0" | "[::1]" | "[::]"
+                    ) || is_valid_domain(&dom)
+                    {
                         neg.push(dom);
                     } else {
                         return DomainOption::HasNegative(Vec::new());
@@ -521,11 +532,9 @@ fn parse_complex_network_modifiers(
 
     let mod_tokens = split_abp_modifiers(mods);
 
-    // Skip client-app/CSP/popup/denyallow rules that have no direct Surge equivalent
+    // Skip client-app/popup/denyallow/stealth rules that have no direct Surge equivalent
     for m in &mod_tokens {
         if m.starts_with("app=")
-            || m.starts_with("csp=")
-            || m.starts_with("permissions=")
             || m.starts_with("denyallow=")
             || m.starts_with("header=")
             || m.starts_with("urltransform=")
@@ -538,6 +547,9 @@ fn parse_complex_network_modifiers(
     }
 
     let is_complex_first = src.role == AdblockSourceRole::ComplexFirst;
+    let is_third_party_only = mod_tokens
+        .iter()
+        .any(|t| matches!(*t, "third-party" | "3p" | "~first-party" | "~1p"));
     let domain_opt = extract_domain_option(&mod_tokens);
     let has_any_domain_scope = !matches!(domain_opt, DomainOption::None);
     let positive_domains: Option<&[String]> = match &domain_opt {
@@ -741,6 +753,98 @@ fn parse_complex_network_modifiers(
                     out.header_rewrites.push(rule);
                 } else {
                     out.fallback_header_rewrites.push(rule);
+                }
+            }
+        } else if *m == "cookie" {
+            handled = true;
+            if !has_negative_domains && !is_third_party_only {
+                emit_header_mod_rules(
+                    HeaderModKind::Cookie,
+                    pat,
+                    positive_domains,
+                    "*".to_string(),
+                    false,
+                    src.weight,
+                    out,
+                );
+            }
+        } else if let Some(cookie_spec) = m.strip_prefix("cookie=") {
+            handled = true;
+            if let Some(tok) = parse_cookie_spec_token(cookie_spec) {
+                if let DomainOption::HasNegative(ref negs) = domain_opt {
+                    for nd in negs {
+                        out.header_mod_exceptions.push(HeaderModException {
+                            kind: HeaderModKind::Cookie,
+                            scope_key: nd.clone(),
+                            spec: tok.clone(),
+                        });
+                    }
+                } else if !is_dangerous_session_or_waf_cookie(&tok) {
+                    emit_header_mod_rules(
+                        HeaderModKind::Cookie,
+                        pat,
+                        if is_third_party_only {
+                            None
+                        } else {
+                            positive_domains
+                        },
+                        tok,
+                        !is_third_party_only,
+                        src.weight,
+                        out,
+                    );
+                }
+            }
+        } else if let Some(csp_spec) = m.strip_prefix("csp=") {
+            handled = true;
+            if !has_negative_domains && let Some(policy) = parse_csp_policy_spec(csp_spec) {
+                emit_header_mod_rules(
+                    HeaderModKind::Csp,
+                    pat,
+                    positive_domains,
+                    policy,
+                    false,
+                    src.weight,
+                    out,
+                );
+            }
+        } else if let Some(perm_spec) = m.strip_prefix("permissions=") {
+            handled = true;
+            if let Some(policy) = parse_permissions_policy_spec(perm_spec) {
+                if let DomainOption::HasNegative(ref negs) = domain_opt {
+                    // uBlock Origin uses `*$permissions=...,from=~localhost|~127.0.0.1|~local`:
+                    // when all negative entries are loopback/local, treat as global while exempting any real domains!
+                    let mut real_neg_domains = Vec::new();
+                    for nd in negs {
+                        if !matches!(nd.as_str(), "localhost" | "local" | "127.0.0.1") {
+                            real_neg_domains.push(nd.clone());
+                        }
+                    }
+                    for nd in &real_neg_domains {
+                        out.header_mod_exceptions.push(HeaderModException {
+                            kind: HeaderModKind::Permissions,
+                            scope_key: nd.clone(),
+                            spec: policy.clone(),
+                        });
+                    }
+                    if matches!(pat, "" | "*" | "*^" | "/.*/") {
+                        out.header_mods.push(HeaderModRule {
+                            kind: HeaderModKind::Permissions,
+                            host_scope: "*".to_string(),
+                            spec: policy,
+                            weight: src.weight,
+                        });
+                    }
+                } else {
+                    emit_header_mod_rules(
+                        HeaderModKind::Permissions,
+                        pat,
+                        positive_domains,
+                        policy,
+                        true,
+                        src.weight,
+                        out,
+                    );
                 }
             }
         }
@@ -1248,4 +1352,239 @@ fn parse_runtime_replace_spec(spec: &str) -> Option<(String, String, String)> {
         }
     }
     Some((pat, rep, flags))
+}
+
+fn parse_header_mod_exception(exc: &str, out: &mut ParsedAdblockSource) {
+    let Some((pat, mods)) = split_pattern_and_modifiers(exc) else {
+        return;
+    };
+    let mod_tokens = split_abp_modifiers(mods);
+    let mut actions: Vec<(HeaderModKind, String)> = Vec::new();
+    let mut rmhdr_actions: Vec<(HeaderDirection, String)> = Vec::new();
+
+    for m in &mod_tokens {
+        if *m == "cookie" {
+            actions.push((HeaderModKind::Cookie, "*".to_string()));
+        } else if let Some(spec) = m.strip_prefix("cookie=") {
+            if let Some(tok) = parse_cookie_spec_token(spec) {
+                actions.push((HeaderModKind::Cookie, tok));
+            }
+        } else if *m == "csp" {
+            actions.push((HeaderModKind::Csp, "*".to_string()));
+        } else if let Some(spec) = m.strip_prefix("csp=") {
+            if let Some(pol) = parse_csp_policy_spec(spec) {
+                actions.push((HeaderModKind::Csp, pol));
+            }
+        } else if *m == "permissions" {
+            actions.push((HeaderModKind::Permissions, "*".to_string()));
+        } else if let Some(spec) = m.strip_prefix("permissions=") {
+            if let Some(pol) = parse_permissions_policy_spec_allow_all(spec) {
+                actions.push((HeaderModKind::Permissions, pol));
+            }
+        } else if let Some(spec) = m.strip_prefix("removeheader=") {
+            if let Some((dir, field)) = parse_removeheader_spec(spec) {
+                rmhdr_actions.push((dir, field.to_ascii_lowercase()));
+            }
+        } else if matches!(*m, "document" | "doc" | "urlblock") && mod_tokens.len() == 1 {
+            // Whole-document exception disables header modifiers on that host/path as well
+            actions.push((HeaderModKind::Cookie, "*".to_string()));
+            actions.push((HeaderModKind::Csp, "*".to_string()));
+            actions.push((HeaderModKind::Permissions, "*".to_string()));
+        }
+    }
+
+    if actions.is_empty() && rmhdr_actions.is_empty() {
+        return;
+    }
+
+    let domain_opt = extract_domain_option(&mod_tokens);
+    let mut scope_keys: Vec<String> = Vec::new();
+    if let Some(dom) = extract_exact_abp_domain(pat) {
+        scope_keys.push(dom);
+    } else if pat.contains('/')
+        && let Some((regex, _)) = abp_url_pattern_to_surge_regex(pat)
+    {
+        scope_keys.push(regex);
+    } else if let DomainOption::Positive(doms) = domain_opt {
+        scope_keys.extend(doms);
+    }
+
+    for scope in &scope_keys {
+        for (kind, spec) in &actions {
+            out.header_mod_exceptions.push(HeaderModException {
+                kind: *kind,
+                scope_key: scope.clone(),
+                spec: spec.clone(),
+            });
+        }
+        for (dir, field) in &rmhdr_actions {
+            out.removeheader_exceptions
+                .push((*dir, scope.clone(), field.clone()));
+        }
+    }
+}
+
+fn emit_header_mod_rules(
+    kind: HeaderModKind,
+    pat: &str,
+    domain_scopes: Option<&[String]>,
+    spec: String,
+    allow_global: bool,
+    weight: u16,
+    out: &mut ParsedAdblockSource,
+) {
+    if let Some(dom) = extract_exact_abp_domain(pat) {
+        out.header_mods.push(HeaderModRule {
+            kind,
+            host_scope: dom,
+            spec,
+            weight,
+        });
+        return;
+    }
+
+    if let Some((_, Some(host))) = abp_url_pattern_to_surge_regex(pat) {
+        out.header_mods.push(HeaderModRule {
+            kind,
+            host_scope: host,
+            spec,
+            weight,
+        });
+        return;
+    }
+
+    if let Some(domains) = domain_scopes {
+        for dom in domains {
+            out.header_mods.push(HeaderModRule {
+                kind,
+                host_scope: dom.clone(),
+                spec: spec.clone(),
+                weight,
+            });
+        }
+        return;
+    }
+
+    if allow_global && matches!(pat, "" | "*" | "*^" | "|http" | "||*" | "/.*/") {
+        out.header_mods.push(HeaderModRule {
+            kind,
+            host_scope: "*".to_string(),
+            spec,
+            weight,
+        });
+    }
+}
+
+fn is_dangerous_session_or_waf_cookie(tok: &str) -> bool {
+    let lower = tok.to_ascii_lowercase();
+    if let Some(rest) = lower.strip_prefix('~') {
+        let pat = rest.split_once(':').map(|x| x.1).unwrap_or(rest);
+        return pat.contains("ak_bmsc")
+            || pat.contains("_abck")
+            || pat.contains("cf_clearance")
+            || pat.contains("__cf_bm")
+            || pat.contains("incap_")
+            || pat.contains("visid_incap")
+            || pat.contains("nlbi_")
+            || pat.contains("phpsessid")
+            || pat.contains("jsessionid")
+            || pat.contains("sessionid")
+            || pat.contains("arraffinity");
+    }
+    matches!(
+        lower.as_str(),
+        "ak_bmsc"
+            | "_abck"
+            | "bm_sz"
+            | "bm_sv"
+            | "cf_clearance"
+            | "__cf_bm"
+            | "asp.net_sessionid"
+            | "jsessionid"
+            | "phpsessid"
+            | "sessionid"
+            | "session_id"
+            | "sid"
+            | "arraffinity"
+            | "arraffinitysamesite"
+            | "awsalb"
+            | "awsalbcors"
+    )
+}
+
+fn parse_cookie_spec_token(raw_spec: &str) -> Option<String> {
+    let trimmed = raw_spec.trim();
+    if trimmed.is_empty() || trimmed.len() > 256 {
+        return None;
+    }
+    // Skip storage-attribute adjustments (`;maxAge=`, `;sameSite=`) — never turn expiry/SameSite adjustments into cookie deletion!
+    let lower = trimmed.to_ascii_lowercase();
+    if lower.contains("maxage=") || lower.contains("samesite=") {
+        return None;
+    }
+    if trimmed.starts_with('/') {
+        let (pat, flags) = parse_single_regex_modifier(trimmed)?;
+        if matches!(pat.as_str(), "" | "." | ".*" | ".+" | "^.*$") {
+            return None;
+        }
+        return Some(format!("~{}:{}", flags, pat));
+    }
+    let clean = unescape_adguard_modifier_text(trimmed);
+    let clean = clean.trim();
+    if clean.is_empty()
+        || clean.contains(';')
+        || clean.contains('=')
+        || clean.chars().any(|c| c.is_whitespace() || c.is_control())
+    {
+        return None;
+    }
+    Some(clean.to_string())
+}
+
+fn parse_csp_policy_spec(raw_spec: &str) -> Option<String> {
+    let clean = unescape_adguard_modifier_text(raw_spec);
+    let trimmed = clean.trim();
+    if trimmed.is_empty() || trimmed.len() > 512 || trimmed.chars().any(|c| c.is_control()) {
+        return None;
+    }
+    let lower = trimmed.to_ascii_lowercase();
+    // AdGuard CoreLibs forbids `report-uri` and `report-to` in `$csp`
+    if lower.contains("report-uri") || lower.contains("report-to") {
+        return None;
+    }
+    // Require either a directive argument (`script-src 'self'`) or valid standalone directive
+    if !trimmed.contains(' ')
+        && !matches!(
+            lower.as_str(),
+            "upgrade-insecure-requests" | "block-all-mixed-content" | "sandbox"
+        )
+    {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+fn parse_permissions_policy_spec_allow_all(raw_spec: &str) -> Option<String> {
+    let clean = unescape_adguard_modifier_text(raw_spec);
+    let normalized = clean.trim().replace('|', ", ");
+    if normalized.is_empty()
+        || normalized.len() > 256
+        || normalized.chars().any(|c| c.is_control())
+        || !normalized.contains('=')
+    {
+        return None;
+    }
+    Some(normalized)
+}
+
+fn parse_permissions_policy_spec(raw_spec: &str) -> Option<String> {
+    let normalized = parse_permissions_policy_spec_allow_all(raw_spec)?;
+    // Never disable FedCM (`identity-credentials-get=()`) to prevent breaking "Sign in with Google / Apple" federated logins
+    if normalized
+        .to_ascii_lowercase()
+        .contains("identity-credentials-get")
+    {
+        return None;
+    }
+    Some(normalized)
 }

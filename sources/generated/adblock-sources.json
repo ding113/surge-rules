@@ -882,6 +882,306 @@
       ]
     },
     {
+      "id": "anudeep_optional_whitelist",
+      "name": "anudeepND Commonly Broken Optional Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "anudeep_whitelist",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/optional-list.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/optional-list.txt"
+        }
+      ]
+    },
+    {
+      "id": "anudeep_referral_whitelist",
+      "name": "anudeepND Referral & Link Unbreak Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "anudeep_whitelist",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/referral-sites.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/referral-sites.txt"
+        }
+      ]
+    },
+    {
+      "id": "anti_ad_whitelist",
+      "name": "anti-AD Official Domain Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "anti_ad",
+      "weight": 95,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/privacy-protection-tools/dead-horse/master/anti-ad-white-list.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/privacy-protection-tools/dead-horse@master/anti-ad-white-list.txt"
+        }
+      ]
+    },
+    {
+      "id": "neodevhost_allow",
+      "name": "NEO DEV HOST Official Allowlist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "neodevhost",
+      "weight": 94,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/neodevpro/neodevhost/master/allow"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/neodevpro/neodevhost@master/allow"
+        }
+      ]
+    },
+    {
+      "id": "yhosts_whitelist",
+      "name": "VeleSila yhosts Official Whitelist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "yhosts",
+      "weight": 94,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/VeleSila/yhosts/master/whitelist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/VeleSila/yhosts@master/whitelist.txt"
+        }
+      ]
+    },
+    {
+      "id": "shadowwhisperer_whitelist",
+      "name": "ShadowWhisperer Curated Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "shadowwhisperer",
+      "weight": 94,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/ShadowWhisperer/BlockLists@master/Whitelists/Whitelist"
+        }
+      ]
+    },
+    {
+      "id": "uhb_whitelist",
+      "name": "Ultimate Hosts Blacklist Official Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "uhb_whitelist",
+      "weight": 94,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Ultimate-Hosts-Blacklist/whitelist/master/domains.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Ultimate-Hosts-Blacklist/whitelist@master/domains.list"
+        }
+      ]
+    },
+    {
+      "id": "notracking_whitelist",
+      "name": "NoTracking Curated Hostnames Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "notracking",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/notracking/hosts-blocklists-scripts@master/hostnames.whitelist.txt"
+        }
+      ]
+    },
+    {
+      "id": "dnslock_pihole_whitelist",
+      "name": "DNSlock Pi-hole Curated Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "dnslock_whitelist",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/raghavdua1995/DNSlock-PiHole-whitelist/master/whitelist.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/raghavdua1995/DNSlock-PiHole-whitelist@master/whitelist.list"
+        }
+      ]
+    },
+    {
+      "id": "hg1978_agh_whitelist",
+      "name": "hg1978 AdGuard Home False-Positive Whitelist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hg1978_whitelist",
+      "weight": 93,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hg1978/AdGuard-Home-Whitelist/master/whitelist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hg1978/AdGuard-Home-Whitelist@master/whitelist.txt"
+        }
+      ]
+    },
+    {
+      "id": "devshubam_whitelist",
+      "name": "DevShubam DNS False-Positive Whitelist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "devshubam_whitelist",
+      "weight": 92,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/DevShubam/Whitelist/master/whitelist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/DevShubam/Whitelist@master/whitelist.txt"
+        }
+      ]
+    },
+    {
+      "id": "dandelion_nordic_allowlist",
+      "name": "Dandelion Sprout Nordic Domains Allowlist",
+      "role": "allowlist",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "dandelion_adfilt",
+      "weight": 94,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersDomainsAllowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersDomainsAllowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "easylist_fanboy_social_allowlist",
+      "name": "EasyList Fanboy Social Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_social_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/easylist/easylist@master/fanboy-addon/fanboy_social_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "easylist_fanboy_notifications_allowlist",
+      "name": "EasyList Fanboy Notifications Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_notifications_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/easylist/easylist@master/fanboy-addon/fanboy_notifications_allowlist.txt"
+        }
+      ]
+    },
+    {
+      "id": "easylist_fanboy_newsletter_allowlist",
+      "name": "EasyList Fanboy Newsletter Allowlist",
+      "role": "allowlist",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 96,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_newsletter_allowlist.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/easylist/easylist@master/fanboy-addon/fanboy_newsletter_allowlist.txt"
+        }
+      ]
+    },
+    {
       "id": "systemjargon_allowlist",
       "name": "SystemJargon DNS Allowlist",
       "role": "allowlist",
@@ -2845,8 +3145,8 @@
       ]
     },
     {
-      "id": "heidai_adblock_surge_lite",
-      "name": "217heidai AdBlock Surge Lite",
+      "id": "heidai_adblock_surge_full",
+      "name": "217heidai AdBlock Surge Full",
       "role": "ruleset_fallback",
       "format": "surge_domainset",
       "platform": "universal",
@@ -2857,11 +3157,11 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblocksurgelite.list"
+          "url": "https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblocksurge.list"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblocksurgelite.list"
+          "url": "https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblocksurge.list"
         }
       ]
     },
@@ -3136,24 +3436,24 @@
       ]
     },
     {
-      "id": "hagezi_pro_plus",
-      "name": "HaGeZi Multi Pro++ DNS Blocklist",
+      "id": "hagezi_ultimate",
+      "name": "HaGeZi Multi ULTIMATE DNS Blocklist",
       "role": "ruleset_fallback",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
-      "weight": 90,
+      "weight": 91,
       "core": true,
       "extractComplexNetworkRules": false,
       "extractFallbackDomainRules": true,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/ultimate.txt"
         },
         {
           "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_51.txt"
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_49.txt"
         }
       ]
     },
@@ -3224,23 +3524,46 @@
       ]
     },
     {
-      "id": "hagezi_tif_mini",
-      "name": "HaGeZi Threat Intelligence Feeds (Mini)",
+      "id": "hagezi_tif_full",
+      "name": "HaGeZi Threat Intelligence Feeds (Full)",
       "role": "ruleset_fallback",
-      "format": "domain_list",
+      "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
-      "weight": 90,
+      "weight": 91,
       "core": false,
+      "extractComplexNetworkRules": false,
       "extractFallbackDomainRules": true,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/tif.mini-onlydomains.txt"
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/wildcard/tif.mini-onlydomains.txt"
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_44.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_referral_native_block",
+      "name": "HaGeZi Native Referral Tracker Blocklist",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/blocklist-referral-native.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/blocklist-referral-native.txt"
         }
       ]
     },
@@ -3399,8 +3722,8 @@
       ]
     },
     {
-      "id": "hagezi_native_tiktok",
-      "name": "HaGeZi Native Tracker Blocklist (TikTok)",
+      "id": "hagezi_native_tiktok_extended",
+      "name": "HaGeZi Native Tracker Blocklist (TikTok Extended)",
       "role": "ruleset_fallback",
       "format": "abp_filter",
       "platform": "universal",
@@ -3412,11 +3735,11 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.txt"
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.extended.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.tiktok.txt"
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.tiktok.extended.txt"
         }
       ]
     },
@@ -3500,21 +3823,77 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://big.oisd.nl/"
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt"
         },
         {
           "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt"
+          "url": "https://big.oisd.nl/"
         }
       ]
     },
     {
-      "id": "onehosts_lite",
-      "name": "1Hosts (Lite)",
+      "id": "onehosts_xtra",
+      "name": "1Hosts (Xtra)",
       "role": "ruleset_fallback",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "onehosts",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/badmojr/1Hosts/master/Xtra/adblock.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_70.txt"
+        }
+      ]
+    },
+    {
+      "id": "developerdan_ads_tracking_extended",
+      "name": "Developer Dan's Ads & Tracking Extended",
+      "role": "ruleset_fallback",
+      "format": "hosts",
+      "platform": "universal",
+      "lineage": "developerdan",
+      "weight": 87,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt"
+        }
+      ]
+    },
+    {
+      "id": "hblock_domains",
+      "name": "hBlock Unified Ad · Tracking & Malware Domains",
+      "role": "ruleset_fallback",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "hblock",
+      "weight": 86,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://hblock.molinero.dev/hosts_domains.txt"
+        }
+      ]
+    },
+    {
+      "id": "neodevhost_adblocker",
+      "name": "NEO DEV HOST Adblocker",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "neodevhost",
       "weight": 86,
       "core": false,
       "extractComplexNetworkRules": false,
@@ -3522,11 +3901,100 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/adblock.txt"
+          "url": "https://raw.githubusercontent.com/neodevpro/neodevhost/master/adblocker"
         },
         {
           "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_24.txt"
+          "url": "https://cdn.jsdelivr.net/gh/neodevpro/neodevhost@master/adblocker"
+        }
+      ]
+    },
+    {
+      "id": "windowsspyblocker_extra",
+      "name": "WindowsSpyBlocker Extra Telemetry Hosts",
+      "role": "ruleset_fallback",
+      "format": "hosts",
+      "platform": "desktop",
+      "lineage": "windowsspyblocker",
+      "weight": 87,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/extra.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/crazy-max/WindowsSpyBlocker@master/data/hosts/extra.txt"
+        }
+      ]
+    },
+    {
+      "id": "frogeye_firstparty_trackers",
+      "name": "Frogeye First-Party Trackers Hosts",
+      "role": "ruleset_fallback",
+      "format": "hosts",
+      "platform": "universal",
+      "lineage": "frogeye",
+      "weight": 89,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt"
+        }
+      ]
+    },
+    {
+      "id": "frogeye_multiparty_trackers",
+      "name": "Frogeye Multi-Party Trackers Hosts",
+      "role": "ruleset_fallback",
+      "format": "hosts",
+      "platform": "universal",
+      "lineage": "frogeye",
+      "weight": 88,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt"
+        }
+      ]
+    },
+    {
+      "id": "quidsup_notrack_blocklist",
+      "name": "Quidsup NoTrack Blocklist",
+      "role": "ruleset_fallback",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "quidsup_notrack",
+      "weight": 88,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-blocklist.txt"
+        }
+      ]
+    },
+    {
+      "id": "quidsup_notrack_malware",
+      "name": "Quidsup NoTrack Malware Blocklist",
+      "role": "ruleset_fallback",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "quidsup_notrack",
+      "weight": 89,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-malware.txt"
         }
       ]
     },
@@ -4201,17 +4669,20 @@
       ]
     },
     {
-      "id": "phishing_army",
-      "name": "Phishing Army Blocklist",
+      "id": "phishing_army_extended",
+      "name": "Phishing Army Extended Blocklist",
       "role": "ruleset_fallback",
-      "format": "abp_filter",
+      "format": "domain_list",
       "platform": "universal",
       "lineage": "phishing_army",
-      "weight": 88,
+      "weight": 89,
       "core": false,
-      "extractComplexNetworkRules": false,
       "extractFallbackDomainRules": true,
       "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://phishing.army/download/phishing_army_blocklist_extended.txt"
+        },
         {
           "kind": "direct",
           "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_18.txt"
@@ -4294,6 +4765,258 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt"
+        }
+      ]
+    },
+    {
+      "id": "blocklistproject_ads",
+      "name": "The Block List Project Ads",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "blocklistproject",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/ads-ags.txt"
+        }
+      ]
+    },
+    {
+      "id": "blocklistproject_tracking",
+      "name": "The Block List Project Tracking",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "blocklistproject",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/tracking-ags.txt"
+        }
+      ]
+    },
+    {
+      "id": "blocklistproject_malware",
+      "name": "The Block List Project Malware",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "blocklistproject",
+      "weight": 88,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/malware-ags.txt"
+        }
+      ]
+    },
+    {
+      "id": "blocklistproject_phishing",
+      "name": "The Block List Project Phishing",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "blocklistproject",
+      "weight": 88,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/phishing-ags.txt"
+        }
+      ]
+    },
+    {
+      "id": "blocklistproject_abuse",
+      "name": "The Block List Project Abuse",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "blocklistproject",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/abuse-ags.txt"
+        }
+      ]
+    },
+    {
+      "id": "blocklistproject_fraud",
+      "name": "The Block List Project Fraud",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "blocklistproject",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/fraud-ags.txt"
+        }
+      ]
+    },
+    {
+      "id": "persianblocker_iran",
+      "name": "PersianBlocker Regional Adblock Filter",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "persianblocker",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_19.txt"
+        }
+      ]
+    },
+    {
+      "id": "macedonian_pihole",
+      "name": "Macedonian Pi-hole Adblock List",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "macedonian_pihole",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_20.txt"
+        }
+      ]
+    },
+    {
+      "id": "turk_adlist",
+      "name": "turk-adlist Turkish DNS Blocklist",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "turk_adlist",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_26.txt"
+        }
+      ]
+    },
+    {
+      "id": "hufilter_hungarian",
+      "name": "Hufilter Hungarian Adblock List",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hufilter",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_35.txt"
+        }
+      ]
+    },
+    {
+      "id": "easylist_lithuania",
+      "name": "EasyList Lithuania DNS Filter",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_36.txt"
+        }
+      ]
+    },
+    {
+      "id": "turkish_ad_hosts",
+      "name": "Turkish Ad Hosts Blocklist",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "turkish_ad_hosts",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_40.txt"
+        }
+      ]
+    },
+    {
+      "id": "easylist_hebrew",
+      "name": "EasyList Hebrew DNS Filter",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_43.txt"
+        }
+      ]
+    },
+    {
+      "id": "ukrainian_security_filter",
+      "name": "Ukrainian Security & Phishing Filter",
+      "role": "ruleset_fallback",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "ukrainian_security",
+      "weight": 88,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_62.txt"
         }
       ]
     },

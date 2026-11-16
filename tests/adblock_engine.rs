@@ -343,6 +343,7 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         script_path: "https://example.com/low.js".to_string(),
         requires_body: true,
         binary_body_mode: false,
+        full_header_mode: false,
         max_size: Some(0),
         timeout: None,
         argument: None,
@@ -356,6 +357,7 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         script_path: "https://example.com/high.js".to_string(),
         requires_body: true,
         binary_body_mode: false,
+        full_header_mode: false,
         max_size: Some(0),
         timeout: None,
         argument: None,
@@ -682,6 +684,7 @@ fn script_quoting_and_mitm_excluded_https_pruning_preserve_domain_protection() {
         script_path: "https://example.com/feed.js".to_string(),
         requires_body: true,
         binary_body_mode: false,
+        full_header_mode: false,
         max_size: Some(0),
         timeout: None,
         argument: None,
@@ -698,6 +701,7 @@ fn script_quoting_and_mitm_excluded_https_pruning_preserve_domain_protection() {
         script_path: "https://example.com/bili.js".to_string(),
         requires_body: true,
         binary_body_mode: false,
+        full_header_mode: false,
         max_size: Some(0),
         timeout: None,
         argument: None,
@@ -1245,6 +1249,7 @@ proptest! {
                 script_path: format!("https://example.com/s{}.js", idx),
                 requires_body: idx % 2 == 0,
                 binary_body_mode: false,
+                full_header_mode: false,
                 max_size: Some(0),
                 timeout: None,
                 argument: None,
@@ -1339,6 +1344,7 @@ proptest! {
             script_path: "https://example.com/init.js".to_string(),
             requires_body: false,
             binary_body_mode: false,
+            full_header_mode: false,
             max_size: None,
             timeout: None,
             argument: None,
@@ -1492,5 +1498,85 @@ proptest! {
                 );
             }
         }
+    }
+}
+
+#[test]
+fn advanced_header_modifiers_compile_with_full_header_mode_and_zero_body_buffering() {
+    let mut cfg = dummy_adblock_source(
+        "adguard_hdr_test",
+        AdblockSourceRole::ComplexFirst,
+        AdblockSourceFormat::AbpFilter,
+        92,
+    );
+    cfg.extract_complex_network_rules = true;
+
+    let raw = "\
+$cookie=__obref\n\
+$cookie=/^_sp_id/\n\
+$cookie=keep_session;maxAge=3600\n\
+||news.example.com^$cookie=_pc_private\n\
+@@||outlook.live.com^$cookie=__obref\n\
+@@||proton.me^$cookie\n\
+||news.example.com^$csp=script-src 'self' 'unsafe-inline'\n\
+||badcsp.example.com^$csp=report-uri /csp-report\n\
+/.*/$permissions=browsing-topics=(),document\n\
+/.*/$permissions=identity-credentials-get=(),document\n\
+@@||shopify.com/authentication/$permissions=browsing-topics=()\n";
+
+    let parsed = parse_adblock_source(&cfg, raw.as_bytes()).unwrap();
+    // Modifier-specific `@@` rules must NOT leak into whole-domain DNS allowlists
+    assert!(!parsed.allow_suffix_domains.contains("outlook.live.com"));
+    assert!(!parsed.allow_suffix_domains.contains("proton.me"));
+    // `;maxAge=` cookie storage adjustments and `report-uri` CSP and `identity-credentials-get` FedCM must be rejected
+    assert!(
+        !parsed
+            .header_mods
+            .iter()
+            .any(|m| m.spec.contains("keep_session"))
+    );
+    assert!(
+        !parsed
+            .header_mods
+            .iter()
+            .any(|m| m.spec.contains("report-uri"))
+    );
+    assert!(
+        !parsed
+            .header_mods
+            .iter()
+            .any(|m| m.spec.contains("identity-credentials-get"))
+    );
+
+    let compiled = compile_adblock(&[parsed], &AdblockOverrides::empty(), 1, 1);
+    verify_module_text(&compiled.module_text).unwrap();
+
+    // Header modifier scripts must specify full-header-mode=true, engine=jsc, and NO requires-body=true
+    let header_scripts: Vec<&str> = compiled
+        .module_text
+        .lines()
+        .filter(|l| {
+            l.starts_with("surge-adguard-cookie-")
+                || l.starts_with("surge-adguard-policy-")
+                || l.starts_with("surge-adguard-global-")
+        })
+        .collect();
+    assert!(
+        header_scripts.len() >= 4,
+        "expected scoped + global header modifier scripts, got: {:?}",
+        header_scripts
+    );
+    for line in header_scripts {
+        assert!(
+            line.contains("full-header-mode=true"),
+            "missing full-header-mode: {}",
+            line
+        );
+        assert!(line.contains("engine=jsc"), "missing engine=jsc: {}", line);
+        assert!(
+            !line.contains("requires-body=true"),
+            "header script must not buffer body: {}",
+            line
+        );
     }
 }

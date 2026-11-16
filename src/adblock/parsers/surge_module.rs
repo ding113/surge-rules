@@ -555,6 +555,7 @@ fn parse_script_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) {
     let mut script_path: Option<String> = None;
     let mut requires_body = false;
     let mut binary_body_mode = false;
+    let mut full_header_mode = false;
     let mut max_size: Option<i64> = None;
     let mut timeout: Option<u32> = None;
     let mut argument: Option<String> = None;
@@ -581,6 +582,7 @@ fn parse_script_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) {
             }
             "requires-body" => requires_body = matches!(v.as_str(), "true" | "1"),
             "binary-body-mode" => binary_body_mode = matches!(v.as_str(), "true" | "1"),
+            "full-header-mode" => full_header_mode = matches!(v.as_str(), "true" | "1"),
             "max-size" => max_size = v.parse::<i64>().ok(),
             "timeout" => timeout = v.parse::<u32>().ok().filter(|t| *t >= 1 && *t <= 120),
             "argument" => argument = Some(v),
@@ -610,6 +612,7 @@ fn parse_script_line(line: &str, weight: u16, out: &mut ParsedAdblockSource) {
         script_path: path,
         requires_body,
         binary_body_mode,
+        full_header_mode,
         max_size: norm_max_size,
         timeout: norm_timeout,
         argument,

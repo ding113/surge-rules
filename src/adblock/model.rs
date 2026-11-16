@@ -278,6 +278,7 @@ pub struct ScriptRule {
     pub script_path: String,
     pub requires_body: bool,
     pub binary_body_mode: bool,
+    pub full_header_mode: bool,
     pub max_size: Option<i64>,
     pub timeout: Option<u32>,
     pub argument: Option<String>,
@@ -368,6 +369,9 @@ impl ScriptRule {
         if self.binary_body_mode {
             params.push("binary-body-mode=true".to_string());
         }
+        if self.full_header_mode {
+            params.push("full-header-mode=true".to_string());
+        }
         if let Some(sz) = self.max_size {
             params.push(format!("max-size={}", sz));
         }
@@ -436,6 +440,28 @@ pub struct ModuleRuleLine {
     pub weight: u16,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+pub enum HeaderModKind {
+    Cookie,
+    Csp,
+    Permissions,
+}
+
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub struct HeaderModRule {
+    pub kind: HeaderModKind,
+    pub host_scope: String,
+    pub spec: String,
+    pub weight: u16,
+}
+
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub struct HeaderModException {
+    pub kind: HeaderModKind,
+    pub scope_key: String,
+    pub spec: String,
+}
+
 #[derive(Default, Clone, Debug)]
 pub struct ParsedAdblockSource {
     pub allow_exact_domains: FxHashSet<String>,
@@ -456,6 +482,9 @@ pub struct ParsedAdblockSource {
     pub scripts: Vec<ScriptRule>,
     pub remove_params: Vec<RemoveParamRule>,
     pub removeparam_exceptions: Vec<(String, String)>,
+    pub header_mods: Vec<HeaderModRule>,
+    pub header_mod_exceptions: Vec<HeaderModException>,
+    pub removeheader_exceptions: Vec<(HeaderDirection, String, String)>,
     pub ruleset_domains: FxHashSet<String>,
     pub ruleset_suffixes: FxHashSet<String>,
     pub ruleset_keywords: FxHashSet<String>,

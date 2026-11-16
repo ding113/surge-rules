@@ -891,6 +891,306 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
+    id: "anudeep_optional_whitelist",
+    name: "anudeepND Commonly Broken Optional Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "anudeep_whitelist",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/optional-list.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/optional-list.txt",
+      },
+    ],
+  },
+  {
+    id: "anudeep_referral_whitelist",
+    name: "anudeepND Referral & Link Unbreak Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "anudeep_whitelist",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/referral-sites.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/anudeepND/whitelist@master/domains/referral-sites.txt",
+      },
+    ],
+  },
+  {
+    id: "anti_ad_whitelist",
+    name: "anti-AD Official Domain Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "anti_ad",
+    weight: 95,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/privacy-protection-tools/dead-horse/master/anti-ad-white-list.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/privacy-protection-tools/dead-horse@master/anti-ad-white-list.txt",
+      },
+    ],
+  },
+  {
+    id: "neodevhost_allow",
+    name: "NEO DEV HOST Official Allowlist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "neodevhost",
+    weight: 94,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/neodevpro/neodevhost/master/allow",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/neodevpro/neodevhost@master/allow",
+      },
+    ],
+  },
+  {
+    id: "yhosts_whitelist",
+    name: "VeleSila yhosts Official Whitelist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "yhosts",
+    weight: 94,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/VeleSila/yhosts/master/whitelist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/VeleSila/yhosts@master/whitelist.txt",
+      },
+    ],
+  },
+  {
+    id: "shadowwhisperer_whitelist",
+    name: "ShadowWhisperer Curated Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "shadowwhisperer",
+    weight: 94,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ShadowWhisperer/BlockLists@master/Whitelists/Whitelist",
+      },
+    ],
+  },
+  {
+    id: "uhb_whitelist",
+    name: "Ultimate Hosts Blacklist Official Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "uhb_whitelist",
+    weight: 94,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Ultimate-Hosts-Blacklist/whitelist/master/domains.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/Ultimate-Hosts-Blacklist/whitelist@master/domains.list",
+      },
+    ],
+  },
+  {
+    id: "notracking_whitelist",
+    name: "NoTracking Curated Hostnames Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "notracking",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/notracking/hosts-blocklists-scripts@master/hostnames.whitelist.txt",
+      },
+    ],
+  },
+  {
+    id: "dnslock_pihole_whitelist",
+    name: "DNSlock Pi-hole Curated Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "dnslock_whitelist",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/raghavdua1995/DNSlock-PiHole-whitelist/master/whitelist.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/raghavdua1995/DNSlock-PiHole-whitelist@master/whitelist.list",
+      },
+    ],
+  },
+  {
+    id: "hg1978_agh_whitelist",
+    name: "hg1978 AdGuard Home False-Positive Whitelist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "hg1978_whitelist",
+    weight: 93,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/hg1978/AdGuard-Home-Whitelist/master/whitelist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/hg1978/AdGuard-Home-Whitelist@master/whitelist.txt",
+      },
+    ],
+  },
+  {
+    id: "devshubam_whitelist",
+    name: "DevShubam DNS False-Positive Whitelist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "devshubam_whitelist",
+    weight: 92,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/DevShubam/Whitelist/master/whitelist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/DevShubam/Whitelist@master/whitelist.txt",
+      },
+    ],
+  },
+  {
+    id: "dandelion_nordic_allowlist",
+    name: "Dandelion Sprout Nordic Domains Allowlist",
+    role: "allowlist",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "dandelion_adfilt",
+    weight: 94,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersDomainsAllowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersDomainsAllowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "easylist_fanboy_social_allowlist",
+    name: "EasyList Fanboy Social Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_social_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/easylist/easylist@master/fanboy-addon/fanboy_social_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "easylist_fanboy_notifications_allowlist",
+    name: "EasyList Fanboy Notifications Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_notifications_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/easylist/easylist@master/fanboy-addon/fanboy_notifications_allowlist.txt",
+      },
+    ],
+  },
+  {
+    id: "easylist_fanboy_newsletter_allowlist",
+    name: "EasyList Fanboy Newsletter Allowlist",
+    role: "allowlist",
+    format: "abp_filter",
+    platform: "universal",
+    lineage: "easylist_official",
+    weight: 96,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_newsletter_allowlist.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/easylist/easylist@master/fanboy-addon/fanboy_newsletter_allowlist.txt",
+      },
+    ],
+  },
+  {
     id: "systemjargon_allowlist",
     name: "SystemJargon DNS Allowlist",
     role: "allowlist",

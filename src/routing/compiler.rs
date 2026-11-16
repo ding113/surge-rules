@@ -37,6 +37,15 @@ const KNOWN_AD_DOMAIN_SUFFIXES: &[&str] = &[
     "appsflyer.com",
     "doubleverify.com",
     "scorecardresearch.com",
+    "exoclick.com",
+    "juicyads.com",
+    "trafficjunky.net",
+    "trafficstars.com",
+    "propellerads.com",
+    "popads.net",
+    "popcash.net",
+    "ero-advertising.com",
+    "plugrush.com",
 ];
 
 #[derive(Clone, Debug, Default)]
@@ -454,13 +463,95 @@ pub fn compile_routing(
         }
     });
 
-    // Remove non-forced Proxy entries overridden by Direct forced entries (e.g., CN CDN endpoints).
+    // Remove non-forced Proxy entries overridden by Direct forced entries (e.g., CN CDN endpoints),
+    // `.cn` domestic TLD entries, or higher-scored Direct ancestor suffixes / overlapping CN DNS CIDRs.
+    let mut direct_suffix_scores: FxHashMap<String, u16> = FxHashMap::default();
+    let mut direct_v4_cidrs: Vec<(Ipv4Net, u16)> = Vec::new();
+    let mut direct_v6_cidrs: Vec<(Ipv6Net, u16)> = Vec::new();
+    for (dk, dc) in &direct_map {
+        match dk.kind {
+            RoutingRuleKind::DomainSuffix => {
+                let sc = dc.score();
+                direct_suffix_scores
+                    .entry(dk.value.clone())
+                    .and_modify(|prev| *prev = (*prev).max(sc))
+                    .or_insert(sc);
+            }
+            RoutingRuleKind::IpCidr => {
+                if let Ok(net) = dk.value.parse::<Ipv4Net>() {
+                    direct_v4_cidrs.push((net.trunc(), dc.score()));
+                }
+            }
+            RoutingRuleKind::IpCidr6 => {
+                if let Ok(net) = dk.value.parse::<Ipv6Net>() {
+                    direct_v6_cidrs.push((net.trunc(), dc.score()));
+                }
+            }
+            _ => {}
+        }
+    }
+
     proxy_map.retain(|k, c| {
-        if !c.forced && direct_forced.matches_key(k) && !proxy_forced.matches_key(k) {
+        if c.forced || proxy_forced.matches_key(k) {
+            return true;
+        }
+        if direct_forced.matches_key(k) {
             conflicts_resolved += 1;
-            false
-        } else {
-            true
+            return false;
+        }
+        match k.kind {
+            RoutingRuleKind::Domain | RoutingRuleKind::DomainSuffix => {
+                if k.value == "cn" || k.value.ends_with(".cn") {
+                    conflicts_resolved += 1;
+                    return false;
+                }
+                let p_score = c.score();
+                if let Some(&d_score) = direct_suffix_scores.get(&k.value)
+                    && d_score > p_score
+                {
+                    conflicts_resolved += 1;
+                    return false;
+                }
+                for (idx, _) in k.value.match_indices('.') {
+                    let anc = &k.value[idx + 1..];
+                    if let Some(&d_score) = direct_suffix_scores.get(anc)
+                        && d_score > p_score
+                    {
+                        conflicts_resolved += 1;
+                        return false;
+                    }
+                }
+                true
+            }
+            RoutingRuleKind::IpCidr => {
+                if let Ok(net) = k.value.parse::<Ipv4Net>() {
+                    let net = net.trunc();
+                    let p_score = c.score();
+                    if direct_v4_cidrs.iter().any(|(dn, ds)| {
+                        *ds > p_score
+                            && (dn.contains(&net.network()) || net.contains(&dn.network()))
+                    }) {
+                        conflicts_resolved += 1;
+                        return false;
+                    }
+                }
+                true
+            }
+            RoutingRuleKind::IpCidr6 => {
+                if let Ok(net) = k.value.parse::<Ipv6Net>() {
+                    let net = net.trunc();
+                    let p_score = c.score();
+                    if direct_v6_cidrs.iter().any(|(dn, ds)| {
+                        *ds > p_score
+                            && (dn.contains(&net.network()) || net.contains(&dn.network()))
+                    }) {
+                        conflicts_resolved += 1;
+                        return false;
+                    }
+                }
+                true
+            }
+            _ => true,
         }
     });
 

@@ -1280,6 +1280,1651 @@
       "matchType": "exact",
       "domain": "img.alibaba.com",
       "rationale": "Alibaba B2B product image CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "officecdn.microsoft.com",
+      "rationale": "Microsoft 365 and Office app binary/update CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "officecdn.microsoft.com.edgesuite.net",
+      "rationale": "Microsoft Office Akamai CDN CNAME"
+    },
+    {
+      "matchType": "exact",
+      "domain": "crl.microsoft.com",
+      "rationale": "Microsoft PKI Certificate Revocation List responder"
+    },
+    {
+      "matchType": "exact",
+      "domain": "mscrl.microsoft.com",
+      "rationale": "Microsoft root/intermediate CRL responder"
+    },
+    {
+      "matchType": "exact",
+      "domain": "oneocsp.microsoft.com",
+      "rationale": "Microsoft OCSP certificate status responder"
+    },
+    {
+      "matchType": "exact",
+      "domain": "login.windows.net",
+      "rationale": "Microsoft Entra ID / Azure AD core authentication"
+    },
+    {
+      "matchType": "exact",
+      "domain": "autologon.microsoftazuread-sso.com",
+      "rationale": "Microsoft Entra ID seamless single sign-on"
+    },
+    {
+      "matchType": "exact",
+      "domain": "mucp.api.account.microsoft.com",
+      "rationale": "Microsoft Account profile and security API"
+    },
+    {
+      "matchType": "exact",
+      "domain": "config.teams.microsoft.com",
+      "rationale": "Microsoft Teams client bootstrap configuration"
+    },
+    {
+      "matchType": "exact",
+      "domain": "statics.teams.cdn.live.net",
+      "rationale": "Microsoft Teams static UI bundle CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "to-do.microsoft.com",
+      "rationale": "Microsoft To Do web and sync endpoint"
+    },
+    {
+      "matchType": "exact",
+      "domain": "wallet.microsoft.com",
+      "rationale": "Microsoft Edge Wallet and payment autofill"
+    },
+    {
+      "matchType": "exact",
+      "domain": "skyapi.live.net",
+      "rationale": "Microsoft OneDrive web API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "onedrive.com",
+      "rationale": "Microsoft OneDrive cloud storage"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "1drv.com",
+      "rationale": "Microsoft OneDrive share links and download gateway"
+    },
+    {
+      "matchType": "exact",
+      "domain": "client-office365-tas.msedge.net",
+      "rationale": "Microsoft 365 client configuration edge"
+    },
+    {
+      "matchType": "exact",
+      "domain": "ocos-office365-s2s.msedge.net",
+      "rationale": "Microsoft 365 service-to-service endpoint"
+    },
+    {
+      "matchType": "exact",
+      "domain": "outlookmobile-office365-tas.msedge.net",
+      "rationale": "Microsoft Outlook Mobile sync edge"
+    },
+    {
+      "matchType": "exact",
+      "domain": "validation.sls.microsoft.com",
+      "rationale": "Microsoft software licensing activation"
+    },
+    {
+      "matchType": "exact",
+      "domain": "validation-v2.sls.microsoft.com",
+      "rationale": "Microsoft software licensing v2 activation"
+    },
+    {
+      "matchType": "exact",
+      "domain": "co2.sls.microsoft.com",
+      "rationale": "Microsoft Store and Windows activation licensing"
+    },
+    {
+      "matchType": "exact",
+      "domain": "licensingphone.md.mp.microsoft.com",
+      "rationale": "Microsoft Store licensing verification"
+    },
+    {
+      "matchType": "exact",
+      "domain": "pti.store.microsoft.com",
+      "rationale": "Microsoft Store product catalog service"
+    },
+    {
+      "matchType": "exact",
+      "domain": "purchase.mp.microsoft.com",
+      "rationale": "Microsoft Store checkout and entitlement service"
+    },
+    {
+      "matchType": "exact",
+      "domain": "storesdk.dsx.mp.microsoft.com",
+      "rationale": "Microsoft Store app SDK entitlement service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "smartscreen.microsoft.com",
+      "rationale": "Microsoft Defender SmartScreen phishing protection"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "smartscreen-prod.microsoft.com",
+      "rationale": "Microsoft Defender SmartScreen production service"
+    },
+    {
+      "matchType": "exact",
+      "domain": "iecvlist.microsoft.com",
+      "rationale": "Microsoft Edge compatibility list"
+    },
+    {
+      "matchType": "exact",
+      "domain": "uhf.microsoft.com",
+      "rationale": "Microsoft Universal Header/Footer navigation assets"
+    },
+    {
+      "matchType": "exact",
+      "domain": "share.microsoft.com",
+      "rationale": "Microsoft Share service"
+    },
+    {
+      "matchType": "exact",
+      "domain": "location.microsoft.com",
+      "rationale": "Windows Location service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "copilot.cloud.microsoft",
+      "rationale": "Microsoft 365 Copilot enterprise workspace"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "moonshot.ai",
+      "rationale": "Moonshot AI / Kimi global platform and API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "qianwen.com",
+      "rationale": "Alibaba Tongyi Qianwen AI assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "deepseeksvc.com",
+      "rationale": "DeepSeek AI backend service domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zhipuai.cn",
+      "rationale": "Zhipu AI / ChatGLM API and web portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "minimaxi.com",
+      "rationale": "MiniMax LLM API and platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hailuoai.com",
+      "rationale": "MiniMax Hailuo AI video and chat platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xingyeai.com",
+      "rationale": "MiniMax Xingye AI application"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xiaomimimo.com",
+      "rationale": "Xiaomi MiMo LLM platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "marscode.cn",
+      "rationale": "ByteDance MarsCode cloud IDE"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "coze.cn",
+      "rationale": "ByteDance Coze AI agent platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "coze.site",
+      "rationale": "ByteDance Coze published bot hosting"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "doubao-dev.com",
+      "rationale": "ByteDance Doubao developer platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "doubaocdn.com",
+      "rationale": "ByteDance Doubao static asset CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "qoder.com",
+      "rationale": "Alibaba Qoder AI coding IDE"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "workbuddy.cn",
+      "rationale": "Tencent WorkBuddy AI assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "liblib.art",
+      "rationale": "LiblibAI image generation community"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "liblib.cloud",
+      "rationale": "LiblibAI cloud inference service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "caiyunai.com",
+      "rationale": "Caiyun AI translation and writing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dui.ai",
+      "rationale": "AISpeech DUI voice AI platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "duiopen.com",
+      "rationale": "AISpeech open platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "aispeech.com",
+      "rationale": "AISpeech conversational AI"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "4paradigm.com",
+      "rationale": "4Paradigm enterprise AI"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hiascend.com",
+      "rationale": "Huawei Ascend AI developer community"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "openai.org",
+      "rationale": "OpenAI foundation domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ant.dev",
+      "rationale": "Anthropic developer portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "labs.google",
+      "rationale": "Google Labs AI experiments"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "labs.google.com",
+      "rationale": "Google Labs web portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "notebook.google",
+      "rationale": "Google NotebookLM domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "v0.app",
+      "rationale": "Vercel v0 generative UI platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cline.bot",
+      "rationale": "Cline AI coding agent"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "opencode.ai",
+      "rationale": "OpenCode terminal AI coding agent"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "commandcode.ai",
+      "rationale": "CommandCode AI developer tool"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cursorvm.com",
+      "rationale": "Cursor cloud sandbox VM infrastructure"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "augmentcode.com",
+      "rationale": "Augment Code AI coding platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ampcode.com",
+      "rationale": "Sourcegraph Amp coding agent"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "factory.ai",
+      "rationale": "Factory AI software engineering agent"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "kilo.ai",
+      "rationale": "Kilo Code AI extension"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "continue.dev",
+      "rationale": "Continue open-source AI IDE assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "qodo.ai",
+      "rationale": "Qodo AI code review and testing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sourcery.ai",
+      "rationale": "Sourcery AI code review"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "context7.com",
+      "rationale": "Context7 MCP documentation service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "smithery.ai",
+      "rationale": "Smithery MCP server registry"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "composio.dev",
+      "rationale": "Composio AI tool integration platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "mintlify.com",
+      "rationale": "Mintlify developer documentation hosting"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "modal.com",
+      "rationale": "Modal serverless GPU cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "runpod.io",
+      "rationale": "RunPod GPU cloud infrastructure"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "vast.ai",
+      "rationale": "Vast.ai GPU cloud marketplace"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lambda.ai",
+      "rationale": "Lambda GPU cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "crusoe.ai",
+      "rationale": "Crusoe AI cloud infrastructure"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "together.xyz",
+      "rationale": "Together AI inference cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "fal.ai",
+      "rationale": "fal.ai generative media inference cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "bfl.ai",
+      "rationale": "Black Forest Labs FLUX platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "stability.ai",
+      "rationale": "Stability AI platform and API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ideogram.ai",
+      "rationale": "Ideogram AI image generation"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "recraft.ai",
+      "rationale": "Recraft AI design platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "runway.com",
+      "rationale": "Runway generative video platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "heygen.com",
+      "rationale": "HeyGen AI video platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "heygen.ai",
+      "rationale": "HeyGen AI service domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "higgsfield.ai",
+      "rationale": "Higgsfield AI video generation"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "magnific.com",
+      "rationale": "Magnific AI upscaler"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "manus.ai",
+      "rationale": "Manus AI agent workspace"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sambanova.ai",
+      "rationale": "SambaNova AI cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "novita.ai",
+      "rationale": "Novita AI inference API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "deepinfra.com",
+      "rationale": "DeepInfra LLM API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "baseten.co",
+      "rationale": "Baseten ML inference infrastructure"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "anyscale.com",
+      "rationale": "Anyscale Ray cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "voyageai.com",
+      "rationale": "Voyage AI embedding API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pinecone.io",
+      "rationale": "Pinecone vector database"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "weaviate.io",
+      "rationale": "Weaviate vector database"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "qdrant.tech",
+      "rationale": "Qdrant vector database"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "milvus.io",
+      "rationale": "Milvus vector database"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "llamaindex.ai",
+      "rationale": "LlamaIndex AI data framework"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "litellm.ai",
+      "rationale": "LiteLLM AI gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "portkey.ai",
+      "rationale": "Portkey AI gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "langfuse.com",
+      "rationale": "Langfuse open-source LLM engineering platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "braintrust.dev",
+      "rationale": "Braintrust AI evaluation platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "arize.com",
+      "rationale": "Arize AI observability"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "tavily.com",
+      "rationale": "Tavily AI search API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "exa.ai",
+      "rationale": "Exa AI web search API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "firecrawl.dev",
+      "rationale": "Firecrawl web data extraction API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "browserbase.com",
+      "rationale": "Browserbase headless browser cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "serpapi.com",
+      "rationale": "SerpApi search API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "serper.dev",
+      "rationale": "Serper Google search API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "deepgram.com",
+      "rationale": "Deepgram speech-to-text AI API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "assemblyai.com",
+      "rationale": "AssemblyAI speech AI API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cartesia.ai",
+      "rationale": "Cartesia voice AI API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hume.ai",
+      "rationale": "Hume AI voice interface"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "allenai.org",
+      "rationale": "Allen Institute for AI (Ai2)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cognition.ai",
+      "rationale": "Cognition AI / Devin"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sierra.ai",
+      "rationale": "Sierra conversational AI"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "glean.com",
+      "rationale": "Glean enterprise AI search"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dust.tt",
+      "rationale": "Dust enterprise AI agents"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "granola.ai",
+      "rationale": "Granola AI meeting notepad"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "thinkingmachines.ai",
+      "rationale": "Thinking Machines Lab"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "artificialanalysis.ai",
+      "rationale": "Artificial Analysis LLM benchmarks"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "watsonx.ai",
+      "rationale": "IBM watsonx AI platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "databricks.com",
+      "rationale": "Databricks data and AI workspace"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "grafana.com",
+      "rationale": "Grafana Cloud and dashboard repository"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "vercel.live",
+      "rationale": "Vercel preview deployment live feedback"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "trycloudflare.com",
+      "rationale": "Cloudflare Quick Tunnels developer preview"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "amplifyapp.com",
+      "rationale": "AWS Amplify web app hosting"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "appdomain.cloud",
+      "rationale": "IBM Cloud application hosting"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cloudflare-ipfs.com",
+      "rationale": "Cloudflare IPFS gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cf-ipfs.com",
+      "rationale": "Cloudflare IPFS gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dweb.link",
+      "rationale": "Protocol Labs IPFS gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "repl.co",
+      "rationale": "Replit application preview hosting"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "grep.app",
+      "rationale": "grep.app code search"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cnb.cool",
+      "rationale": "Tencent Cloud Native Build (CNB) developer platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "daocloud.io",
+      "rationale": "DaoCloud container registry mirror"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ruby-china.org",
+      "rationale": "Ruby China developer community"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "vijos.org",
+      "rationale": "Vijos competitive programming judge"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "antbank.hk",
+      "rationale": "Ant Bank (Hong Kong) digital banking"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "adyenpayments.com",
+      "rationale": "Adyen global payment gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "link.com",
+      "rationale": "Stripe Link one-click checkout"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "polar.sh",
+      "rationale": "Polar open-source developer billing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "authkit.app",
+      "rationale": "WorkOS AuthKit authentication"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "simility.com",
+      "rationale": "PayPal Simility fraud & risk-control check"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "paypalhere.com.cn",
+      "rationale": "PayPal China merchant portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "paypal-latam.com",
+      "rationale": "PayPal Latin America regional portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "duxiaomanfintech.com",
+      "rationale": "Du Xiaoman financial services"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dxmbaoxian.com",
+      "rationale": "Du Xiaoman insurance portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dxmstatic.com",
+      "rationale": "Du Xiaoman static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yqb.com",
+      "rationale": "Ping An YiQianBao payment platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yqbimg.net",
+      "rationale": "Ping An YiQianBao static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lufax.com",
+      "rationale": "Ping An Lufax financial platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ebscn.com",
+      "rationale": "Everbright Securities portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "taikang.com",
+      "rationale": "Taikang Insurance Group"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "taikanglife.com",
+      "rationale": "Taikang Life Insurance"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "kuaishoupay.com",
+      "rationale": "Kuaishou Pay checkout service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "e.189.cn",
+      "rationale": "China Telecom Tianyi 1-click mobile number login"
+    },
+    {
+      "matchType": "exact",
+      "domain": "config.cmpassport.com",
+      "rationale": "China Mobile SIM 1-click login bootstrap"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wosms.cn",
+      "rationale": "China Unicom SIM 1-click login authentication"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wo.cn",
+      "rationale": "China Unicom Wo portal and mail"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wo.com.cn",
+      "rationale": "China Unicom Wo service portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wostore.cn",
+      "rationale": "China Unicom Wo Store cloud"
+    },
+    {
+      "matchType": "exact",
+      "domain": "ye.dun.163yun.com",
+      "rationale": "NetEase Yidun slider CAPTCHA verification"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yundunwaf.com",
+      "rationale": "Alibaba Cloud Yundun WAF gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "jianying.com",
+      "rationale": "ByteDance CapCut CN (Jianying) video editor"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "huoshan.com",
+      "rationale": "ByteDance Douyin Huoshan video"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "huoshanimg.com",
+      "rationale": "ByteDance Huoshan image CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "huoshanlive.com",
+      "rationale": "ByteDance Huoshan live streaming"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "huoshanstatic.com",
+      "rationale": "ByteDance Huoshan static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "idouyinvod.com",
+      "rationale": "ByteDance Douyin VOD CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "douyinec.com",
+      "rationale": "Douyin E-Commerce merchant service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "douyinliving.com",
+      "rationale": "Douyin Live streaming service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xiguashipin.net",
+      "rationale": "Xigua Video CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "byted-static.com",
+      "rationale": "ByteDance frontend static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "bytefcdnrd.com",
+      "rationale": "ByteDance edge CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zjcdn.com",
+      "rationale": "ByteDance static asset CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dongchediapp.com",
+      "rationale": "Dongchedi automotive app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dcdapp.com",
+      "rationale": "Dongchedi mobile API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dcarapi.com",
+      "rationale": "Dongchedi automotive API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dcarimg.com",
+      "rationale": "Dongchedi image CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dcarstatic.com",
+      "rationale": "Dongchedi static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "dcarvod.com",
+      "rationale": "Dongchedi video CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "mioffice.cn",
+      "rationale": "Xiaomi Office and collaboration suite"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xiaomiwear.com",
+      "rationale": "Xiaomi Wear / Mi Fitness smartwatch sync"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xiaomiinc.net",
+      "rationale": "Xiaomi corporate infrastructure"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yeelight.com",
+      "rationale": "Yeelight smart lighting IoT cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zepp.com",
+      "rationale": "Zepp / Amazfit smartwatch health cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zeekrlife.com",
+      "rationale": "Zeekr EV mobile vehicle control and app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "flymeauto.com",
+      "rationale": "Meizu / Lynk & Co FlymeAuto smart cockpit"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "apollo.auto",
+      "rationale": "Baidu Apollo autonomous mobility"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "redmagic.com",
+      "rationale": "Nubia RedMagic gaming smartphone portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "agora.io",
+      "rationale": "Agora real-time voice/video RTC SDK"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "agoralab.co",
+      "rationale": "Agora real-time media cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ronghub.com",
+      "rationale": "RongCloud instant messaging IM SDK"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yunxindns.com",
+      "rationale": "NetEase CommsEase IM/RTC DNS"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yunxinfw.com",
+      "rationale": "NetEase CommsEase IM/RTC gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yunxinvcloud.com",
+      "rationale": "NetEase CommsEase video cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "kingsoft-office-service.com",
+      "rationale": "Kingsoft WPS Office cloud sync"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wpsgo.com",
+      "rationale": "Kingsoft WPS Office web service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "docer.com",
+      "rationale": "WPS Docer document templates"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "nlark.com",
+      "rationale": "Ant/Alibaba Yuque document & image CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "qiniucdn.com",
+      "rationale": "Qiniu Cloud OSS/CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "upcdn.net",
+      "rationale": "Upyun static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "baidustatic.com",
+      "rationale": "Baidu frontend static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sinaimg.com",
+      "rationale": "Sina Weibo media CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "aliimg.com",
+      "rationale": "Alibaba image CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "antpcdn.com",
+      "rationale": "Ant Group static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "jcloudcs.com",
+      "rationale": "JD Cloud OSS object storage"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "jdcache.com",
+      "rationale": "JD edge cache CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yiyaojd.com",
+      "rationale": "JD Health pharmacy portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "allawnfs.com",
+      "rationale": "OPPO / OnePlus cloud file storage"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "heytapcs.com",
+      "rationale": "OPPO HeyTap cloud service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "migucloud.com",
+      "rationale": "China Mobile Migu Cloud"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "mwcloudcdn.com",
+      "rationale": "Apple China & domestic multi-CDN node"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pphimalayanrt.com",
+      "rationale": "Steam China / Perfect World download CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lv.queniujq.cn",
+      "rationale": "Steam China download mirror CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xoyocdn.com",
+      "rationale": "Kingsoft Seasun Games CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xoyobox.com",
+      "rationale": "Kingsoft Seasun gaming assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "bh3.com",
+      "rationale": "miHoYo Honkai Impact 3rd portal and patcher"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "youzu.com",
+      "rationale": "Youzu Interactive games"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "indienova.com",
+      "rationale": "Indienova indie game community"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yumchina.com",
+      "rationale": "Yum China (KFC / Pizza Hut ordering)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "heytea.com",
+      "rationale": "HEYTEA mobile ordering and mini-program"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hainanairlines.com",
+      "rationale": "Hainan Airlines booking and check-in"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yundaex.com",
+      "rationale": "Yunda Express parcel tracking"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cnsuning.com",
+      "rationale": "Suning commerce infrastructure"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "114piaowu.com",
+      "rationale": "114 Piaowu train & bus ticket portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "didialift.com",
+      "rationale": "DiDi Hitch ride-sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "chunyu.mobi",
+      "rationale": "Chunyu Doctor telemedicine app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "mojichina.com",
+      "rationale": "Moji Weather data API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "seniverse.com",
+      "rationale": "Seniverse weather API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yodao.net",
+      "rationale": "NetEase Youdao Dictionary & Note CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "127.com",
+      "rationale": "NetEase Mail asset domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "166.com",
+      "rationale": "NetEase Mail & Games account domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hunantv.com",
+      "rationale": "Mango TV / Hunan TV streaming"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pplive.com",
+      "rationale": "PPTV streaming platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pplive.cn",
+      "rationale": "PPTV streaming CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "71.am",
+      "rationale": "iQIYI official video share shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "bilibili.co",
+      "rationale": "Bilibili official short domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "kwai.com",
+      "rationale": "Kwai short video platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lizhifm.com",
+      "rationale": "Lizhi FM audio platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "gzlzfm.com",
+      "rationale": "Lizhi FM media CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "iflyrec.com",
+      "rationale": "iFLYTEK Tingjian transcription"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "infzm.com",
+      "rationale": "Southern Weekly news portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "jianshuapi.com",
+      "rationale": "Jianshu mobile API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "luojilab.com",
+      "rationale": "Dedao / Luojilab learning app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zhenguanyu.com",
+      "rationale": "Yuanfudao / Zebra education"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yuansouti.com",
+      "rationale": "Yuansouti education app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xueersi.com",
+      "rationale": "TAL Xueersi education platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xesimg.com",
+      "rationale": "TAL Xueersi static CDN"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zhixue.com",
+      "rationale": "iFLYTEK Zhixue education portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "duxiu.com",
+      "rationale": "Duxiu academic literature search"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "superlib.net",
+      "rationale": "Chaoxing Superlib academic library"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "aichaoxing.com",
+      "rationale": "Chaoxing learning platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "5read.com",
+      "rationale": "Chaoxing 5read mobile library"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "chinaxiv.org",
+      "rationale": "Chinese Academy of Sciences ChinaXiv preprint server"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "foundertype.com",
+      "rationale": "FounderType Chinese webfont and font library"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ciweimao.com",
+      "rationale": "Ciweimao novel community"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "shuqi.com",
+      "rationale": "Alibaba Shuqi novel app"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "xxsy.net",
+      "rationale": "Xiaoxiang Shuyuan novel portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yamibo.com",
+      "rationale": "Yamibo community forum"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "101weiqi.com",
+      "rationale": "101Weiqi Go learning platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzoub.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzoue.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzouj.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzoul.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzoum.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzouo.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzoup.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzouq.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzout.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzouu.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzouv.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lanzouy.com",
+      "rationale": "Lanzou Cloud file sharing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pubyun.com",
+      "rationale": "PubYun DDNS for home NAS"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "2288.org",
+      "rationale": "PubYun DDNS domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "gotdns.ch",
+      "rationale": "DynDNS domain for home NAS"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sci-hub.ru",
+      "rationale": "Sci-Hub academic paper mirror (routed via Proxy.list)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "annas-archive.li",
+      "rationale": "Anna's Archive shadow library mirror (routed via Proxy.list)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "nyaa.si",
+      "rationale": "Nyaa anime/media index (routed via Proxy.list)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pixiv.org",
+      "rationale": "Pixiv community domain (routed via Proxy.list)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "donmai.us",
+      "rationale": "Danbooru illustration archive (routed via Proxy.list)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "stake.com",
+      "rationale": "Stake platform (routed via Proxy.list)"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wego.here.com",
+      "rationale": "HERE WeGo web maps"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "telega.one",
+      "rationale": "Telegram link gateway"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "archive.md",
+      "rationale": "Archive.today webpage archiver"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "archive.vn",
+      "rationale": "Archive.today webpage archiver"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "altmetric.com",
+      "rationale": "Altmetric scholarly citation badges"
+    },
+    {
+      "matchType": "exact",
+      "domain": "bbc.co",
+      "rationale": "BBC official shortlink"
+    },
+    {
+      "matchType": "exact",
+      "domain": "videos-f.jwpsrv.com",
+      "rationale": "JWPlayer video stream delivery"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sslcs.cdngc.net",
+      "rationale": "Samsung Galaxy App Store & OTA firmware CDN"
+    },
+    {
+      "matchType": "exact",
+      "domain": "us-central1-xi-labs.cloudfunctions.net",
+      "rationale": "ElevenLabs voice AI API endpoint"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "bardeen.ai",
+      "rationale": "Bardeen AI workflow automation"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "captions.ai",
+      "rationale": "Captions AI video studio"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "colossyan.com",
+      "rationale": "Colossyan AI video platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "fathom.video",
+      "rationale": "Fathom AI meeting assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "fliki.ai",
+      "rationale": "Fliki AI media platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "grok-sandbox.com",
+      "rationale": "xAI Grok code execution sandbox"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hebbia.ai",
+      "rationale": "Hebbia enterprise AI"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "hebbia.com",
+      "rationale": "Hebbia enterprise AI portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "lindy.ai",
+      "rationale": "Lindy AI agent platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "meetgeek.ai",
+      "rationale": "MeetGeek AI meeting assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "mem.ai",
+      "rationale": "Mem AI workspace"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "metaaivm.com",
+      "rationale": "Meta AI sandbox runtime"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "metademolab.com",
+      "rationale": "Meta AI research demo lab"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "mindstudio.ai",
+      "rationale": "MindStudio AI agent builder"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "murf.ai",
+      "rationale": "Murf AI voice studio"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "niji.journey.com",
+      "rationale": "Midjourney Niji anime AI studio"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "pictory.ai",
+      "rationale": "Pictory AI video platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "prelude.dev",
+      "rationale": "Prelude verification API"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "read.ai",
+      "rationale": "Read AI meeting copilot"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "reka.ai",
+      "rationale": "Reka AI multimodal LLM platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "rytr.me",
+      "rationale": "Rytr AI writing assistant"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sudowrite.com",
+      "rationale": "Sudowrite AI creative writing"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "syntx.ai",
+      "rationale": "Syntx AI platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "talkie-ai.com",
+      "rationale": "Talkie AI application"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "tldv.io",
+      "rationale": "tl;dv AI meeting recorder"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "vellum.ai",
+      "rationale": "Vellum LLM development platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wellsaidlabs.com",
+      "rationale": "WellSaid Labs AI voice platform"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "elex.com",
+      "rationale": "Elex game CDN and portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "elexapp.com",
+      "rationale": "Elex mobile game service"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "01caijing.com",
+      "rationale": "01Caijing financial news portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "100ppi.com",
+      "rationale": "SunSirs commodity market data portal"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "1024tools.com",
+      "rationale": "1024Tools developer utilities"
     }
   ],
   "protectedApexDomains": [
@@ -1666,6 +3311,22 @@
     {
       "domain": "hupu.com",
       "rationale": "Hupu community apex"
+    },
+    {
+      "domain": "windows.net",
+      "rationale": "Shared Microsoft Azure Storage (blob.core.windows.net) and Entra ID apex"
+    },
+    {
+      "domain": "msedge.net",
+      "rationale": "Shared Microsoft Edge / Office 365 / Teams Anycast CDN apex"
+    },
+    {
+      "domain": "msecnd.net",
+      "rationale": "Shared Microsoft Azure legacy CDN apex"
+    },
+    {
+      "domain": "msn.com",
+      "rationale": "Shared MSN portal and weather/news widget apex"
     }
   ],
   "forceRuleSetEntries": [

@@ -10,8 +10,9 @@ use crate::adblock::config::AllowDomainMatchType;
 use crate::adblock::config::{AdblockOverrides, ModuleScriptOverride};
 use crate::adblock::model::{
     AdguardTransformOp, AdguardTransformRule, BodyRewriteKind, BodyRewriteRule, HeaderAction,
-    HeaderDirection, HeaderRewriteRule, MapLocalDataType, MapLocalRule, ParsedAdblockSource,
-    RemoveParamRule, ScriptRule, ScriptType, UrlRewriteMode, UrlRewriteRule,
+    HeaderDirection, HeaderModException, HeaderModKind, HeaderModRule, HeaderRewriteRule,
+    MapLocalDataType, MapLocalRule, ParsedAdblockSource, RemoveParamRule, ScriptRule, ScriptType,
+    UrlRewriteMode, UrlRewriteRule,
 };
 use crate::adblock::regex_util::{
     canonical_url_pattern_key, extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host,
@@ -218,6 +219,9 @@ pub fn compile_adblock(
     let mut script_candidates: Vec<ScriptRule> = Vec::new();
     let mut remove_params: Vec<RemoveParamRule> = Vec::new();
     let mut removeparam_exceptions: Vec<(String, String)> = Vec::new();
+    let mut header_mods: Vec<HeaderModRule> = Vec::new();
+    let mut header_mod_exceptions: Vec<HeaderModException> = Vec::new();
+    let mut removeheader_exceptions: Vec<(HeaderDirection, String, String)> = Vec::new();
     let mut mitm_positive: BTreeSet<String> = BTreeSet::new();
 
     for src in sources {
@@ -270,6 +274,9 @@ pub fn compile_adblock(
         }
         remove_params.extend(src.remove_params.iter().cloned());
         removeparam_exceptions.extend(src.removeparam_exceptions.iter().cloned());
+        header_mods.extend(src.header_mods.iter().cloned());
+        header_mod_exceptions.extend(src.header_mod_exceptions.iter().cloned());
+        removeheader_exceptions.extend(src.removeheader_exceptions.iter().cloned());
         for mh in &src.mitm_hosts {
             let clean = mh.trim().to_ascii_lowercase();
             if is_valid_mitm_host(&clean) {
@@ -647,14 +654,26 @@ pub fn compile_adblock(
 
     // 7. Filter MITM hosts against `-` exclusions and prune HTTPS-only module rules targeting excluded hosts
     mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
-    header_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
+    header_map.retain(|_, r| {
+        if pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set) {
+            return false;
+        }
+        !removeheader_exceptions.iter().any(|(dir, scope, field)| {
+            *dir == r.direction
+                && r.field.eq_ignore_ascii_case(field)
+                && r.pattern
+                    .to_ascii_lowercase()
+                    .contains(&scope.to_ascii_lowercase())
+        })
+    });
     url_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
     map_local_map
         .retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
     body_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
     final_scripts.retain(|s| !pattern_targets_excluded_https_only(&s.pattern, &mitm_exclusion_set));
 
-    // 8. Append `$removeparam` scripts last (global + host-scoped) so app-specific http-request scripts run first
+    // 8. Append `$removeparam` and advanced header modifier (`$cookie`, `$csp`, `$permissions`) scripts last
+    //    so app-specific scripts and body transforms take precedence without unbounded body buffering.
     final_scripts.extend(build_removeparam_scripts(
         &remove_params,
         &removeparam_exceptions,
@@ -663,6 +682,24 @@ pub fn compile_adblock(
         &final_suffix_trie,
         &compressed_domains,
     ));
+    let new_hdr_scripts = build_header_modifier_scripts(
+        &header_mods,
+        &header_mod_exceptions,
+        &protected_apex_set,
+        &mut mitm_positive,
+        &mitm_exclusion_set,
+        &final_suffix_trie,
+        &compressed_domains,
+    );
+    let mut existing_triggers: FxHashSet<(ScriptType, String)> = final_scripts
+        .iter()
+        .map(|s| (s.script_type, s.pattern.clone()))
+        .collect();
+    for s in new_hdr_scripts {
+        if existing_triggers.insert((s.script_type, s.pattern.clone())) {
+            final_scripts.push(s);
+        }
+    }
     for s in &mut final_scripts {
         s.normalize_runtime_bounds();
     }
@@ -845,6 +882,7 @@ fn script_override_to_rule(s: &ModuleScriptOverride) -> ScriptRule {
         script_path: s.script_path.clone(),
         requires_body: s.requires_body,
         binary_body_mode: s.binary_body_mode,
+        full_header_mode: false,
         max_size: s.max_size,
         timeout: None,
         argument: s.argument.clone(),
@@ -955,6 +993,7 @@ fn build_adguard_transform_scripts(mut rules: Vec<AdguardTransformRule>) -> Vec<
             script_path: ADGUARD_SCRIPT_URL.to_string(),
             requires_body: true,
             binary_body_mode: false,
+            full_header_mode: false,
             max_size: Some(524_288),
             timeout: Some(5),
             argument: Some(argument),
@@ -1315,6 +1354,7 @@ fn build_removeparam_scripts(
                 script_path: REMOVEPARAM_SCRIPT_URL.to_string(),
                 requires_body: false,
                 binary_body_mode: false,
+                full_header_mode: false,
                 max_size: None,
                 timeout: Some(5),
                 argument: Some(arg_parts.join(";")),
@@ -1441,6 +1481,7 @@ fn build_removeparam_scripts(
                 script_path: REMOVEPARAM_SCRIPT_URL.to_string(),
                 requires_body: false,
                 binary_body_mode: false,
+                full_header_mode: false,
                 max_size: None,
                 timeout: Some(5),
                 argument: Some(arg_chunks.join(";")),
@@ -1448,6 +1489,537 @@ fn build_removeparam_scripts(
                 weight: 1,
             });
         }
+    }
+
+    scripts
+}
+
+#[derive(serde::Serialize)]
+struct HeaderRuntimeOp {
+    op: &'static str,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    exact: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    regexes: Vec<(String, String)>,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    all: bool,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    policies: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    hosts: Vec<String>,
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    exc: BTreeMap<String, Vec<String>>,
+}
+
+fn split_cookie_token_for_runtime(tok: &str) -> Option<Result<String, (String, String)>> {
+    if let Some(rest) = tok.strip_prefix('~') {
+        let (flags, pat) = rest.split_once(':')?;
+        if pat.is_empty() {
+            return None;
+        }
+        Some(Err((pat.to_string(), flags.to_string())))
+    } else if !tok.is_empty() && tok != "*" {
+        Some(Ok(tok.to_string()))
+    } else {
+        None
+    }
+}
+
+fn is_exempted_by_host_map(
+    host: &str,
+    spec: &str,
+    exc_map: &BTreeMap<String, BTreeSet<String>>,
+) -> bool {
+    let mut cur = host;
+    while !cur.is_empty() {
+        if let Some(set) = exc_map.get(cur)
+            && (set.contains("*") || set.contains(spec))
+        {
+            return true;
+        }
+        match cur.find('.') {
+            Some(idx) => cur = &cur[idx + 1..],
+            None => break,
+        }
+    }
+    false
+}
+
+fn collect_relevant_exceptions(
+    exc_map: &BTreeMap<String, BTreeSet<String>>,
+    active_hosts: Option<&BTreeSet<String>>,
+    max_entries: usize,
+) -> BTreeMap<String, Vec<String>> {
+    let mut out: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for (scope, specs) in exc_map {
+        if out.len() >= max_entries {
+            break;
+        }
+        let include = match active_hosts {
+            None => true,
+            Some(hosts) => {
+                if scope.starts_with('^') {
+                    let info = extract_hosts_from_regex(scope);
+                    info.concrete_hosts
+                        .iter()
+                        .any(|ch| mitm_host_is_excluded(ch, hosts))
+                } else {
+                    mitm_host_is_excluded(scope, hosts)
+                }
+            }
+        };
+        if include {
+            let list: Vec<String> = if specs.contains("*") {
+                vec!["*".to_string()]
+            } else {
+                specs.iter().take(12).cloned().collect()
+            };
+            if !list.is_empty() {
+                out.insert(scope.clone(), list);
+            }
+        }
+    }
+    out
+}
+
+fn encode_header_ops_arg(ops: &[HeaderRuntimeOp]) -> Option<String> {
+    if ops.is_empty() {
+        return None;
+    }
+    let json = serde_json::to_string(ops).ok()?;
+    let encoded = format!("u:{}", percent_encode_uri_component(&json));
+    if encoded.len() <= 7600 {
+        Some(encoded)
+    } else {
+        None
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn build_header_modifier_scripts(
+    rules: &[HeaderModRule],
+    exceptions: &[HeaderModException],
+    protected_apex_set: &FxHashSet<String>,
+    mitm_positive: &mut BTreeSet<String>,
+    mitm_exclusion_set: &BTreeSet<String>,
+    final_suffix_trie: &DomainTrie,
+    compressed_domains: &BTreeSet<String>,
+) -> Vec<ScriptRule> {
+    if rules.is_empty() {
+        return Vec::new();
+    }
+
+    let mut cookie_exc: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut csp_exc: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut perm_exc: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+
+    for ex in exceptions {
+        let key = if ex.scope_key.starts_with('^') {
+            ex.scope_key.clone()
+        } else {
+            ex.scope_key
+                .trim()
+                .trim_end_matches('.')
+                .to_ascii_lowercase()
+        };
+        if key.is_empty() || ex.spec.is_empty() {
+            continue;
+        }
+        match ex.kind {
+            HeaderModKind::Cookie => {
+                cookie_exc.entry(key).or_default().insert(ex.spec.clone());
+            }
+            HeaderModKind::Csp => {
+                csp_exc.entry(key).or_default().insert(ex.spec.clone());
+            }
+            HeaderModKind::Permissions => {
+                perm_exc.entry(key).or_default().insert(ex.spec.clone());
+            }
+        }
+    }
+
+    let mut global_cookies: BTreeMap<String, u16> = BTreeMap::new();
+    let mut global_perms: BTreeSet<String> = BTreeSet::new();
+    let mut scoped_cookies: BTreeMap<String, (u16, BTreeSet<String>)> = BTreeMap::new();
+    let mut scoped_csp: BTreeMap<String, (u16, BTreeSet<String>)> = BTreeMap::new();
+    let mut scoped_perms: BTreeMap<String, (u16, BTreeSet<String>)> = BTreeMap::new();
+
+    for r in rules {
+        let host = r
+            .host_scope
+            .trim()
+            .trim_end_matches('.')
+            .to_ascii_lowercase();
+        if host == "*" {
+            match r.kind {
+                HeaderModKind::Cookie
+                    if r.spec != "*"
+                        && !matches!(r.spec.as_str(), "DSID" | "actppresence" | "SID" | "HSID") =>
+                {
+                    let e = global_cookies.entry(r.spec.clone()).or_insert(r.weight);
+                    *e = (*e).max(r.weight);
+                }
+                HeaderModKind::Permissions => {
+                    global_perms.insert(r.spec.clone());
+                }
+                _ => {}
+            }
+            continue;
+        }
+
+        if !is_valid_mitm_host(&host)
+            || mitm_host_is_excluded(&host, mitm_exclusion_set)
+            || final_suffix_trie.matches_domain(&host)
+            || compressed_domains.contains(&host)
+        {
+            continue;
+        }
+
+        match r.kind {
+            HeaderModKind::Cookie => {
+                if !is_exempted_by_host_map(&host, &r.spec, &cookie_exc) {
+                    let entry = scoped_cookies
+                        .entry(host)
+                        .or_insert_with(|| (r.weight, BTreeSet::new()));
+                    entry.0 = entry.0.max(r.weight);
+                    entry.1.insert(r.spec.clone());
+                }
+            }
+            HeaderModKind::Csp => {
+                if !is_exempted_by_host_map(&host, &r.spec, &csp_exc) {
+                    let entry = scoped_csp
+                        .entry(host)
+                        .or_insert_with(|| (r.weight, BTreeSet::new()));
+                    entry.0 = entry.0.max(r.weight);
+                    entry.1.insert(r.spec.clone());
+                }
+            }
+            HeaderModKind::Permissions => {
+                if !is_exempted_by_host_map(&host, &r.spec, &perm_exc) {
+                    let entry = scoped_perms
+                        .entry(host)
+                        .or_insert_with(|| (r.weight, BTreeSet::new()));
+                    entry.0 = entry.0.max(r.weight);
+                    entry.1.insert(r.spec.clone());
+                }
+            }
+        }
+    }
+
+    let mut scripts: Vec<ScriptRule> = Vec::new();
+    let mut mitm_budget = 160usize;
+
+    // 1. Host-scoped `$cookie` request shards (`http-request` only, header-only `requires-body=false`)
+    if !scoped_cookies.is_empty() {
+        let mut ranked: Vec<(String, u16, BTreeSet<String>)> = scoped_cookies
+            .iter()
+            .map(|(h, (w, specs))| (h.clone(), *w, specs.clone()))
+            .collect();
+        ranked.sort_by(|a, b| {
+            b.1.cmp(&a.1)
+                .then_with(|| b.2.len().cmp(&a.2.len()))
+                .then_with(|| a.0.cmp(&b.0))
+        });
+
+        let mut cursor = 0usize;
+        for shard_idx in 0..8usize {
+            if cursor >= ranked.len() {
+                break;
+            }
+            let mut ops: Vec<HeaderRuntimeOp> = Vec::new();
+            let mut active_hosts: BTreeSet<String> = BTreeSet::new();
+            let mut est_json_bytes = 2usize;
+
+            while cursor < ranked.len() && active_hosts.len() < 32 {
+                let (ref host, _, ref specs) = ranked[cursor];
+                let all = specs.contains("*");
+                let mut exact = Vec::new();
+                let mut regexes = Vec::new();
+                if !all {
+                    for s in specs.iter().take(16) {
+                        if let Some(parsed) = split_cookie_token_for_runtime(s) {
+                            match parsed {
+                                Ok(lit) => exact.push(lit),
+                                Err(re_pair) => regexes.push(re_pair),
+                            }
+                        }
+                    }
+                }
+                if !all && exact.is_empty() && regexes.is_empty() {
+                    cursor += 1;
+                    continue;
+                }
+                let mut host_btree = BTreeSet::new();
+                host_btree.insert(host.clone());
+                let exc = collect_relevant_exceptions(&cookie_exc, Some(&host_btree), 8);
+                let op = HeaderRuntimeOp {
+                    op: "cookie",
+                    exact,
+                    regexes,
+                    all,
+                    policies: Vec::new(),
+                    hosts: vec![host.clone()],
+                    exc,
+                };
+                let op_len = serde_json::to_string(&op).map(|s| s.len()).unwrap_or(9999);
+                if est_json_bytes + op_len * 2 > 5400 && !ops.is_empty() {
+                    break;
+                }
+                est_json_bytes += op_len * 2;
+                if !protected_apex_set.contains(host)
+                    && mitm_budget > 0
+                    && mitm_positive.insert(host.clone())
+                {
+                    mitm_budget -= 1;
+                }
+                active_hosts.insert(host.clone());
+                ops.push(op);
+                cursor += 1;
+            }
+
+            if let Some(arg) = encode_header_ops_arg(&ops)
+                && !active_hosts.is_empty()
+            {
+                let host_atoms: Vec<String> = active_hosts
+                    .iter()
+                    .map(|h| host_scope_to_regex(h))
+                    .collect();
+                let pattern = format!("^https?://(?:{})(?::\\d+)?(?:/|$)", host_atoms.join("|"));
+                scripts.push(ScriptRule {
+                    name: format!("surge-adguard-cookie-req-{}", shard_idx + 1),
+                    script_type: ScriptType::HttpRequest,
+                    pattern,
+                    script_path: ADGUARD_SCRIPT_URL.to_string(),
+                    requires_body: false,
+                    binary_body_mode: false,
+                    full_header_mode: true,
+                    max_size: None,
+                    timeout: Some(5),
+                    argument: Some(arg),
+                    engine: Some("jsc".to_string()),
+                    weight: 2,
+                });
+            }
+        }
+    }
+
+    // 2. Unified host-scoped `$cookie` + `$csp` + `$permissions` response shards (`http-response`, header-only `requires-body=false`)
+    //    Combining all response header ops per host avoids first-match shadowing and duplicate trigger patterns.
+    let mut all_resp_hosts: BTreeSet<String> = scoped_cookies.keys().cloned().collect();
+    all_resp_hosts.extend(scoped_csp.keys().cloned());
+    all_resp_hosts.extend(scoped_perms.keys().cloned());
+    if !all_resp_hosts.is_empty() {
+        let mut ranked_hosts: Vec<(String, u16)> = all_resp_hosts
+            .into_iter()
+            .map(|h| {
+                let w0 = scoped_cookies.get(&h).map(|x| x.0).unwrap_or(0);
+                let w1 = scoped_csp.get(&h).map(|x| x.0).unwrap_or(0);
+                let w2 = scoped_perms.get(&h).map(|x| x.0).unwrap_or(0);
+                (h, w0.max(w1).max(w2))
+            })
+            .collect();
+        ranked_hosts.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+
+        let mut cursor = 0usize;
+        for shard_idx in 0..12usize {
+            if cursor >= ranked_hosts.len() {
+                break;
+            }
+            let mut ops: Vec<HeaderRuntimeOp> = Vec::new();
+            let mut active_hosts: BTreeSet<String> = BTreeSet::new();
+            let mut est_json_bytes = 2usize;
+
+            while cursor < ranked_hosts.len() && active_hosts.len() < 28 {
+                let (ref host, _) = ranked_hosts[cursor];
+                let mut host_set = BTreeSet::new();
+                host_set.insert(host.clone());
+                let mut host_ops = Vec::new();
+
+                if let Some((_, specs)) = scoped_cookies.get(host) {
+                    let all = specs.contains("*");
+                    let mut exact = Vec::new();
+                    let mut regexes = Vec::new();
+                    if !all {
+                        for s in specs.iter().take(16) {
+                            if let Some(parsed) = split_cookie_token_for_runtime(s) {
+                                match parsed {
+                                    Ok(lit) => exact.push(lit),
+                                    Err(re_pair) => regexes.push(re_pair),
+                                }
+                            }
+                        }
+                    }
+                    if all || !exact.is_empty() || !regexes.is_empty() {
+                        host_ops.push(HeaderRuntimeOp {
+                            op: "cookie",
+                            exact,
+                            regexes,
+                            all,
+                            policies: Vec::new(),
+                            hosts: vec![host.clone()],
+                            exc: collect_relevant_exceptions(&cookie_exc, Some(&host_set), 8),
+                        });
+                    }
+                }
+                if let Some((_, csp_set)) = scoped_csp.get(host) {
+                    host_ops.push(HeaderRuntimeOp {
+                        op: "csp",
+                        exact: Vec::new(),
+                        regexes: Vec::new(),
+                        all: false,
+                        policies: csp_set.iter().take(4).cloned().collect(),
+                        hosts: vec![host.clone()],
+                        exc: collect_relevant_exceptions(&csp_exc, Some(&host_set), 6),
+                    });
+                }
+                if let Some((_, perm_set)) = scoped_perms.get(host) {
+                    host_ops.push(HeaderRuntimeOp {
+                        op: "permissions",
+                        exact: Vec::new(),
+                        regexes: Vec::new(),
+                        all: false,
+                        policies: perm_set.iter().take(6).cloned().collect(),
+                        hosts: vec![host.clone()],
+                        exc: collect_relevant_exceptions(&perm_exc, Some(&host_set), 6),
+                    });
+                }
+
+                if host_ops.is_empty() {
+                    cursor += 1;
+                    continue;
+                }
+                let add_bytes: usize = host_ops
+                    .iter()
+                    .map(|o| {
+                        serde_json::to_string(o)
+                            .map(|s| s.len() * 2)
+                            .unwrap_or(9999)
+                    })
+                    .sum();
+                if est_json_bytes + add_bytes > 5200 && !ops.is_empty() {
+                    break;
+                }
+                est_json_bytes += add_bytes;
+                if !protected_apex_set.contains(host)
+                    && mitm_budget > 0
+                    && mitm_positive.insert(host.clone())
+                {
+                    mitm_budget -= 1;
+                }
+                active_hosts.insert(host.clone());
+                ops.extend(host_ops);
+                cursor += 1;
+            }
+
+            if let Some(arg) = encode_header_ops_arg(&ops)
+                && !active_hosts.is_empty()
+            {
+                let host_atoms: Vec<String> = active_hosts
+                    .iter()
+                    .map(|h| host_scope_to_regex(h))
+                    .collect();
+                let pattern = format!("^https?://(?:{})(?::\\d+)?(?:/|$)", host_atoms.join("|"));
+                scripts.push(ScriptRule {
+                    name: format!("surge-adguard-policy-resp-{}", shard_idx + 1),
+                    script_type: ScriptType::HttpResponse,
+                    pattern,
+                    script_path: ADGUARD_SCRIPT_URL.to_string(),
+                    requires_body: false,
+                    binary_body_mode: false,
+                    full_header_mode: true,
+                    max_size: None,
+                    timeout: Some(5),
+                    argument: Some(arg),
+                    engine: Some("jsc".to_string()),
+                    weight: 2,
+                });
+            }
+        }
+    }
+
+    // 3. Global tracking `$cookie` & privacy `$permissions` fallback header scripts (`requires-body=false`)
+    let mut global_exact = Vec::new();
+    let mut global_regexes = Vec::new();
+    let mut ranked_gc: Vec<(String, u16)> = global_cookies.into_iter().collect();
+    ranked_gc.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    for (tok, _) in ranked_gc.into_iter().take(160) {
+        if let Some(parsed) = split_cookie_token_for_runtime(&tok) {
+            match parsed {
+                Ok(lit) => global_exact.push(lit),
+                Err(re_pair) => global_regexes.push(re_pair),
+            }
+        }
+    }
+
+    let global_cookie_exc = collect_relevant_exceptions(&cookie_exc, None, 48);
+    let global_perm_exc = collect_relevant_exceptions(&perm_exc, None, 24);
+
+    if !global_exact.is_empty() || !global_regexes.is_empty() {
+        let req_op = HeaderRuntimeOp {
+            op: "cookie",
+            exact: global_exact.clone(),
+            regexes: global_regexes.clone(),
+            all: false,
+            policies: Vec::new(),
+            hosts: Vec::new(),
+            exc: global_cookie_exc.clone(),
+        };
+        if let Some(arg) = encode_header_ops_arg(&[req_op]) {
+            scripts.push(ScriptRule {
+                name: "surge-adguard-global-req-headers".to_string(),
+                script_type: ScriptType::HttpRequest,
+                pattern: "^https?://.+".to_string(),
+                script_path: ADGUARD_SCRIPT_URL.to_string(),
+                requires_body: false,
+                binary_body_mode: false,
+                full_header_mode: true,
+                max_size: None,
+                timeout: Some(5),
+                argument: Some(arg),
+                engine: Some("jsc".to_string()),
+                weight: 1,
+            });
+        }
+    }
+
+    let mut resp_global_ops = Vec::new();
+    if !global_exact.is_empty() || !global_regexes.is_empty() {
+        resp_global_ops.push(HeaderRuntimeOp {
+            op: "cookie",
+            exact: global_exact,
+            regexes: global_regexes,
+            all: false,
+            policies: Vec::new(),
+            hosts: Vec::new(),
+            exc: global_cookie_exc,
+        });
+    }
+    if !global_perms.is_empty() {
+        resp_global_ops.push(HeaderRuntimeOp {
+            op: "permissions",
+            exact: Vec::new(),
+            regexes: Vec::new(),
+            all: false,
+            policies: global_perms.into_iter().take(16).collect(),
+            hosts: Vec::new(),
+            exc: global_perm_exc,
+        });
+    }
+    if let Some(arg) = encode_header_ops_arg(&resp_global_ops) {
+        scripts.push(ScriptRule {
+            name: "surge-adguard-global-resp-headers".to_string(),
+            script_type: ScriptType::HttpResponse,
+            pattern: "^https?://.+".to_string(),
+            script_path: ADGUARD_SCRIPT_URL.to_string(),
+            requires_body: false,
+            binary_body_mode: false,
+            full_header_mode: true,
+            max_size: None,
+            timeout: Some(5),
+            argument: Some(arg),
+            engine: Some("jsc".to_string()),
+            weight: 1,
+        });
     }
 
     scripts

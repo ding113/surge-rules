@@ -1,20 +1,28 @@
 /**
- * Surge http-response transformer for AdGuard CoreLibs advanced modifiers:
- * - $replace   ({ op: "replace", pat, rep, flags? })
- * - $hls       ({ op: "hls", pat, flags? })
- * - $xmlprune  ({ op: "xmlprune", expr })
- * - $jsonprune ({ op: "jsonprune", expr })
+ * Surge HTTP request/response transformer for AdGuard CoreLibs advanced modifiers:
+ * - Body ops (`http-response` with `requires-body=true`):
+ *   - $replace      ({ op: "replace", pat, rep, flags? })
+ *   - $hls          ({ op: "hls", pat, flags? })
+ *   - $xmlprune     ({ op: "xmlprune", expr })
+ *   - $jsonprune    ({ op: "jsonprune", expr })
+ * - Header ops (`http-request` & `http-response`, `full-header-mode=true`, zero body buffering when header-only):
+ *   - $cookie       ({ op: "cookie", exact?, regexes?, all?, hosts?, exc? })
+ *   - $csp          ({ op: "csp", policies, hosts?, exc? })
+ *   - $permissions  ({ op: "permissions", policies, hosts?, exc? })
+ *   - $removeheader ({ op: "removeheader", names, dir?, hosts?, exc? })
  *
  * Argument format: either `u:<encodeURIComponent(JSON)>` or raw JSON array of ops.
  * Strictly fail-open: calls `$done({})` whenever nothing changes or input is non-matching/malformed.
+ * Never returns `body` unless `$response.body` was present as a string and mutated.
  */
 (() => {
-  if (typeof $response === "undefined" || typeof $done !== "function") {
+  if (typeof $done !== "function") {
     return;
   }
 
-  const origBody = $response.body;
-  if (typeof origBody !== "string" || origBody.length === 0) {
+  const hasResponse = typeof $response !== "undefined" && $response !== null;
+  const hasRequest = typeof $request !== "undefined" && $request !== null;
+  if (!hasResponse && !hasRequest) {
     $done({});
     return;
   }
@@ -25,73 +33,277 @@
     return;
   }
 
+  const FORBIDDEN_REMOVE_HEADERS = new Set([
+    "access-control-allow-credentials",
+    "access-control-allow-headers",
+    "access-control-allow-methods",
+    "access-control-allow-origin",
+    "access-control-expose-headers",
+    "access-control-max-age",
+    "access-control-request-headers",
+    "access-control-request-method",
+    "alt-svc",
+    "authentication-info",
+    "clear-site-data",
+    "connection",
+    "content-encoding",
+    "content-length",
+    "content-range",
+    "content-security-policy",
+    "content-security-policy-report-only",
+    "content-type",
+    "cross-origin-embedder-policy",
+    "cross-origin-opener-policy",
+    "cross-origin-resource-policy",
+    "host",
+    "keep-alive",
+    "origin",
+    "permissions-policy",
+    "proxy-authenticate",
+    "proxy-authorization",
+    "proxy-connection",
+    "sec-fetch-dest",
+    "sec-fetch-mode",
+    "sec-fetch-site",
+    "sec-fetch-user",
+    "sec-websocket-accept",
+    "sec-websocket-extensions",
+    "sec-websocket-key",
+    "sec-websocket-protocol",
+    "sec-websocket-version",
+    "strict-transport-security",
+    "te",
+    "trailer",
+    "transfer-encoding",
+    "upgrade",
+    "www-authenticate",
+    "x-content-type-options",
+    "x-frame-options",
+  ]);
+
   const ops = getParsedOps(rawArg);
   if (ops.length === 0) {
     $done({});
     return;
   }
 
-  let body = origBody;
-  let jsonState = null; // { parsed: unknown, dirty: boolean } | "invalid"
+  const reqUrl = hasRequest && typeof $request.url === "string" ? $request.url : "";
+  const rawHeaders = hasResponse ? $response.headers : hasRequest ? $request.headers : null;
+  const reqHeaders = hasRequest ? $request.headers : null;
+  const reqHost = extractRequestHost(reqUrl, reqHeaders);
 
-  function flushJsonIfDirty() {
-    if (jsonState && jsonState !== "invalid") {
-      if (jsonState.dirty) {
-        body = JSON.stringify(jsonState.parsed);
+  // 1. Execute Header Ops (`$cookie`, `$csp`, `$permissions`, `$removeheader`)
+  let headersChanged = false;
+  let workingHeaders = null;
+  const headersWereArray = Array.isArray(rawHeaders);
+
+  function ensureWorkingHeaders() {
+    if (workingHeaders !== null) return workingHeaders;
+    workingHeaders = normalizeHeadersToArray(rawHeaders);
+    return workingHeaders;
+  }
+
+  if (rawHeaders && typeof rawHeaders === "object") {
+    for (let i = 0; i < ops.length; i++) {
+      const item = ops[i];
+      if (item.hosts && (!reqHost || !matchesHostSet(reqHost, item.hosts))) {
+        continue;
       }
-      jsonState = null;
+
+      if (item.kind === "cookie") {
+        const hdrs = ensureWorkingHeaders();
+        if (hasResponse) {
+          const next = [];
+          for (let j = 0; j < hdrs.length; j++) {
+            const h = hdrs[j];
+            if (h.field.toLowerCase() !== "set-cookie") {
+              next.push(h);
+              continue;
+            }
+            const cname = extractSetCookieName(h.value);
+            if (
+              cname &&
+              matchesCookieTarget(cname, item) &&
+              !isCookieExempted(cname, reqHost, reqUrl, item.exc)
+            ) {
+              headersChanged = true;
+            } else {
+              next.push(h);
+            }
+          }
+          workingHeaders = next;
+        } else {
+          const next = [];
+          for (let j = 0; j < hdrs.length; j++) {
+            const h = hdrs[j];
+            if (h.field.toLowerCase() !== "cookie") {
+              next.push(h);
+              continue;
+            }
+            const rawCookie = String(h.value ?? "");
+            const pairs = rawCookie.split(";");
+            const kept = [];
+            let droppedAny = false;
+            for (let k = 0; k < pairs.length; k++) {
+              const pair = pairs[k];
+              const trimmedPair = pair.trim();
+              if (!trimmedPair) continue;
+              const eqIdx = trimmedPair.indexOf("=");
+              const cname = (eqIdx < 0 ? trimmedPair : trimmedPair.slice(0, eqIdx)).trim();
+              if (
+                cname &&
+                matchesCookieTarget(cname, item) &&
+                !isCookieExempted(cname, reqHost, reqUrl, item.exc)
+              ) {
+                droppedAny = true;
+              } else {
+                kept.push(trimmedPair);
+              }
+            }
+            if (droppedAny) {
+              headersChanged = true;
+              if (kept.length > 0) {
+                next.push({ field: h.field, value: kept.join("; ") });
+              }
+            } else {
+              next.push(h);
+            }
+          }
+          workingHeaders = next;
+        }
+      } else if (hasResponse && item.kind === "csp") {
+        const hdrs = ensureWorkingHeaders();
+        if (!isHtmlDocumentResponse(hdrs, reqHeaders)) continue;
+        const existingCsp = collectHeaderValues(hdrs, "content-security-policy");
+        for (let p = 0; p < item.policies.length; p++) {
+          const pol = item.policies[p];
+          if (isPolicyExempted(pol, reqHost, reqUrl, item.exc)) continue;
+          if (!existingCsp.some((v) => v.includes(pol))) {
+            hdrs.push({ field: "Content-Security-Policy", value: pol });
+            existingCsp.push(pol);
+            headersChanged = true;
+          }
+        }
+      } else if (hasResponse && item.kind === "permissions") {
+        const hdrs = ensureWorkingHeaders();
+        if (!isHtmlDocumentResponse(hdrs, reqHeaders)) continue;
+        const existingPerm = collectHeaderValues(hdrs, "permissions-policy");
+        const toAdd = [];
+        for (let p = 0; p < item.policies.length; p++) {
+          const pol = item.policies[p];
+          if (isPolicyExempted(pol, reqHost, reqUrl, item.exc)) continue;
+          if (!existingPerm.some((v) => v.includes(pol))) {
+            toAdd.push(pol);
+          }
+        }
+        if (toAdd.length > 0) {
+          const merged = toAdd.join(", ");
+          hdrs.push({ field: "Permissions-Policy", value: merged });
+          headersChanged = true;
+        }
+      } else if (item.kind === "removeheader") {
+        const targetResp = item.dir !== "request";
+        if (targetResp !== hasResponse) continue;
+        const hdrs = ensureWorkingHeaders();
+        const next = [];
+        for (let j = 0; j < hdrs.length; j++) {
+          const h = hdrs[j];
+          const lower = h.field.toLowerCase();
+          if (
+            !FORBIDDEN_REMOVE_HEADERS.has(lower) &&
+            item.names.has(lower) &&
+            !isPolicyExempted(lower, reqHost, reqUrl, item.exc)
+          ) {
+            headersChanged = true;
+          } else {
+            next.push(h);
+          }
+        }
+        workingHeaders = next;
+      }
     }
   }
 
-  for (let i = 0; i < ops.length; i++) {
-    const item = ops[i];
-    if (item.kind === "jsonprune") {
-      if (jsonState === null) {
-        const trimmed = body.trim();
-        if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
-          jsonState = "invalid";
-          continue;
+  // 2. Execute Body Ops (`$replace`, `$hls`, `$xmlprune`, `$jsonprune`) ONLY when `$response.body` is a non-empty string
+  const origBody = hasResponse ? $response.body : undefined;
+  let body = origBody;
+  let bodyChanged = false;
+
+  if (hasResponse && typeof origBody === "string" && origBody.length > 0) {
+    let jsonState = null; // { parsed: unknown, dirty: boolean } | "invalid"
+
+    const flushJsonIfDirty = () => {
+      if (jsonState && jsonState !== "invalid") {
+        if (jsonState.dirty) {
+          body = JSON.stringify(jsonState.parsed);
         }
-        try {
-          jsonState = { parsed: JSON.parse(body), dirty: false };
-        } catch {
-          jsonState = "invalid";
-          continue;
+        jsonState = null;
+      }
+    };
+
+    for (let i = 0; i < ops.length; i++) {
+      const item = ops[i];
+      if (item.kind === "jsonprune") {
+        if (jsonState === null) {
+          const trimmed = body.trim();
+          if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+            jsonState = "invalid";
+            continue;
+          }
+          try {
+            jsonState = { parsed: JSON.parse(body), dirty: false };
+          } catch {
+            jsonState = "invalid";
+            continue;
+          }
+        }
+        if (jsonState !== "invalid") {
+          if (applyJsonPruneSteps(jsonState.parsed, item.steps, 0)) {
+            jsonState.dirty = true;
+          }
+        }
+        continue;
+      }
+
+      if (item.kind !== "replace" && item.kind !== "hls" && item.kind !== "xmlprune") {
+        continue;
+      }
+
+      flushJsonIfDirty();
+
+      if (item.kind === "replace") {
+        const next = body.replace(item.re, item.rep);
+        if (next !== body) {
+          body = next;
+        }
+      } else if (item.kind === "hls") {
+        if (body.includes("#EXTM3U")) {
+          body = pruneHlsPlaylist(body, item.re);
+        }
+      } else if (item.kind === "xmlprune") {
+        if (body.includes("<")) {
+          body = pruneXmlDocument(body, item.branches);
         }
       }
-      if (jsonState !== "invalid") {
-        if (applyJsonPruneSteps(jsonState.parsed, item.steps, 0)) {
-          jsonState.dirty = true;
-        }
-      }
-      continue;
     }
 
     flushJsonIfDirty();
-
-    if (item.kind === "replace") {
-      const next = body.replace(item.re, item.rep);
-      if (next !== body) {
-        body = next;
-      }
-    } else if (item.kind === "hls") {
-      if (body.includes("#EXTM3U")) {
-        body = pruneHlsPlaylist(body, item.re);
-      }
-    } else if (item.kind === "xmlprune") {
-      if (body.includes("<")) {
-        body = pruneXmlDocument(body, item.branches);
-      }
-    }
+    bodyChanged = body !== origBody;
   }
 
-  flushJsonIfDirty();
-
-  if (body === origBody) {
+  if (!headersChanged && !bodyChanged) {
     $done({});
     return;
   }
-  $done({ body });
+
+  const out = {};
+  if (headersChanged && workingHeaders !== null) {
+    out.headers = headersWereArray ? workingHeaders : serializeHeadersToObject(workingHeaders);
+  }
+  if (bodyChanged) {
+    out.body = body;
+  }
+  $done(out);
 
   function sanitizeFlags(rawFlags, ensureGlobal) {
     let out = ensureGlobal ? "g" : "";
@@ -107,6 +319,62 @@
       }
     }
     return out;
+  }
+
+  function compileHostSet(rawHosts) {
+    if (!Array.isArray(rawHosts) || rawHosts.length === 0) return null;
+    const set = new Set();
+    for (let i = 0; i < rawHosts.length; i++) {
+      if (typeof rawHosts[i] === "string" && rawHosts[i]) {
+        set.add(rawHosts[i].toLowerCase());
+      }
+    }
+    return set.size > 0 ? set : null;
+  }
+
+  function compileExcMap(rawExc) {
+    if (!rawExc || typeof rawExc !== "object") return null;
+    const byHost = new Map();
+    const urlRules = [];
+    const keys = Object.keys(rawExc);
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i];
+      const vals = Array.isArray(rawExc[k]) ? rawExc[k] : [];
+      const exact = new Set();
+      const regexes = [];
+      let all = false;
+      for (let j = 0; j < vals.length; j++) {
+        const tok = String(vals[j]);
+        if (tok === "*") {
+          all = true;
+        } else if (tok.startsWith("~")) {
+          const colon = tok.indexOf(":");
+          if (colon > 0) {
+            try {
+              regexes.push(
+                new RegExp(tok.slice(colon + 1), sanitizeFlags(tok.slice(1, colon), false)),
+              );
+            } catch {
+              // ignore malformed exception regex
+            }
+          }
+        } else {
+          exact.add(tok);
+        }
+      }
+      const entry = { all, exact, regexes };
+      if (k.startsWith("^")) {
+        try {
+          urlRules.push({ urlRe: new RegExp(k, "i"), entry });
+        } catch {
+          // ignore malformed exception URL regex
+        }
+      } else {
+        byHost.set(k.toLowerCase(), entry);
+      }
+    }
+    if (byHost.size === 0 && urlRules.length === 0) return null;
+    return { byHost, urlRules };
   }
 
   function getParsedOps(argStr) {
@@ -156,11 +424,224 @@
         if (steps.length > 0) {
           compiled.push({ kind: "jsonprune", steps });
         }
+      } else if (entry.op === "cookie") {
+        const exact = new Set(Array.isArray(entry.exact) ? entry.exact.map(String) : []);
+        const regexes = [];
+        if (Array.isArray(entry.regexes)) {
+          for (let r = 0; r < entry.regexes.length; r++) {
+            const pair = entry.regexes[r];
+            if (Array.isArray(pair) && typeof pair[0] === "string") {
+              try {
+                regexes.push(new RegExp(pair[0], sanitizeFlags(pair[1], false)));
+              } catch {
+                // Skip invalid cookie regex
+              }
+            }
+          }
+        }
+        const hosts = compileHostSet(entry.hosts);
+        const all = Boolean(entry.all) && hosts !== null;
+        if (all || exact.size > 0 || regexes.length > 0) {
+          compiled.push({
+            kind: "cookie",
+            all,
+            exact,
+            regexes,
+            hosts,
+            exc: compileExcMap(entry.exc),
+          });
+        }
+      } else if (entry.op === "csp" && Array.isArray(entry.policies)) {
+        const policies = entry.policies.map(String).filter((s) => s.length > 0);
+        if (policies.length > 0) {
+          compiled.push({
+            kind: "csp",
+            policies,
+            hosts: compileHostSet(entry.hosts),
+            exc: compileExcMap(entry.exc),
+          });
+        }
+      } else if (entry.op === "permissions" && Array.isArray(entry.policies)) {
+        const policies = entry.policies.map(String).filter((s) => s.length > 0);
+        if (policies.length > 0) {
+          compiled.push({
+            kind: "permissions",
+            policies,
+            hosts: compileHostSet(entry.hosts),
+            exc: compileExcMap(entry.exc),
+          });
+        }
+      } else if (entry.op === "removeheader" && Array.isArray(entry.names)) {
+        const names = new Set(entry.names.map((s) => String(s).toLowerCase()).filter(Boolean));
+        if (names.size > 0) {
+          compiled.push({
+            kind: "removeheader",
+            names,
+            dir: entry.dir === "request" ? "request" : "response",
+            hosts: compileHostSet(entry.hosts),
+            exc: compileExcMap(entry.exc),
+          });
+        }
       }
     }
 
     globalThis.__surgeAdguardCache = { arg: argStr, ops: compiled };
     return compiled;
+  }
+
+  // ============================================================================
+  // 0. Header Helpers (`full-header-mode` preserving)
+  // ============================================================================
+  function normalizeHeadersToArray(hdrs) {
+    if (!hdrs || typeof hdrs !== "object") return [];
+    if (Array.isArray(hdrs)) {
+      const out = [];
+      for (let i = 0; i < hdrs.length; i++) {
+        const x = hdrs[i];
+        if (x && typeof x.field === "string") {
+          out.push({ field: x.field, value: String(x.value ?? "") });
+        }
+      }
+      return out;
+    }
+    const keys = Object.keys(hdrs);
+    const out = [];
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i];
+      if (hdrs[k] !== undefined && hdrs[k] !== null) {
+        out.push({ field: k, value: String(hdrs[k]) });
+      }
+    }
+    return out;
+  }
+
+  function serializeHeadersToObject(arr) {
+    const obj = {};
+    for (let i = 0; i < arr.length; i++) {
+      const { field, value } = arr[i];
+      if (Object.hasOwn(obj, field)) {
+        obj[field] = `${obj[field]}, ${value}`;
+      } else {
+        obj[field] = value;
+      }
+    }
+    return obj;
+  }
+
+  function collectHeaderValues(hdrs, lowerName) {
+    const out = [];
+    for (let i = 0; i < hdrs.length; i++) {
+      if (hdrs[i].field.toLowerCase() === lowerName) {
+        out.push(String(hdrs[i].value ?? ""));
+      }
+    }
+    return out;
+  }
+
+  function extractRequestHost(url, reqHdrs) {
+    if (typeof url === "string" && url.length > 0) {
+      const m = url.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/([^/?#:]+)/);
+      if (m?.[1]) {
+        return m[1].toLowerCase().replace(/\.$/, "");
+      }
+    }
+    if (reqHdrs && typeof reqHdrs === "object") {
+      const arr = normalizeHeadersToArray(reqHdrs);
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].field.toLowerCase() === "host") {
+          return String(arr[i].value).split(":")[0].trim().toLowerCase().replace(/\.$/, "");
+        }
+      }
+    }
+    return "";
+  }
+
+  function matchesHostSet(host, hostSet) {
+    let cur = host;
+    while (cur.length > 0) {
+      if (hostSet.has(cur)) return true;
+      const dot = cur.indexOf(".");
+      if (dot < 0) break;
+      cur = cur.slice(dot + 1);
+    }
+    return false;
+  }
+
+  function extractSetCookieName(val) {
+    const s = String(val ?? "");
+    const firstPart = s.split(";")[0] || "";
+    const eq = firstPart.indexOf("=");
+    if (eq < 0) return "";
+    return firstPart.slice(0, eq).trim();
+  }
+
+  function matchesCookieTarget(cname, item) {
+    if (item.all) return true;
+    if (item.exact.has(cname)) return true;
+    for (let i = 0; i < item.regexes.length; i++) {
+      if (item.regexes[i].test(cname)) return true;
+    }
+    return false;
+  }
+
+  function matchesExcEntry(val, entry) {
+    if (entry.all) return true;
+    if (entry.exact.has(val)) return true;
+    for (let i = 0; i < entry.regexes.length; i++) {
+      if (entry.regexes[i].test(val)) return true;
+    }
+    return false;
+  }
+
+  function isCookieExempted(cname, host, url, exc) {
+    if (!exc) return false;
+    const star = exc.byHost.get("*");
+    if (star && matchesExcEntry(cname, star)) return true;
+    let cur = host;
+    while (cur && cur.length > 0) {
+      const hit = exc.byHost.get(cur);
+      if (hit && matchesExcEntry(cname, hit)) return true;
+      const dot = cur.indexOf(".");
+      if (dot < 0) break;
+      cur = cur.slice(dot + 1);
+    }
+    if (url && exc.urlRules.length > 0) {
+      for (let i = 0; i < exc.urlRules.length; i++) {
+        const r = exc.urlRules[i];
+        if (r.urlRe.test(url) && matchesExcEntry(cname, r.entry)) return true;
+      }
+    }
+    return false;
+  }
+
+  function isPolicyExempted(pol, host, url, exc) {
+    return isCookieExempted(pol, host, url, exc);
+  }
+
+  function isHtmlDocumentResponse(respHdrs, reqHdrs) {
+    let isHtml = false;
+    for (let i = 0; i < respHdrs.length; i++) {
+      if (respHdrs[i].field.toLowerCase() === "content-type") {
+        const ct = String(respHdrs[i].value).trim().toLowerCase();
+        if (ct.startsWith("text/html") || ct.startsWith("application/xhtml+xml")) {
+          isHtml = true;
+          break;
+        }
+      }
+    }
+    if (!isHtml) return false;
+    if (reqHdrs && typeof reqHdrs === "object") {
+      const reqArr = normalizeHeadersToArray(reqHdrs);
+      for (let i = 0; i < reqArr.length; i++) {
+        if (reqArr[i].field.toLowerCase() === "sec-fetch-dest") {
+          const dest = String(reqArr[i].value).trim().toLowerCase();
+          if (dest && dest !== "document" && dest !== "iframe" && dest !== "frame") {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   }
 
   // ============================================================================

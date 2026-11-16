@@ -142,6 +142,7 @@ pub fn parse_qx_rewrite(text: &str, weight: u16, out: &mut ParsedAdblockSource) 
                     script_path: (*script_url).to_string(),
                     requires_body,
                     binary_body_mode: false,
+                    full_header_mode: false,
                     max_size,
                     timeout,
                     argument: None,
