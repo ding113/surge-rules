@@ -2743,6 +2743,13 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     domain: "zhenyunpan.com",
     rationale: "Legitimate CloudDrive2 service domain; blocking breaks CloudDrive2 functionality",
   },
+  // ccc-x.jd.com 被广告列表拦截后，第三方广告无法跳转到商品页
+  {
+    matchType: "exact",
+    domain: "ccc-x.jd.com",
+    rationale:
+      "User report: blocking ccc-x.jd.com prevents third-party ads from opening the JD product page",
+  },
 ];
 
 /**

@@ -4450,6 +4450,11 @@
       "matchType": "suffix",
       "domain": "zhenyunpan.com",
       "rationale": "Legitimate CloudDrive2 service domain; blocking breaks CloudDrive2 functionality"
+    },
+    {
+      "matchType": "exact",
+      "domain": "ccc-x.jd.com",
+      "rationale": "User report: blocking ccc-x.jd.com prevents third-party ads from opening the JD product page"
     }
   ],
   "protectedApexDomains": [
