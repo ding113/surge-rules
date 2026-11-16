@@ -2737,6 +2737,12 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     domain: "cdn6.cc.cd",
     rationale: "Legitimate content CDN host; blocking breaks resource loading",
   },
+  // zhenyunpan.com 为 CloudDrive2 正常业务域名，不应被广告规则拦截
+  {
+    matchType: "suffix",
+    domain: "zhenyunpan.com",
+    rationale: "Legitimate CloudDrive2 service domain; blocking breaks CloudDrive2 functionality",
+  },
 ];
 
 /**

@@ -4445,6 +4445,11 @@
       "matchType": "suffix",
       "domain": "cdn6.cc.cd",
       "rationale": "Legitimate content CDN host; blocking breaks resource loading"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "zhenyunpan.com",
+      "rationale": "Legitimate CloudDrive2 service domain; blocking breaks CloudDrive2 functionality"
     }
   ],
   "protectedApexDomains": [
