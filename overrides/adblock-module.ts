@@ -163,11 +163,13 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   },
   {
     pattern: "*.snssdk.com",
-    rationale: "ByteDance app/API endpoints (is, gurd, i-lq) enforce TLS certificate pinning",
+    rationale:
+      "User report: MITM on *.snssdk.com (example http://aweme.snssdk.com) prevents Douyin local services from loading",
   },
   {
     pattern: "snssdk.com",
-    rationale: "ByteDance mobile app API root domain enforces TLS certificate pinning",
+    rationale:
+      "User report: MITM on the snssdk.com root prevents Douyin local services from loading",
   },
   {
     pattern: "*.amemv.com",
@@ -201,7 +203,8 @@ export const DISABLED_URL_PATTERNS: readonly string[] = [
   "xiaohongshu\\.com",
   "xhscdn\\.com",
   "redbook",
-  // Strip Google APIs, Tencent Beacon & ByteDance snssdk HTTPS MITM rewrites/scripts (TLS-pinned)
+  // Strip Google APIs and Tencent Beacon HTTPS MITM rewrites/scripts (TLS-pinned).
+  // snssdk: user-reported Douyin local-service breakage. Do not assert certificate pinning.
   "youtubei\\.googleapis\\.com",
   "\\.googleapis\\.com/",
   "^https?://googleapis\\.com/",
@@ -209,8 +212,10 @@ export const DISABLED_URL_PATTERNS: readonly string[] = [
   "gurd\\.snssdk\\.com",
   "\\.snssdk\\.com/",
   "\\.snssdk.com/",
-  "^https?://is\\.snssdk\\.com/",
+  // Unescaped is.snssdk.com form is not covered by the escaped slash needles above.
   "^https?://is.snssdk.com/",
+  // One upstream Map Local alternation; slash needles miss HTTP aweme.snssdk.com /api and /motor paths.
+  "(amemv|musical|snssdk|tiktokv)\\.com/",
   "amemv\\.com",
   // Prevent Kelee broad Alibaba CDN image-dimension regexes from breaking Taobao/Alipay UI icons
   "gw\\.alicdn\\.com/mt/",

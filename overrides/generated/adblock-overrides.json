@@ -5655,11 +5655,11 @@
     },
     {
       "pattern": "*.snssdk.com",
-      "rationale": "ByteDance app/API endpoints (is, gurd, i-lq) enforce TLS certificate pinning"
+      "rationale": "User report: MITM on *.snssdk.com (example http://aweme.snssdk.com) prevents Douyin local services from loading"
     },
     {
       "pattern": "snssdk.com",
-      "rationale": "ByteDance mobile app API root domain enforces TLS certificate pinning"
+      "rationale": "User report: MITM on the snssdk.com root prevents Douyin local services from loading"
     },
     {
       "pattern": "*.amemv.com",
@@ -5693,8 +5693,8 @@
     "gurd\\.snssdk\\.com",
     "\\.snssdk\\.com/",
     "\\.snssdk.com/",
-    "^https?://is\\.snssdk\\.com/",
     "^https?://is.snssdk.com/",
+    "(amemv|musical|snssdk|tiktokv)\\.com/",
     "amemv\\.com",
     "gw\\.alicdn\\.com/mt/",
     "gw\\.alicdn\\.com/tfs/",
