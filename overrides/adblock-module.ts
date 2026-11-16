@@ -97,8 +97,12 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
     rationale: "Google Firestore gRPC/streaming breaks under MITM (HttpsExclusions)",
   },
   {
-    pattern: "instantmessaging-pa.googleapis.com",
-    rationale: "Google Messages pairing breaks under MITM (HttpsExclusions)",
+    pattern: "*.googleapis.com",
+    rationale: "Google APIs and mobile/desktop SDKs enforce TLS certificate pinning",
+  },
+  {
+    pattern: "googleapis.com",
+    rationale: "Google APIs root domain enforces TLS certificate pinning",
   },
   { pattern: "login.microsoftonline.com", rationale: "Microsoft Entra ID OAuth/FIDO2 login" },
   { pattern: "login.live.com", rationale: "Microsoft account OAuth/Passkey login" },
@@ -149,6 +153,22 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
     pattern: "*.xhscdn.com",
     rationale: "Xiaohongshu media CDN enforces strict TLS validation",
   },
+  {
+    pattern: "*.beacon.qq.com",
+    rationale: "Tencent Beacon telemetry SDK (otheve, mtteve) enforces TLS certificate pinning",
+  },
+  {
+    pattern: "beacon.qq.com",
+    rationale: "Tencent Beacon root domain enforces TLS certificate pinning",
+  },
+  {
+    pattern: "*.snssdk.com",
+    rationale: "ByteDance app/API endpoints (is, gurd, i-lq) enforce TLS certificate pinning",
+  },
+  {
+    pattern: "snssdk.com",
+    rationale: "ByteDance mobile app API root domain enforces TLS certificate pinning",
+  },
 ];
 
 export const MITM_ADDED_HOSTS: readonly MitmHostEntry[] = [];
@@ -172,6 +192,16 @@ export const DISABLED_URL_PATTERNS: readonly string[] = [
   "xiaohongshu\\.com",
   "xhscdn\\.com",
   "redbook",
+  // Strip Google APIs, Tencent Beacon & ByteDance snssdk HTTPS MITM rewrites/scripts (TLS-pinned)
+  "youtubei\\.googleapis\\.com",
+  "\\.googleapis\\.com/",
+  "^https?://googleapis\\.com/",
+  "beacon\\.qq\\.com",
+  "gurd\\.snssdk\\.com",
+  "\\.snssdk\\.com/",
+  "\\.snssdk.com/",
+  "^https?://is\\.snssdk\\.com/",
+  "^https?://is.snssdk.com/",
   // Prevent Kelee broad Alibaba CDN image-dimension regexes from breaking Taobao/Alipay UI icons
   "gw\\.alicdn\\.com/mt/",
   "gw\\.alicdn\\.com/tfs/",

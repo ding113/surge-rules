@@ -2504,7 +2504,8 @@ fn mitm_host_is_excluded(host: &str, exclusions: &BTreeSet<String>) -> bool {
         .split(':')
         .next()
         .unwrap_or(host)
-        .trim_start_matches("*.");
+        .trim_start_matches("*.")
+        .trim_end_matches(".*");
     for ex in exclusions {
         if ex == host || ex == bare {
             return true;

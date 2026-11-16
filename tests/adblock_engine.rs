@@ -121,13 +121,21 @@ fn real_adblock_catalog_and_overrides_load_cleanly() {
         overrides.protected_apex_domains.len() >= 30,
         "expected curated protectedApexDomains in overrides"
     );
-    assert!(
-        overrides
-            .mitm_excluded_hosts
-            .iter()
-            .any(|m| m.pattern.contains("apple.com")),
-        "expected Apple certificate-pinned hosts excluded from MITM"
-    );
+    for pinned in [
+        "*.apple.com",
+        "*.googleapis.com",
+        "*.beacon.qq.com",
+        "*.snssdk.com",
+    ] {
+        assert!(
+            overrides
+                .mitm_excluded_hosts
+                .iter()
+                .any(|m| m.pattern == pinned),
+            "expected certificate-pinned host '{}' excluded from MITM",
+            pinned
+        );
+    }
 }
 
 #[test]
@@ -373,6 +381,9 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         .mitm_hosts
         .insert("api.bilibili.com".to_string());
     complex_src.mitm_hosts.insert("push.apple.com".to_string());
+    complex_src
+        .mitm_hosts
+        .insert("push.apple.com.*".to_string());
     complex_src.scripts.push(ScriptRule {
         name: "low_prio".to_string(),
         script_type: ScriptType::HttpResponse,

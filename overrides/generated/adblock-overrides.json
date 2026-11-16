@@ -5501,8 +5501,12 @@
       "rationale": "Google Firestore gRPC/streaming breaks under MITM (HttpsExclusions)"
     },
     {
-      "pattern": "instantmessaging-pa.googleapis.com",
-      "rationale": "Google Messages pairing breaks under MITM (HttpsExclusions)"
+      "pattern": "*.googleapis.com",
+      "rationale": "Google APIs and mobile/desktop SDKs enforce TLS certificate pinning"
+    },
+    {
+      "pattern": "googleapis.com",
+      "rationale": "Google APIs root domain enforces TLS certificate pinning"
     },
     {
       "pattern": "login.microsoftonline.com",
@@ -5635,6 +5639,22 @@
     {
       "pattern": "*.xhscdn.com",
       "rationale": "Xiaohongshu media CDN enforces strict TLS validation"
+    },
+    {
+      "pattern": "*.beacon.qq.com",
+      "rationale": "Tencent Beacon telemetry SDK (otheve, mtteve) enforces TLS certificate pinning"
+    },
+    {
+      "pattern": "beacon.qq.com",
+      "rationale": "Tencent Beacon root domain enforces TLS certificate pinning"
+    },
+    {
+      "pattern": "*.snssdk.com",
+      "rationale": "ByteDance app/API endpoints (is, gurd, i-lq) enforce TLS certificate pinning"
+    },
+    {
+      "pattern": "snssdk.com",
+      "rationale": "ByteDance mobile app API root domain enforces TLS certificate pinning"
     }
   ],
   "mitmAddedHosts": [],
@@ -5653,6 +5673,15 @@
     "xiaohongshu\\.com",
     "xhscdn\\.com",
     "redbook",
+    "youtubei\\.googleapis\\.com",
+    "\\.googleapis\\.com/",
+    "^https?://googleapis\\.com/",
+    "beacon\\.qq\\.com",
+    "gurd\\.snssdk\\.com",
+    "\\.snssdk\\.com/",
+    "\\.snssdk.com/",
+    "^https?://is\\.snssdk\\.com/",
+    "^https?://is.snssdk.com/",
     "gw\\.alicdn\\.com/mt/",
     "gw\\.alicdn\\.com/tfs/",
     "gw\\.alicdn\\.com/tps/",
