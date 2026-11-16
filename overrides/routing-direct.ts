@@ -1029,4 +1029,12 @@ export const DIRECT_EXCLUDE_ENTRIES: readonly RoutingExclusionOverride[] = [
     value: "talkie-ai.com",
     rationale: "Talkie overseas AI platform requires Proxy/AI routing rather than Direct",
   },
+  // .top 为全球开放注册通用顶级域，大量海外站点与接口使用 .top；排除整段 TLD 直连规则，国内 .top 仍可通过 GeoIP CN 直连
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
+    value: "top",
+    rationale:
+      "Open global .top gTLD is widely used by overseas services; avoid blanket Direct.list hijacking while domestic .top hosts fall back to GeoIP CN",
+  },
 ];

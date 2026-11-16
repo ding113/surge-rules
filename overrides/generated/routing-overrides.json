@@ -6099,6 +6099,12 @@
       "rationale": "Talkie overseas AI platform requires Proxy/AI routing rather than Direct"
     },
     {
+      "target": "direct",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "top",
+      "rationale": "Open global .top gTLD is widely used by overseas services; avoid blanket Direct.list hijacking while domestic .top hosts fall back to GeoIP CN"
+    },
+    {
       "target": "proxy",
       "kind": "DOMAIN-SUFFIX",
       "value": "cn",
