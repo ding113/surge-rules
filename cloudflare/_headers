@@ -1,14 +1,13 @@
 # Static assets only (install page & Surge scripts). Build artifacts, updated-at.svg and
-# build-meta.json are served from R2 by worker.js; their Content-Type / Cache-Control are
-# stored on the objects by the release workflow's R2 upload step.
+# build-meta.json are served from R2 through tiered Workers Cache by worker.js.
 /*
   Access-Control-Allow-Origin: *
   X-Content-Type-Options: nosniff
 
 /*.js
   Content-Type: application/javascript; charset=utf-8
-  Cache-Control: public, max-age=1800, stale-while-revalidate=86400
+  Cache-Control: public, max-age=300, must-revalidate
 
 /install.html
   Content-Type: text/html; charset=utf-8
-  Cache-Control: public, max-age=600
+  Cache-Control: public, max-age=300, must-revalidate

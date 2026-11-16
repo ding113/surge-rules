@@ -7,6 +7,8 @@
       "metadata/**/*.ts",
       "scripts/**/*.js",
       "scripts/**/*.ts",
+      "cloudflare/**/*.js",
+      "cloudflare/**/*.jsonc",
       "package.json",
       "tsconfig.json",
       "biome.json"

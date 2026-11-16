@@ -191,14 +191,15 @@ jobs:
           ARTIFACTS=(Country.mmdb Country-only.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Privacy.list Adblock.sgmodule Direct.list AI.list Payment.list Telemetry.list Proxy.list)
           for f in "${ARTIFACTS[@]}"; do
             case "${f}" in
-              *.mmdb) r2_put "dist/${f}" "${f}" "application/octet-stream" "public, max-age=3600, stale-while-revalidate=86400" ;;
-              *) r2_put "dist/${f}" "${f}" "text/plain; charset=utf-8" "public, max-age=1800, stale-while-revalidate=86400" ;;
+              *.mmdb) r2_put "dist/${f}" "${f}" "application/octet-stream" "public, max-age=300, must-revalidate" ;;
+              *) r2_put "dist/${f}" "${f}" "text/plain; charset=utf-8" "public, max-age=60, must-revalidate" ;;
             esac
           done
           # Metadata last, so it never advertises a build whose artifacts are not uploaded yet.
-          NO_CACHE="no-cache, no-store, max-age=0, s-maxage=0, must-revalidate"
-          r2_put dist/release-meta/build-meta.json build-meta.json "application/json; charset=utf-8" "${NO_CACHE}"
-          r2_put dist/release-meta/updated-at.svg updated-at.svg "image/svg+xml; charset=utf-8" "${NO_CACHE}"
+          # Avoid `no-store` so tiered Workers Cache can absorb badge spikes while clients revalidate via ETag.
+          META_CACHE="public, max-age=0, must-revalidate"
+          r2_put dist/release-meta/build-meta.json build-meta.json "application/json; charset=utf-8" "${META_CACHE}"
+          r2_put dist/release-meta/updated-at.svg updated-at.svg "image/svg+xml; charset=utf-8" "${META_CACHE}"
           # Keep only the latest build: drop any object that is not part of this release.
           EXPECTED=" ${ARTIFACTS[*]} build-meta.json updated-at.svg "
           aws s3api list-objects-v2 --bucket "${R2_BUCKET}" --endpoint-url "${R2_ENDPOINT}" \
@@ -269,6 +270,7 @@ jobs:
           rm -f "${TMP_INDEX}"
           touch "${STAGE_DIR}/.nojekyll"
           cp cloudflare/wrangler.jsonc "${STAGE_DIR}/wrangler.jsonc"
+          sed -i "s/\"RELEASE_TAG\": \"dev\"/\"RELEASE_TAG\": \"${RELEASE_TAG}\"/" "${STAGE_DIR}/wrangler.jsonc"
           cp cloudflare/worker.js "${STAGE_DIR}/worker.js"
           cp cloudflare/.assetsignore "${STAGE_DIR}/.assetsignore"
           cp cloudflare/_headers "${STAGE_DIR}/_headers"

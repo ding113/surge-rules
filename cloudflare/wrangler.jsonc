@@ -2,7 +2,12 @@
   "name": "surge-rules",
   "account_id": "199c831f9865b14c47f24f2f8b0c8ce6",
   "main": "worker.js",
-  "compatibility_date": "2026-04-01",
+  "compatibility_date": "2026-11-16",
+  // Tiered Workers Cache in front of worker.js. Default per-version keying ensures
+  // each release deployment immediately switches to the newly uploaded R2 artifacts.
+  "cache": {
+    "enabled": true
+  },
   "routes": [
     {
       "pattern": "rule-set.ygxz.de",
@@ -28,7 +33,8 @@
   "vars": {
     "GH_REPO": "ding113/surge-rules",
     "GH_WORKFLOW": "release.yml",
-    "GH_REF": "main"
+    "GH_REF": "main",
+    "RELEASE_TAG": "dev"
   },
   "observability": {
     "enabled": true

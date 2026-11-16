@@ -1,25 +1,59 @@
 // Entry point of the `surge-rules` Worker (rule-set.ygxz.de).
 //
 // Requests are assets-first: `_redirects` and the static files in the `release` branch
-// (install.html, Surge scripts) are served by the assets layer and never reach this script.
-// It only handles:
-//   - fetch: every build artifact (rule sets, modules, MMDBs, updated-at.svg,
-//     build-meta.json) is served from the `surge-rules` R2 bucket, which the release workflow
-//     overwrites with the latest build on each run. R2 misses fall back to the assets binding
-//     so 404 behaviour is unchanged.
+// (install.html, Surge scripts) are served by the assets layer. Everything else passes
+// through tiered Workers Cache (`cache.enabled = true` in wrangler.jsonc) in front of
+// this Worker:
+//   - Cache HIT: Cloudflare returns the cached response directly from the edge (0 Worker
+//     CPU time, 0 R2 Class B reads), including automatic 206 Partial Content byte-range
+//     slicing and conditional 304 Not Modified responses.
+//   - Cache MISS / background revalidation: `serveFromR2` streams the full 200 OK object
+//     from R2 (or answers 304 via `onlyIf`) with split client (`Cache-Control`) and edge
+//     (`Cloudflare-CDN-Cache-Control`) directives so edge hit rates stay high while
+//     clients revalidate promptly via ETag.
+//   - Release updates: each `release.yml` run uploads fresh artifacts to R2 first and
+//     then deploys a new Worker version (stamping `vars.RELEASE_TAG`). Because Workers
+//     Cache includes the Worker version in its cache key by default, the new deployment
+//     switches over to the fresh R2 build immediately without waiting for TTL expiry.
 //   - scheduled: the hourly Cron Trigger that dispatches the GitHub `release.yml` workflow.
-//     GitHub's own `schedule` event is best-effort and silently drops runs under load;
-//     Cloudflare Cron Triggers fire reliably.
 //
 // Required secret: GH_TOKEN — fine-grained PAT scoped to the repo with Actions: read & write.
 
-// Release artifacts are flat, plain file names; anything else never touches R2.
-const R2_KEY = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+// Release artifacts and metadata live at flat root keys with known extensions;
+// arbitrary scanner paths (/favicon.ico, /robots.txt, etc.) skip R2 completely.
+const R2_KEY = /^[A-Za-z0-9][A-Za-z0-9._-]*\.(?:mmdb|list|sgmodule|json|svg)$/;
+
+const CACHE_POLICIES = {
+  meta: {
+    tagGroup: "r2-meta",
+    clientCacheControl: "public, max-age=0, must-revalidate",
+    edgeCacheControl: "public, max-age=60, stale-while-revalidate=300, stale-if-error=86400",
+  },
+  mmdb: {
+    tagGroup: "r2-mmdb",
+    clientCacheControl: "public, max-age=300, must-revalidate",
+    edgeCacheControl: "public, max-age=3600, stale-while-revalidate=86400, stale-if-error=86400",
+  },
+  ruleset: {
+    tagGroup: "r2-ruleset",
+    clientCacheControl: "public, max-age=60, must-revalidate",
+    edgeCacheControl: "public, max-age=1800, stale-while-revalidate=86400, stale-if-error=86400",
+  },
+};
 
 export default {
   async fetch(request, env) {
     const fromR2 = await serveFromR2(request, env);
-    return fromR2 ?? env.ASSETS.fetch(request);
+    if (fromR2 !== null) return fromR2;
+
+    const assetRes = await env.ASSETS.fetch(request);
+    if (assetRes.status === 404 && !assetRes.headers.has("Cache-Control")) {
+      const headers = new Headers(assetRes.headers);
+      headers.set("Cache-Control", "public, max-age=60");
+      headers.set("Cloudflare-CDN-Cache-Control", "public, max-age=300");
+      return new Response(assetRes.body, { status: 404, headers });
+    }
+    return assetRes;
   },
 
   async scheduled(controller, env) {
@@ -50,71 +84,85 @@ export default {
 /** Returns a Response for an R2-hosted artifact, or null to fall through to static assets. */
 async function serveFromR2(request, env) {
   if (request.method !== "GET" && request.method !== "HEAD") return null;
-  const key = new URL(request.url).pathname.slice(1);
+
+  const url = new URL(request.url);
+  const key = url.pathname.slice(1);
   if (!R2_KEY.test(key)) return null;
+
+  // Canonicalize away random query strings (?t=..., ?utm_source=...) so cache-busting
+  // parameters cannot partition Workers Cache keys or trigger repeated R2 reads.
+  if (url.search !== "") {
+    return new Response(null, {
+      status: 301,
+      headers: {
+        Location: `${url.origin}${url.pathname}`,
+        "Cache-Control": "public, max-age=300",
+        "Cloudflare-CDN-Cache-Control": "public, max-age=3600",
+      },
+    });
+  }
 
   if (request.method === "HEAD") {
     const meta = await env.RELEASE_BUCKET.head(key);
     if (meta === null) return null;
-    const headers = objectHeaders(meta);
-    headers.set("Content-Length", String(meta.size));
-    return new Response(null, { headers });
+    const headers = objectHeaders(key, meta, env, true);
+    return new Response(null, { status: 200, headers });
   }
 
-  let object;
-  try {
-    object = await env.RELEASE_BUCKET.get(key, {
-      onlyIf: request.headers,
-      range: request.headers,
-    });
-  } catch (err) {
-    if (!request.headers.has("Range")) throw err;
-    // Unsatisfiable or malformed Range header.
-    const meta = await env.RELEASE_BUCKET.head(key);
-    if (meta === null) return null;
-    return new Response(null, {
-      status: 416,
-      headers: { "Content-Range": `bytes */${meta.size}` },
-    });
-  }
+  // Always request the full object (no `range`): Workers Cache strips inbound `Range`,
+  // caches the complete 200 OK body, and performs byte-range slicing (206 / 416) at the
+  // edge. Passing `onlyIf` lets edge revalidations short-circuit with 304 Not Modified.
+  const object = await env.RELEASE_BUCKET.get(key, {
+    onlyIf: request.headers,
+  });
   if (object === null) return null;
 
-  const headers = objectHeaders(object);
-  if (!("body" in object)) {
-    // A conditional header failed: If-None-Match / If-Modified-Since → 304, otherwise 412.
+  if (!("body" in object) || !object.body) {
     const status =
       request.headers.has("If-Match") || request.headers.has("If-Unmodified-Since") ? 412 : 304;
+    const headers = objectHeaders(key, object, env, false);
     return new Response(null, { status, headers });
   }
-  if (request.headers.has("Range") && object.range) {
-    const { offset, length } = resolveRange(object.range, object.size);
-    // A range covering the whole object (or one R2 ignored) is just a normal 200.
-    if (offset > 0 || length < object.size) {
-      headers.set("Content-Range", `bytes ${offset}-${offset + length - 1}/${object.size}`);
-      return new Response(object.body, { status: 206, headers });
-    }
-  }
-  return new Response(object.body, { headers });
+
+  const headers = objectHeaders(key, object, env, true);
+  return new Response(object.body, { status: 200, headers });
 }
 
-function objectHeaders(object) {
+function cachePolicyForKey(key) {
+  if (key === "build-meta.json" || key === "updated-at.svg") {
+    return CACHE_POLICIES.meta;
+  }
+  if (key.endsWith(".mmdb")) {
+    return CACHE_POLICIES.mmdb;
+  }
+  return CACHE_POLICIES.ruleset;
+}
+
+function objectHeaders(key, object, env, includeContentLength) {
   const headers = new Headers();
-  // Content-Type and Cache-Control are stored on the object by the release upload step.
   object.writeHttpMetadata(headers);
+
+  const policy = cachePolicyForKey(key);
+  // Client directive: short freshness + mandatory ETag validation for prompt updates.
+  headers.set("Cache-Control", policy.clientCacheControl);
+  // Edge directive (consumed & stripped by Cloudflare): long tiered-cache TTL + SWR/SIE.
+  headers.set("Cloudflare-CDN-Cache-Control", policy.edgeCacheControl);
+  headers.set("Cache-Tag", `r2,${policy.tagGroup},artifact:${key}`);
+
   headers.set("ETag", object.httpEtag);
   headers.set("Last-Modified", object.uploaded.toUTCString());
   headers.set("Accept-Ranges", "bytes");
+  if (includeContentLength) {
+    headers.set("Content-Length", String(object.size));
+  }
+  if (env.RELEASE_TAG) {
+    headers.set("X-Release-Tag", env.RELEASE_TAG);
+  }
   headers.set("Access-Control-Allow-Origin", "*");
+  headers.set(
+    "Access-Control-Expose-Headers",
+    "ETag, Last-Modified, Content-Length, Content-Range, Cf-Cache-Status, X-Release-Tag",
+  );
   headers.set("X-Content-Type-Options", "nosniff");
   return headers;
-}
-
-function resolveRange(range, size) {
-  // R2 always returns the `suffix` key (possibly undefined), so test its value, not its presence.
-  if (typeof range.suffix === "number") {
-    const length = Math.min(range.suffix, size);
-    return { offset: size - length, length };
-  }
-  const offset = range.offset ?? 0;
-  return { offset, length: range.length ?? size - offset };
 }
