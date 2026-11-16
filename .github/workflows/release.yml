@@ -219,6 +219,7 @@ jobs:
           rm -f "${TMP_INDEX}"
           touch "${STAGE_DIR}/.nojekyll"
           cp cloudflare/wrangler.jsonc "${STAGE_DIR}/wrangler.jsonc"
+          cp cloudflare/worker.js "${STAGE_DIR}/worker.js"
           cp cloudflare/.assetsignore "${STAGE_DIR}/.assetsignore"
           cp cloudflare/_headers "${STAGE_DIR}/_headers"
           cp cloudflare/_redirects "${STAGE_DIR}/_redirects"

@@ -5,6 +5,7 @@
 .nojekyll
 README.md
 wrangler.jsonc
+worker.js
 cloudflare.config.ts
 wrangler.config.ts
 .assetsignore
