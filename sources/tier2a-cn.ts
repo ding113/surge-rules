@@ -130,6 +130,10 @@ export const TIER2A_CN_SOURCES: readonly GeoIpSourceEntry[] = [
         kind: "direct",
         url: "https://gaoyifan.github.io/china-operator-ip/china6.txt",
       },
+      {
+        kind: "direct",
+        url: "https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt",
+      },
     ],
   },
   {
@@ -299,38 +303,6 @@ export const TIER2A_CN_SOURCES: readonly GeoIpSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt",
-      },
-    ],
-  },
-  {
-    id: "sukkaw_china_ipv6",
-    tier: "tier2a_cn",
-    format: "cidr_country",
-    lineage: "chnroutes2",
-    cnWeight: 88,
-    fixedCountry: "CN",
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt",
-      },
-    ],
-  },
-  {
-    id: "heidai_china_v4",
-    tier: "tier2a_cn",
-    format: "cidr_country",
-    lineage: "heidai_routing",
-    cnWeight: 87,
-    fixedCountry: "CN",
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt",
-      },
-      {
-        kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/ipv4_china.txt",
       },
     ],
   },

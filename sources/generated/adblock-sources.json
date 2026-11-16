@@ -968,30 +968,13 @@
       ]
     },
     {
-      "id": "sefinek_whitelist",
-      "name": "Sefinek Blocklist Collection Main Whitelist",
-      "role": "allowlist",
-      "category": "both",
-      "format": "domain_list",
-      "platform": "universal",
-      "lineage": "sefinek_whitelist",
-      "weight": 94,
-      "core": false,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/sefinek/Sefinek-Blocklist-Collection/main/whitelists/main.txt"
-        }
-      ]
-    },
-    {
       "id": "cpbl_whitelist",
       "name": "Combined Privacy Block Lists Official Whitelist",
       "role": "allowlist",
       "category": "privacy",
       "format": "domain_list",
       "platform": "universal",
-      "lineage": "cpbl_whitelist",
+      "lineage": "cpbl",
       "weight": 94,
       "core": false,
       "endpoints": [
@@ -3707,6 +3690,14 @@
         {
           "kind": "direct",
           "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_12.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/259.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareAdGuard.txt"
         }
       ]
     },
@@ -4059,29 +4050,6 @@
       ]
     },
     {
-      "id": "majkiit_polish_adguard",
-      "name": "MajkiIT Official Polish AdGuard Filter",
-      "role": "ruleset_fallback",
-      "category": "ad",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "majkiit_polish",
-      "weight": 88,
-      "core": false,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock_adguard.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://filters.adtidy.org/windows/filters/216.txt"
-        }
-      ]
-    },
-    {
       "id": "filtersheroes_kad",
       "name": "FiltersHeroes KAD Polish Anti-Scam & Fraud Filter",
       "role": "ruleset_fallback",
@@ -4374,7 +4342,7 @@
       "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
-      "lineage": "icelandic_abp",
+      "lineage": "brave_adblock",
       "weight": 86,
       "core": false,
       "extractComplexNetworkRules": true,
@@ -4667,38 +4635,113 @@
       ]
     },
     {
-      "id": "rpilist_malware",
-      "name": "RPiList Specials Malware Blocklist",
+      "id": "chainapsis_keplr_phishing",
+      "name": "Chainapsis / Keplr CosmoShield Web3 Phishing Blocklist",
       "role": "ruleset_fallback",
       "category": "ad",
       "format": "domain_list",
       "platform": "universal",
-      "lineage": "rpilist",
-      "weight": 88,
+      "lineage": "chainapsis_phishing",
+      "weight": 91,
       "core": false,
       "extractFallbackDomainRules": true,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/malware"
+          "url": "https://raw.githubusercontent.com/chainapsis/phishing-block-list/main/block-list.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/chainapsis/phishing-block-list@main/block-list.txt"
         }
       ]
     },
     {
-      "id": "rpilist_phishing",
-      "name": "RPiList Specials Phishing Blocklist",
+      "id": "easylist_french_listefr",
+      "name": "EasyList Liste FR (French Supplement)",
+      "role": "ruleset_fallback",
+      "category": "ad",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://easylist-downloads.adblockplus.org/liste_fr.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/easylist/listefr/master/liste_fr.txt"
+        }
+      ]
+    },
+    {
+      "id": "spmedia_crypto_phishing",
+      "name": "SPMedia Crypto Scam & Phishing Threat Intel",
       "role": "ruleset_fallback",
       "category": "ad",
       "format": "domain_list",
       "platform": "universal",
-      "lineage": "rpilist",
+      "lineage": "spmedia_crypto",
+      "weight": 89,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/spmedia/Crypto-Scam-and-Crypto-Phishing-Threat-Intel-Feed/main/detected_urls.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/spmedia/Crypto-Scam-and-Crypto-Phishing-Threat-Intel-Feed@main/detected_urls.txt"
+        }
+      ]
+    },
+    {
+      "id": "phishunt_active_domains",
+      "name": "Phishunt Active Phishing Hostnames",
+      "role": "ruleset_fallback",
+      "category": "ad",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "phishunt",
       "weight": 88,
       "core": false,
       "extractFallbackDomainRules": true,
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe"
+          "url": "https://raw.githubusercontent.com/0xDanielLopez/phishunt-feed/main/blocklist/domains.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/0xDanielLopez/phishunt-feed@main/blocklist/domains.txt"
+        }
+      ]
+    },
+    {
+      "id": "ut1_ddos",
+      "name": "UT1 Blacklists DDoS & Stresser Domains",
+      "role": "ruleset_fallback",
+      "category": "ad",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "ut1_blacklists",
+      "weight": 88,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/ddos/domains"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/olbat/ut1-blacklists@master/blacklists/ddos/domains"
         }
       ]
     },
@@ -5329,6 +5372,72 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt"
+        }
+      ]
+    },
+    {
+      "id": "ut1_stalkerware",
+      "name": "UT1 Blacklists Stalkerware & Spyware Domains",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "ut1_blacklists",
+      "weight": 88,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/stalkerware/domains"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/olbat/ut1-blacklists@master/blacklists/stalkerware/domains"
+        }
+      ]
+    },
+    {
+      "id": "perflyst_session_replay",
+      "name": "Perflyst Session Replay Trackers",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "perflyst_smarttv",
+      "weight": 86,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SessionReplay.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Perflyst/PiHoleBlocklist@master/SessionReplay.txt"
+        }
+      ]
+    },
+    {
+      "id": "perflyst_amazon_firetv",
+      "name": "Perflyst Amazon FireTV Native Telemetry",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "perflyst_smarttv",
+      "weight": 86,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/AmazonFireTV.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Perflyst/PiHoleBlocklist@master/AmazonFireTV.txt"
         }
       ]
     }

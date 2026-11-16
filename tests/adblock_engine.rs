@@ -2085,3 +2085,122 @@ proptest! {
         }
     }
 }
+
+#[test]
+fn clean_egress_protection_guards_payment_and_ai() {
+    use surge_rules::adblock::verify::render_adblock_release_notes;
+
+    let overrides = AdblockOverrides::empty();
+    let telemetry_raw = "\
+# Telemetry.list fixture\n\
+DOMAIN-SUFFIX,arkoselabs.com,extended-matching\n";
+    let payment_raw = "\
+# Payment.list fixture\n\
+DOMAIN,forms.cybersource.com\n\
+DOMAIN-SUFFIX,stripe.com,extended-matching\n";
+    let ai_raw = "\
+# AI.list fixture\n\
+DOMAIN,ab.chatgpt.com\n\
+DOMAIN-SUFFIX,chatgpt.com,extended-matching\n";
+
+    let mut guard = TelemetryProtectionSet::default();
+    guard.ingest_ruleset_text(telemetry_raw);
+    guard.ingest_ruleset_text(payment_raw);
+    guard.ingest_ruleset_text(ai_raw);
+
+    let mut src_ad = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "phishing_feed".to_string(),
+        weight: 91,
+        ..Default::default()
+    };
+    src_ad
+        .ruleset_domains
+        .insert("forms.cybersource.com".to_string());
+    src_ad.ruleset_domains.insert("m.stripe.com".to_string());
+    src_ad
+        .ruleset_suffixes
+        .insert("doubleclick.net".to_string());
+
+    let mut src_priv = ParsedAdblockSource {
+        category: AdblockCategory::Privacy,
+        lineage: "cname_feed".to_string(),
+        weight: 90,
+        ..Default::default()
+    };
+    src_priv
+        .ruleset_domains
+        .insert("ab.chatgpt.com".to_string());
+    src_priv
+        .ruleset_domains
+        .insert("client-api.arkoselabs.com".to_string());
+    src_priv
+        .ruleset_suffixes
+        .insert("scorecardresearch.com".to_string());
+
+    let compiled =
+        compile_adblock_with_telemetry_guard(&[src_ad, src_priv], &overrides, Some(&guard), 2, 2);
+
+    for protected in [
+        "forms.cybersource.com",
+        "stripe.com",
+        "ab.chatgpt.com",
+        "chatgpt.com",
+        "arkoselabs.com",
+    ] {
+        assert!(!compiled.ruleset_text.contains(protected));
+        assert!(!compiled.privacy_ruleset_text.contains(protected));
+    }
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,doubleclick.net\n")
+    );
+    assert!(
+        compiled
+            .privacy_ruleset_text
+            .contains("DOMAIN-SUFFIX,scorecardresearch.com\n")
+    );
+
+    let tmp = TempDir::new().unwrap();
+    fs::write(tmp.path().join("Telemetry.list"), telemetry_raw).unwrap();
+    fs::write(tmp.path().join("Payment.list"), payment_raw).unwrap();
+    fs::write(tmp.path().join("AI.list"), ai_raw).unwrap();
+    fs::write(tmp.path().join("Adblock.list"), &compiled.ruleset_text).unwrap();
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        &compiled.privacy_ruleset_text,
+    )
+    .unwrap();
+    fs::write(tmp.path().join("Adblock.sgmodule"), &compiled.module_text).unwrap();
+
+    let report = verify_adblock_dir(tmp.path(), &overrides, 0, 0)
+        .expect("disjoint Telemetry/Payment/AI + Adblock/Privacy must pass");
+    let notes = render_adblock_release_notes(&report, 2, 2, 4, 0);
+    assert!(notes.contains("https://rule-set.ygxz.de/Adblock.list"));
+    assert!(notes.contains("https://rule-set.ygxz.de/Privacy.list"));
+    assert!(notes.contains("https://rule-set.ygxz.de/Adblock.sgmodule"));
+    assert!(!notes.contains("releases/latest/download"));
+
+    // Collisions against Payment.list or AI.list must fail verify_adblock_dir immediately.
+    fs::write(
+        tmp.path().join("Adblock.list"),
+        format!("{}DOMAIN,m.stripe.com\n", compiled.ruleset_text),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "Adblock.list blocking Payment.list subdomain must fail verifier"
+    );
+
+    fs::write(tmp.path().join("Adblock.list"), &compiled.ruleset_text).unwrap();
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        format!("{}DOMAIN,ab.chatgpt.com\n", compiled.privacy_ruleset_text),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "Privacy.list blocking AI.list domain must fail verifier"
+    );
+}

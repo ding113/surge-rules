@@ -1,4 +1,6 @@
+use anyhow::{Context, Result};
 use ipnet::IpNet;
+use serde::Deserialize;
 
 use crate::adblock::parsers::ruleset::{
     is_comment_or_empty, parse_canonical_cidr, strip_inline_comment,
@@ -6,6 +8,42 @@ use crate::adblock::parsers::ruleset::{
 use crate::adblock::parsers::surge_module::split_top_level_commas;
 use crate::routing::config::RoutingRuleKind;
 use crate::routing::model::ParsedRoutingSource;
+
+#[derive(Deserialize)]
+struct OpenaiIpDoc {
+    #[serde(default)]
+    prefixes: Vec<OpenaiIpPrefix>,
+}
+
+#[derive(Deserialize)]
+struct OpenaiIpPrefix {
+    #[serde(rename = "ipv4Prefix")]
+    ipv4_prefix: Option<String>,
+    #[serde(rename = "ipv6Prefix")]
+    ipv6_prefix: Option<String>,
+}
+
+pub fn parse_openai_ip_json(
+    bytes: &[u8],
+    source_id: &str,
+    out: &mut ParsedRoutingSource,
+) -> Result<()> {
+    let doc: OpenaiIpDoc = serde_json::from_slice(bytes)
+        .with_context(|| format!("invalid OpenAI IP JSON in '{}'", source_id))?;
+    for entry in doc.prefixes {
+        if let Some(v4_raw) = entry.ipv4_prefix.as_deref()
+            && let Some(IpNet::V4(net)) = parse_canonical_cidr(v4_raw)
+        {
+            out.push_normalized(RoutingRuleKind::IpCidr, &net.to_string(), false);
+        }
+        if let Some(v6_raw) = entry.ipv6_prefix.as_deref()
+            && let Some(IpNet::V6(net)) = parse_canonical_cidr(v6_raw)
+        {
+            out.push_normalized(RoutingRuleKind::IpCidr6, &net.to_string(), false);
+        }
+    }
+    Ok(())
+}
 
 pub fn parse_surge_ruleset(text: &str, out: &mut ParsedRoutingSource) {
     for raw_line in text.lines() {

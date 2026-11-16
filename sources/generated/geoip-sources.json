@@ -14,6 +14,10 @@
           "kind": "github_release",
           "repo": "ipanalytics/GeoFeed-Harvester",
           "assetPattern": "^geofeed\\.parquet$"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/ipanalytics/GeoFeed-Harvester/releases/download/dataset-current/geofeed.parquet"
         }
       ]
     },
@@ -582,6 +586,10 @@
         {
           "kind": "direct",
           "url": "https://gaoyifan.github.io/china-operator-ip/china6.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt"
         }
       ]
     },
@@ -756,38 +764,6 @@
       ]
     },
     {
-      "id": "sukkaw_china_ipv6",
-      "tier": "tier2a_cn",
-      "format": "cidr_country",
-      "lineage": "chnroutes2",
-      "cnWeight": 88,
-      "fixedCountry": "CN",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt"
-        }
-      ]
-    },
-    {
-      "id": "heidai_china_v4",
-      "tier": "tier2a_cn",
-      "format": "cidr_country",
-      "lineage": "heidai_routing",
-      "cnWeight": 87,
-      "fixedCountry": "CN",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/ipv4_china.txt"
-        }
-      ]
-    },
-    {
       "id": "hackl0us_geoip2_cn",
       "tier": "tier2a_cn",
       "format": "cidr_country",
@@ -952,35 +928,6 @@
         {
           "kind": "direct",
           "url": "https://github.com/sapics/ip-location-db/releases/download/latest/dbip-country.mmdb"
-        }
-      ]
-    },
-    {
-      "id": "ip2location_db11",
-      "tier": "tier2b_global",
-      "format": "ip2location_bin",
-      "lineage": "ip2location",
-      "countryWeight": 78,
-      "cityWeight": 82,
-      "core": true,
-      "endpoints": [
-        {
-          "kind": "github_release",
-          "repo": "renfei/ip2location",
-          "assetPattern": "^IP2LOCATION-LITE-DB11\\.IPV6\\.BIN$"
-        }
-      ]
-    },
-    {
-      "id": "ip2location_db1_official",
-      "tier": "tier2b_global",
-      "format": "ip2location_csv",
-      "lineage": "ip2location",
-      "countryWeight": 78,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP"
         }
       ]
     },
@@ -1461,6 +1408,24 @@
       ]
     },
     {
+      "id": "hexydec_datacentres",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "hexydec_crawlers",
+      "isHosting": true,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hexydec/ip-ranges/main/output/datacentres.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hexydec/ip-ranges@main/output/datacentres.txt"
+        }
+      ]
+    },
+    {
       "id": "tor_bulk_exits",
       "tier": "trait_overlay",
       "format": "cidr_trait",
@@ -1507,6 +1472,25 @@
       ]
     },
     {
+      "id": "protonvpn_exit_v4",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "protonvpn_official",
+      "isVpn": true,
+      "isAnonymousProxy": true,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/tn3w/ProtonVPN-IPs/master/protonvpn_ip_ranges.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/tn3w/ProtonVPN-IPs@master/protonvpn_ip_ranges.txt"
+        }
+      ]
+    },
+    {
       "id": "x4bnet_datacenter_v4",
       "tier": "trait_overlay",
       "format": "cidr_trait",
@@ -1516,6 +1500,24 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt"
+        }
+      ]
+    },
+    {
+      "id": "josephrocca_vpn_v4",
+      "tier": "trait_overlay",
+      "format": "cidr_trait",
+      "lineage": "josephrocca_vpn",
+      "isHosting": true,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/josephrocca/is-vpn/main/vpn-or-datacenter-ipv4-ranges.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/josephrocca/is-vpn@main/vpn-or-datacenter-ipv4-ranges.txt"
         }
       ]
     },

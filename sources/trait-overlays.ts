@@ -179,6 +179,24 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
+    id: "hexydec_datacentres",
+    tier: "trait_overlay",
+    format: "cidr_trait",
+    lineage: "hexydec_crawlers",
+    isHosting: true,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/hexydec/ip-ranges/main/output/datacentres.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/hexydec/ip-ranges@main/output/datacentres.txt",
+      },
+    ],
+  },
+  {
     id: "tor_bulk_exits",
     tier: "trait_overlay",
     format: "cidr_trait",
@@ -225,6 +243,25 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
+    id: "protonvpn_exit_v4",
+    tier: "trait_overlay",
+    format: "cidr_trait",
+    lineage: "protonvpn_official",
+    isVpn: true,
+    isAnonymousProxy: true,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/tn3w/ProtonVPN-IPs/master/protonvpn_ip_ranges.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/tn3w/ProtonVPN-IPs@master/protonvpn_ip_ranges.txt",
+      },
+    ],
+  },
+  {
     id: "x4bnet_datacenter_v4",
     tier: "trait_overlay",
     format: "cidr_trait",
@@ -234,6 +271,24 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt",
+      },
+    ],
+  },
+  {
+    id: "josephrocca_vpn_v4",
+    tier: "trait_overlay",
+    format: "cidr_trait",
+    lineage: "josephrocca_vpn",
+    isHosting: true,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/josephrocca/is-vpn/main/vpn-or-datacenter-ipv4-ranges.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/josephrocca/is-vpn@main/vpn-or-datacenter-ipv4-ranges.txt",
       },
     ],
   },

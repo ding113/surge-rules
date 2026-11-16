@@ -131,35 +131,6 @@ export const TIER2B_GLOBAL_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
-    id: "ip2location_db11",
-    tier: "tier2b_global",
-    format: "ip2location_bin",
-    lineage: "ip2location",
-    countryWeight: 78,
-    cityWeight: 82,
-    core: true,
-    endpoints: [
-      {
-        kind: "github_release",
-        repo: "renfei/ip2location",
-        assetPattern: "^IP2LOCATION-LITE-DB11\\.IPV6\\.BIN$",
-      },
-    ],
-  },
-  {
-    id: "ip2location_db1_official",
-    tier: "tier2b_global",
-    format: "ip2location_csv",
-    lineage: "ip2location",
-    countryWeight: 78,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP",
-      },
-    ],
-  },
-  {
     id: "ipfire_libloc",
     tier: "tier2b_global",
     format: "libloc",

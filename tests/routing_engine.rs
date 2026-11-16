@@ -1421,3 +1421,74 @@ fn non_adblock_abp_and_hosts_lists_route_to_proxy_while_protecting_direct_cn() {
     assert!(!compiled.proxy_text.contains("doubleclick.net"));
     assert!(!compiled.proxy_text.contains("exoclick.com"));
 }
+
+#[test]
+fn parses_openai_chatgpt_voice_json() {
+    use surge_rules::routing::config::RoutingSourceCatalog;
+
+    let catalog =
+        RoutingSourceCatalog::load_from_path(Path::new("sources/generated/routing-sources.json"))
+            .expect("sources/generated/routing-sources.json should load cleanly");
+    assert!(
+        catalog
+            .sources
+            .iter()
+            .any(|s| s.id == "openai_chatgpt_voice_cidr"
+                && s.format == RoutingSourceFormat::OpenaiIpJson
+                && s.target == RoutingTarget::Ai),
+        "routing catalog must include openai_chatgpt_voice_cidr"
+    );
+
+    let cfg = dummy_source_cfg(
+        "openai_chatgpt_voice_cidr",
+        RoutingTarget::Ai,
+        "openai_official",
+        RoutingSourceFormat::OpenaiIpJson,
+        None,
+        96,
+    );
+    let payload = br#"{
+        "creationTime": "2026-11-16T01:33:53.175979+00:00",
+        "prefixes": [
+            {"ipv4Prefix": "102.37.57.54/32"},
+            {"ipv4Prefix": "10.0.0.1/32"},
+            {"ipv6Prefix": "2603:1030:7::/48"}
+        ]
+    }"#;
+    let parsed = parse_routing_source(payload, &cfg).unwrap();
+    assert!(
+        parsed
+            .rules
+            .contains(&rule(RoutingRuleKind::IpCidr, "102.37.57.54/32", false))
+    );
+    assert!(
+        parsed
+            .rules
+            .contains(&rule(RoutingRuleKind::IpCidr6, "2603:1030:7::/48", false))
+    );
+
+    let compiled = compile_routing(
+        &[parsed],
+        &RoutingOverrides::empty(),
+        &AdblockOverrides::empty(),
+        RoutingSourceCounts::default(),
+    );
+    assert!(
+        compiled
+            .ai_text
+            .contains("IP-CIDR,102.37.57.54/32,no-resolve\n")
+    );
+    assert!(
+        compiled
+            .ai_text
+            .contains("IP-CIDR6,2603:1030:7::/48,no-resolve\n")
+    );
+    assert!(!compiled.ai_text.contains("10.0.0.1"));
+    assert!(
+        compiled
+            .proxy_text
+            .contains("IP-CIDR,102.37.57.54/32,no-resolve\n")
+    );
+
+    assert!(parse_routing_source(b"not-json", &cfg).is_err());
+}

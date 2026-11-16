@@ -184,47 +184,45 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
   },
   {
     id: "v2fly_dlc_games_cn",
-    name: "v2fly domain-list-community category-games-cn",
+    name: "MetaCubeX category-games-cn (v2fly pre-expanded)",
     target: "direct",
     lineage: "v2fly_dlc",
-    format: "geosite",
-    geositeFilter: "all_non_ads",
+    format: "clash_classical",
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
-    homepage: "https://github.com/v2fly/domain-list-community",
+    license: "GPL-3.0",
+    homepage: "https://github.com/MetaCubeX/meta-rules-dat",
     endpoints: [
       {
         kind: "direct",
-        url: "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-games-cn",
+        url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-games-cn.list",
       },
       {
         kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/category-games-cn",
+        url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-games-cn.list",
       },
     ],
   },
   {
     id: "v2fly_dlc_scholar_cn",
-    name: "v2fly domain-list-community category-scholar-cn",
+    name: "MetaCubeX category-scholar-cn (v2fly pre-expanded)",
     target: "direct",
     lineage: "v2fly_dlc",
-    format: "geosite",
-    geositeFilter: "all_non_ads",
+    format: "clash_classical",
     weight: 92,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
-    homepage: "https://github.com/v2fly/domain-list-community",
+    license: "GPL-3.0",
+    homepage: "https://github.com/MetaCubeX/meta-rules-dat",
     endpoints: [
       {
         kind: "direct",
-        url: "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-scholar-cn",
+        url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-scholar-cn.list",
       },
       {
         kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/category-scholar-cn",
+        url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-scholar-cn.list",
       },
     ],
   },
@@ -237,7 +235,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 96,
     core: true,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -259,7 +257,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 84,
     core: true,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -281,7 +279,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 96,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -303,7 +301,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 95,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -325,7 +323,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 95,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -415,7 +413,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "GPL-2.0",
     homepage: "https://github.com/blackmatrix7/ios_rule_script",
     endpoints: [
       {
@@ -437,7 +435,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "GPL-2.0",
     homepage: "https://github.com/blackmatrix7/ios_rule_script",
     endpoints: [
       {
@@ -459,7 +457,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 86,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -481,7 +479,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -503,7 +501,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -525,7 +523,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -547,7 +545,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -674,7 +672,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "tannayej_ai_cn",
     name: "TannayeJ AI CN Vendor Rules",
     target: "direct",
-    lineage: "tannayej",
+    lineage: "v2fly_dlc",
     format: "clash_yaml",
     weight: 86,
     core: false,
@@ -696,7 +694,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "nsza156_category_ai_cn",
     name: "NSZA156 Surge GeoX category-ai-cn",
     target: "direct",
-    lineage: "nsza156",
+    lineage: "v2fly_dlc",
     format: "surge_ruleset",
     weight: 88,
     core: false,
@@ -724,7 +722,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 91,
     core: false,
     updateCadence: "daily",
-    license: "GPL-3.0",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/Aethersailor/Custom_OpenClash_Rules",
     endpoints: [
       {
@@ -746,7 +744,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 93,
     core: false,
     updateCadence: "daily",
-    license: "GPL-3.0",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/Aethersailor/Custom_OpenClash_Rules",
     endpoints: [
       {
@@ -763,7 +761,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "heidai_routing_direct",
     name: "217heidai RoutingRules Domestic Direct Domains",
     target: "direct",
-    lineage: "heidai_routing",
+    lineage: "v2fly_dlc",
     format: "domain_suffix_set",
     weight: 89,
     core: false,
@@ -778,28 +776,6 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/direct.txt",
-      },
-    ],
-  },
-  {
-    id: "heidai_routing_ipv4_cn",
-    name: "217heidai RoutingRules China IPv4 CIDR",
-    target: "direct",
-    lineage: "heidai_routing",
-    format: "ip_cidr",
-    weight: 89,
-    core: false,
-    updateCadence: "daily",
-    license: "GPL-3.0",
-    homepage: "https://github.com/217heidai/RoutingRules",
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt",
-      },
-      {
-        kind: "direct",
-        url: "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/ipv4_china.txt",
       },
     ],
   },
@@ -829,7 +805,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "gmoogway_sr_direct",
     name: "GMOogway Shadowrocket Direct List",
     target: "direct",
-    lineage: "gmoogway",
+    lineage: "v2fly_dlc",
     format: "surge_ruleset",
     weight: 87,
     core: false,
@@ -856,7 +832,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 95,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -878,7 +854,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 93,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -900,7 +876,7 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 92,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -1420,6 +1396,161 @@ export const DIRECT_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-number-verification-cn.list",
+      },
+    ],
+  },
+  {
+    id: "acl4ssr_game_download",
+    name: "ACL4SSR GameDownload CN Patch CDNs",
+    target: "direct",
+    lineage: "acl4ssr",
+    format: "clash_classical",
+    weight: 89,
+    core: false,
+    updateCadence: "daily",
+    license: "CC-BY-SA-4.0",
+    homepage: "https://github.com/ACL4SSR/ACL4SSR",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/GameDownload.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/GameDownload.list",
+      },
+    ],
+  },
+  {
+    id: "metacubex_category_dev_cn",
+    name: "MetaCubeX category-dev-cn",
+    target: "direct",
+    lineage: "v2fly_dlc",
+    format: "clash_classical",
+    weight: 91,
+    core: false,
+    updateCadence: "6h",
+    license: "GPL-3.0",
+    homepage: "https://github.com/MetaCubeX/meta-rules-dat",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-dev-cn.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-dev-cn.list",
+      },
+    ],
+  },
+  {
+    id: "metacubex_category_cdn_cn",
+    name: "MetaCubeX category-cdn-cn",
+    target: "direct",
+    lineage: "v2fly_dlc",
+    format: "clash_classical",
+    weight: 92,
+    core: false,
+    updateCadence: "6h",
+    license: "GPL-3.0",
+    homepage: "https://github.com/MetaCubeX/meta-rules-dat",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-cdn-cn.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-cdn-cn.list",
+      },
+    ],
+  },
+  {
+    id: "v2fly_dlc_hsbc_cn",
+    name: "v2fly domain-list-community hsbc-cn",
+    target: "direct",
+    lineage: "v2fly_dlc",
+    format: "geosite",
+    geositeFilter: "all_non_ads",
+    weight: 95,
+    core: false,
+    updateCadence: "6h",
+    license: "MIT",
+    homepage: "https://github.com/v2fly/domain-list-community",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/hsbc-cn",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/hsbc-cn",
+      },
+    ],
+  },
+  {
+    id: "gaoyifan_china_cidr_v4",
+    name: "gaoyifan china-operator-ip China IPv4",
+    target: "direct",
+    lineage: "gaoyifan_cn",
+    format: "ip_cidr",
+    weight: 92,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/gaoyifan/china-operator-ip",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://gaoyifan.github.io/china-operator-ip/china.txt",
+      },
+    ],
+  },
+  {
+    id: "gaoyifan_china_cidr_v6",
+    name: "gaoyifan china-operator-ip China IPv6",
+    target: "direct",
+    lineage: "gaoyifan_cn",
+    format: "ip_cidr",
+    weight: 92,
+    core: false,
+    updateCadence: "daily",
+    license: "MIT",
+    homepage: "https://github.com/gaoyifan/china-operator-ip",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://gaoyifan.github.io/china-operator-ip/china6.txt",
+      },
+    ],
+  },
+  {
+    id: "misakaio_chnroutes2_v4",
+    name: "misakaio chnroutes2 China IPv4",
+    target: "direct",
+    lineage: "chnroutes2",
+    format: "ip_cidr",
+    weight: 91,
+    core: false,
+    updateCadence: "daily",
+    license: "CC-BY-SA-4.0",
+    homepage: "https://github.com/misakaio/chnroutes2",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/misakaio/chnroutes2@master/chnroutes.txt",
       },
     ],
   },

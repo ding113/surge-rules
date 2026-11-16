@@ -14,6 +14,7 @@ export type RoutingSourceFormat =
   | "dnsmasq_china"
   | "gfwlist_base64"
   | "ip_cidr"
+  | "openai_ip_json"
   | "asn_list";
 
 export type GeositeTagFilter = "all_non_ads" | "only_cn" | "exclude_cn";

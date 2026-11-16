@@ -452,7 +452,7 @@ pub fn render_release_notes(
 ## Surge 配置\n\n\
 ```ini\n\
 [General]\n\
-geoip-maxmind-url = https://github.com/ding113/surge-rules/releases/latest/download/Country.mmdb\n\
+geoip-maxmind-url = https://rule-set.ygxz.de/Country.mmdb\n\
 ```\n",
         report.canaries_checked,
         report.country.file_name,

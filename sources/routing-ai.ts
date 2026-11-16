@@ -58,7 +58,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 96,
     core: true,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -80,7 +80,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 95,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -102,7 +102,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 95,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -112,6 +112,24 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://cdn.jsdelivr.net/gh/SukkaW/Surge@master/Source/ip/ai.conf",
+      },
+    ],
+  },
+  {
+    id: "openai_chatgpt_voice_cidr",
+    name: "OpenAI Official ChatGPT Voice WebRTC CIDR Ranges",
+    target: "ai",
+    lineage: "openai_official",
+    format: "openai_ip_json",
+    weight: 96,
+    core: false,
+    updateCadence: "daily",
+    license: "Public-Source",
+    homepage: "https://openai.com/chatgpt-voice.json",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://openai.com/chatgpt-voice.json",
       },
     ],
   },
@@ -190,7 +208,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 92,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "GPL-2.0",
     homepage: "https://github.com/viewer12/OverseasAI.list",
     endpoints: [
       {
@@ -432,7 +450,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 86,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "GPL-3.0",
     homepage: "https://github.com/blankmagic/Surge",
     endpoints: [
       {
@@ -454,7 +472,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 86,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -493,7 +511,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "tannayej_ai_global",
     name: "TannayeJ AI Global Vendor Rules",
     target: "ai",
-    lineage: "tannayej",
+    lineage: "v2fly_dlc",
     format: "clash_yaml",
     weight: 86,
     core: false,
@@ -515,7 +533,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "nsza156_category_ai_not_cn",
     name: "NSZA156 Surge GeoX category-ai-!cn",
     target: "ai",
-    lineage: "nsza156",
+    lineage: "v2fly_dlc",
     format: "surge_ruleset",
     weight: 88,
     core: false,
@@ -637,7 +655,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 89,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -655,7 +673,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 89,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -673,7 +691,7 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 89,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -950,6 +968,74 @@ export const AI_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic%40telemetry.list",
+      },
+    ],
+  },
+  {
+    id: "v2fly_dlc_manus",
+    name: "v2fly domain-list-community manus",
+    target: "ai",
+    lineage: "v2fly_dlc",
+    format: "geosite",
+    geositeFilter: "all_non_ads",
+    weight: 93,
+    core: false,
+    updateCadence: "6h",
+    license: "MIT",
+    homepage: "https://github.com/v2fly/domain-list-community",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/manus",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/manus",
+      },
+    ],
+  },
+  {
+    id: "v2fly_dlc_cerebras",
+    name: "v2fly domain-list-community cerebras",
+    target: "ai",
+    lineage: "v2fly_dlc",
+    format: "geosite",
+    geositeFilter: "all_non_ads",
+    weight: 92,
+    core: false,
+    updateCadence: "6h",
+    license: "MIT",
+    homepage: "https://github.com/v2fly/domain-list-community",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/cerebras",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/cerebras",
+      },
+    ],
+  },
+  {
+    id: "metacubex_bytedance_ai_not_cn",
+    name: "MetaCubeX bytedance-ai-!cn",
+    target: "ai",
+    lineage: "v2fly_dlc",
+    format: "clash_classical",
+    weight: 93,
+    core: false,
+    updateCadence: "6h",
+    license: "GPL-3.0",
+    homepage: "https://github.com/MetaCubeX/meta-rules-dat",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/bytedance-ai-%21cn.list",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/bytedance-ai-%21cn.list",
       },
     ],
   },

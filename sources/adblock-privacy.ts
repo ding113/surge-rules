@@ -636,4 +636,70 @@ export const ADBLOCK_PRIVACY_SOURCES: readonly AdblockSourceEntry[] = [
       },
     ],
   },
+  {
+    id: "ut1_stalkerware",
+    name: "UT1 Blacklists Stalkerware & Spyware Domains",
+    role: "ruleset_fallback",
+    category: "privacy",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "ut1_blacklists",
+    weight: 88,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/stalkerware/domains",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/olbat/ut1-blacklists@master/blacklists/stalkerware/domains",
+      },
+    ],
+  },
+  {
+    id: "perflyst_session_replay",
+    name: "Perflyst Session Replay Trackers",
+    role: "ruleset_fallback",
+    category: "privacy",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "perflyst_smarttv",
+    weight: 86,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SessionReplay.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/Perflyst/PiHoleBlocklist@master/SessionReplay.txt",
+      },
+    ],
+  },
+  {
+    id: "perflyst_amazon_firetv",
+    name: "Perflyst Amazon FireTV Native Telemetry",
+    role: "ruleset_fallback",
+    category: "privacy",
+    format: "domain_list",
+    platform: "universal",
+    lineage: "perflyst_smarttv",
+    weight: 86,
+    core: false,
+    extractFallbackDomainRules: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/AmazonFireTV.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/Perflyst/PiHoleBlocklist@master/AmazonFireTV.txt",
+      },
+    ],
+  },
 ];

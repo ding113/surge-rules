@@ -977,30 +977,13 @@ export const ADBLOCK_ALLOWLIST_SOURCES: readonly AdblockSourceEntry[] = [
     ],
   },
   {
-    id: "sefinek_whitelist",
-    name: "Sefinek Blocklist Collection Main Whitelist",
-    role: "allowlist",
-    category: "both",
-    format: "domain_list",
-    platform: "universal",
-    lineage: "sefinek_whitelist",
-    weight: 94,
-    core: false,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/sefinek/Sefinek-Blocklist-Collection/main/whitelists/main.txt",
-      },
-    ],
-  },
-  {
     id: "cpbl_whitelist",
     name: "Combined Privacy Block Lists Official Whitelist",
     role: "allowlist",
     category: "privacy",
     format: "domain_list",
     platform: "universal",
-    lineage: "cpbl_whitelist",
+    lineage: "cpbl",
     weight: 94,
     core: false,
     endpoints: [

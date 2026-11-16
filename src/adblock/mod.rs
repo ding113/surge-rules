@@ -105,21 +105,26 @@ pub async fn build_adblock_pipeline(
         );
     }
 
-    let telemetry_path = opts.output_dir.join("Telemetry.list");
-    let telemetry_guard = if telemetry_path.exists() {
-        let tel_raw = fs::read_to_string(&telemetry_path).with_context(|| {
-            format!(
-                "failed reading Telemetry.list at {}",
-                telemetry_path.display()
-            )
-        })?;
-        let guard = TelemetryProtectionSet::from_ruleset_text(&tel_raw);
+    let mut clean_guard = TelemetryProtectionSet::default();
+    let mut loaded_clean_lists = Vec::new();
+    for clean_file in ["Telemetry.list", "Payment.list", "AI.list"] {
+        let clean_path = opts.output_dir.join(clean_file);
+        if clean_path.exists() {
+            let clean_raw = fs::read_to_string(&clean_path).with_context(|| {
+                format!("failed reading {} at {}", clean_file, clean_path.display())
+            })?;
+            clean_guard.ingest_ruleset_text(&clean_raw);
+            loaded_clean_lists.push(clean_file);
+        }
+    }
+    let telemetry_guard = if !loaded_clean_lists.is_empty() {
         info!(
-            telemetry_exact = guard.exact_domains.len(),
-            telemetry_suffixes = guard.suffix_domains.len(),
-            "loaded Telemetry.list protection guard for Adblock & Privacy compilation"
+            lists = ?loaded_clean_lists,
+            clean_exact = clean_guard.exact_domains.len(),
+            clean_suffixes = clean_guard.suffix_domains.len(),
+            "loaded clean-egress protection guard (Telemetry/Payment/AI) for Adblock & Privacy compilation"
         );
-        Some(guard)
+        Some(clean_guard)
     } else {
         None
     };

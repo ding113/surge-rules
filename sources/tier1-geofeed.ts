@@ -18,6 +18,10 @@ export const TIER1_GEOFEED_SOURCES: readonly GeoIpSourceEntry[] = [
         repo: "ipanalytics/GeoFeed-Harvester",
         assetPattern: "^geofeed\\.parquet$",
       },
+      {
+        kind: "direct",
+        url: "https://github.com/ipanalytics/GeoFeed-Harvester/releases/download/dataset-current/geofeed.parquet",
+      },
     ],
   },
   {

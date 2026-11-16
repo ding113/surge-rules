@@ -46,6 +46,13 @@ pub fn parse_rfc8805_csv(
         let Ok(net) = prefix_str.parse::<IpNet>() else {
             continue;
         };
+        let min_plen = match net {
+            IpNet::V4(_) => 8,
+            IpNet::V6(_) => 19,
+        };
+        if net.prefix_len() < min_plen {
+            continue;
+        }
         let alpha2 = rec.get(1).unwrap_or("");
         let region = rec.get(2).unwrap_or("");
         let city = rec.get(3).unwrap_or("");
@@ -121,6 +128,13 @@ pub fn parse_geofeed_parquet(
         let Ok(net) = prefix.trim().parse::<IpNet>() else {
             continue;
         };
+        let min_plen = match net {
+            IpNet::V4(_) => 8,
+            IpNet::V6(_) => 19,
+        };
+        if net.prefix_len() < min_plen {
+            continue;
+        }
         if let Some(pid) = build_geofeed_record_payload(
             country,
             region,

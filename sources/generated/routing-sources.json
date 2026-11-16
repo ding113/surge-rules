@@ -180,47 +180,45 @@
     },
     {
       "id": "v2fly_dlc_games_cn",
-      "name": "v2fly domain-list-community category-games-cn",
+      "name": "MetaCubeX category-games-cn (v2fly pre-expanded)",
       "target": "direct",
       "lineage": "v2fly_dlc",
-      "format": "geosite",
-      "geositeFilter": "all_non_ads",
+      "format": "clash_classical",
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/v2fly/domain-list-community",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-games-cn"
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-games-cn.list"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/category-games-cn"
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-games-cn.list"
         }
       ]
     },
     {
       "id": "v2fly_dlc_scholar_cn",
-      "name": "v2fly domain-list-community category-scholar-cn",
+      "name": "MetaCubeX category-scholar-cn (v2fly pre-expanded)",
       "target": "direct",
       "lineage": "v2fly_dlc",
-      "format": "geosite",
-      "geositeFilter": "all_non_ads",
+      "format": "clash_classical",
       "weight": 92,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/v2fly/domain-list-community",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-scholar-cn"
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-scholar-cn.list"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/category-scholar-cn"
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-scholar-cn.list"
         }
       ]
     },
@@ -233,7 +231,7 @@
       "weight": 96,
       "core": true,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -255,7 +253,7 @@
       "weight": 84,
       "core": true,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -277,7 +275,7 @@
       "weight": 96,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -299,7 +297,7 @@
       "weight": 95,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -321,7 +319,7 @@
       "weight": 95,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -410,7 +408,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "GPL-2.0",
       "homepage": "https://github.com/blackmatrix7/ios_rule_script",
       "endpoints": [
         {
@@ -432,7 +430,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "GPL-2.0",
       "homepage": "https://github.com/blackmatrix7/ios_rule_script",
       "endpoints": [
         {
@@ -454,7 +452,7 @@
       "weight": 86,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -476,7 +474,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -498,7 +496,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -520,7 +518,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -542,7 +540,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -669,7 +667,7 @@
       "id": "tannayej_ai_cn",
       "name": "TannayeJ AI CN Vendor Rules",
       "target": "direct",
-      "lineage": "tannayej",
+      "lineage": "v2fly_dlc",
       "format": "clash_yaml",
       "weight": 86,
       "core": false,
@@ -691,7 +689,7 @@
       "id": "nsza156_category_ai_cn",
       "name": "NSZA156 Surge GeoX category-ai-cn",
       "target": "direct",
-      "lineage": "nsza156",
+      "lineage": "v2fly_dlc",
       "format": "surge_ruleset",
       "weight": 88,
       "core": false,
@@ -718,7 +716,7 @@
       "weight": 91,
       "core": false,
       "updateCadence": "daily",
-      "license": "GPL-3.0",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/Aethersailor/Custom_OpenClash_Rules",
       "endpoints": [
         {
@@ -740,7 +738,7 @@
       "weight": 93,
       "core": false,
       "updateCadence": "daily",
-      "license": "GPL-3.0",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/Aethersailor/Custom_OpenClash_Rules",
       "endpoints": [
         {
@@ -757,7 +755,7 @@
       "id": "heidai_routing_direct",
       "name": "217heidai RoutingRules Domestic Direct Domains",
       "target": "direct",
-      "lineage": "heidai_routing",
+      "lineage": "v2fly_dlc",
       "format": "domain_suffix_set",
       "weight": 89,
       "core": false,
@@ -772,28 +770,6 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/direct.txt"
-        }
-      ]
-    },
-    {
-      "id": "heidai_routing_ipv4_cn",
-      "name": "217heidai RoutingRules China IPv4 CIDR",
-      "target": "direct",
-      "lineage": "heidai_routing",
-      "format": "ip_cidr",
-      "weight": 89,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/217heidai/RoutingRules",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/ipv4_china.txt"
         }
       ]
     },
@@ -823,7 +799,7 @@
       "id": "gmoogway_sr_direct",
       "name": "GMOogway Shadowrocket Direct List",
       "target": "direct",
-      "lineage": "gmoogway",
+      "lineage": "v2fly_dlc",
       "format": "surge_ruleset",
       "weight": 87,
       "core": false,
@@ -850,7 +826,7 @@
       "weight": 95,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -872,7 +848,7 @@
       "weight": 93,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -894,7 +870,7 @@
       "weight": 92,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -1418,6 +1394,161 @@
       ]
     },
     {
+      "id": "acl4ssr_game_download",
+      "name": "ACL4SSR GameDownload CN Patch CDNs",
+      "target": "direct",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/GameDownload.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/GameDownload.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_dev_cn",
+      "name": "MetaCubeX category-dev-cn",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-dev-cn.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-dev-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_cdn_cn",
+      "name": "MetaCubeX category-cdn-cn",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-cdn-cn.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/category-cdn-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "v2fly_dlc_hsbc_cn",
+      "name": "v2fly domain-list-community hsbc-cn",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "geosite",
+      "geositeFilter": "all_non_ads",
+      "weight": 95,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "MIT",
+      "homepage": "https://github.com/v2fly/domain-list-community",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/hsbc-cn"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/hsbc-cn"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_china_cidr_v4",
+      "name": "gaoyifan china-operator-ip China IPv4",
+      "target": "direct",
+      "lineage": "gaoyifan_cn",
+      "format": "ip_cidr",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/gaoyifan/china-operator-ip",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://gaoyifan.github.io/china-operator-ip/china.txt"
+        }
+      ]
+    },
+    {
+      "id": "gaoyifan_china_cidr_v6",
+      "name": "gaoyifan china-operator-ip China IPv6",
+      "target": "direct",
+      "lineage": "gaoyifan_cn",
+      "format": "ip_cidr",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/gaoyifan/china-operator-ip",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://gaoyifan.github.io/china-operator-ip/china6.txt"
+        }
+      ]
+    },
+    {
+      "id": "misakaio_chnroutes2_v4",
+      "name": "misakaio chnroutes2 China IPv4",
+      "target": "direct",
+      "lineage": "chnroutes2",
+      "format": "ip_cidr",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/misakaio/chnroutes2",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/misakaio/chnroutes2@master/chnroutes.txt"
+        }
+      ]
+    },
+    {
       "id": "vpsdance_ai_global",
       "name": "VPSDance ai-proxy-rules Global AI",
       "target": "ai",
@@ -1470,7 +1601,7 @@
       "weight": 96,
       "core": true,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -1492,7 +1623,7 @@
       "weight": 95,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -1514,7 +1645,7 @@
       "weight": 95,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -1524,6 +1655,24 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/SukkaW/Surge@master/Source/ip/ai.conf"
+        }
+      ]
+    },
+    {
+      "id": "openai_chatgpt_voice_cidr",
+      "name": "OpenAI Official ChatGPT Voice WebRTC CIDR Ranges",
+      "target": "ai",
+      "lineage": "openai_official",
+      "format": "openai_ip_json",
+      "weight": 96,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "Public-Source",
+      "homepage": "https://openai.com/chatgpt-voice.json",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://openai.com/chatgpt-voice.json"
         }
       ]
     },
@@ -1602,7 +1751,7 @@
       "weight": 92,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "GPL-2.0",
       "homepage": "https://github.com/viewer12/OverseasAI.list",
       "endpoints": [
         {
@@ -1844,7 +1993,7 @@
       "weight": 86,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "GPL-3.0",
       "homepage": "https://github.com/blankmagic/Surge",
       "endpoints": [
         {
@@ -1866,7 +2015,7 @@
       "weight": 86,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -1905,7 +2054,7 @@
       "id": "tannayej_ai_global",
       "name": "TannayeJ AI Global Vendor Rules",
       "target": "ai",
-      "lineage": "tannayej",
+      "lineage": "v2fly_dlc",
       "format": "clash_yaml",
       "weight": 86,
       "core": false,
@@ -1927,7 +2076,7 @@
       "id": "nsza156_category_ai_not_cn",
       "name": "NSZA156 Surge GeoX category-ai-!cn",
       "target": "ai",
-      "lineage": "nsza156",
+      "lineage": "v2fly_dlc",
       "format": "surge_ruleset",
       "weight": 88,
       "core": false,
@@ -2048,7 +2197,7 @@
       "weight": 89,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -2066,7 +2215,7 @@
       "weight": 89,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -2084,7 +2233,7 @@
       "weight": 89,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -2360,6 +2509,74 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic%40telemetry.list"
+        }
+      ]
+    },
+    {
+      "id": "v2fly_dlc_manus",
+      "name": "v2fly domain-list-community manus",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "geosite",
+      "geositeFilter": "all_non_ads",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "MIT",
+      "homepage": "https://github.com/v2fly/domain-list-community",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/manus"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/manus"
+        }
+      ]
+    },
+    {
+      "id": "v2fly_dlc_cerebras",
+      "name": "v2fly domain-list-community cerebras",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "geosite",
+      "geositeFilter": "all_non_ads",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "MIT",
+      "homepage": "https://github.com/v2fly/domain-list-community",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/cerebras"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/v2fly/domain-list-community@master/data/cerebras"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_bytedance_ai_not_cn",
+      "name": "MetaCubeX bytedance-ai-!cn",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/bytedance-ai-%21cn.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/bytedance-ai-%21cn.list"
         }
       ]
     },
@@ -2995,7 +3212,7 @@
       "weight": 96,
       "core": true,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -3017,7 +3234,7 @@
       "weight": 94,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -3039,7 +3256,7 @@
       "weight": 95,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -3061,7 +3278,7 @@
       "weight": 95,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "AGPL-3.0",
       "homepage": "https://github.com/SukkaW/Surge",
       "endpoints": [
         {
@@ -3083,7 +3300,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "GPL-2.0",
       "homepage": "https://github.com/blackmatrix7/ios_rule_script",
       "endpoints": [
         {
@@ -3105,7 +3322,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "GPL-2.0",
       "homepage": "https://github.com/blackmatrix7/ios_rule_script",
       "endpoints": [
         {
@@ -3127,7 +3344,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3149,7 +3366,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3171,7 +3388,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3325,7 +3542,7 @@
       "weight": 90,
       "core": true,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "GPL-2.0",
       "homepage": "https://github.com/blackmatrix7/ios_rule_script",
       "endpoints": [
         {
@@ -3347,7 +3564,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3369,7 +3586,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3391,7 +3608,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3413,7 +3630,7 @@
       "weight": 90,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3435,7 +3652,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3457,7 +3674,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3479,7 +3696,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3501,7 +3718,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3523,7 +3740,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3589,7 +3806,7 @@
       "weight": 91,
       "core": false,
       "updateCadence": "daily",
-      "license": "GPL-3.0",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/Aethersailor/Custom_OpenClash_Rules",
       "endpoints": [
         {
@@ -3606,7 +3823,7 @@
       "id": "heidai_routing_proxy",
       "name": "217heidai RoutingRules Overseas Proxy Domains",
       "target": "proxy",
-      "lineage": "heidai_routing",
+      "lineage": "v2fly_dlc",
       "format": "domain_suffix_set",
       "weight": 89,
       "core": false,
@@ -3628,7 +3845,7 @@
       "id": "gmoogway_sr_proxy",
       "name": "GMOogway Shadowrocket Proxy List",
       "target": "proxy",
-      "lineage": "gmoogway",
+      "lineage": "v2fly_dlc",
       "format": "surge_ruleset",
       "weight": 88,
       "core": false,
@@ -3639,24 +3856,6 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module"
-        }
-      ]
-    },
-    {
-      "id": "hezhijie_gfwlist_agh",
-      "name": "hezhijie0327 GFWList2AGH Full Overseas Blacklist (Repurposed)",
-      "target": "proxy",
-      "lineage": "gfwlist2agh",
-      "format": "abp_filter",
-      "weight": 89,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/hezhijie0327/GFWList2AGH",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hezhijie0327/GFWList2AGH/main/gfwlist2adguardhome/blacklist_full.txt"
         }
       ]
     },
@@ -3741,7 +3940,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3921,7 +4120,7 @@
       "weight": 88,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -3939,7 +4138,7 @@
       "weight": 89,
       "core": false,
       "updateCadence": "daily",
-      "license": "MIT",
+      "license": "CC-BY-SA-4.0",
       "homepage": "https://github.com/ACL4SSR/ACL4SSR",
       "endpoints": [
         {
@@ -4652,7 +4851,7 @@
       "id": "metacubex_discord",
       "name": "MetaCubeX Geosite Discord",
       "target": "proxy",
-      "lineage": "metacubex",
+      "lineage": "v2fly_dlc",
       "format": "domain_set",
       "weight": 88,
       "core": false,
@@ -4674,7 +4873,7 @@
       "id": "metacubex_twitch",
       "name": "MetaCubeX Geosite Twitch",
       "target": "proxy",
-      "lineage": "metacubex",
+      "lineage": "v2fly_dlc",
       "format": "domain_set",
       "weight": 88,
       "core": false,
@@ -4965,24 +5164,6 @@
       ]
     },
     {
-      "id": "rpilist_pornblock1",
-      "name": "RPiList Adult & NSFW Content Inventory (pornblock1)",
-      "target": "proxy",
-      "lineage": "rpilist_specials",
-      "format": "domain_suffix_set",
-      "weight": 85,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/RPiList/specials",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/pornblock1"
-        }
-      ]
-    },
-    {
       "id": "stevo_ai_repurposed",
       "name": "Stevo's AI & Generative Media Blocklist (Repurposed for Proxy)",
       "target": "proxy",
@@ -5145,42 +5326,6 @@
       ]
     },
     {
-      "id": "rpilist_proxies",
-      "name": "RPiList Specials Proxy & Bypass Endpoints",
-      "target": "proxy",
-      "lineage": "rpilist",
-      "format": "domain_suffix_set",
-      "weight": 85,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/RPiList/specials",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies"
-        }
-      ]
-    },
-    {
-      "id": "rpilist_streaming",
-      "name": "RPiList Specials Overseas Streaming Mirrors",
-      "target": "proxy",
-      "lineage": "rpilist",
-      "format": "domain_suffix_set",
-      "weight": 85,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/RPiList/specials",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Streaming"
-        }
-      ]
-    },
-    {
       "id": "cbuijs_doh_bypass",
       "name": "cbuijs Accomplist Encrypted DoH & Bypass Inventory",
       "target": "proxy",
@@ -5285,6 +5430,24 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list"
+        }
+      ]
+    },
+    {
+      "id": "telegram_official_cidr",
+      "name": "Telegram Official Data Center CIDR Ranges",
+      "target": "proxy",
+      "lineage": "telegram_official",
+      "format": "ip_cidr",
+      "weight": 96,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "Public-Source",
+      "homepage": "https://core.telegram.org/resources/cidr.txt",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://core.telegram.org/resources/cidr.txt"
         }
       ]
     }

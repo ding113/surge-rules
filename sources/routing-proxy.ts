@@ -170,7 +170,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 96,
     core: true,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -192,7 +192,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 94,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -214,7 +214,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 95,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -236,7 +236,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 95,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "AGPL-3.0",
     homepage: "https://github.com/SukkaW/Surge",
     endpoints: [
       {
@@ -258,7 +258,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "GPL-2.0",
     homepage: "https://github.com/blackmatrix7/ios_rule_script",
     endpoints: [
       {
@@ -280,7 +280,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "GPL-2.0",
     homepage: "https://github.com/blackmatrix7/ios_rule_script",
     endpoints: [
       {
@@ -302,7 +302,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -324,7 +324,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -346,7 +346,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -501,7 +501,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: true,
     updateCadence: "daily",
-    license: "MIT",
+    license: "GPL-2.0",
     homepage: "https://github.com/blackmatrix7/ios_rule_script",
     endpoints: [
       {
@@ -523,7 +523,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -545,7 +545,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -567,7 +567,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -589,7 +589,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 90,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -611,7 +611,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -633,7 +633,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -655,7 +655,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -677,7 +677,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -699,7 +699,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -771,7 +771,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 91,
     core: false,
     updateCadence: "daily",
-    license: "GPL-3.0",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/Aethersailor/Custom_OpenClash_Rules",
     endpoints: [
       {
@@ -788,7 +788,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "heidai_routing_proxy",
     name: "217heidai RoutingRules Overseas Proxy Domains",
     target: "proxy",
-    lineage: "heidai_routing",
+    lineage: "v2fly_dlc",
     format: "domain_suffix_set",
     weight: 89,
     core: false,
@@ -810,7 +810,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "gmoogway_sr_proxy",
     name: "GMOogway Shadowrocket Proxy List",
     target: "proxy",
-    lineage: "gmoogway",
+    lineage: "v2fly_dlc",
     format: "surge_ruleset",
     weight: 88,
     core: false,
@@ -821,24 +821,6 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module",
-      },
-    ],
-  },
-  {
-    id: "hezhijie_gfwlist_agh",
-    name: "hezhijie0327 GFWList2AGH Full Overseas Blacklist (Repurposed)",
-    target: "proxy",
-    lineage: "gfwlist2agh",
-    format: "abp_filter",
-    weight: 89,
-    core: false,
-    updateCadence: "daily",
-    license: "GPL-3.0",
-    homepage: "https://github.com/hezhijie0327/GFWList2AGH",
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/hezhijie0327/GFWList2AGH/main/gfwlist2adguardhome/blacklist_full.txt",
       },
     ],
   },
@@ -924,7 +906,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -1104,7 +1086,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 88,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -1122,7 +1104,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     weight: 89,
     core: false,
     updateCadence: "daily",
-    license: "MIT",
+    license: "CC-BY-SA-4.0",
     homepage: "https://github.com/ACL4SSR/ACL4SSR",
     endpoints: [
       {
@@ -1838,7 +1820,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "metacubex_discord",
     name: "MetaCubeX Geosite Discord",
     target: "proxy",
-    lineage: "metacubex",
+    lineage: "v2fly_dlc",
     format: "domain_set",
     weight: 88,
     core: false,
@@ -1860,7 +1842,7 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     id: "metacubex_twitch",
     name: "MetaCubeX Geosite Twitch",
     target: "proxy",
-    lineage: "metacubex",
+    lineage: "v2fly_dlc",
     format: "domain_set",
     weight: 88,
     core: false,
@@ -2151,24 +2133,6 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     ],
   },
   {
-    id: "rpilist_pornblock1",
-    name: "RPiList Adult & NSFW Content Inventory (pornblock1)",
-    target: "proxy",
-    lineage: "rpilist_specials",
-    format: "domain_suffix_set",
-    weight: 85,
-    core: false,
-    updateCadence: "daily",
-    license: "MIT",
-    homepage: "https://github.com/RPiList/specials",
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/pornblock1",
-      },
-    ],
-  },
-  {
     id: "stevo_ai_repurposed",
     name: "Stevo's AI & Generative Media Blocklist (Repurposed for Proxy)",
     target: "proxy",
@@ -2331,42 +2295,6 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
     ],
   },
   {
-    id: "rpilist_proxies",
-    name: "RPiList Specials Proxy & Bypass Endpoints",
-    target: "proxy",
-    lineage: "rpilist",
-    format: "domain_suffix_set",
-    weight: 85,
-    core: false,
-    updateCadence: "daily",
-    license: "GPL-3.0",
-    homepage: "https://github.com/RPiList/specials",
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies",
-      },
-    ],
-  },
-  {
-    id: "rpilist_streaming",
-    name: "RPiList Specials Overseas Streaming Mirrors",
-    target: "proxy",
-    lineage: "rpilist",
-    format: "domain_suffix_set",
-    weight: 85,
-    core: false,
-    updateCadence: "daily",
-    license: "GPL-3.0",
-    homepage: "https://github.com/RPiList/specials",
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Streaming",
-      },
-    ],
-  },
-  {
     id: "cbuijs_doh_bypass",
     name: "cbuijs Accomplist Encrypted DoH & Bypass Inventory",
     target: "proxy",
@@ -2471,6 +2399,24 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list",
+      },
+    ],
+  },
+  {
+    id: "telegram_official_cidr",
+    name: "Telegram Official Data Center CIDR Ranges",
+    target: "proxy",
+    lineage: "telegram_official",
+    format: "ip_cidr",
+    weight: 96,
+    core: false,
+    updateCadence: "daily",
+    license: "Public-Source",
+    homepage: "https://core.telegram.org/resources/cidr.txt",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://core.telegram.org/resources/cidr.txt",
       },
     ],
   },

@@ -292,8 +292,9 @@ impl RuleClaim {
     }
 }
 
-/// Domain and suffix rules imported from `Telemetry.list` so that `Adblock.list` and `Privacy.list`
-/// never conflict with or reject clean-exit risk-control, CAPTCHA, IP-geo, and OS/SDK telemetry rules.
+/// Domain and suffix rules imported from clean-egress routing lists (`Telemetry.list`, `Payment.list`,
+/// and `AI.list`) so that `Adblock.list` and `Privacy.list` never conflict with or reject clean-exit
+/// risk-control, CAPTCHA, banking/payment, or AI endpoints.
 #[derive(Clone, Default, Debug)]
 pub struct TelemetryProtectionSet {
     pub exact_domains: FxHashSet<String>,
@@ -303,6 +304,11 @@ pub struct TelemetryProtectionSet {
 impl TelemetryProtectionSet {
     pub fn from_ruleset_text(text: &str) -> Self {
         let mut out = Self::default();
+        out.ingest_ruleset_text(text);
+        out
+    }
+
+    pub fn ingest_ruleset_text(&mut self, text: &str) {
         for raw_line in text.lines() {
             let line = raw_line.trim();
             if line.is_empty()
@@ -328,15 +334,14 @@ impl TelemetryProtectionSet {
             }
             match kind {
                 "DOMAIN" => {
-                    out.exact_domains.insert(clean);
+                    self.exact_domains.insert(clean);
                 }
                 "DOMAIN-SUFFIX" => {
-                    out.suffix_domains.insert(clean);
+                    self.suffix_domains.insert(clean);
                 }
                 _ => {}
             }
         }
-        out
     }
 }
 

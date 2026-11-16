@@ -80,7 +80,7 @@ fmz200 Wool Scripts BlockAds Module, https://raw.githubusercontent.com/fmz200/wo
 </details>
 
 <details>
-<summary>广告与安全威胁拦截数据源（Adblock.list）（共 134 项）</summary>
+<summary>广告与安全威胁拦截数据源（Adblock.list）（共 136 项）</summary>
 
 ```text
 AdGuard Mobile Ads Filter (CoreLibs), https://filters.adtidy.org/windows/filters/11.txt
@@ -184,7 +184,6 @@ Ukrainian Security & Phishing Filter, https://adguardteam.github.io/HostlistsReg
 zachlagden Custom Malicious Domains, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/malicious.txt
 AdBlockID Plus Indonesian Filter (CoreLibs), https://raw.githubusercontent.com/realodix/AdBlockID/main/dist/adblockid_plus.adfl.txt
 ABPVN Vietnamese AdGuard Advanced Filter, https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_adguard.txt
-MajkiIT Official Polish AdGuard Filter, https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock_adguard.txt
 FiltersHeroes KAD Polish Anti-Scam & Fraud Filter, https://raw.githubusercontent.com/FiltersHeroes/KAD/master/KAD.txt
 FiltersHeroes Polish Annoyances Filters (CoreLibs), https://filters.adtidy.org/windows/filters/237.txt
 EasyList Czech and Slovak, https://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt
@@ -215,14 +214,17 @@ HaGeZi The World's Most Abused TLDs, https://adguardteam.github.io/HostlistsRegi
 UT1 Toulouse University Malware Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/malware/domains
 UT1 Toulouse University Phishing Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/phishing/domains
 UT1 Toulouse University Cryptojacking Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/cryptojacking/domains
-RPiList Specials Malware Blocklist, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/malware
-RPiList Specials Phishing Blocklist, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe
+Chainapsis / Keplr CosmoShield Web3 Phishing Blocklist, https://raw.githubusercontent.com/chainapsis/phishing-block-list/main/block-list.txt
+EasyList Liste FR (French Supplement), https://easylist-downloads.adblockplus.org/liste_fr.txt
+SPMedia Crypto Scam & Phishing Threat Intel, https://raw.githubusercontent.com/spmedia/Crypto-Scam-and-Crypto-Phishing-Threat-Intel-Feed/main/detected_urls.txt
+Phishunt Active Phishing Hostnames, https://raw.githubusercontent.com/0xDanielLopez/phishunt-feed/main/blocklist/domains.txt
+UT1 Blacklists DDoS & Stresser Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/ddos/domains
 ```
 
 </details>
 
 <details>
-<summary>隐私跟踪与遥测拦截数据源（Privacy.list）（共 30 项）</summary>
+<summary>隐私跟踪与遥测拦截数据源（Privacy.list）（共 33 项）</summary>
 
 ```text
 AdGuard Tracking Protection Filter (CoreLibs), https://filters.adtidy.org/windows/filters/3.txt
@@ -255,12 +257,15 @@ zachlagden Custom Tracking Domains, https://raw.githubusercontent.com/zachlagden
 ShadowWhisperer Tracking List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_69.txt
 AssoEchap Stalkerware Indicators List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_31.txt
 PhishIndex IP Logger Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt
+UT1 Blacklists Stalkerware & Spyware Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/stalkerware/domains
+Perflyst Session Replay Trackers, https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SessionReplay.txt
+Perflyst Amazon FireTV Native Telemetry, https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/AmazonFireTV.txt
 ```
 
 </details>
 
 <details>
-<summary>去广告与隐私防误伤白名单数据源（共 74 项）</summary>
+<summary>去广告与隐私防误伤白名单数据源（共 73 项）</summary>
 
 ```text
 uBlock Origin Unbreak Allowlist, https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt
@@ -309,7 +314,6 @@ zachlagden Pi-hole Optimized Whitelist, https://raw.githubusercontent.com/zachla
 NEO DEV HOST Official Allowlist, https://raw.githubusercontent.com/neodevpro/neodevhost/master/allow
 ShadowWhisperer Curated Whitelist, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist
 Ultimate Hosts Blacklist Official Whitelist, https://raw.githubusercontent.com/Ultimate-Hosts-Blacklist/whitelist/master/domains.list
-Sefinek Blocklist Collection Main Whitelist, https://raw.githubusercontent.com/sefinek/Sefinek-Blocklist-Collection/main/whitelists/main.txt
 Combined Privacy Block Lists Official Whitelist, https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/NoFormatting/WhitelistedDomains.txt
 UT1 Toulouse University Official Allowlist (liste_blanche), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/liste_blanche/domains
 ACL4SSR UnBan False-Positive Allowlist, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/UnBan.list
@@ -342,7 +346,7 @@ BadBlock Miscellaneous Functional Services Whitelist, https://raw.githubusercont
 </details>
 
 <details>
-<summary>国内直连分流数据源（Direct.list）（共 68 项）</summary>
+<summary>国内直连分流数据源（Direct.list）（共 74 项）</summary>
 
 ```text
 Loyalsoldier surge-rules direct ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/direct.txt
@@ -353,8 +357,8 @@ MetaCubeX apple@cn CDN & connectivity, https://raw.githubusercontent.com/MetaCub
 MetaCubeX microsoft@cn CDN & connectivity, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/microsoft%40cn.list
 MetaCubeX steam@cn download CDN, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/steam%40cn.list
 MetaCubeX google@cn localized endpoints, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/google%40cn.list
-v2fly domain-list-community category-games-cn, https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-games-cn
-v2fly domain-list-community category-scholar-cn, https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-scholar-cn
+MetaCubeX category-games-cn (v2fly pre-expanded), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-games-cn.list
+MetaCubeX category-scholar-cn (v2fly pre-expanded), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-scholar-cn.list
 SukkaW Surge domestic rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/non_ip/domestic.conf
 SukkaW Surge direct rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/non_ip/direct.conf
 SukkaW Surge domestic CDN rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/non_ip/domestic_cdn.conf
@@ -380,7 +384,6 @@ NSZA156 Surge GeoX category-ai-cn, https://raw.githubusercontent.com/NSZA156/sur
 Aethersailor Custom OpenClash Direct Rules, https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Custom_Direct.list
 Aethersailor Domestic Steam Download CDN Rules, https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Steam_CDN.list
 217heidai RoutingRules Domestic Direct Domains, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/direct.txt
-217heidai RoutingRules China IPv4 CIDR, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt
 Loyalsoldier surge-rules cncidr IPv4/IPv6, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/cncidr.txt
 GMOogway Shadowrocket Direct List, https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
 ACL4SSR China Carrier One-Key SIM Login, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ChinaOneKeyLogin.list
@@ -413,12 +416,19 @@ MetaCubeX category-game-platforms-download@cn, https://raw.githubusercontent.com
 MetaCubeX category-wiki-cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-wiki-cn.list
 MetaCubeX category-ntp-cn (Domestic NTP Servers), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ntp-cn.list
 MetaCubeX category-number-verification-cn (Carrier SIM Auth), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-number-verification-cn.list
+ACL4SSR GameDownload CN Patch CDNs, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/GameDownload.list
+MetaCubeX category-dev-cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-dev-cn.list
+MetaCubeX category-cdn-cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-cdn-cn.list
+v2fly domain-list-community hsbc-cn, https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/hsbc-cn
+gaoyifan china-operator-ip China IPv4, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt
+gaoyifan china-operator-ip China IPv6, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt
+misakaio chnroutes2 China IPv4, https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt
 ```
 
 </details>
 
 <details>
-<summary>境外 AI 应用数据源（AI.list）（共 47 项）</summary>
+<summary>境外 AI 应用数据源（AI.list）（共 51 项）</summary>
 
 ```text
 VPSDance ai-proxy-rules Global AI, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global.list
@@ -426,6 +436,7 @@ VPSDance Apple Intelligence custom Surge list, https://raw.githubusercontent.com
 SukkaW Surge AI rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/non_ip/ai.conf
 SukkaW Surge Apple Intelligence rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/non_ip/apple_intelligence.conf
 SukkaW Surge AI IP rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/ip/ai.conf
+OpenAI Official ChatGPT Voice WebRTC CIDR Ranges, https://openai.com/chatgpt-voice.json
 VPSDance ai-proxy-rules Global AI Coding Agents, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-coding.list
 VPSDance ai-proxy-rules Global LLM & Model APIs, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-model.list
 VPSDance ai-proxy-rules Global Generative Media AI, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-media.list
@@ -468,6 +479,9 @@ UT1 Toulouse University AI Domains (Repurposed as AI Inventory), https://raw.git
 MetaCubeX category-ai-!cn@telemetry (AI Attestation & Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ai-%21cn%40telemetry.list
 MetaCubeX openai@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/openai%40telemetry.list
 MetaCubeX anthropic@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic%40telemetry.list
+v2fly domain-list-community manus, https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/manus
+v2fly domain-list-community cerebras, https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/cerebras
+MetaCubeX bytedance-ai-!cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/bytedance-ai-%21cn.list
 ```
 
 </details>
@@ -513,7 +527,7 @@ MetaCubeX category-telemetry (Overseas OS & SDK Telemetry), https://raw.githubus
 </details>
 
 <details>
-<summary>境外代理与流媒体数据源（Proxy.list）（共 126 项）</summary>
+<summary>境外代理与流媒体数据源（Proxy.list）（共 123 项）</summary>
 
 ```text
 Loyalsoldier surge-rules proxy ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/proxy.txt
@@ -553,7 +567,6 @@ LM-Firefly GlobalMedia Surge ruleset, https://raw.githubusercontent.com/LM-Firef
 Aethersailor Custom OpenClash Proxy Rules, https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Custom_Proxy.list
 217heidai RoutingRules Overseas Proxy Domains, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/proxy.txt
 GMOogway Shadowrocket Proxy List, https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
-hezhijie0327 GFWList2AGH Full Overseas Blacklist (Repurposed), https://raw.githubusercontent.com/hezhijie0327/GFWList2AGH/main/gfwlist2adguardhome/blacklist_full.txt
 Loyalsoldier surge-rules iCloud ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/icloud.txt
 Loyalsoldier surge-rules Google ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt
 MetaCubeX category-scholar-!cn (Global Academic & Research), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-scholar-%21cn.list
@@ -624,7 +637,6 @@ StevenBlack Adult Media Hosts Extension, https://raw.githubusercontent.com/Steve
 StevenBlack Overseas Gambling Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling-only/hosts
 HaGeZi Overseas Gambling Platforms (Full), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.txt
 HaGeZi Anti-Piracy · Sci-Hub · LibGen · DDL & Streaming Mirrors, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/anti.piracy.txt
-RPiList Adult & NSFW Content Inventory (pornblock1), https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/pornblock1
 Stevo's AI & Generative Media Blocklist (Repurposed for Proxy), https://filters.adtidy.org/windows/filters/260.txt
 UT1 Toulouse University Gambling Platforms, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/gambling/domains
 UT1 Toulouse University Dating Platforms, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/dating/domains
@@ -634,20 +646,19 @@ UT1 Toulouse University Residential Proxy & Circumvention Endpoints, https://raw
 UT1 Toulouse University Warez & DDL Mirrors, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/warez/domains
 UT1 Toulouse University Manga & Anime Portals, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/manga/domains
 UT1 Toulouse University Bitcoin & Crypto Portals, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bitcoin/domains
-RPiList Specials Proxy & Bypass Endpoints, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies
-RPiList Specials Overseas Streaming Mirrors, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Streaming
 cbuijs Accomplist Encrypted DoH & Bypass Inventory, https://raw.githubusercontent.com/cbuijs/accomplist/master/doh/deugniets.black.list
 Sinfonietta Gambling Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts
 Sinfonietta Adult Media Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts
 Sinfonietta Global Social Media Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/social-hosts
 hostsVN Overseas Gambling Extension, https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/gambling/hosts
 MetaCubeX category-password-management (Passkey & Vault Sync), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list
+Telegram Official Data Center CIDR Ranges, https://core.telegram.org/resources/cidr.txt
 ```
 
 </details>
 
 <details>
-<summary>GeoIP、ASN 与行政区划元数据数据源（共 113 项）</summary>
+<summary>GeoIP、ASN 与行政区划元数据数据源（共 112 项）</summary>
 
 ```text
 Geofeed Harvester, https://github.com/ipanalytics/GeoFeed-Harvester/releases/latest
@@ -697,8 +708,6 @@ gaoyifan china-operator-ip CSTNET, https://raw.githubusercontent.com/gaoyifan/ch
 gaoyifan china-operator-ip Dr.Peng, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng46.txt
 Metowolf China, https://metowolf.github.io/iplist/data/special/china.txt
 SukkaW chnroutes2, https://chnroutes2.cdn.skk.moe/reversed-chnroutes.txt
-Sukkaw China Ipv6, https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt
-217heidai RoutingRules China IPv4, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt
 Hackl0us GeoIP2-CN, https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ip-cidr.txt
 Chanthmiao Cn V4, https://raw.githubusercontent.com/ChanthMiao/China-IPv4-List/release/cn.txt
 Chanthmiao Cn V6, https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt
@@ -706,8 +715,6 @@ IPinfo Lite Country & ASN, https://github.com/Alice39s/ipinfo-csv-lite/releases/
 MaxMind GeoLite2 City / Country / ASN, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest
 DB-IP City Lite, https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb
 DB-IP Country Lite, https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb
-Ip2Location Db11, https://github.com/renfei/ip2location/releases/latest
-Ip2Location Db1 Official, https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP
 IPFire Location Database, https://location.ipfire.org/databases/1/location.db.xz
 Sapics User Country, https://github.com/sapics/ip-location-db/releases/download/latest/user-country.mmdb
 IPLocate IP-to-Country, https://media.githubusercontent.com/media/iplocate/ip-address-databases/HEAD/ip-to-country/ip-to-country.mmdb
@@ -738,10 +745,13 @@ Fastly Public IP List, https://api.fastly.com/public-ip-list
 Gcore CDN Public IP List, https://api.gcore.com/cdn/public-ip-list
 GitHub Meta IP Ranges, https://api.github.com/meta
 hexydec Verified Crawlers IP Ranges, https://raw.githubusercontent.com/hexydec/ip-ranges/main/output/crawlers.txt
+hexydec Cloud & Datacenter IP Ranges, https://raw.githubusercontent.com/hexydec/ip-ranges/main/output/datacentres.txt
 Tor Project Bulk Exit List, https://check.torproject.org/torbulkexitlist
 Tor Project Onionoo Exit Summary, https://onionoo.torproject.org/summary?flag=Exit&running=true
 X4BNet VPN IPv4 List, https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt
+ProtonVPN Verified Exit IPv4 Ranges, https://raw.githubusercontent.com/tn3w/ProtonVPN-IPs/master/protonvpn_ip_ranges.txt
 X4BNet Datacenter IPv4 List, https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt
+josephrocca VPN & Datacenter IPv4, https://raw.githubusercontent.com/josephrocca/is-vpn/main/vpn-or-datacenter-ipv4-ranges.txt
 josephrocca VPN & Datacenter IPv6, https://raw.githubusercontent.com/josephrocca/is-vpn/main/vpn-or-datacenter-ipv6-ranges.txt
 NetworkCats OpenProxyDB, https://github.com/NetworkCats/OpenProxyDB/releases/latest
 jhassine Server & Datacenter IPs, https://raw.githubusercontent.com/jhassine/server-ip-addresses/master/data/datacenters.txt
@@ -778,15 +788,18 @@ bun install
 bun run build:config
 bun run sync:metadata
 
-# 2. 构建并校验全部产物（输出至 dist/）
+# 2. 构建并校验全部产物（输出至 dist/；先运行 routing build 以生成 Clean-Egress 保护集合）
 cargo run --release -- geoip build --output dist
-cargo run --release -- adblock build --output dist
 cargo run --release -- routing build --output dist
+cargo run --release -- adblock build --output dist
 ```
 
 ## 开源许可
 
-本项目采用 [MIT License](./LICENSE) 开源许可协议发布。
+本项目仓库源码采用 [MIT License](./LICENSE) 开源许可协议发布。自动编译生成的规则集与 GeoIP 产物聚合了以下开源数据集（各自遵循其上游许可协议与署名条款）：
+
+- **GeoIP、ASN 与地理元数据**：[IPinfo Lite](https://ipinfo.io) (`CC-BY-SA-4.0`)、[IP Geolocation by DB-IP](https://db-ip.com) (`CC-BY-4.0`)、[GeoLite2 Data created by MaxMind](https://www.maxmind.com)、[IP address data powered by IPLocate.io](https://www.iplocate.io) (`CC-BY-4.0`)、[hexydec/ip-ranges](https://github.com/hexydec/ip-ranges) (`MIT` / `CC-BY-4.0`)、[GeoNames](https://www.geonames.org) (`CC-BY-4.0`)。
+- **分流与去广告规则集**：[UT1 Blacklists — Université Toulouse 1 Capitole (Fabrice Prigent)](https://dsi.ut-capitole.fr/blacklists/) / [olbat/ut1-blacklists](https://github.com/olbat/ut1-blacklists) (`CC-BY-SA-4.0`)、[ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) (`CC-BY-SA-4.0`)、[Aethersailor/Custom_OpenClash_Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) (`CC-BY-SA-4.0`)、[misakaio/chnroutes2](https://github.com/misakaio/chnroutes2) (`CC-BY-SA-4.0`)、[EasyList](https://easylist.to) (`CC-BY-SA-3.0` / `GPL-3.0`)、[DandelionSprout/adfilt](https://github.com/DandelionSprout/adfilt) (`Dandelicence-1.4`) 及完整数据源目录中所列各开源仓库。
 
 ## 免责声明
 

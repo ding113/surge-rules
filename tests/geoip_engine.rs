@@ -74,8 +74,8 @@ fn catalog_metadata_and_overrides_are_valid_and_complete() {
 
     assert_eq!(
         catalog.sources.len(),
-        102,
-        "expected 102 upstream sources in catalog, got {}",
+        101,
+        "expected 101 upstream sources in catalog, got {}",
         catalog.sources.len()
     );
     for s in &catalog.sources {
@@ -1172,4 +1172,123 @@ fn openproxydb_boolean_columns_filter_broad_webhost_and_cdn_blocks() {
     let t_proxy = find_traits([1, 0, 171, 213]);
     assert!(t_proxy.contains(TraitFlags::IS_ANONYMOUS_PROXY));
     assert!(!t_proxy.contains(TraitFlags::IS_VPN));
+}
+
+#[test]
+fn rejects_default_route_and_overbroad_prefixes() {
+    use parquet::data_type::ByteArray;
+    use parquet::file::properties::WriterProperties;
+    use parquet::file::writer::SerializedFileWriter;
+    use parquet::schema::parser::parse_message_type;
+    use std::sync::Arc;
+
+    let (metadata, _, _) = load_real_fixtures();
+
+    let csv_bytes = b"::/0,DE,DE-NW,Bonn,53111\n\
+0.0.0.0/0,US,US-CA,Los Angeles,90001\n\
+4.0.0.0/7,US,,,\n\
+2000::/18,DE,,,\n\
+8.8.8.0/24,US,US-CA,Mountain View,94043\n\
+2a01:170::/29,DE,DE-NW,Bonn,53111\n";
+    let src_csv = dummy_source(
+        "test_geofeed_guard_csv",
+        SourceTier::Tier1Geofeed,
+        SourceFormat::Rfc8805Csv,
+        "rfc",
+    );
+    let parsed_csv = parse_source_bytes(&src_csv, csv_bytes, &metadata).unwrap();
+    assert_eq!(
+        parsed_csv.v4.len(),
+        1,
+        "only /24 should survive IPv4 min_plen >= 8 guard"
+    );
+    assert_eq!(
+        parsed_csv.v6.len(),
+        1,
+        "only /29 should survive IPv6 min_plen >= 19 guard"
+    );
+    assert_eq!(parsed_csv.v4[0].start, u32::from(Ipv4Addr::new(8, 8, 8, 0)));
+    assert_eq!(
+        parsed_csv.v6[0].start,
+        u128::from("2a01:170::".parse::<Ipv6Addr>().unwrap())
+    );
+
+    // Also verify Parquet geofeed parser enforces identical min_plen guard (`v4 >= 8`, `v6 >= 19`).
+    let schema = Arc::new(
+        parse_message_type(
+            "message geofeed {
+                REQUIRED BYTE_ARRAY prefix (UTF8);
+                REQUIRED BYTE_ARRAY country (UTF8);
+                REQUIRED BOOLEAN bgp_valid;
+                REQUIRED DOUBLE confidence;
+            }",
+        )
+        .unwrap(),
+    );
+    let props = Arc::new(WriterProperties::builder().build());
+    let mut pq_buf: Vec<u8> = Vec::new();
+    {
+        let mut writer = SerializedFileWriter::new(&mut pq_buf, schema, props).unwrap();
+        let mut row_group = writer.next_row_group().unwrap();
+
+        let prefixes: Vec<ByteArray> = [
+            "::/0",
+            "0.0.0.0/0",
+            "4.0.0.0/7",
+            "2000::/18",
+            "8.8.8.0/24",
+            "2a01:170::/29",
+        ]
+        .into_iter()
+        .map(ByteArray::from)
+        .collect();
+        let countries: Vec<ByteArray> = ["DE", "US", "US", "DE", "US", "DE"]
+            .into_iter()
+            .map(ByteArray::from)
+            .collect();
+        let valid_flags = [true; 6];
+        let confs = [0.95_f64; 6];
+
+        let mut col0 = row_group.next_column().unwrap().unwrap();
+        col0.typed::<parquet::data_type::ByteArrayType>()
+            .write_batch(&prefixes, None, None)
+            .unwrap();
+        col0.close().unwrap();
+
+        let mut col1 = row_group.next_column().unwrap().unwrap();
+        col1.typed::<parquet::data_type::ByteArrayType>()
+            .write_batch(&countries, None, None)
+            .unwrap();
+        col1.close().unwrap();
+
+        let mut col2 = row_group.next_column().unwrap().unwrap();
+        col2.typed::<parquet::data_type::BoolType>()
+            .write_batch(&valid_flags, None, None)
+            .unwrap();
+        col2.close().unwrap();
+
+        let mut col3 = row_group.next_column().unwrap().unwrap();
+        col3.typed::<parquet::data_type::DoubleType>()
+            .write_batch(&confs, None, None)
+            .unwrap();
+        col3.close().unwrap();
+
+        row_group.close().unwrap();
+        writer.close().unwrap();
+    }
+
+    let src_pq = dummy_source(
+        "test_geofeed_guard_pq",
+        SourceTier::Tier1Geofeed,
+        SourceFormat::GeofeedParquet,
+        "geofeed_harvester",
+    );
+    let parsed_pq = parse_source_bytes(&src_pq, &pq_buf, &metadata).unwrap();
+    assert_eq!(parsed_pq.v4.len(), 1);
+    assert_eq!(parsed_pq.v6.len(), 1);
+    assert_eq!(parsed_pq.v4[0].start, u32::from(Ipv4Addr::new(8, 8, 8, 0)));
+    assert_eq!(
+        parsed_pq.v6[0].start,
+        u128::from("2a01:170::".parse::<Ipv6Addr>().unwrap())
+    );
 }

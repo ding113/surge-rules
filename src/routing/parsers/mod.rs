@@ -50,6 +50,9 @@ pub fn parse_routing_source(
         RoutingSourceFormat::IpCidr => {
             surge_clash::parse_ip_cidr_list(&text, &mut out);
         }
+        RoutingSourceFormat::OpenaiIpJson => {
+            surge_clash::parse_openai_ip_json(bytes, &src.id, &mut out)?;
+        }
         RoutingSourceFormat::AsnList => {
             surge_clash::parse_asn_list(&text, &mut out);
         }

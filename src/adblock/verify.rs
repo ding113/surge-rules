@@ -140,50 +140,51 @@ pub fn verify_adblock_dir(
     verify_disjoint_cidrs_v4(&ad_verified.cidrs_v4, &priv_verified.cidrs_v4)?;
     verify_disjoint_cidrs_v6(&ad_verified.cidrs_v6, &priv_verified.cidrs_v6)?;
 
-    // When Telemetry.list is present in the artifact directory, strictly enforce zero conflict
-    // between Telemetry.list and both Adblock.list and Privacy.list.
-    let telemetry_path = dir.join("Telemetry.list");
-    if telemetry_path.exists() {
-        let tel_raw = fs::read_to_string(&telemetry_path).with_context(|| {
-            format!(
-                "failed reading Telemetry.list at {}",
-                telemetry_path.display()
-            )
-        })?;
-        let tel_set = TelemetryProtectionSet::from_ruleset_text(&tel_raw);
-        let mut tel_trie = DomainTrie::default();
-        for d in &tel_set.exact_domains {
-            tel_trie.insert_exact(d);
-        }
-        for s in &tel_set.suffix_domains {
-            tel_trie.insert_suffix(s);
-        }
-        for d in tel_set
-            .exact_domains
-            .iter()
-            .chain(tel_set.suffix_domains.iter())
-        {
-            if ad_verified.trie.matches_domain(d) {
-                bail!(
-                    "Telemetry.list domain '{}' is conflicted/blocked by Adblock.list",
-                    d
-                );
+    // When clean-egress lists (Telemetry.list, Payment.list, AI.list) are present in the artifact
+    // directory, strictly enforce zero conflict between each list and both Adblock.list and Privacy.list.
+    for clean_file in ["Telemetry.list", "Payment.list", "AI.list"] {
+        let clean_path = dir.join(clean_file);
+        if clean_path.exists() {
+            let clean_raw = fs::read_to_string(&clean_path).with_context(|| {
+                format!("failed reading {} at {}", clean_file, clean_path.display())
+            })?;
+            let clean_set = TelemetryProtectionSet::from_ruleset_text(&clean_raw);
+            let mut clean_trie = DomainTrie::default();
+            for d in &clean_set.exact_domains {
+                clean_trie.insert_exact(d);
             }
-            if priv_verified.trie.matches_domain(d) {
-                bail!(
-                    "Telemetry.list domain '{}' is conflicted/blocked by Privacy.list",
-                    d
-                );
+            for s in &clean_set.suffix_domains {
+                clean_trie.insert_suffix(s);
             }
-        }
-        for d in &ad_verified.domains {
-            if tel_trie.matches_domain(d) {
-                bail!("Adblock.list domain '{}' conflicts with Telemetry.list", d);
+            for d in clean_set
+                .exact_domains
+                .iter()
+                .chain(clean_set.suffix_domains.iter())
+            {
+                if ad_verified.trie.matches_domain(d) {
+                    bail!(
+                        "{} domain '{}' is conflicted/blocked by Adblock.list",
+                        clean_file,
+                        d
+                    );
+                }
+                if priv_verified.trie.matches_domain(d) {
+                    bail!(
+                        "{} domain '{}' is conflicted/blocked by Privacy.list",
+                        clean_file,
+                        d
+                    );
+                }
             }
-        }
-        for d in &priv_verified.domains {
-            if tel_trie.matches_domain(d) {
-                bail!("Privacy.list domain '{}' conflicts with Telemetry.list", d);
+            for d in &ad_verified.domains {
+                if clean_trie.matches_domain(d) {
+                    bail!("Adblock.list domain '{}' conflicts with {}", d, clean_file);
+                }
+            }
+            for d in &priv_verified.domains {
+                if clean_trie.matches_domain(d) {
+                    bail!("Privacy.list domain '{}' conflicts with {}", d, clean_file);
+                }
             }
         }
     }
@@ -962,10 +963,10 @@ pub fn render_adblock_release_notes(
         - 校验通过：`Adblock.list ∩ Privacy.list = ∅` 严格互不重合，且 `{canaries}` 项正反金丝雀断言与 Surge 模块格式校验全部通过\n\n\
         ```ini\n\
         [Rule]\n\
-        RULE-SET,https://github.com/ding113/surge-rules/releases/latest/download/Adblock.list,REJECT,extended-matching\n\
-        RULE-SET,https://github.com/ding113/surge-rules/releases/latest/download/Privacy.list,REJECT,extended-matching\n\
+        RULE-SET,https://rule-set.ygxz.de/Adblock.list,REJECT,extended-matching\n\
+        RULE-SET,https://rule-set.ygxz.de/Privacy.list,REJECT,extended-matching\n\
         ```\n\
-        模块直链：`https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule`\n",
+        模块直链：`https://rule-set.ygxz.de/Adblock.sgmodule`\n",
         active = active_sources,
         total = total_sources,
         ad_rules = report.ruleset_total,
