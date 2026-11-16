@@ -4430,6 +4430,21 @@
       "matchType": "suffix",
       "domain": "cdn.sportnanoapi.com",
       "rationale": "Legitimate sports live-streaming and match data CDN; blocking breaks live broadcasts and score feeds"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "tgbot-sub.sharewithyou.dpdns.org",
+      "rationale": "Legitimate live-streaming endpoint; blocking breaks live stream playback"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "api.rc-backup.com",
+      "rationale": "RevenueCat fallback subscription / in-app purchase API; blocking breaks entitlement checks and purchase restore"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cdn6.cc.cd",
+      "rationale": "Legitimate content CDN host; blocking breaks resource loading"
     }
   ],
   "protectedApexDomains": [

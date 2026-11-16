@@ -2718,6 +2718,25 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale:
       "Legitimate sports live-streaming and match data CDN; blocking breaks live broadcasts and score feeds",
   },
+  // tgbot-sub.sharewithyou.dpdns.org 为正常直播域名，被广告规则误拦截会导致直播内容无法加载
+  {
+    matchType: "suffix",
+    domain: "tgbot-sub.sharewithyou.dpdns.org",
+    rationale: "Legitimate live-streaming endpoint; blocking breaks live stream playback",
+  },
+  // api.rc-backup.com 为 RevenueCat 订阅/内购备用 API 域名，拦截会导致 App 订阅校验与恢复购买失败
+  {
+    matchType: "suffix",
+    domain: "api.rc-backup.com",
+    rationale:
+      "RevenueCat fallback subscription / in-app purchase API; blocking breaks entitlement checks and purchase restore",
+  },
+  // cdn6.cc.cd 为正常 CDN 域名，被广告规则误拦截会导致相关资源无法加载
+  {
+    matchType: "suffix",
+    domain: "cdn6.cc.cd",
+    rationale: "Legitimate content CDN host; blocking breaks resource loading",
+  },
 ];
 
 /**
