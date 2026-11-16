@@ -61,7 +61,7 @@ export const TIER2B_GLOBAL_SOURCES: readonly GeoIpSourceEntry[] = [
       },
       {
         kind: "direct",
-        url: "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-City.mmdb",
+        url: "https://github.com/jcjc-dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-City.mmdb",
       },
     ],
   },
@@ -90,7 +90,7 @@ export const TIER2B_GLOBAL_SOURCES: readonly GeoIpSourceEntry[] = [
       },
       {
         kind: "direct",
-        url: "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-Country.mmdb",
+        url: "https://github.com/jcjc-dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-Country.mmdb",
       },
     ],
   },
@@ -105,7 +105,7 @@ export const TIER2B_GLOBAL_SOURCES: readonly GeoIpSourceEntry[] = [
     endpoints: [
       {
         kind: "direct",
-        url: "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb",
+        url: "https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb",
       },
       {
         kind: "direct",
@@ -122,7 +122,7 @@ export const TIER2B_GLOBAL_SOURCES: readonly GeoIpSourceEntry[] = [
     endpoints: [
       {
         kind: "direct",
-        url: "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb",
+        url: "https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb",
       },
       {
         kind: "direct",

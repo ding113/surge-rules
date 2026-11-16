@@ -770,16 +770,20 @@
       ]
     },
     {
-      "id": "ipip_17mon_china",
+      "id": "heidai_china_v4",
       "tier": "tier2a_cn",
       "format": "cidr_country",
-      "lineage": "ipip_17mon",
-      "cnWeight": 86,
+      "lineage": "heidai_routing",
+      "cnWeight": 87,
       "fixedCountry": "CN",
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+          "url": "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/ipv4_china.txt"
         }
       ]
     },
@@ -882,7 +886,7 @@
         },
         {
           "kind": "direct",
-          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-City.mmdb"
+          "url": "https://github.com/jcjc-dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-City.mmdb"
         }
       ]
     },
@@ -911,7 +915,7 @@
         },
         {
           "kind": "direct",
-          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-Country.mmdb"
+          "url": "https://github.com/jcjc-dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-Country.mmdb"
         }
       ]
     },
@@ -926,7 +930,7 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb"
+          "url": "https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb"
         },
         {
           "kind": "direct",
@@ -943,7 +947,7 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb"
+          "url": "https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb"
         },
         {
           "kind": "direct",
@@ -1162,7 +1166,7 @@
         },
         {
           "kind": "direct",
-          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-ASN.mmdb"
+          "url": "https://github.com/jcjc-dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-ASN.mmdb"
         }
       ]
     },
@@ -1175,7 +1179,7 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb"
+          "url": "https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb"
         },
         {
           "kind": "direct",
@@ -1345,6 +1349,60 @@
           "kind": "github_release",
           "repo": "Alice39s/BGP.Tools-OpenDB",
           "assetPattern": "^tags-cdn-.*\\.csv\\.gz$"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_tags_anycast",
+      "tier": "trait_overlay",
+      "format": "bgptools_tag_csv",
+      "lineage": "bgptools_tags",
+      "isAnycast": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/anycast/tags-anycast.csv"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_tags_vpn",
+      "tier": "trait_overlay",
+      "format": "bgptools_tag_csv",
+      "lineage": "bgptools_tags",
+      "isVpn": true,
+      "isAnonymousProxy": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpn/tags-vpn.csv"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_tags_tor",
+      "tier": "trait_overlay",
+      "format": "bgptools_tag_csv",
+      "lineage": "bgptools_tags",
+      "isTorExit": true,
+      "isAnonymousProxy": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/tor/tags-tor.csv"
+        }
+      ]
+    },
+    {
+      "id": "bgptools_tags_satnet",
+      "tier": "trait_overlay",
+      "format": "bgptools_tag_csv",
+      "lineage": "bgptools_tags",
+      "isSatellite": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/satnet/tags-satnet.csv"
         }
       ]
     },

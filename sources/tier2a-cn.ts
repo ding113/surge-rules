@@ -317,16 +317,20 @@ export const TIER2A_CN_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
-    id: "ipip_17mon_china",
+    id: "heidai_china_v4",
     tier: "tier2a_cn",
     format: "cidr_country",
-    lineage: "ipip_17mon",
-    cnWeight: 86,
+    lineage: "heidai_routing",
+    cnWeight: 87,
     fixedCountry: "CN",
     endpoints: [
       {
         kind: "direct",
-        url: "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt",
+        url: "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/ipv4_china.txt",
       },
     ],
   },

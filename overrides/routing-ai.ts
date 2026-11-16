@@ -1615,6 +1615,14 @@ export const AI_FORCE_ENTRIES: readonly RoutingRuleOverride[] = [
       ["onfido.com", "Entrust Onfido identity verification"],
       ["jumio.com", "Jumio bank/fintech eKYC verification"],
       ["id.me", "ID.me digital identity verification"],
+      ["scamalytics.com", "Scamalytics IP fraud-risk scoring API used by AI and banking portals"],
+      ["ipqualityscore.com", "IPQualityScore proxy/VPN/fraud risk scoring API"],
+      ["spur.us", "Spur anonymous residential/VPN intelligence API"],
+      ["ipinfo.io", "IPinfo geolocation and ASN risk check endpoint"],
+      ["ipregistry.co", "Ipregistry IP reputation and proxy detection API"],
+      ["ipdata.co", "ipdata IP threat and proxy intelligence API"],
+      ["vpnapi.io", "VPNAPI proxy/VPN risk detection service"],
+      ["proxycheck.io", "proxycheck.io VPN/proxy fraud scoring service"],
     ] as const
   ).map(
     ([value, rationale]): RoutingRuleOverride => ({

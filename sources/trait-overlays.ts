@@ -67,6 +67,60 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
+    id: "bgptools_tags_anycast",
+    tier: "trait_overlay",
+    format: "bgptools_tag_csv",
+    lineage: "bgptools_tags",
+    isAnycast: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/anycast/tags-anycast.csv",
+      },
+    ],
+  },
+  {
+    id: "bgptools_tags_vpn",
+    tier: "trait_overlay",
+    format: "bgptools_tag_csv",
+    lineage: "bgptools_tags",
+    isVpn: true,
+    isAnonymousProxy: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpn/tags-vpn.csv",
+      },
+    ],
+  },
+  {
+    id: "bgptools_tags_tor",
+    tier: "trait_overlay",
+    format: "bgptools_tag_csv",
+    lineage: "bgptools_tags",
+    isTorExit: true,
+    isAnonymousProxy: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/tor/tags-tor.csv",
+      },
+    ],
+  },
+  {
+    id: "bgptools_tags_satnet",
+    tier: "trait_overlay",
+    format: "bgptools_tag_csv",
+    lineage: "bgptools_tags",
+    isSatellite: true,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/satnet/tags-satnet.csv",
+      },
+    ],
+  },
+  {
     id: "cloudflare_edge_v4",
     tier: "trait_overlay",
     format: "cidr_trait",

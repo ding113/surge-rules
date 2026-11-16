@@ -42,7 +42,7 @@ FINAL,Proxy,dns-failed
 
 <!-- sources:start -->
 <details>
-<summary>去广告模块与高级重写数据源（共 38 项）</summary>
+<summary>去广告模块与高级重写数据源（共 24 项）</summary>
 
 ```text
 app2smile YouTube Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/youtube.sgmodule
@@ -52,31 +52,17 @@ app2smile Zhihu Adblock Module, https://raw.githubusercontent.com/app2smile/rule
 app2smile Baidu Tieba Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/tieba.sgmodule
 app2smile Baidu Map Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/baidumap.sgmodule
 app2smile Qidian Reader Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/qidian.sgmodule
-ddgksf2013 Weibo Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/WeiboAds.conf
-ddgksf2013 Amap Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/AmapAds.conf
 AdGuard URL Tracking Protection Filter (CoreLibs), https://filters.adtidy.org/windows/filters/17.txt
 uBlock Origin Privacy Query Parameter Stripping ($removeparam), https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt
 AdGuard Spyware Filter General Extensions ($removeparam / $removeheader), https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/general_extensions.txt
 AdGuard Legitimate URL Shortener Filter ($removeparam Pre-Compiled), https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_251_LegitimateURLShortener/filter.txt
-Dandelion Sprout ClearURLs ($removeparam), https://raw.githubusercontent.com/DandelionSprout/adfilt/master/ClearURLs%20for%20uBo/clear_urls_uboified.txt
 AdGuard Dandelion Sprout Annoyances ($removeparam Pre-Compiled), https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/ThirdParty/filter_250_DandelionSproutAnnoyances/filter.txt
 RU AdList Counter & Parameter Block ($removeparam), https://raw.githubusercontent.com/easylist/ruadlist/master/cntblock.txt
 app2smile Tencent News Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/qqnews.sgmodule
 Maasea Keep Adblock Module, https://raw.githubusercontent.com/Maasea/sgmodule/master/KeepAds.sgmodule
 app2smile Google AdSense Module, https://raw.githubusercontent.com/app2smile/rules/master/module/adsense.sgmodule
 fmz200 X (Twitter) Web Adblock Module, https://raw.githubusercontent.com/fmz200/wool_scripts/main/Surge/module/XWebAds.module
-ddgksf2013 Ximalaya Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/Ximalaya.conf
-ddgksf2013 Cainiao Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/CainiaoAds.conf
-ddgksf2013 SMZDM Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/SmzdmAds.conf
-ddgksf2013 Goofish (Xianyu) Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/GoofishAds.conf
-ddgksf2013 WeChat Official Account Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/WeChat.conf
-ddgksf2013 NetEase Cloud Music Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/NeteaseAds.conf
-ddgksf2013 Soda Music (QiShui) Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/QiShuiMusicAds.conf
-ddgksf2013 Xiaoyuzhou Podcast Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/XiaoYuZhouAds.conf
-ddgksf2013 ColorfulClouds Weather Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/CaiYunAds.conf
-ddgksf2013 Reddit Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/RedditAds.conf
-QingRex HTTPDNS Block Module, https://raw.githubusercontent.com/QingRex/LoonKissSurge/main/Surge/Beta/%E6%8B%A6%E6%88%AAHTTPDNS.beta.sgmodule
-ddgksf2013 WeChat Mini-Program Adblock Rewrite, https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/Applet.conf
+AdGuard Mail Tracking Protection Filter (CoreLibs), https://filters.adtidy.org/windows/filters/25.txt
 Repcz / Kelee General Adblock Surge Module, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Module/Kelee/Remove_ads_by_keli.sgmodule
 Repcz / Kelee WeChat Mini-Programs Adblock Module, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Module/Kelee/WexinMiniPrograms_Remove_ads.sgmodule
 Repcz / Kelee Mobile Ad SDKs Module, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Module/Kelee/BlockAdvertisers.sgmodule
@@ -88,7 +74,7 @@ fmz200 Wool Scripts BlockAds Module, https://raw.githubusercontent.com/fmz200/wo
 </details>
 
 <details>
-<summary>去广告与隐私安全拦截数据源（共 149 项）</summary>
+<summary>去广告与隐私安全拦截数据源（共 164 项）</summary>
 
 ```text
 AdGuard Mobile Ads Filter (CoreLibs), https://filters.adtidy.org/windows/filters/11.txt
@@ -111,6 +97,9 @@ AdGuard Russian Filter (CoreLibs), https://filters.adtidy.org/windows/filters/1.
 AdGuard Spanish/Portuguese Filter (CoreLibs), https://filters.adtidy.org/windows/filters/9.txt
 AdGuard Turkish Filter (CoreLibs), https://filters.adtidy.org/windows/filters/13.txt
 AdGuard Dutch Filter (CoreLibs), https://filters.adtidy.org/windows/filters/8.txt
+AdGuard Ukrainian Filter (CoreLibs), https://filters.adtidy.org/windows/filters/23.txt
+AdGuard Italian Filter (CoreLibs), https://filters.adtidy.org/windows/filters/26.txt
+AdGuard Polish Filter (CoreLibs), https://filters.adtidy.org/windows/filters/27.txt
 uBlock Origin Built-in Filters (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/filters.min.txt
 uBlock Origin Privacy Filters (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt
 uBlock Origin Badware Risks (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/badware.min.txt
@@ -128,27 +117,20 @@ EasyList China, https://raw.githubusercontent.com/easylist/easylistchina/master/
 Fanboy's Annoyance List, https://secure.fanboy.co.nz/fanboy-annoyance.txt
 EasyList / Fanboy Cookie Monster (uBO), https://secure.fanboy.co.nz/fanboy-cookiemonster_ubo.txt
 Fanboy Mobile App Promo & Notifications Blocker, https://secure.fanboy.co.nz/fanboy-mobile-notifications.txt
-ABP Anti-Circumvention Filter List, https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/english.txt
 Anti-Adblock Killer / EasyList Anti-Adblock Filters, https://raw.githubusercontent.com/easylist/antiadblockfilters/master/antiadblockfilters/antiadblock_english.txt
 AWAvenue Ads Rule (Surge RULE-SET), https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-RULE-SET.list
 AWAvenue Ads Rule (ABP Filter), https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/AWAvenue-Ads-Rule.txt
-AWAvenue Ads Rule Replenish, https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Replenish.txt
 SukkaW Reject Ruleset, https://ruleset.skk.moe/Clash/non_ip/reject.txt
 SukkaW Reject-Drop Ruleset, https://ruleset.skk.moe/Clash/non_ip/reject-drop.txt
 SukkaW Reject DomainSet, https://ruleset.skk.moe/List/domainset/reject.conf
 SukkaW Reject IP Ruleset, https://ruleset.skk.moe/List/ip/reject.conf
-mieqq In-App Tracker Ruleset, https://raw.githubusercontent.com/mieqq/mieqq/master/In-AppTracker.txt
-Hackl0us Video Ad Ruleset, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Custom/video-ad.list
 8680 GOODBYEADS Adblock Filter, https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/adblock.txt
 8680 GOODBYEADS DNS Blocklist, https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/dns.txt
-217heidai AdBlock Surge Full, https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblocksurge.list
+217heidai AdBlock Filters Full Release, https://github.com/217heidai/adblockfilters/releases/download/rule/adblockdns.txt
 Cats-Team AdRules Surge DomainSet, https://raw.githubusercontent.com/Cats-Team/AdRules/main/adrules_surge_domainset.txt
 Cats-Team / damengzhu jiekouAD Filter, https://raw.githubusercontent.com/Cats-Team/AdRules/main/rules/jiekouAD.txt
 anti-AD Surge Ruleset, https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-surge.txt
 HalfLife Merged Adblock Filter, https://raw.githubusercontent.com/sbwml/halflife-list/master/ad.txt
-NobyDa ND-AD Surge Ruleset, https://raw.githubusercontent.com/NobyDa/ND-AD/master/Surge/AD_Block.txt
-xinggsf Chengfeng Adblock Rule, https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/rule.txt
-xinggsf Chengfeng Video Ad Rule, https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/mv.txt
 cjxlist Annoyance Filter, https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-annoyance.txt
 ACL4SSR BanProgramAD, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanProgramAD.list
 ACL4SSR BanAD, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/BanAD.list
@@ -175,31 +157,24 @@ HaGeZi Native Tracker Blocklist (LG webOS), https://adguardteam.github.io/Hostli
 HaGeZi Native Tracker Blocklist (Roku), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.roku.txt
 OISD Blocklist Big, https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt
 1Hosts (Xtra), https://raw.githubusercontent.com/badmojr/1Hosts/master/Xtra/adblock.txt
-Developer Dan's Ads & Tracking Extended, https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt
 hBlock Unified Ad · Tracking & Malware Domains, https://hblock.molinero.dev/hosts_domains.txt
 NEO DEV HOST Adblocker, https://raw.githubusercontent.com/neodevpro/neodevhost/master/adblocker
-WindowsSpyBlocker Extra Telemetry Hosts, https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/extra.txt
 Frogeye First-Party Trackers Hosts, https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt
 Frogeye Multi-Party Trackers Hosts, https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt
 Quidsup NoTrack Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-blocklist.txt
 Quidsup NoTrack Malware Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-malware.txt
-Disconnect Simple Ad Filter List, https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
-Disconnect Simple Malvertising List, https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt
 wBlock Ad and Tracking Hosts, https://raw.githubusercontent.com/0xCUB3/wBlock/main/filters/ad-tracking-hosts.txt
-WindowsSpyBlocker Telemetry & Spy Hosts, https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt
 KADhosts Polish Ad & Fraud Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_14.txt
 ABPVN Vietnamese Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_16.txt
 ABPindo Indonesian Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_22.txt
 Dandelion Sprout Nordic Filters, https://adguardteam.github.io/HostlistsRegistry/assets/filter_13.txt
 Frellwit's Swedish Hosts Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_17.txt
 StevenBlack Unified Hosts, https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-AdAway Official Mobile Adblock Hosts, https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt
 Peter Lowe's Ad and Tracking Server List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_3.txt
 Dan Pollock's someonewhocares Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_4.txt
 Dandelion Sprout Game Console Adblock List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_6.txt
 Perflyst & Dandelion Sprout Smart-TV Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_7.txt
 Dandelion Sprout Anti Push Notifications, https://adguardteam.github.io/HostlistsRegistry/assets/filter_39.txt
-LanikSJ Web Annoyances Ultralist, https://raw.githubusercontent.com/LanikSJ/webannoyances/master/filters/web_annoyances.txt
 celenityy BadBlock Ad & Tracking Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/badblock.txt
 celenityy BadBlock Click-Tracking Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/click-tracking.txt
 celenityy BadBlock Data Brokers Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/data-brokers.txt
@@ -215,7 +190,6 @@ ShadowWhisperer Malware List, https://adguardteam.github.io/HostlistsRegistry/as
 AssoEchap Stalkerware Indicators List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_31.txt
 DurableNapkin Scam Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_10.txt
 Dandelion Sprout Anti-Malware List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_12.txt
-mitchellkrogza Hacked Malware Web Sites, https://adguardteam.github.io/HostlistsRegistry/assets/filter_9.txt
 abuse.ch URLHaus Malicious URL Blocklist, https://malware-filter.gitlab.io/malware-filter/urlhaus-filter-agh-online.txt
 PhishTank & OpenPhish Phishing URL Blocklist, https://malware-filter.gitlab.io/malware-filter/phishing-filter-agh.txt
 Phishing Army Extended Blocklist, https://phishing.army/download/phishing_army_blocklist_extended.txt
@@ -223,12 +197,6 @@ CERT Polska Malicious & Phishing Domains, https://adguardteam.github.io/Hostlist
 PhishDestroy Content-Verified Active Phishing Blocklist, https://raw.githubusercontent.com/phishdestroy/destroylist/main/dns/content_active.txt
 PhishIndex Malicious Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/Malicious%20Domains/adblock/phishindex_domains-adblock.txt
 PhishIndex IP Logger Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt
-The Block List Project Ads, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/ads-ags.txt
-The Block List Project Tracking, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/tracking-ags.txt
-The Block List Project Malware, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/malware-ags.txt
-The Block List Project Phishing, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/phishing-ags.txt
-The Block List Project Abuse, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/abuse-ags.txt
-The Block List Project Fraud, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/fraud-ags.txt
 PersianBlocker Regional Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_19.txt
 Macedonian Pi-hole Adblock List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_20.txt
 turk-adlist Turkish DNS Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_26.txt
@@ -237,15 +205,48 @@ EasyList Lithuania DNS Filter, https://adguardteam.github.io/HostlistsRegistry/a
 Turkish Ad Hosts Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_40.txt
 EasyList Hebrew DNS Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_43.txt
 Ukrainian Security & Phishing Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_62.txt
-The Block List Project Ransomware, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/ransomware-ags.txt
-The Block List Project Scam, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/scam-ags.txt
 zachlagden Custom Malicious Domains, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/malicious.txt
+AdBlockID Plus Indonesian Filter (CoreLibs), https://raw.githubusercontent.com/realodix/AdBlockID/main/dist/adblockid_plus.adfl.txt
+ABPVN Vietnamese AdGuard Advanced Filter, https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_adguard.txt
+MajkiIT Official Polish AdGuard Filter, https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock_adguard.txt
+FiltersHeroes KAD Polish Anti-Scam & Fraud Filter, https://raw.githubusercontent.com/FiltersHeroes/KAD/master/KAD.txt
+FiltersHeroes Polish Annoyances Filters (CoreLibs), https://filters.adtidy.org/windows/filters/237.txt
+EasyList Czech and Slovak, https://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt
+Adblock List for Finland, https://raw.githubusercontent.com/finnish-easylist-addition/finnish-easylist-addition/master/Finland_adb.txt
+EasyList Thailand, https://raw.githubusercontent.com/easylist-thailand/easylist-thailand/master/subscription/easylist-thailand.txt
+Xfiles Italian Adblock Filter, https://raw.githubusercontent.com/gioxx/xfiles/master/filtri.txt
+Dandelion Sprout Serbo-Croatian Filter (CoreLibs), https://filters.adtidy.org/windows/filters/252.txt
+IndianList Regional Adblock Filter (CoreLibs), https://filters.adtidy.org/windows/filters/253.txt
+Liste AR Arabic Adblock Filter (CoreLibs), https://filters.adtidy.org/windows/filters/112.txt
+EasyList Italy (CoreLibs), https://filters.adtidy.org/windows/filters/109.txt
+EasyList Portuguese (CoreLibs), https://filters.adtidy.org/windows/filters/124.txt
+Greek AdBlock Filter (CoreLibs), https://filters.adtidy.org/windows/filters/121.txt
+Bulgarian Adblock List (CoreLibs), https://filters.adtidy.org/windows/filters/103.txt
+Latvian Adblock List (CoreLibs), https://filters.adtidy.org/windows/filters/111.txt
+Icelandic ABP Adblock List (CoreLibs), https://filters.adtidy.org/windows/filters/119.txt
+Loyalsoldier surge-rules reject ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/reject.txt
+GMOogway Shadowrocket Reject List, https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_reject_list.module
+MetaCubeX category-httpdns-cn (Anti-HTTPDNS Bypass), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-httpdns-cn.list
+Combined Privacy Block Lists (ABP), https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/cpbl-abp-list.txt
+hostsVN Vietnamese & Global Adservers Filter, https://raw.githubusercontent.com/bigdargon/hostsVN/master/filters/adservers-all.txt
+hostsVN Malicious & Threat Extension Filter, https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/threat/filter.txt
+FMHY Unsafe · Fake-Download & Scamware Filterlist, https://raw.githubusercontent.com/fmhy/FMHYFilterlist/main/filterlist-abp.txt
+MetaMask Web3 & Crypto Drainer Phishing Blocklist, https://raw.githubusercontent.com/MetaMask/eth-phishing-detect/master/src/hosts.txt
+Global Anti-Scam Organization (GASO) Blocklist, https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/main/global-anti-scam-org-scam-urls-ABP.txt
+ShadowWhisperer Scam & Fraud Domains, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Scam
+ShadowWhisperer Typosquatting & Homograph Domains, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Typo
+HaGeZi The World's Most Abused TLDs, https://adguardteam.github.io/HostlistsRegistry/assets/filter_56.txt
+UT1 Toulouse University Malware Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/malware/domains
+UT1 Toulouse University Phishing Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/phishing/domains
+UT1 Toulouse University Cryptojacking Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/cryptojacking/domains
+RPiList Specials Malware Blocklist, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/malware
+RPiList Specials Phishing Blocklist, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe
 ```
 
 </details>
 
 <details>
-<summary>去广告防误伤白名单数据源（共 75 项）</summary>
+<summary>去广告防误伤白名单数据源（共 74 项）</summary>
 
 ```text
 uBlock Origin Unbreak Allowlist, https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt
@@ -291,24 +292,17 @@ Dandelion Sprout Legitimate URL Shortener Affiliate Allowlist, https://raw.githu
 zachlagden Pi-hole Optimized Whitelist, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/whitelist.txt
 1Hosts Global Exclusion Allowlist, https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_all.txt
 1Hosts Mini & Lite Exclusion Allowlist, https://raw.githubusercontent.com/badmojr/1Hosts/master/-data/lists/exclude_for_mini_Lite_only.txt
-anudeepND Curated Domain Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt
-anudeepND Commonly Broken Optional Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/optional-list.txt
-anudeepND Referral & Link Unbreak Whitelist, https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/referral-sites.txt
-anti-AD Official Domain Whitelist, https://raw.githubusercontent.com/privacy-protection-tools/dead-horse/master/anti-ad-white-list.txt
 NEO DEV HOST Official Allowlist, https://raw.githubusercontent.com/neodevpro/neodevhost/master/allow
-VeleSila yhosts Official Whitelist, https://raw.githubusercontent.com/VeleSila/yhosts/master/whitelist.txt
 ShadowWhisperer Curated Whitelist, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist
 Ultimate Hosts Blacklist Official Whitelist, https://raw.githubusercontent.com/Ultimate-Hosts-Blacklist/whitelist/master/domains.list
-NoTracking Curated Hostnames Whitelist, https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt
-DNSlock Pi-hole Curated Whitelist, https://raw.githubusercontent.com/raghavdua1995/DNSlock-PiHole-whitelist/master/whitelist.list
-hg1978 AdGuard Home False-Positive Whitelist, https://raw.githubusercontent.com/hg1978/AdGuard-Home-Whitelist/master/whitelist.txt
-DevShubam DNS False-Positive Whitelist, https://raw.githubusercontent.com/DevShubam/Whitelist/master/whitelist.txt
+Sefinek Blocklist Collection Main Whitelist, https://raw.githubusercontent.com/sefinek/Sefinek-Blocklist-Collection/main/whitelists/main.txt
+Combined Privacy Block Lists Official Whitelist, https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/NoFormatting/WhitelistedDomains.txt
+UT1 Toulouse University Official Allowlist (liste_blanche), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/liste_blanche/domains
+ACL4SSR UnBan False-Positive Allowlist, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/UnBan.list
 Dandelion Sprout Nordic Domains Allowlist, https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersDomainsAllowlist.txt
 EasyList Fanboy Social Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_social_allowlist.txt
 EasyList Fanboy Notifications Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_notifications_allowlist.txt
 EasyList Fanboy Newsletter Allowlist, https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_newsletter_allowlist.txt
-SystemJargon DNS Allowlist, https://raw.githubusercontent.com/SystemJargon/filters/main/allowlist.txt
-Ealenn AdGuard Home Service Allowlist, https://raw.githubusercontent.com/Ealenn/AdGuard-Home-List/master/allowlist/concat/allowlist.external.adguard.list
 BadBlock Apple Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/apple_whitelist.txt
 BadBlock Browser Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/browser_whitelist.txt
 BadBlock CAPTCHA Verification Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/captcha_whitelist.txt
@@ -323,12 +317,18 @@ BadBlock Mozilla Firefox Whitelist, https://raw.githubusercontent.com/celenityy/
 BadBlock Push Notification Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/push_whitelist.txt
 BadBlock Safe Browsing Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/safe-browsing_whitelist.txt
 BadBlock NTP Time Sync Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/time_whitelist.txt
+BadBlock Combined Unbreak Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/whitelist.txt
+BadBlock Android System Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/android_whitelist.txt
+BadBlock Linux Distro & Package Mirror Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/linux_whitelist.txt
+BadBlock Nintendo Online Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/nintendo_whitelist.txt
+BadBlock Privacy-Respecting Analytics Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/ethical_whitelist.txt
+BadBlock Miscellaneous Functional Services Whitelist, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/misc_whitelist.txt
 ```
 
 </details>
 
 <details>
-<summary>国内直连分流数据源（Direct.list）（共 36 项）</summary>
+<summary>国内直连分流数据源（Direct.list）（共 68 项）</summary>
 
 ```text
 Loyalsoldier surge-rules direct ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/direct.txt
@@ -350,8 +350,6 @@ VPSDance ai-proxy-rules Mainland China AI, https://raw.githubusercontent.com/VPS
 felixonmars dnsmasq-china-list accelerated-domains, https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf
 felixonmars dnsmasq-china-list apple.china, https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf
 blackmatrix7 ChinaMax Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaMax/ChinaMax.list
-blackmatrix7 ChinaMedia Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaMedia/ChinaMedia.list
-blackmatrix7 SteamCN Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/SteamCN/SteamCN.list
 blackmatrix7 ChinaIPsBGP Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaIPsBGP/ChinaIPsBGP.list
 ACL4SSR ChinaDomain, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaDomain.list
 ACL4SSR ChinaMedia, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaMedia.list
@@ -361,18 +359,52 @@ ACL4SSR ChinaIpV6, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clas
 Repcz Tool ChinaDomain, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ChinaDomain.list
 Repcz Tool ChinaASN, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ChinaASN.list
 Repcz Tool DownloadCDN_CN, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/DownloadCDN_CN.list
-Hackl0us SS-Rule-Snippet Apple-direct, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Basic/Apple-direct.list
-Hackl0us SS-Rule-Snippet academic-direct, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Custom/academic-direct.list
 LM-Firefly Domestic Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/Domestic.list
 Clash-FX CN Apps Direct Domains, https://raw.githubusercontent.com/Clash-FX/cn-apps-direct-domains/main/apps-direct-domains.list
 TannayeJ AI CN Vendor Rules, https://raw.githubusercontent.com/TannayeJ/ai-vendor-rules/main/generated/clash/all-ai-cn.yaml
 NSZA156 Surge GeoX category-ai-cn, https://raw.githubusercontent.com/NSZA156/surge-geox-rules/release/geo/geosite/category-ai-cn.conf
+Aethersailor Custom OpenClash Direct Rules, https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Custom_Direct.list
+Aethersailor Domestic Steam Download CDN Rules, https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Steam_CDN.list
+217heidai RoutingRules Domestic Direct Domains, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/direct.txt
+217heidai RoutingRules China IPv4 CIDR, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt
+Loyalsoldier surge-rules cncidr IPv4/IPv6, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/cncidr.txt
+GMOogway Shadowrocket Direct List, https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module
+ACL4SSR China Carrier One-Key SIM Login, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ChinaOneKeyLogin.list
+ACL4SSR Domestic Public DNS Endpoints, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ChinaDNS.list
+ACL4SSR Steam China & Domestic CDN, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/SteamCN.list
+Repcz Tool Direct Surge Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/Direct.list
+Repcz Tool Custom Direct Overrides, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Custom/Direct.list
+Repcz Tool Apple China CDN & Services, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/AppleCN.list
+Repcz Tool ChinaIP Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ChinaIP.list
+VPSDance Mainland China AI Coding Tools, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/cn-coding.list
+VPSDance Mainland China LLM & Model APIs, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/cn-model.list
+MetaCubeX tld-cn (.cn & Chinese IDN TLDs), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/tld-cn.list
+MetaCubeX category-companies@cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-companies%40cn.list
+MetaCubeX category-bank-cn (Domestic Banks), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-bank-cn.list
+MetaCubeX category-securities-cn (Domestic Brokerages), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-securities-cn.list
+MetaCubeX category-finance@cn (Domestic Finance), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-finance%40cn.list
+MetaCubeX category-cas@cn (Domestic Certificate Authorities), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-cas%40cn.list
+MetaCubeX category-ip-geo-detect@cn (Domestic IP Lookup), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ip-geo-detect%40cn.list
+MetaCubeX category-education-cn (Domestic Universities & MOOCs), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-education-cn.list
+MetaCubeX category-hospital-cn (Domestic Healthcare), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-hospital-cn.list
+MetaCubeX category-automobile-cn (Domestic Smart EV & Auto), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-automobile-cn.list
+MetaCubeX category-logistics-cn (Domestic Express & Logistics), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-logistics-cn.list
+MetaCubeX category-food-cn (Domestic Dining & Delivery), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-food-cn.list
+MetaCubeX category-netdisk-cn (Domestic Cloud Drives), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-netdisk-cn.list
+MetaCubeX category-entertainment-cn (Domestic Streaming & Video), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-entertainment-cn.list
+MetaCubeX category-media-cn (Domestic News & Media), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-media-cn.list
+MetaCubeX category-social-media-cn (Domestic Social Platforms), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-social-media-cn.list
+MetaCubeX category-game-accelerator-cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-game-accelerator-cn.list
+MetaCubeX category-game-platforms-download@cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-game-platforms-download%40cn.list
+MetaCubeX category-wiki-cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-wiki-cn.list
+MetaCubeX category-ntp-cn (Domestic NTP Servers), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ntp-cn.list
+MetaCubeX category-number-verification-cn (Carrier SIM Auth), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-number-verification-cn.list
 ```
 
 </details>
 
 <details>
-<summary>境外 AI、支付与风控数据源（AI.list）（共 39 项）</summary>
+<summary>境外 AI、支付与风控数据源（AI.list）（共 72 项）</summary>
 
 ```text
 VPSDance ai-proxy-rules Global AI, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global.list
@@ -380,7 +412,9 @@ VPSDance Apple Intelligence custom Surge list, https://raw.githubusercontent.com
 SukkaW Surge AI rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/non_ip/ai.conf
 SukkaW Surge Apple Intelligence rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/non_ip/apple_intelligence.conf
 SukkaW Surge AI IP rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/ip/ai.conf
-xiaolai Anthropic & Claude Code Surge ruleset, https://raw.githubusercontent.com/xiaolai/anthropic-claude-surge-rules-set/main/dist/anthropic.list
+VPSDance ai-proxy-rules Global AI Coding Agents, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-coding.list
+VPSDance ai-proxy-rules Global LLM & Model APIs, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-model.list
+VPSDance ai-proxy-rules Global Generative Media AI, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-media.list
 viewer12 OverseasAI with third-party auth & verification hosts, https://raw.githubusercontent.com/viewer12/OverseasAI.list/HEAD/rule/Loon/OverseasAI/OverseasAI.list
 zfdang clash-ruleset-ai-providers, https://raw.githubusercontent.com/zfdang/clash-ruleset-ai-providers/main/rules/ai-providers.yaml
 zfdang Antigravity & Cloud Code YAML, https://raw.githubusercontent.com/zfdang/clash-ruleset-ai-providers/main/rules/antigravity.yaml
@@ -390,19 +424,11 @@ MetaCubeX openai, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/met
 MetaCubeX anthropic, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic.list
 MetaCubeX google-gemini, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/google-gemini.list
 MetaCubeX apple-intelligence, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/apple-intelligence.list
-blackmatrix7 OpenAI Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/OpenAI/OpenAI.list
-blackmatrix7 Claude Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Claude/Claude.list
-blackmatrix7 Anthropic Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Anthropic/Anthropic.list
-blackmatrix7 Gemini Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Gemini/Gemini.list
-blackmatrix7 Copilot Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Copilot/Copilot.list
-blackmatrix7 BardAI Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BardAI/BardAI.list
 max1874 funnysurge AI rules, https://raw.githubusercontent.com/max1874/funnysurge/main/rules/AI.txt
 max1874 funnysurge Apple Intelligence rules, https://raw.githubusercontent.com/max1874/funnysurge/main/rules/Apple-Intelligence.txt
 blankmagic Surge AI list, https://raw.githubusercontent.com/blankmagic/Surge/main/rule/ai.list
 ACL4SSR AI ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AI.list
 Repcz Tool AI Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/AI.list
-blackmatrix7 PayPal Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PayPal/PayPal.list
-blackmatrix7 Stripe Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Stripe/Stripe.list
 MetaCubeX paypal, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal.list
 MetaCubeX stripe, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/stripe.list
 MetaCubeX wise, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wise.list
@@ -414,12 +440,51 @@ MetaCubeX hcaptcha, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/m
 TannayeJ AI Global Vendor Rules, https://raw.githubusercontent.com/TannayeJ/ai-vendor-rules/main/generated/clash/all-ai-global.yaml
 NSZA156 Surge GeoX category-ai-!cn, https://raw.githubusercontent.com/NSZA156/surge-geox-rules/release/geo/geosite/category-ai-!cn.conf
 qianchongyang OpenClash AI Rules, https://raw.githubusercontent.com/qianchongyang/openclash-ai-rules/main/Rules/AI.list
+Repcz Tool Custom AI Overrides, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Custom/AI.list
+Repcz Tool OpenAI Surge Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/OpenAI.list
+Repcz Tool Claude Surge Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/Claude.list
+Repcz Tool xAI / Grok Surge Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/xAI.list
+ACL4SSR OpenAI Ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/OpenAi.list
+ACL4SSR Claude Ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Claude.list
+ACL4SSR Gemini Ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Gemini.list
+MetaCubeX perplexity, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/perplexity.list
+MetaCubeX xai (Grok), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/xai.list
+MetaCubeX cursor, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/cursor.list
+MetaCubeX windsurf (Codeium), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/windsurf.list
+MetaCubeX github-copilot, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/github-copilot.list
+MetaCubeX jetbrains-ai, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/jetbrains-ai.list
+MetaCubeX groq, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/groq.list
+MetaCubeX poe, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/poe.list
+MetaCubeX elevenlabs, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/elevenlabs.list
+MetaCubeX huggingface, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/huggingface.list
+itdoginfo Google AI & Gemini Regional Bypass Domains, https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Services/google_ai.lst
+UT1 Toulouse University AI Domains (Repurposed as AI Inventory), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/ai/domains
+Repcz Tool PayPal Surge Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/PayPal.list
+MetaCubeX ibkr (Interactive Brokers), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/ibkr.list
+MetaCubeX schwab (Charles Schwab), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/schwab.list
+MetaCubeX standardchartered, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/standardchartered.list
+MetaCubeX citic@!cn (CITIC Bank International HK), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/citic%40%21cn.list
+MetaCubeX category-bank-jp (Japanese Banking), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-bank-jp.list
+MetaCubeX squareup (Square / Block Payments), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/squareup.list
+MetaCubeX redotpay (Overseas Card & Payment), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/redotpay.list
+MetaCubeX straitsx (Singapore Payment Gateway), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/straitsx.list
+MetaCubeX category-finance (Overseas Finance & Exchanges), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-finance.list
+UT1 Toulouse University Global Banking Inventory (Repurposed), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bank/domains
+UT1 Toulouse University Global Financial Inventory (Repurposed), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/financial/domains
+MetaCubeX category-ip-geo-detect (IP Risk & Geo Scoring), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ip-geo-detect.list
+BadBlock CAPTCHA Verification Allowlist (Repurposed for Risk-Control), https://raw.githubusercontent.com/celenityy/BadBlock/pages/wildcards-no-star/captcha_whitelist.txt
+MetaCubeX category-password-management (Passkey & Vault Sync), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list
+MetaCubeX category-ai-!cn@telemetry (AI Attestation & Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ai-%21cn%40telemetry.list
+MetaCubeX openai@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/openai%40telemetry.list
+MetaCubeX anthropic@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic%40telemetry.list
+MetaCubeX paypal@telemetry (PayPal Risk & Device Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal%40telemetry.list
+MetaCubeX category-telemetry (Overseas OS & SDK Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-telemetry.list
 ```
 
 </details>
 
 <details>
-<summary>境外代理与流媒体数据源（Proxy.list）（共 60 项）</summary>
+<summary>境外代理与流媒体数据源（Proxy.list）（共 125 项）</summary>
 
 ```text
 Loyalsoldier surge-rules proxy ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/proxy.txt
@@ -435,7 +500,6 @@ SukkaW Surge Telegram domain rules, https://raw.githubusercontent.com/SukkaW/Sur
 SukkaW Surge Telegram ASN & IP rules, https://raw.githubusercontent.com/SukkaW/Surge/master/Source/ip/telegram_asn.conf
 blackmatrix7 Global Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Global/Global.list
 blackmatrix7 Proxy Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Proxy/Proxy.list
-blackmatrix7 Telegram Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Telegram/Telegram.list
 ACL4SSR Telegram ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Telegram.list
 ACL4SSR GitHub ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Github.list
 ACL4SSR Google ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Google.list
@@ -443,8 +507,6 @@ Repcz Tool Proxy Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/S
 Repcz Tool ProxyGFW Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ProxyGFW.list
 Repcz Tool AppleProxy Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/AppleProxy.list
 Repcz Tool DownloadCDN_Global Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/DownloadCDN_Global.list
-Hackl0us SS-Rule-Snippet Apple-proxy, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Basic/Apple-proxy.list
-Hackl0us SS-Rule-Snippet academic-proxy, https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Custom/academic-proxy.list
 LM-Firefly PROXY Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/PROXY.list
 LM-Firefly CCC-Global Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/CCC-Global.list
 blackmatrix7 GlobalMedia Surge ruleset, https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/GlobalMedia/GlobalMedia.list
@@ -459,35 +521,103 @@ ACL4SSR MyTVSuper ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/mas
 ACL4SSR ViuTV ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ViuTV.list
 Repcz Tool ProxyMedia Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ProxyMedia.list
 LM-Firefly GlobalMedia Surge ruleset, https://raw.githubusercontent.com/LM-Firefly/Rules/master/GlobalMedia.list
+Aethersailor Custom OpenClash Proxy Rules, https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Custom_Proxy.list
+217heidai RoutingRules Overseas Proxy Domains, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/proxy.txt
+GMOogway Shadowrocket Proxy List, https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
+hezhijie0327 GFWList2AGH Full Overseas Blacklist (Repurposed), https://raw.githubusercontent.com/hezhijie0327/GFWList2AGH/main/gfwlist2adguardhome/blacklist_full.txt
+Loyalsoldier surge-rules iCloud ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/icloud.txt
+Loyalsoldier surge-rules Google ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt
+MetaCubeX category-scholar-!cn (Global Academic & Research), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-scholar-%21cn.list
+MetaCubeX google-scholar, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/google-scholar.list
+ACL4SSR Overseas Scholar & Journals, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Scholar.list
+MetaCubeX wikimedia (Wikipedia & Wikimedia), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wikimedia.list
+MetaCubeX category-web-archive (Internet Archive & Mirrors), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-web-archive.list
+MetaCubeX category-dev (Global Developer Ecosystem), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-dev.list
+MetaCubeX category-container (OCI & Container Registries), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-container.list
+MetaCubeX github, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/github.list
+MetaCubeX gitlab, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/gitlab.list
+MetaCubeX docker, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/docker.list
+MetaCubeX npmjs, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/npmjs.list
+MetaCubeX vercel, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/vercel.list
+ACL4SSR Developer Ecosystem, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Developer.list
+ACL4SSR Docker & Registries, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Docker.list
+MetaCubeX category-entertainment@!cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-entertainment%40%21cn.list
+MetaCubeX category-games-!cn (Global Gaming Platforms), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-games-%21cn.list
+MetaCubeX category-social-media-!cn, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-social-media-%21cn.list
+MetaCubeX category-forums (Overseas Communities), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-forums.list
+MetaCubeX category-communication (Global IM & VoIP), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-communication.list
+MetaCubeX youtube, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/youtube.list
+MetaCubeX spotify, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/spotify.list
+MetaCubeX netflix, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/netflix.list
+MetaCubeX disney, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/disney.list
+MetaCubeX hbo, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hbo.list
+MetaCubeX primevideo, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/primevideo.list
+MetaCubeX tiktok, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/tiktok.list
+MetaCubeX twitter (X), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/twitter.list
+MetaCubeX meta (Facebook / Instagram / Threads), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/meta.list
+MetaCubeX whatsapp, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/whatsapp.list
+MetaCubeX signal, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/signal.list
+MetaCubeX reddit, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/reddit.list
+MetaCubeX pixiv, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/pixiv.list
+MetaCubeX line, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/line.list
+MetaCubeX steam (Community & Store; CN CDN stays Direct), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/steam.list
+MetaCubeX epicgames, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/epicgames.list
+MetaCubeX playstation, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/playstation.list
+MetaCubeX xbox, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/xbox.list
+MetaCubeX nintendo, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/nintendo.list
+MetaCubeX category-cryptocurrency (Web3 & Exchanges), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-cryptocurrency.list
+MetaCubeX category-anticensorship, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-anticensorship.list
+MetaCubeX category-vpnservices, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-vpnservices.list
+MetaCubeX category-doh (Encrypted DNS Endpoints), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-doh.list
+MetaCubeX category-ipfs (IPFS Gateways), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ipfs.list
+MetaCubeX category-pt (Private Trackers), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-pt.list
+MetaCubeX category-public-tracker, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-public-tracker.list
+Repcz Tool Crypto & Web3 Surge Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/Crypto.list
 HaGeZi Encrypted DNS · VPN · TOR · Proxy Endpoints, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/doh-vpn-proxy-bypass.txt
 ShadowWhisperer VPN · Proxy & Tunnel Domains, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Tunnels
-The Block List Project Proxy & Redirectors, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/redirect-ags.txt
 HaGeZi Global Social Networks Inventory, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/social.txt
 NoGoogle Exhaustive Google Ecosystem Domains, https://adguardteam.github.io/HostlistsRegistry/assets/filter_37.txt
-Developer Dan Facebook & Meta Extended Domains, https://www.github.developerdan.com/hosts/lists/facebook-extended.txt
-anudeepND Facebook & Meta Domains, https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt
+NoAmazon Exhaustive Amazon · PrimeVideo · Twitch · IMDb Ecosystem, https://raw.githubusercontent.com/nickspaargaren/no-amazon/master/amazon-adguard.txt
 StevenBlack Social Media Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/social-only/hosts
-The Block List Project Facebook & Instagram, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/facebook-ags.txt
-The Block List Project Twitter / X, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/twitter-ags.txt
-The Block List Project YouTube, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/youtube-ags.txt
-The Block List Project TikTok International, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/tiktok-ags.txt
 MetaCubeX Geosite Discord, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/discord.list
-The Block List Project WhatsApp, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/whatsapp-ags.txt
 MetaCubeX Geosite Twitch, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitch.list
+itdoginfo Overseas Anime & Manga Platforms, https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/anime.lst
+itdoginfo Censored International News Media, https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/news.lst
+itdoginfo Geo-Restricted Global Services, https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/geoblock.lst
+itdoginfo Adult Streaming Inventory, https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/porn.lst
 HaGeZi NSFW & Adult Platforms, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/nsfw.txt
+OISD NSFW & Adult Platforms (Full Inventory), https://raw.githubusercontent.com/sjhgvr/oisd/main/domainswild_nsfw.txt
+ShadowWhisperer Adult Platforms, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Adult
 ShadowWhisperer Overseas Dating Platforms, https://adguardteam.github.io/HostlistsRegistry/assets/filter_57.txt
+ShadowWhisperer Overseas Gambling Platforms, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Gambling
+ShadowWhisperer Cryptocurrency & Web3 Platforms, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Cryptocurrency
 StevenBlack Adult Media Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn-only/hosts
 StevenBlack Overseas Gambling Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling-only/hosts
-HaGeZi Overseas Gambling Platforms (Medium), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.medium.txt
+HaGeZi Overseas Gambling Platforms (Full), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.txt
 HaGeZi Anti-Piracy · Sci-Hub · LibGen · DDL & Streaming Mirrors, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/anti.piracy.txt
-The Block List Project Piracy & Mirrors, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/piracy-ags.txt
-The Block List Project BitTorrent & Trackers, https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/torrent-ags.txt
+RPiList Adult & NSFW Content Inventory (pornblock1), https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/pornblock1
+Stevo's AI & Generative Media Blocklist (Repurposed for Proxy), https://filters.adtidy.org/windows/filters/260.txt
+UT1 Toulouse University Gambling Platforms, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/gambling/domains
+UT1 Toulouse University Dating Platforms, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/dating/domains
+UT1 Toulouse University Social Networks, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/social_networks/domains
+UT1 Toulouse University VPN Endpoints, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/vpn/domains
+UT1 Toulouse University Residential Proxy & Circumvention Endpoints, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/residential-proxies/domains
+UT1 Toulouse University Warez & DDL Mirrors, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/warez/domains
+UT1 Toulouse University Manga & Anime Portals, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/manga/domains
+UT1 Toulouse University Bitcoin & Crypto Portals, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bitcoin/domains
+RPiList Specials Proxy & Bypass Endpoints, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies
+RPiList Specials Overseas Streaming Mirrors, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Streaming
+cbuijs Accomplist Encrypted DoH & Bypass Inventory, https://raw.githubusercontent.com/cbuijs/accomplist/master/doh/deugniets.black.list
+Sinfonietta Gambling Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts
+Sinfonietta Adult Media Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts
+Sinfonietta Global Social Media Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/social-hosts
+hostsVN Overseas Gambling Extension, https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/gambling/hosts
 ```
 
 </details>
 
 <details>
-<summary>GeoIP、ASN 与行政区划元数据数据源（共 111 项）</summary>
+<summary>GeoIP、ASN 与行政区划元数据数据源（共 115 项）</summary>
 
 ```text
 Geofeed Harvester, https://github.com/ipanalytics/GeoFeed-Harvester/releases/latest
@@ -538,14 +668,14 @@ gaoyifan china-operator-ip Dr.Peng, https://raw.githubusercontent.com/gaoyifan/c
 Metowolf China, https://metowolf.github.io/iplist/data/special/china.txt
 SukkaW chnroutes2, https://chnroutes2.cdn.skk.moe/reversed-chnroutes.txt
 Sukkaw China Ipv6, https://ruleset.skk.moe/Clash/ip/china_ip_ipv6.txt
-Ipip 17Mon China, https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt
+217heidai RoutingRules China IPv4, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt
 Hackl0us GeoIP2-CN, https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ip-cidr.txt
 Chanthmiao Cn V4, https://raw.githubusercontent.com/ChanthMiao/China-IPv4-List/release/cn.txt
 Chanthmiao Cn V6, https://raw.githubusercontent.com/ChanthMiao/China-IPv6-List/release/cn6.txt
 IPinfo Lite Country & ASN, https://github.com/Alice39s/ipinfo-csv-lite/releases/latest
 MaxMind GeoLite2 City / Country / ASN, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest
-DB-IP City Lite, https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb
-DB-IP Country Lite, https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb
+DB-IP City Lite, https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb
+DB-IP Country Lite, https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb
 Ip2Location Db11, https://github.com/renfei/ip2location/releases/latest
 Ip2Location Db1 Official, https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP
 IPFire Location Database, https://location.ipfire.org/databases/1/location.db.xz
@@ -559,7 +689,7 @@ bgp.tools ASN Registry (with Alice39s/BGP.Tools-OpenDB mirror), https://bgp.tool
 ipverse AS Metadata, https://raw.githubusercontent.com/ipverse/as-metadata/master/as.csv
 IPtoASN Combined Database, https://iptoasn.com/data/ip2asn-combined.tsv.gz
 Sapics Origin Asn, https://github.com/sapics/ip-location-db/releases/download/latest/origin-asn.mmdb
-DB-IP ASN Lite, https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb
+DB-IP ASN Lite, https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb
 IPLocate IP-to-ASN, https://media.githubusercontent.com/media/iplocate/ip-address-databases/HEAD/ip-to-asn/ip-to-asn.mmdb
 Rir Apnic, https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest
 Rir Arin, https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest
@@ -570,6 +700,10 @@ bgp.tools Anycast Prefixes IPv4, https://raw.githubusercontent.com/bgptools/anyc
 bgp.tools Anycast Prefixes IPv6, https://raw.githubusercontent.com/bgptools/anycast-prefixes/master/anycatch-v6-prefixes.txt
 Alice39s BGP.Tools-OpenDB VPS & Hosting ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpsh/tags-vpsh.csv
 Alice39s BGP.Tools-OpenDB CDN ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/cdn/tags-cdn.csv
+Alice39s BGP.Tools-OpenDB Anycast ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/anycast/tags-anycast.csv
+Alice39s BGP.Tools-OpenDB Commercial VPN ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpn/tags-vpn.csv
+Alice39s BGP.Tools-OpenDB Tor Provider ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/tor/tags-tor.csv
+Alice39s BGP.Tools-OpenDB Satellite Network ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/satnet/tags-satnet.csv
 Cloudflare Edge IPv4, https://www.cloudflare.com/ips-v4
 Cloudflare Edge IPv6, https://www.cloudflare.com/ips-v6/
 Fastly Public IP List, https://api.fastly.com/public-ip-list

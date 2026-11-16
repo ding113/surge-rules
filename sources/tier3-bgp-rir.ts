@@ -106,7 +106,7 @@ export const TIER3_BGP_RIR_SOURCES: readonly GeoIpSourceEntry[] = [
       },
       {
         kind: "direct",
-        url: "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-ASN.mmdb",
+        url: "https://github.com/jcjc-dev/mmdb-latest/releases/download/maxmind-latest/GeoLite2-ASN.mmdb",
       },
     ],
   },
@@ -119,7 +119,7 @@ export const TIER3_BGP_RIR_SOURCES: readonly GeoIpSourceEntry[] = [
     endpoints: [
       {
         kind: "direct",
-        url: "https://github.com/Shoyu-Dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb",
+        url: "https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-asn-lite.mmdb",
       },
       {
         kind: "direct",

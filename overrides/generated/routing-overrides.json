@@ -2628,6 +2628,62 @@
     {
       "target": "ai",
       "kind": "DOMAIN-SUFFIX",
+      "value": "scamalytics.com",
+      "extendedMatching": true,
+      "rationale": "Scamalytics IP fraud-risk scoring API used by AI and banking portals"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ipqualityscore.com",
+      "extendedMatching": true,
+      "rationale": "IPQualityScore proxy/VPN/fraud risk scoring API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "spur.us",
+      "extendedMatching": true,
+      "rationale": "Spur anonymous residential/VPN intelligence API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ipinfo.io",
+      "extendedMatching": true,
+      "rationale": "IPinfo geolocation and ASN risk check endpoint"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ipregistry.co",
+      "extendedMatching": true,
+      "rationale": "Ipregistry IP reputation and proxy detection API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "ipdata.co",
+      "extendedMatching": true,
+      "rationale": "ipdata IP threat and proxy intelligence API"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "vpnapi.io",
+      "extendedMatching": true,
+      "rationale": "VPNAPI proxy/VPN risk detection service"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
+      "value": "proxycheck.io",
+      "extendedMatching": true,
+      "rationale": "proxycheck.io VPN/proxy fraud scoring service"
+    },
+    {
+      "target": "ai",
+      "kind": "DOMAIN-SUFFIX",
       "value": "prodregistryv2.org",
       "extendedMatching": true,
       "rationale": "Statsig alias telemetry & feature-gate gateway used by OpenAI/Claude"

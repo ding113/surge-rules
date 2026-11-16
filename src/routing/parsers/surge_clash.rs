@@ -44,12 +44,64 @@ pub fn parse_domain_set(text: &str, out: &mut ParsedRoutingSource) {
     }
 }
 
+pub fn parse_domain_suffix_set(text: &str, out: &mut ParsedRoutingSource) {
+    for raw_line in text.lines() {
+        let line = strip_inline_comment(raw_line.trim_start_matches('\u{feff}')).trim();
+        if is_comment_or_empty(line)
+            || line.starts_with('!')
+            || line.starts_with("@@")
+            || line.starts_with('[')
+        {
+            continue;
+        }
+        let cleaned = strip_matching_quotes(line).trim();
+        if cleaned.is_empty() {
+            continue;
+        }
+        if let Some(rest) = cleaned.strip_prefix("full:") {
+            out.push_normalized(RoutingRuleKind::Domain, rest.trim(), false);
+        } else if let Some(rest) = cleaned.strip_prefix("domain:") {
+            out.push_normalized(RoutingRuleKind::DomainSuffix, rest.trim(), false);
+        } else if let Some(rest) = cleaned.strip_prefix("||") {
+            let inner = rest.strip_suffix('^').unwrap_or(rest);
+            if !inner.contains(['/', '$', '*', '?']) {
+                out.push_normalized(RoutingRuleKind::DomainSuffix, inner, false);
+            }
+        } else if let Some(rest) = cleaned.strip_prefix("+.") {
+            out.push_normalized(RoutingRuleKind::DomainSuffix, rest, false);
+        } else if let Some(rest) = cleaned.strip_prefix("*.") {
+            if rest.contains('*') || rest.contains('?') {
+                out.push_normalized(RoutingRuleKind::DomainWildcard, cleaned, false);
+            } else {
+                out.push_normalized(RoutingRuleKind::DomainSuffix, rest, false);
+            }
+        } else if let Some(rest) = cleaned.strip_prefix('.') {
+            out.push_normalized(RoutingRuleKind::DomainSuffix, rest, false);
+        } else if cleaned.contains('*') || cleaned.contains('?') {
+            out.push_normalized(RoutingRuleKind::DomainWildcard, cleaned, false);
+        } else {
+            out.push_normalized(RoutingRuleKind::DomainSuffix, cleaned, false);
+        }
+    }
+}
+
 pub fn parse_abp_routing(text: &str, out: &mut ParsedRoutingSource) {
     let mut badfiltered: rustc_hash::FxHashSet<String> = rustc_hash::FxHashSet::default();
     let mut lines_buf: Vec<&str> = Vec::new();
 
     for raw_line in text.lines() {
         let line = raw_line.trim_start_matches('\u{feff}').trim();
+        if let Some(rest) = line.strip_prefix("[/") {
+            if let Some((doms, _)) = rest.split_once("/]") {
+                for dom in doms.split('/') {
+                    let clean = dom.trim().strip_prefix("*.").unwrap_or(dom.trim());
+                    if !clean.is_empty() && !clean.contains(['*', '?', ':', '|', '$']) {
+                        out.push_normalized(RoutingRuleKind::DomainSuffix, clean, false);
+                    }
+                }
+            }
+            continue;
+        }
         if line.is_empty()
             || line.starts_with('!')
             || line.starts_with('#')

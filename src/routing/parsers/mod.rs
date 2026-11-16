@@ -22,6 +22,9 @@ pub fn parse_routing_source(
         RoutingSourceFormat::DomainSet => {
             surge_clash::parse_domain_set(&text, &mut out);
         }
+        RoutingSourceFormat::DomainSuffixSet => {
+            surge_clash::parse_domain_suffix_set(&text, &mut out);
+        }
         RoutingSourceFormat::AbpFilter => {
             surge_clash::parse_abp_routing(&text, &mut out);
         }

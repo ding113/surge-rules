@@ -208,6 +208,50 @@ payload:
             .rules
             .contains(&rule(RoutingRuleKind::IpCidr, "149.154.160.0/20", false))
     );
+
+    let zone_set = "\
+# Zone / DNS domain list
+*.oisd-example.org
+pornhub.com # inline comment
+full:exact-only.example.net
+||abp-zone.io^
+@@||whitelisted.io^
+";
+    let zs_cfg = dummy_source_cfg(
+        "zs",
+        RoutingTarget::Proxy,
+        "zs",
+        RoutingSourceFormat::DomainSuffixSet,
+        None,
+        85,
+    );
+    let zs_parsed = parse_routing_source(zone_set.as_bytes(), &zs_cfg).unwrap();
+    assert!(zs_parsed.rules.contains(&rule(
+        RoutingRuleKind::DomainSuffix,
+        "oisd-example.org",
+        false
+    )));
+    assert!(
+        zs_parsed
+            .rules
+            .contains(&rule(RoutingRuleKind::DomainSuffix, "pornhub.com", false))
+    );
+    assert!(zs_parsed.rules.contains(&rule(
+        RoutingRuleKind::Domain,
+        "exact-only.example.net",
+        false
+    )));
+    assert!(
+        zs_parsed
+            .rules
+            .contains(&rule(RoutingRuleKind::DomainSuffix, "abp-zone.io", false))
+    );
+    assert!(
+        !zs_parsed
+            .rules
+            .iter()
+            .any(|r| r.key.value.contains("whitelisted"))
+    );
 }
 
 #[test]
@@ -1140,7 +1184,7 @@ fn non_adblock_abp_and_hosts_lists_route_to_proxy_while_protecting_direct_cn() {
     )
     .unwrap();
     let p_abp = parse_routing_source(
-        b"||dns.google^\n||cloudflare-dns.com^\n||dns.alidns.com^\n||doh.360.cn^\n||doubleclick.net^\n",
+        b"||dns.google^\n||cloudflare-dns.com^\n||dns.alidns.com^\n||doh.360.cn^\n||doubleclick.net^\n[/archive.org/1lib.sk/baidu.cn/]https://dns.opendns.com:443/dns-query\n",
         &proxy_abp_cfg,
     )
     .unwrap();
@@ -1157,14 +1201,17 @@ fn non_adblock_abp_and_hosts_lists_route_to_proxy_while_protecting_direct_cn() {
         RoutingSourceCounts::default(),
     );
 
-    // Overseas DoH & social hosts route to Proxy
+    // Overseas DoH, AdGuard Home upstream [/.../], & social hosts route to Proxy
     assert!(compiled.proxy_text.contains("DOMAIN-SUFFIX,dns.google"));
     assert!(
         compiled
             .proxy_text
             .contains("DOMAIN-SUFFIX,cloudflare-dns.com")
     );
+    assert!(compiled.proxy_text.contains("DOMAIN-SUFFIX,archive.org"));
+    assert!(compiled.proxy_text.contains("DOMAIN-SUFFIX,1lib.sk"));
     assert!(compiled.proxy_text.contains("DOMAIN,www.facebook.com"));
+    assert!(!compiled.proxy_text.contains("baidu.cn"));
     // Domestic `.cn` and Direct-ancestor children (`dns.alidns.com`, `open.douyin.com`) NEVER leak into Proxy
     assert!(!compiled.proxy_text.contains("alidns.com"));
     assert!(!compiled.proxy_text.contains("360.cn"));

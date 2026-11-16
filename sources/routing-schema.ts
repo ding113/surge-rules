@@ -5,6 +5,7 @@ export type RoutingTarget = "direct" | "ai" | "proxy";
 export type RoutingSourceFormat =
   | "surge_ruleset"
   | "domain_set"
+  | "domain_suffix_set"
   | "abp_filter"
   | "hosts"
   | "clash_classical"

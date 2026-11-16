@@ -424,50 +424,6 @@
       ]
     },
     {
-      "id": "blackmatrix7_chinamedia",
-      "name": "blackmatrix7 ChinaMedia Surge ruleset",
-      "target": "direct",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/ChinaMedia/ChinaMedia.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/ChinaMedia/ChinaMedia.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_steamcn",
-      "name": "blackmatrix7 SteamCN Surge ruleset",
-      "target": "direct",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/SteamCN/SteamCN.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/SteamCN/SteamCN.list"
-        }
-      ]
-    },
-    {
       "id": "blackmatrix7_chinaips_bgp",
       "name": "blackmatrix7 ChinaIPsBGP Surge ruleset",
       "target": "direct",
@@ -666,50 +622,6 @@
       ]
     },
     {
-      "id": "hackl0us_apple_direct",
-      "name": "Hackl0us SS-Rule-Snippet Apple-direct",
-      "target": "direct",
-      "lineage": "hackl0us",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "weekly",
-      "license": "MIT",
-      "homepage": "https://github.com/Hackl0us/SS-Rule-Snippet",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Basic/Apple-direct.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@main/Rulesets/Surge/Basic/Apple-direct.list"
-        }
-      ]
-    },
-    {
-      "id": "hackl0us_academic_direct",
-      "name": "Hackl0us SS-Rule-Snippet academic-direct",
-      "target": "direct",
-      "lineage": "hackl0us",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "weekly",
-      "license": "MIT",
-      "homepage": "https://github.com/Hackl0us/SS-Rule-Snippet",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Custom/academic-direct.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@main/Rulesets/Surge/Custom/academic-direct.list"
-        }
-      ]
-    },
-    {
       "id": "lm_firefly_domestic",
       "name": "LM-Firefly Domestic Surge ruleset",
       "target": "direct",
@@ -794,6 +706,714 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/NSZA156/surge-geox-rules@release/geo/geosite/category-ai-cn.conf"
+        }
+      ]
+    },
+    {
+      "id": "aethersailor_custom_direct",
+      "name": "Aethersailor Custom OpenClash Direct Rules",
+      "target": "direct",
+      "lineage": "aethersailor",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Aethersailor/Custom_OpenClash_Rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Custom_Direct.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct.list"
+        }
+      ]
+    },
+    {
+      "id": "aethersailor_steam_cdn",
+      "name": "Aethersailor Domestic Steam Download CDN Rules",
+      "target": "direct",
+      "lineage": "aethersailor",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Aethersailor/Custom_OpenClash_Rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Steam_CDN.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Steam_CDN.list"
+        }
+      ]
+    },
+    {
+      "id": "heidai_routing_direct",
+      "name": "217heidai RoutingRules Domestic Direct Domains",
+      "target": "direct",
+      "lineage": "heidai_routing",
+      "format": "domain_suffix_set",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/217heidai/RoutingRules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/direct.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/direct.txt"
+        }
+      ]
+    },
+    {
+      "id": "heidai_routing_ipv4_cn",
+      "name": "217heidai RoutingRules China IPv4 CIDR",
+      "target": "direct",
+      "lineage": "heidai_routing",
+      "format": "ip_cidr",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/217heidai/RoutingRules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/ipv4_china.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/ipv4_china.txt"
+        }
+      ]
+    },
+    {
+      "id": "loyalsoldier_surge_cncidr",
+      "name": "Loyalsoldier surge-rules cncidr IPv4/IPv6",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "surge_ruleset",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Loyalsoldier/surge-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/cncidr.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/ruleset/cncidr.txt"
+        }
+      ]
+    },
+    {
+      "id": "gmoogway_sr_direct",
+      "name": "GMOogway Shadowrocket Direct List",
+      "target": "direct",
+      "lineage": "gmoogway",
+      "format": "surge_ruleset",
+      "weight": 87,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/GMOogway/shadowrocket-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_direct_list.module"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/GMOogway/shadowrocket-rules@master/sr_direct_list.module"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_china_onekey_login",
+      "name": "ACL4SSR China Carrier One-Key SIM Login",
+      "target": "direct",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 95,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ChinaOneKeyLogin.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/ChinaOneKeyLogin.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_china_dns",
+      "name": "ACL4SSR Domestic Public DNS Endpoints",
+      "target": "direct",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/ChinaDNS.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/ChinaDNS.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_steam_cn",
+      "name": "ACL4SSR Steam China & Domestic CDN",
+      "target": "direct",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/SteamCN.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/Ruleset/SteamCN.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_direct_rules",
+      "name": "Repcz Tool Direct Surge Ruleset",
+      "target": "direct",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 88,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/Direct.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Surge/Rules/Direct.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_custom_direct",
+      "name": "Repcz Tool Custom Direct Overrides",
+      "target": "direct",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Custom/Direct.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Surge/Custom/Direct.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_apple_cn",
+      "name": "Repcz Tool Apple China CDN & Services",
+      "target": "direct",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/AppleCN.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Surge/Rules/AppleCN.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_china_ip",
+      "name": "Repcz Tool ChinaIP Ruleset",
+      "target": "direct",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/ChinaIP.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Surge/Rules/ChinaIP.list"
+        }
+      ]
+    },
+    {
+      "id": "vpsdance_ai_cn_coding",
+      "name": "VPSDance Mainland China AI Coding Tools",
+      "target": "direct",
+      "lineage": "vpsdance_ai",
+      "format": "surge_ruleset",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/VPSDance/ai-proxy-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/cn-coding.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/surge/cn-coding.list"
+        }
+      ]
+    },
+    {
+      "id": "vpsdance_ai_cn_model",
+      "name": "VPSDance Mainland China LLM & Model APIs",
+      "target": "direct",
+      "lineage": "vpsdance_ai",
+      "format": "surge_ruleset",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/VPSDance/ai-proxy-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/cn-model.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/surge/cn-model.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_tld_cn",
+      "name": "MetaCubeX tld-cn (.cn & Chinese IDN TLDs)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 95,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/tld-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_companies_at_cn",
+      "name": "MetaCubeX category-companies@cn",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-companies%40cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_bank_cn",
+      "name": "MetaCubeX category-bank-cn (Domestic Banks)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 96,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-bank-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_securities_cn",
+      "name": "MetaCubeX category-securities-cn (Domestic Brokerages)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 96,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-securities-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_finance_at_cn",
+      "name": "MetaCubeX category-finance@cn (Domestic Finance)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 95,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-finance%40cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_cas_at_cn",
+      "name": "MetaCubeX category-cas@cn (Domestic Certificate Authorities)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-cas%40cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ip_geo_detect_at_cn",
+      "name": "MetaCubeX category-ip-geo-detect@cn (Domestic IP Lookup)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ip-geo-detect%40cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_education_cn",
+      "name": "MetaCubeX category-education-cn (Domestic Universities & MOOCs)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-education-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_hospital_cn",
+      "name": "MetaCubeX category-hospital-cn (Domestic Healthcare)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-hospital-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_automobile_cn",
+      "name": "MetaCubeX category-automobile-cn (Domestic Smart EV & Auto)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-automobile-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_logistics_cn",
+      "name": "MetaCubeX category-logistics-cn (Domestic Express & Logistics)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-logistics-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_food_cn",
+      "name": "MetaCubeX category-food-cn (Domestic Dining & Delivery)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-food-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_netdisk_cn",
+      "name": "MetaCubeX category-netdisk-cn (Domestic Cloud Drives)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-netdisk-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_entertainment_cn",
+      "name": "MetaCubeX category-entertainment-cn (Domestic Streaming & Video)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-entertainment-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_media_cn",
+      "name": "MetaCubeX category-media-cn (Domestic News & Media)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-media-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_social_media_cn",
+      "name": "MetaCubeX category-social-media-cn (Domestic Social Platforms)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-social-media-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_game_accelerator_cn",
+      "name": "MetaCubeX category-game-accelerator-cn",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-game-accelerator-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_game_platforms_dl_cn",
+      "name": "MetaCubeX category-game-platforms-download@cn",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 95,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-game-platforms-download%40cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_wiki_cn",
+      "name": "MetaCubeX category-wiki-cn",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-wiki-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ntp_cn",
+      "name": "MetaCubeX category-ntp-cn (Domestic NTP Servers)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 95,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ntp-cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_number_verification_cn",
+      "name": "MetaCubeX category-number-verification-cn (Carrier SIM Auth)",
+      "target": "direct",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 96,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-number-verification-cn.list"
         }
       ]
     },
@@ -908,24 +1528,68 @@
       ]
     },
     {
-      "id": "xiaolai_anthropic",
-      "name": "xiaolai Anthropic & Claude Code Surge ruleset",
+      "id": "vpsdance_ai_global_coding",
+      "name": "VPSDance ai-proxy-rules Global AI Coding Agents",
       "target": "ai",
-      "lineage": "xiaolai_claude",
+      "lineage": "vpsdance_ai",
       "format": "surge_ruleset",
-      "weight": 95,
-      "core": true,
+      "weight": 96,
+      "core": false,
       "updateCadence": "daily",
       "license": "MIT",
-      "homepage": "https://github.com/xiaolai/anthropic-claude-surge-rules-set",
+      "homepage": "https://github.com/VPSDance/ai-proxy-rules",
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/xiaolai/anthropic-claude-surge-rules-set/main/dist/anthropic.list"
+          "url": "https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-coding.list"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/xiaolai/anthropic-claude-surge-rules-set@main/dist/anthropic.list"
+          "url": "https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/surge/global-coding.list"
+        }
+      ]
+    },
+    {
+      "id": "vpsdance_ai_global_model",
+      "name": "VPSDance ai-proxy-rules Global LLM & Model APIs",
+      "target": "ai",
+      "lineage": "vpsdance_ai",
+      "format": "surge_ruleset",
+      "weight": 95,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/VPSDance/ai-proxy-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-model.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/surge/global-model.list"
+        }
+      ]
+    },
+    {
+      "id": "vpsdance_ai_global_media",
+      "name": "VPSDance ai-proxy-rules Global Generative Media AI",
+      "target": "ai",
+      "lineage": "vpsdance_ai",
+      "format": "surge_ruleset",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/VPSDance/ai-proxy-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global-media.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/surge/global-media.list"
         }
       ]
     },
@@ -1128,138 +1792,6 @@
       ]
     },
     {
-      "id": "blackmatrix7_openai",
-      "name": "blackmatrix7 OpenAI Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/OpenAI/OpenAI.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/OpenAI/OpenAI.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_claude",
-      "name": "blackmatrix7 Claude Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Claude/Claude.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/Claude/Claude.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_anthropic",
-      "name": "blackmatrix7 Anthropic Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Anthropic/Anthropic.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/Anthropic/Anthropic.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_gemini",
-      "name": "blackmatrix7 Gemini Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Gemini/Gemini.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/Gemini/Gemini.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_copilot",
-      "name": "blackmatrix7 Copilot Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Copilot/Copilot.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/Copilot/Copilot.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_bardai",
-      "name": "blackmatrix7 BardAI Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 88,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/BardAI/BardAI.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/BardAI/BardAI.list"
-        }
-      ]
-    },
-    {
       "id": "max1874_ai",
       "name": "max1874 funnysurge AI rules",
       "target": "ai",
@@ -1366,50 +1898,6 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Surge/Rules/AI.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_paypal",
-      "name": "blackmatrix7 PayPal Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 94,
-      "core": true,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PayPal/PayPal.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/PayPal/PayPal.list"
-        }
-      ]
-    },
-    {
-      "id": "blackmatrix7_stripe",
-      "name": "blackmatrix7 Stripe Surge ruleset",
-      "target": "ai",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Stripe/Stripe.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/Stripe/Stripe.list"
         }
       ]
     },
@@ -1654,6 +2142,713 @@
           "url": "https://cdn.jsdelivr.net/gh/qianchongyang/openclash-ai-rules@main/Rules/AI.list"
         }
       ]
+    },
+    {
+      "id": "repcz_custom_ai",
+      "name": "Repcz Tool Custom AI Overrides",
+      "target": "ai",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Custom/AI.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_openai",
+      "name": "Repcz Tool OpenAI Surge Ruleset",
+      "target": "ai",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/OpenAI.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_claude",
+      "name": "Repcz Tool Claude Surge Ruleset",
+      "target": "ai",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/Claude.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_xai",
+      "name": "Repcz Tool xAI / Grok Surge Ruleset",
+      "target": "ai",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/xAI.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_openai",
+      "name": "ACL4SSR OpenAI Ruleset",
+      "target": "ai",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/OpenAi.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_claude",
+      "name": "ACL4SSR Claude Ruleset",
+      "target": "ai",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Claude.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_gemini",
+      "name": "ACL4SSR Gemini Ruleset",
+      "target": "ai",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Gemini.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_perplexity",
+      "name": "MetaCubeX perplexity",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/perplexity.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_xai",
+      "name": "MetaCubeX xai (Grok)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/xai.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_cursor",
+      "name": "MetaCubeX cursor",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/cursor.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_windsurf",
+      "name": "MetaCubeX windsurf (Codeium)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/windsurf.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_github_copilot",
+      "name": "MetaCubeX github-copilot",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/github-copilot.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_jetbrains_ai",
+      "name": "MetaCubeX jetbrains-ai",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/jetbrains-ai.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_groq",
+      "name": "MetaCubeX groq",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/groq.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_poe",
+      "name": "MetaCubeX poe",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/poe.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_elevenlabs",
+      "name": "MetaCubeX elevenlabs",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/elevenlabs.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_huggingface",
+      "name": "MetaCubeX huggingface",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/huggingface.list"
+        }
+      ]
+    },
+    {
+      "id": "itdoginfo_google_ai",
+      "name": "itdoginfo Google AI & Gemini Regional Bypass Domains",
+      "target": "ai",
+      "lineage": "itdoginfo",
+      "format": "domain_suffix_set",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/itdoginfo/allow-domains",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Services/google_ai.lst"
+        }
+      ]
+    },
+    {
+      "id": "ut1_ai_repurposed",
+      "name": "UT1 Toulouse University AI Domains (Repurposed as AI Inventory)",
+      "target": "ai",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 84,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/ai/domains"
+        }
+      ]
+    },
+    {
+      "id": "repcz_paypal",
+      "name": "Repcz Tool PayPal Surge Ruleset",
+      "target": "ai",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/PayPal.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ibkr",
+      "name": "MetaCubeX ibkr (Interactive Brokers)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/ibkr.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_schwab",
+      "name": "MetaCubeX schwab (Charles Schwab)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/schwab.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_standardchartered",
+      "name": "MetaCubeX standardchartered",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/standardchartered.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_citic_not_cn",
+      "name": "MetaCubeX citic@!cn (CITIC Bank International HK)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/citic%40%21cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_bank_jp",
+      "name": "MetaCubeX category-bank-jp (Japanese Banking)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-bank-jp.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_squareup",
+      "name": "MetaCubeX squareup (Square / Block Payments)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/squareup.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_redotpay",
+      "name": "MetaCubeX redotpay (Overseas Card & Payment)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/redotpay.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_straitsx",
+      "name": "MetaCubeX straitsx (Singapore Payment Gateway)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/straitsx.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_finance",
+      "name": "MetaCubeX category-finance (Overseas Finance & Exchanges)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 82,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-finance.list"
+        }
+      ],
+      "notes": "Domestic CN finance domains automatically yield to higher-scored Direct consensus"
+    },
+    {
+      "id": "ut1_bank_repurposed",
+      "name": "UT1 Toulouse University Global Banking Inventory (Repurposed)",
+      "target": "ai",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 82,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bank/domains"
+        }
+      ],
+      "notes": "Global bank domain inventory repurposed for clean overseas banking risk-control egress"
+    },
+    {
+      "id": "ut1_financial_repurposed",
+      "name": "UT1 Toulouse University Global Financial Inventory (Repurposed)",
+      "target": "ai",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 82,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/financial/domains"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ip_geo_detect",
+      "name": "MetaCubeX category-ip-geo-detect (IP Risk & Geo Scoring)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 84,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ip-geo-detect.list"
+        }
+      ],
+      "notes": "Routes overseas IP/fraud-scoring checks via AI residential exit while CN IP-lookup sites yield to Direct consensus"
+    },
+    {
+      "id": "badblock_captcha_repurposed",
+      "name": "BadBlock CAPTCHA Verification Allowlist (Repurposed for Risk-Control)",
+      "target": "ai",
+      "lineage": "celenityy_badblock",
+      "format": "domain_suffix_set",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/celenityy/BadBlock",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/celenityy/BadBlock/pages/wildcards-no-star/captcha_whitelist.txt"
+        }
+      ],
+      "notes": "Repurposes curated CAPTCHA allowlist so human-verification challenges match AI exit IP"
+    },
+    {
+      "id": "metacubex_password_management",
+      "name": "MetaCubeX category-password-management (Passkey & Vault Sync)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ai_not_cn_telemetry",
+      "name": "MetaCubeX category-ai-!cn@telemetry (AI Attestation & Telemetry)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ai-%21cn%40telemetry.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_openai_telemetry",
+      "name": "MetaCubeX openai@telemetry",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/openai%40telemetry.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_anthropic_telemetry",
+      "name": "MetaCubeX anthropic@telemetry",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic%40telemetry.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_paypal_telemetry",
+      "name": "MetaCubeX paypal@telemetry (PayPal Risk & Device Telemetry)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal%40telemetry.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_telemetry",
+      "name": "MetaCubeX category-telemetry (Overseas OS & SDK Telemetry)",
+      "target": "ai",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 80,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-telemetry.list"
+        }
+      ],
+      "notes": "Pure ad trackers and CN domestic telemetry are automatically stripped at compile time"
     },
     {
       "id": "loyalsoldier_surge_proxy",
@@ -1942,28 +3137,6 @@
       ]
     },
     {
-      "id": "blackmatrix7_telegram",
-      "name": "blackmatrix7 Telegram Surge ruleset",
-      "target": "proxy",
-      "lineage": "blackmatrix7",
-      "format": "surge_ruleset",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/blackmatrix7/ios_rule_script",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Telegram/Telegram.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Surge/Telegram/Telegram.list"
-        }
-      ]
-    },
-    {
       "id": "acl4ssr_telegram",
       "name": "ACL4SSR Telegram ruleset",
       "target": "proxy",
@@ -2114,50 +3287,6 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Surge/Rules/DownloadCDN_Global.list"
-        }
-      ]
-    },
-    {
-      "id": "hackl0us_apple_proxy",
-      "name": "Hackl0us SS-Rule-Snippet Apple-proxy",
-      "target": "proxy",
-      "lineage": "hackl0us",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "weekly",
-      "license": "MIT",
-      "homepage": "https://github.com/Hackl0us/SS-Rule-Snippet",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Basic/Apple-proxy.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@main/Rulesets/Surge/Basic/Apple-proxy.list"
-        }
-      ]
-    },
-    {
-      "id": "hackl0us_academic_proxy",
-      "name": "Hackl0us SS-Rule-Snippet academic-proxy",
-      "target": "proxy",
-      "lineage": "hackl0us",
-      "format": "surge_ruleset",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "weekly",
-      "license": "MIT",
-      "homepage": "https://github.com/Hackl0us/SS-Rule-Snippet",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/main/Rulesets/Surge/Custom/academic-proxy.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@main/Rulesets/Surge/Custom/academic-proxy.list"
         }
       ]
     },
@@ -2470,6 +3599,950 @@
       ]
     },
     {
+      "id": "aethersailor_custom_proxy",
+      "name": "Aethersailor Custom OpenClash Proxy Rules",
+      "target": "proxy",
+      "lineage": "aethersailor",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Aethersailor/Custom_OpenClash_Rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Custom_Proxy.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy.list"
+        }
+      ]
+    },
+    {
+      "id": "heidai_routing_proxy",
+      "name": "217heidai RoutingRules Overseas Proxy Domains",
+      "target": "proxy",
+      "lineage": "heidai_routing",
+      "format": "domain_suffix_set",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/217heidai/RoutingRules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/proxy.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/217heidai/RoutingRules@main/rules/proxy.txt"
+        }
+      ]
+    },
+    {
+      "id": "gmoogway_sr_proxy",
+      "name": "GMOogway Shadowrocket Proxy List",
+      "target": "proxy",
+      "lineage": "gmoogway",
+      "format": "surge_ruleset",
+      "weight": 88,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/GMOogway/shadowrocket-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module"
+        }
+      ]
+    },
+    {
+      "id": "hezhijie_gfwlist_agh",
+      "name": "hezhijie0327 GFWList2AGH Full Overseas Blacklist (Repurposed)",
+      "target": "proxy",
+      "lineage": "gfwlist2agh",
+      "format": "abp_filter",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/hezhijie0327/GFWList2AGH",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hezhijie0327/GFWList2AGH/main/gfwlist2adguardhome/blacklist_full.txt"
+        }
+      ]
+    },
+    {
+      "id": "loyalsoldier_surge_icloud",
+      "name": "Loyalsoldier surge-rules iCloud ruleset",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "surge_ruleset",
+      "weight": 88,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Loyalsoldier/surge-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/icloud.txt"
+        }
+      ]
+    },
+    {
+      "id": "loyalsoldier_surge_google",
+      "name": "Loyalsoldier surge-rules Google ruleset",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "surge_ruleset",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/Loyalsoldier/surge-rules",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_scholar_not_cn",
+      "name": "MetaCubeX category-scholar-!cn (Global Academic & Research)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-scholar-%21cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_google_scholar",
+      "name": "MetaCubeX google-scholar",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/google-scholar.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_scholar",
+      "name": "ACL4SSR Overseas Scholar & Journals",
+      "target": "proxy",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 88,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Scholar.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_wikimedia",
+      "name": "MetaCubeX wikimedia (Wikipedia & Wikimedia)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wikimedia.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_web_archive",
+      "name": "MetaCubeX category-web-archive (Internet Archive & Mirrors)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-web-archive.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_dev",
+      "name": "MetaCubeX category-dev (Global Developer Ecosystem)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-dev.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_container",
+      "name": "MetaCubeX category-container (OCI & Container Registries)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-container.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_github",
+      "name": "MetaCubeX github",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/github.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_gitlab",
+      "name": "MetaCubeX gitlab",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/gitlab.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_docker",
+      "name": "MetaCubeX docker",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/docker.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_npmjs",
+      "name": "MetaCubeX npmjs",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/npmjs.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_vercel",
+      "name": "MetaCubeX vercel",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/vercel.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_developer",
+      "name": "ACL4SSR Developer Ecosystem",
+      "target": "proxy",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 88,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Developer.list"
+        }
+      ]
+    },
+    {
+      "id": "acl4ssr_docker",
+      "name": "ACL4SSR Docker & Registries",
+      "target": "proxy",
+      "lineage": "acl4ssr",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ACL4SSR/ACL4SSR",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Docker.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_entertainment_not_cn",
+      "name": "MetaCubeX category-entertainment@!cn",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-entertainment%40%21cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_games_not_cn",
+      "name": "MetaCubeX category-games-!cn (Global Gaming Platforms)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-games-%21cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_social_media_not_cn",
+      "name": "MetaCubeX category-social-media-!cn",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-social-media-%21cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_forums",
+      "name": "MetaCubeX category-forums (Overseas Communities)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-forums.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_communication",
+      "name": "MetaCubeX category-communication (Global IM & VoIP)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-communication.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_youtube",
+      "name": "MetaCubeX youtube",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/youtube.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_spotify",
+      "name": "MetaCubeX spotify",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/spotify.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_netflix",
+      "name": "MetaCubeX netflix",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/netflix.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_disney",
+      "name": "MetaCubeX disney",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/disney.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_hbo",
+      "name": "MetaCubeX hbo",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hbo.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_primevideo",
+      "name": "MetaCubeX primevideo",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/primevideo.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_tiktok",
+      "name": "MetaCubeX tiktok",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/tiktok.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_twitter",
+      "name": "MetaCubeX twitter (X)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/twitter.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_meta",
+      "name": "MetaCubeX meta (Facebook / Instagram / Threads)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/meta.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_whatsapp",
+      "name": "MetaCubeX whatsapp",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/whatsapp.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_signal",
+      "name": "MetaCubeX signal",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/signal.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_reddit",
+      "name": "MetaCubeX reddit",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/reddit.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_pixiv",
+      "name": "MetaCubeX pixiv",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/pixiv.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_line",
+      "name": "MetaCubeX line",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/line.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_steam",
+      "name": "MetaCubeX steam (Community & Store; CN CDN stays Direct)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 88,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/steam.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_epicgames",
+      "name": "MetaCubeX epicgames",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/epicgames.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_playstation",
+      "name": "MetaCubeX playstation",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/playstation.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_xbox",
+      "name": "MetaCubeX xbox",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/xbox.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_nintendo",
+      "name": "MetaCubeX nintendo",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/nintendo.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_cryptocurrency",
+      "name": "MetaCubeX category-cryptocurrency (Web3 & Exchanges)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-cryptocurrency.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_anticensorship",
+      "name": "MetaCubeX category-anticensorship",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-anticensorship.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_vpnservices",
+      "name": "MetaCubeX category-vpnservices",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-vpnservices.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_doh",
+      "name": "MetaCubeX category-doh (Encrypted DNS Endpoints)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-doh.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ipfs",
+      "name": "MetaCubeX category-ipfs (IPFS Gateways)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ipfs.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_pt",
+      "name": "MetaCubeX category-pt (Private Trackers)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-pt.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_public_tracker",
+      "name": "MetaCubeX category-public-tracker",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 89,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-public-tracker.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_crypto",
+      "name": "Repcz Tool Crypto & Web3 Surge Ruleset",
+      "target": "proxy",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/Crypto.list"
+        }
+      ]
+    },
+    {
       "id": "hagezi_doh_vpn_proxy_bypass",
       "name": "HaGeZi Encrypted DNS · VPN · TOR · Proxy Endpoints",
       "target": "proxy",
@@ -2496,7 +4569,7 @@
       "name": "ShadowWhisperer VPN · Proxy & Tunnel Domains",
       "target": "proxy",
       "lineage": "shadowwhisperer",
-      "format": "domain_set",
+      "format": "domain_suffix_set",
       "weight": 87,
       "core": false,
       "updateCadence": "daily",
@@ -2510,28 +4583,6 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/ShadowWhisperer/BlockLists@master/Lists/Tunnels"
-        }
-      ]
-    },
-    {
-      "id": "blocklistproject_redirect_proxy",
-      "name": "The Block List Project Proxy & Redirectors",
-      "target": "proxy",
-      "lineage": "blocklistproject",
-      "format": "abp_filter",
-      "weight": 86,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/redirect-ags.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/redirect-ags.txt"
         }
       ]
     },
@@ -2576,42 +4627,20 @@
       ]
     },
     {
-      "id": "developerdan_facebook_extended",
-      "name": "Developer Dan Facebook & Meta Extended Domains",
+      "id": "no_amazon_ecosystem",
+      "name": "NoAmazon Exhaustive Amazon · PrimeVideo · Twitch · IMDb Ecosystem",
       "target": "proxy",
-      "lineage": "developerdan",
-      "format": "hosts",
-      "weight": 88,
+      "lineage": "noamazon",
+      "format": "abp_filter",
+      "weight": 86,
       "core": false,
       "updateCadence": "daily",
-      "license": "Apache-2.0",
-      "homepage": "https://github.com/lightswitch05/hosts",
+      "license": "Unlicense",
+      "homepage": "https://github.com/nickspaargaren/no-amazon",
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://www.github.developerdan.com/hosts/lists/facebook-extended.txt"
-        }
-      ]
-    },
-    {
-      "id": "anudeep_facebook_meta",
-      "name": "anudeepND Facebook & Meta Domains",
-      "target": "proxy",
-      "lineage": "anudeep_social",
-      "format": "hosts",
-      "weight": 87,
-      "core": false,
-      "updateCadence": "weekly",
-      "license": "MIT",
-      "homepage": "https://github.com/anudeepND/blacklist",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/anudeepND/blacklist/master/facebook.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/anudeepND/blacklist@master/facebook.txt"
+          "url": "https://raw.githubusercontent.com/nickspaargaren/no-amazon/master/amazon-adguard.txt"
         }
       ]
     },
@@ -2638,94 +4667,6 @@
       ]
     },
     {
-      "id": "blocklistproject_facebook",
-      "name": "The Block List Project Facebook & Instagram",
-      "target": "proxy",
-      "lineage": "blocklistproject",
-      "format": "abp_filter",
-      "weight": 87,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/facebook-ags.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/facebook-ags.txt"
-        }
-      ]
-    },
-    {
-      "id": "blocklistproject_twitter",
-      "name": "The Block List Project Twitter / X",
-      "target": "proxy",
-      "lineage": "blocklistproject",
-      "format": "abp_filter",
-      "weight": 87,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/twitter-ags.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/twitter-ags.txt"
-        }
-      ]
-    },
-    {
-      "id": "blocklistproject_youtube",
-      "name": "The Block List Project YouTube",
-      "target": "proxy",
-      "lineage": "blocklistproject",
-      "format": "abp_filter",
-      "weight": 87,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/youtube-ags.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/youtube-ags.txt"
-        }
-      ]
-    },
-    {
-      "id": "blocklistproject_tiktok",
-      "name": "The Block List Project TikTok International",
-      "target": "proxy",
-      "lineage": "blocklistproject",
-      "format": "abp_filter",
-      "weight": 86,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/tiktok-ags.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/tiktok-ags.txt"
-        }
-      ]
-    },
-    {
       "id": "metacubex_discord",
       "name": "MetaCubeX Geosite Discord",
       "target": "proxy",
@@ -2744,28 +4685,6 @@
         {
           "kind": "direct",
           "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/discord.list"
-        }
-      ]
-    },
-    {
-      "id": "blocklistproject_whatsapp",
-      "name": "The Block List Project WhatsApp",
-      "target": "proxy",
-      "lineage": "blocklistproject",
-      "format": "abp_filter",
-      "weight": 87,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/whatsapp-ags.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/whatsapp-ags.txt"
         }
       ]
     },
@@ -2792,6 +4711,78 @@
       ]
     },
     {
+      "id": "itdoginfo_anime",
+      "name": "itdoginfo Overseas Anime & Manga Platforms",
+      "target": "proxy",
+      "lineage": "itdoginfo",
+      "format": "domain_suffix_set",
+      "weight": 87,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/itdoginfo/allow-domains",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/anime.lst"
+        }
+      ]
+    },
+    {
+      "id": "itdoginfo_news",
+      "name": "itdoginfo Censored International News Media",
+      "target": "proxy",
+      "lineage": "itdoginfo",
+      "format": "domain_suffix_set",
+      "weight": 87,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/itdoginfo/allow-domains",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/news.lst"
+        }
+      ]
+    },
+    {
+      "id": "itdoginfo_geoblock",
+      "name": "itdoginfo Geo-Restricted Global Services",
+      "target": "proxy",
+      "lineage": "itdoginfo",
+      "format": "domain_suffix_set",
+      "weight": 87,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/itdoginfo/allow-domains",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/geoblock.lst"
+        }
+      ]
+    },
+    {
+      "id": "itdoginfo_porn",
+      "name": "itdoginfo Adult Streaming Inventory",
+      "target": "proxy",
+      "lineage": "itdoginfo",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/itdoginfo/allow-domains",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Categories/porn.lst"
+        }
+      ]
+    },
+    {
       "id": "hagezi_nsfw_adult",
       "name": "HaGeZi NSFW & Adult Platforms",
       "target": "proxy",
@@ -2814,6 +4805,42 @@
       ]
     },
     {
+      "id": "oisd_nsfw_domains",
+      "name": "OISD NSFW & Adult Platforms (Full Inventory)",
+      "target": "proxy",
+      "lineage": "oisd_nsfw",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://oisd.nl",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/sjhgvr/oisd/main/domainswild_nsfw.txt"
+        }
+      ]
+    },
+    {
+      "id": "shadowwhisperer_adult",
+      "name": "ShadowWhisperer Adult Platforms",
+      "target": "proxy",
+      "lineage": "shadowwhisperer",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ShadowWhisperer/BlockLists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Adult"
+        }
+      ]
+    },
+    {
       "id": "shadowwhisperer_dating",
       "name": "ShadowWhisperer Overseas Dating Platforms",
       "target": "proxy",
@@ -2828,6 +4855,42 @@
         {
           "kind": "direct",
           "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_57.txt"
+        }
+      ]
+    },
+    {
+      "id": "shadowwhisperer_gambling",
+      "name": "ShadowWhisperer Overseas Gambling Platforms",
+      "target": "proxy",
+      "lineage": "shadowwhisperer",
+      "format": "domain_suffix_set",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ShadowWhisperer/BlockLists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Gambling"
+        }
+      ]
+    },
+    {
+      "id": "shadowwhisperer_crypto",
+      "name": "ShadowWhisperer Cryptocurrency & Web3 Platforms",
+      "target": "proxy",
+      "lineage": "shadowwhisperer",
+      "format": "domain_suffix_set",
+      "weight": 87,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/ShadowWhisperer/BlockLists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Cryptocurrency"
         }
       ]
     },
@@ -2876,8 +4939,8 @@
       ]
     },
     {
-      "id": "hagezi_gambling_medium",
-      "name": "HaGeZi Overseas Gambling Platforms (Medium)",
+      "id": "hagezi_gambling_full",
+      "name": "HaGeZi Overseas Gambling Platforms (Full)",
       "target": "proxy",
       "lineage": "hagezi_gambling",
       "format": "abp_filter",
@@ -2889,11 +4952,11 @@
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.medium.txt"
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.txt"
         },
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/gambling.medium.txt"
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_47.txt"
         }
       ]
     },
@@ -2920,46 +4983,308 @@
       ]
     },
     {
-      "id": "blocklistproject_piracy",
-      "name": "The Block List Project Piracy & Mirrors",
+      "id": "rpilist_pornblock1",
+      "name": "RPiList Adult & NSFW Content Inventory (pornblock1)",
       "target": "proxy",
-      "lineage": "blocklistproject",
-      "format": "abp_filter",
-      "weight": 86,
+      "lineage": "rpilist_specials",
+      "format": "domain_suffix_set",
+      "weight": 85,
       "core": false,
       "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
+      "license": "MIT",
+      "homepage": "https://github.com/RPiList/specials",
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/piracy-ags.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/piracy-ags.txt"
+          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/pornblock1"
         }
       ]
     },
     {
-      "id": "blocklistproject_torrent",
-      "name": "The Block List Project BitTorrent & Trackers",
+      "id": "stevo_ai_repurposed",
+      "name": "Stevo's AI & Generative Media Blocklist (Repurposed for Proxy)",
       "target": "proxy",
-      "lineage": "blocklistproject",
+      "lineage": "stevo_ai",
       "format": "abp_filter",
-      "weight": 86,
+      "weight": 85,
       "core": false,
       "updateCadence": "daily",
-      "license": "Unlicense",
-      "homepage": "https://github.com/blocklistproject/Lists",
+      "license": "MIT",
+      "homepage": "https://github.com/AdguardTeam/FiltersRegistry",
       "endpoints": [
         {
           "kind": "direct",
-          "url": "https://raw.githubusercontent.com/blocklistproject/Lists/master/adguard/torrent-ags.txt"
-        },
+          "url": "https://filters.adtidy.org/windows/filters/260.txt"
+        }
+      ]
+    },
+    {
+      "id": "ut1_gambling",
+      "name": "UT1 Toulouse University Gambling Platforms",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
         {
           "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/blocklistproject/Lists@master/adguard/torrent-ags.txt"
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/gambling/domains"
+        }
+      ]
+    },
+    {
+      "id": "ut1_dating",
+      "name": "UT1 Toulouse University Dating Platforms",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/dating/domains"
+        }
+      ]
+    },
+    {
+      "id": "ut1_social_networks",
+      "name": "UT1 Toulouse University Social Networks",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/social_networks/domains"
+        }
+      ]
+    },
+    {
+      "id": "ut1_vpn",
+      "name": "UT1 Toulouse University VPN Endpoints",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/vpn/domains"
+        }
+      ]
+    },
+    {
+      "id": "ut1_residential_proxies",
+      "name": "UT1 Toulouse University Residential Proxy & Circumvention Endpoints",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/residential-proxies/domains"
+        }
+      ]
+    },
+    {
+      "id": "ut1_warez",
+      "name": "UT1 Toulouse University Warez & DDL Mirrors",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/warez/domains"
+        }
+      ]
+    },
+    {
+      "id": "ut1_manga",
+      "name": "UT1 Toulouse University Manga & Anime Portals",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/manga/domains"
+        }
+      ]
+    },
+    {
+      "id": "ut1_bitcoin",
+      "name": "UT1 Toulouse University Bitcoin & Crypto Portals",
+      "target": "proxy",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bitcoin/domains"
+        }
+      ]
+    },
+    {
+      "id": "rpilist_proxies",
+      "name": "RPiList Specials Proxy & Bypass Endpoints",
+      "target": "proxy",
+      "lineage": "rpilist",
+      "format": "domain_suffix_set",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/RPiList/specials",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies"
+        }
+      ]
+    },
+    {
+      "id": "rpilist_streaming",
+      "name": "RPiList Specials Overseas Streaming Mirrors",
+      "target": "proxy",
+      "lineage": "rpilist",
+      "format": "domain_suffix_set",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/RPiList/specials",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Streaming"
+        }
+      ]
+    },
+    {
+      "id": "cbuijs_doh_bypass",
+      "name": "cbuijs Accomplist Encrypted DoH & Bypass Inventory",
+      "target": "proxy",
+      "lineage": "cbuijs_accomplist",
+      "format": "domain_suffix_set",
+      "weight": 86,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/cbuijs/accomplist",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/cbuijs/accomplist/master/doh/deugniets.black.list"
+        }
+      ]
+    },
+    {
+      "id": "sinfonietta_gambling",
+      "name": "Sinfonietta Gambling Hosts Inventory",
+      "target": "proxy",
+      "lineage": "sinfonietta",
+      "format": "hosts",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "weekly",
+      "license": "MIT",
+      "homepage": "https://github.com/Sinfonietta/hostfiles",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts"
+        }
+      ]
+    },
+    {
+      "id": "sinfonietta_porn",
+      "name": "Sinfonietta Adult Media Hosts Inventory",
+      "target": "proxy",
+      "lineage": "sinfonietta",
+      "format": "hosts",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "weekly",
+      "license": "MIT",
+      "homepage": "https://github.com/Sinfonietta/hostfiles",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts"
+        }
+      ]
+    },
+    {
+      "id": "sinfonietta_social",
+      "name": "Sinfonietta Global Social Media Hosts Inventory",
+      "target": "proxy",
+      "lineage": "sinfonietta",
+      "format": "hosts",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "weekly",
+      "license": "MIT",
+      "homepage": "https://github.com/Sinfonietta/hostfiles",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/social-hosts"
+        }
+      ]
+    },
+    {
+      "id": "hostsvn_gambling",
+      "name": "hostsVN Overseas Gambling Extension",
+      "target": "proxy",
+      "lineage": "hostsvn",
+      "format": "hosts",
+      "weight": 85,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/bigdargon/hostsVN",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/gambling/hosts"
         }
       ]
     }

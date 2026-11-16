@@ -416,12 +416,76 @@ pub fn compile_routing(
     ai_map.retain(|k, c| c.forced || !is_excluded(&ai_exclude, k));
     proxy_map.retain(|k, c| c.forced || !is_excluded(&proxy_exclude, k));
 
-    // Resolve overlaps between Direct and AI: surviving AI rules take precedence over non-forced Direct rules.
+    // Resolve overlaps between Direct and AI:
+    // 1. Non-forced AI rules yield when Direct has strictly higher multi-lineage domestic consensus
+    //    (e.g., global topical lists repurposed into AI.list that incidentally include CN domains).
+    // 2. Surviving AI rules take precedence over remaining non-forced Direct rules.
+    let mut pre_direct_exact_scores: FxHashMap<String, u16> = FxHashMap::default();
+    let mut pre_direct_suffix_scores: FxHashMap<String, u16> = FxHashMap::default();
+    for (dk, dc) in &direct_map {
+        let sc = dc.score();
+        match dk.kind {
+            RoutingRuleKind::Domain => {
+                pre_direct_exact_scores
+                    .entry(dk.value.clone())
+                    .and_modify(|prev| *prev = (*prev).max(sc))
+                    .or_insert(sc);
+            }
+            RoutingRuleKind::DomainSuffix => {
+                pre_direct_suffix_scores
+                    .entry(dk.value.clone())
+                    .and_modify(|prev| *prev = (*prev).max(sc))
+                    .or_insert(sc);
+            }
+            _ => {}
+        }
+    }
+
+    let mut conflicts_resolved = 0usize;
+    ai_map.retain(|k, c| {
+        if c.forced {
+            return true;
+        }
+        let ai_score = c.score();
+        let check_dom = match k.kind {
+            RoutingRuleKind::Domain | RoutingRuleKind::DomainSuffix => Some(k.value.as_str()),
+            RoutingRuleKind::DomainWildcard => k
+                .value
+                .strip_prefix("*.")
+                .filter(|t| !t.contains('*') && !t.contains('?')),
+            _ => None,
+        };
+        if let Some(dom) = check_dom {
+            if let Some(&d_score) = pre_direct_exact_scores.get(dom)
+                && k.kind == RoutingRuleKind::Domain
+                && d_score > ai_score
+            {
+                conflicts_resolved += 1;
+                return false;
+            }
+            if let Some(&d_score) = pre_direct_suffix_scores.get(dom)
+                && d_score > ai_score
+            {
+                conflicts_resolved += 1;
+                return false;
+            }
+            for (idx, _) in dom.match_indices('.') {
+                let anc = &dom[idx + 1..];
+                if let Some(&d_score) = pre_direct_suffix_scores.get(anc)
+                    && d_score > ai_score
+                {
+                    conflicts_resolved += 1;
+                    return false;
+                }
+            }
+        }
+        true
+    });
+
     let mut ai_matcher = RuleMatcher::default();
     for key in ai_map.keys() {
         ai_matcher.insert_key(key);
     }
-    let mut conflicts_resolved = 0usize;
     direct_map.retain(|k, c| {
         if !c.forced && ai_matcher.matches_key(k) {
             conflicts_resolved += 1;
