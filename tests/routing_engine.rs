@@ -5,7 +5,9 @@ use proptest::prelude::*;
 use tempfile::tempdir;
 
 use surge_rules::adblock::config::AdblockOverrides;
-use surge_rules::routing::compiler::{RoutingSourceCounts, compile_routing};
+use surge_rules::routing::compiler::{
+    CompiledRoutingArtifacts, RoutingSourceCounts, compile_routing,
+};
 use surge_rules::routing::config::{
     GeositeTagFilter, RoutingExclusionOverride, RoutingOverrides, RoutingRuleKind,
     RoutingRuleOverride, RoutingSourceConfig, RoutingSourceFormat, RoutingTarget,
@@ -16,7 +18,38 @@ use surge_rules::routing::model::{
     normalize_logical_and_value, normalize_rule_value, parse_logical_and_clauses,
 };
 use surge_rules::routing::parsers::parse_routing_source;
-use surge_rules::routing::verify::verify_routing_dir;
+use surge_rules::routing::verify::{RoutingThresholds, verify_routing_dir};
+
+fn write_compiled_dir(dir: &Path, compiled: &CompiledRoutingArtifacts) {
+    fs::write(dir.join("Direct.list"), &compiled.direct_text).unwrap();
+    fs::write(dir.join("AI.list"), &compiled.ai_text).unwrap();
+    fs::write(dir.join("Payment.list"), &compiled.payment_text).unwrap();
+    fs::write(dir.join("Telemetry.list"), &compiled.telemetry_text).unwrap();
+    fs::write(dir.join("Proxy.list"), &compiled.proxy_text).unwrap();
+}
+
+fn write_raw_lists(
+    dir: &Path,
+    direct: &str,
+    ai: &str,
+    payment: &str,
+    telemetry: &str,
+    proxy: &str,
+) {
+    fs::write(dir.join("Direct.list"), direct).unwrap();
+    fs::write(dir.join("AI.list"), ai).unwrap();
+    fs::write(dir.join("Payment.list"), payment).unwrap();
+    fs::write(dir.join("Telemetry.list"), telemetry).unwrap();
+    fs::write(dir.join("Proxy.list"), proxy).unwrap();
+}
+
+fn rule_lines(text: &str) -> std::collections::BTreeSet<String> {
+    text.lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .map(ToOwned::to_owned)
+        .collect()
+}
 
 fn dummy_source_cfg(
     id: &str,
@@ -476,10 +509,18 @@ fn shared_infra_roots_blocks_apex_and_wildcards_while_allowing_ai_children() {
 
     // Must be cleanly verifiable including shared infra apex checks and AI subset of Proxy.
     let dir = tempdir().unwrap();
-    fs::write(dir.path().join("Direct.list"), &compiled.direct_text).unwrap();
-    fs::write(dir.path().join("AI.list"), &compiled.ai_text).unwrap();
-    fs::write(dir.path().join("Proxy.list"), &compiled.proxy_text).unwrap();
-    verify_routing_dir(dir.path(), &overrides, 0, 1, 1, false).unwrap();
+    write_compiled_dir(dir.path(), &compiled);
+    verify_routing_dir(
+        dir.path(),
+        &overrides,
+        RoutingThresholds {
+            min_ai_lines: 1,
+            min_proxy_lines: 1,
+            ..RoutingThresholds::default()
+        },
+        false,
+    )
+    .unwrap();
 }
 
 #[test]
@@ -533,6 +574,9 @@ fn direct_vs_proxy_scoring_and_real_overrides_reconcile_cleanly() {
                 rule(RoutingRuleKind::DomainSuffix, "deepseek.com", false),
                 rule(RoutingRuleKind::DomainSuffix, "moonshot.cn", false),
                 rule(RoutingRuleKind::DomainSuffix, "doubleclick.net", false),
+                // Upstream AI bundled payment & CAPTCHA spillover must yield to Payment/Telemetry
+                rule(RoutingRuleKind::DomainSuffix, "stripe.com", false),
+                rule(RoutingRuleKind::DomainSuffix, "arkoselabs.com", false),
             ],
         },
     ];
@@ -556,84 +600,135 @@ fn direct_vs_proxy_scoring_and_real_overrides_reconcile_cleanly() {
             .contains("DOMAIN-SUFFIX,overseas-example.com")
     );
 
-    // Domestic AI must stay in Direct and out of AI/Proxy.
+    // Domestic AI must stay in Direct and out of AI/Payment/Telemetry/Proxy.
     assert!(compiled.direct_text.contains("DOMAIN-SUFFIX,deepseek.com"));
     assert!(!compiled.ai_text.contains("deepseek.com"));
+    assert!(!compiled.payment_text.contains("deepseek.com"));
+    assert!(!compiled.telemetry_text.contains("deepseek.com"));
     assert!(!compiled.proxy_text.contains("deepseek.com"));
     assert!(!compiled.ai_text.contains("moonshot.cn"));
 
-    // Pure ad tracker stripped, while AI auth/feature-gate allowlisted domains remain in AI & Proxy.
+    // Pure ad tracker stripped, while AI/Payment/Telemetry curated domains land in disjoint sets & Proxy.
     assert!(!compiled.ai_text.contains("doubleclick.net"));
     assert!(!compiled.proxy_text.contains("doubleclick.net"));
     assert!(compiled.ai_text.contains("DOMAIN-SUFFIX,oaistatsig.com"));
+    assert!(compiled.payment_text.contains("DOMAIN-SUFFIX,stripe.com"));
+    assert!(!compiled.ai_text.contains("DOMAIN-SUFFIX,stripe.com"));
+    assert!(
+        compiled
+            .telemetry_text
+            .contains("DOMAIN-SUFFIX,arkoselabs.com")
+    );
+    assert!(!compiled.ai_text.contains("arkoselabs.com"));
     assert!(compiled.proxy_text.contains("DOMAIN-SUFFIX,oaistatsig.com"));
+    assert!(compiled.proxy_text.contains("DOMAIN-SUFFIX,stripe.com"));
+    assert!(compiled.proxy_text.contains("DOMAIN-SUFFIX,arkoselabs.com"));
+
+    let dir = tempdir().unwrap();
+    write_compiled_dir(dir.path(), &compiled);
+    verify_routing_dir(dir.path(), &routing_ov, RoutingThresholds::default(), false).unwrap();
 }
 
 #[test]
 fn verify_routing_dir_rejects_invalid_ruleset_invariants() {
     let overrides = RoutingOverrides::empty();
+    let zero = RoutingThresholds::default();
 
     // 1. Policy column in external RULE-SET must fail.
     let d1 = tempdir().unwrap();
-    fs::write(
-        d1.path().join("Direct.list"),
+    write_raw_lists(
+        d1.path(),
         "DOMAIN-SUFFIX,baidu.com,DIRECT\n",
-    )
-    .unwrap();
-    fs::write(d1.path().join("AI.list"), "DOMAIN-SUFFIX,openai.com\n").unwrap();
-    fs::write(d1.path().join("Proxy.list"), "DOMAIN-SUFFIX,openai.com\n").unwrap();
-    assert!(verify_routing_dir(d1.path(), &overrides, 0, 0, 0, false).is_err());
+        "DOMAIN-SUFFIX,openai.com\n",
+        "",
+        "",
+        "DOMAIN-SUFFIX,openai.com\n",
+    );
+    assert!(verify_routing_dir(d1.path(), &overrides, zero, false).is_err());
 
     // 2. IP-CIDR without no-resolve must fail.
     let d2 = tempdir().unwrap();
-    fs::write(d2.path().join("Direct.list"), "DOMAIN-SUFFIX,baidu.com\n").unwrap();
-    fs::write(d2.path().join("AI.list"), "DOMAIN-SUFFIX,openai.com\n").unwrap();
-    fs::write(
-        d2.path().join("Proxy.list"),
+    write_raw_lists(
+        d2.path(),
+        "DOMAIN-SUFFIX,baidu.com\n",
+        "DOMAIN-SUFFIX,openai.com\n",
+        "",
+        "",
         "DOMAIN-SUFFIX,openai.com\nIP-CIDR,149.154.160.0/20\n",
-    )
-    .unwrap();
-    assert!(verify_routing_dir(d2.path(), &overrides, 0, 0, 0, false).is_err());
+    );
+    assert!(verify_routing_dir(d2.path(), &overrides, zero, false).is_err());
 
     // 3. Reserved/Tailscale CIDR must fail.
     let d3 = tempdir().unwrap();
-    fs::write(
-        d3.path().join("Direct.list"),
+    write_raw_lists(
+        d3.path(),
         "IP-CIDR,100.64.0.0/10,no-resolve\n",
-    )
-    .unwrap();
-    fs::write(d3.path().join("AI.list"), "").unwrap();
-    fs::write(d3.path().join("Proxy.list"), "").unwrap();
-    assert!(verify_routing_dir(d3.path(), &overrides, 0, 0, 0, false).is_err());
+        "",
+        "",
+        "",
+        "",
+    );
+    assert!(verify_routing_dir(d3.path(), &overrides, zero, false).is_err());
 
-    // 4. Broken AI subset of Proxy must fail.
+    // 4. Broken Payment subset of Proxy must fail.
     let d4 = tempdir().unwrap();
-    fs::write(d4.path().join("Direct.list"), "DOMAIN-SUFFIX,baidu.com\n").unwrap();
-    fs::write(d4.path().join("AI.list"), "DOMAIN-SUFFIX,anthropic.com\n").unwrap();
-    fs::write(d4.path().join("Proxy.list"), "DOMAIN-SUFFIX,openai.com\n").unwrap();
-    assert!(verify_routing_dir(d4.path(), &overrides, 0, 0, 0, false).is_err());
+    write_raw_lists(
+        d4.path(),
+        "DOMAIN-SUFFIX,baidu.com\n",
+        "DOMAIN-SUFFIX,openai.com\n",
+        "DOMAIN-SUFFIX,paypal.com\n",
+        "",
+        "DOMAIN-SUFFIX,openai.com\n",
+    );
+    assert!(verify_routing_dir(d4.path(), &overrides, zero, false).is_err());
 
     // 5. Proxy missing extended-matching present on AI rule must fail.
     let d5 = tempdir().unwrap();
-    fs::write(d5.path().join("Direct.list"), "").unwrap();
-    fs::write(
-        d5.path().join("AI.list"),
+    write_raw_lists(
+        d5.path(),
+        "",
         "DOMAIN,api.openai.com,extended-matching\n",
-    )
-    .unwrap();
-    fs::write(d5.path().join("Proxy.list"), "DOMAIN-SUFFIX,openai.com\n").unwrap();
-    assert!(verify_routing_dir(d5.path(), &overrides, 0, 0, 0, false).is_err());
+        "",
+        "",
+        "DOMAIN-SUFFIX,openai.com\n",
+    );
+    assert!(verify_routing_dir(d5.path(), &overrides, zero, false).is_err());
 
-    // Direct.list with extended-matching must be rejected.
+    // 6. Direct.list with extended-matching must be rejected.
     let d6 = tempdir().unwrap();
-    fs::write(
-        d6.path().join("Direct.list"),
+    write_raw_lists(
+        d6.path(),
         "DOMAIN-SUFFIX,cn,extended-matching\n",
-    )
-    .unwrap();
-    fs::write(d6.path().join("AI.list"), "").unwrap();
-    fs::write(d6.path().join("Proxy.list"), "").unwrap();
-    assert!(verify_routing_dir(d6.path(), &overrides, 0, 0, 0, false).is_err());
+        "",
+        "",
+        "",
+        "",
+    );
+    assert!(verify_routing_dir(d6.path(), &overrides, zero, false).is_err());
+
+    // 7. Overlapping domain between AI.list and Payment.list must fail disjointness check.
+    let d7 = tempdir().unwrap();
+    write_raw_lists(
+        d7.path(),
+        "",
+        "DOMAIN,checkout.stripe.com\n",
+        "DOMAIN-SUFFIX,stripe.com\n",
+        "",
+        "DOMAIN-SUFFIX,stripe.com\n",
+    );
+    assert!(verify_routing_dir(d7.path(), &overrides, zero, false).is_err());
+
+    // 8. Overlapping CIDR between AI.list and Telemetry.list must fail disjointness check.
+    let d8 = tempdir().unwrap();
+    write_raw_lists(
+        d8.path(),
+        "",
+        "IP-CIDR,160.79.104.0/21,no-resolve\n",
+        "",
+        "IP-CIDR,160.79.104.1/32,no-resolve\n",
+        "IP-CIDR,160.79.104.0/21,no-resolve\n",
+    );
+    assert!(verify_routing_dir(d8.path(), &overrides, zero, false).is_err());
 }
 
 #[test]
@@ -690,10 +785,17 @@ fn direct_list_strips_extended_matching_even_when_requested() {
     );
 
     let dir = tempdir().unwrap();
-    fs::write(dir.path().join("Direct.list"), &compiled.direct_text).unwrap();
-    fs::write(dir.path().join("AI.list"), &compiled.ai_text).unwrap();
-    fs::write(dir.path().join("Proxy.list"), &compiled.proxy_text).unwrap();
-    verify_routing_dir(dir.path(), &overrides, 0, 1, 0, false).unwrap();
+    write_compiled_dir(dir.path(), &compiled);
+    verify_routing_dir(
+        dir.path(),
+        &overrides,
+        RoutingThresholds {
+            min_ai_lines: 1,
+            ..RoutingThresholds::default()
+        },
+        false,
+    )
+    .unwrap();
 }
 
 #[test]
@@ -790,32 +892,48 @@ fn logical_and_normalization_guard_and_subset_propagation() {
     );
 
     let dir = tempdir().unwrap();
-    fs::write(dir.path().join("Direct.list"), &compiled.direct_text).unwrap();
-    fs::write(dir.path().join("AI.list"), &compiled.ai_text).unwrap();
-    fs::write(dir.path().join("Proxy.list"), &compiled.proxy_text).unwrap();
-    verify_routing_dir(dir.path(), &overrides, 0, 0, 0, false).unwrap();
+    write_compiled_dir(dir.path(), &compiled);
+    verify_routing_dir(dir.path(), &overrides, RoutingThresholds::default(), false).unwrap();
 
     // Verifier must reject AI AND missing from Proxy.list.
     let bad_subset = tempdir().unwrap();
-    fs::write(bad_subset.path().join("Direct.list"), "").unwrap();
-    fs::write(
-        bad_subset.path().join("AI.list"),
+    write_raw_lists(
+        bad_subset.path(),
+        "",
         "AND,((DOMAIN-SUFFIX,auth0.com),(PROCESS-NAME,ChatGPT))\n",
-    )
-    .unwrap();
-    fs::write(bad_subset.path().join("Proxy.list"), "").unwrap();
-    assert!(verify_routing_dir(bad_subset.path(), &overrides, 0, 0, 0, false).is_err());
+        "",
+        "",
+        "",
+    );
+    assert!(
+        verify_routing_dir(
+            bad_subset.path(),
+            &overrides,
+            RoutingThresholds::default(),
+            false
+        )
+        .is_err()
+    );
 
     // Verifier must reject reserved IP inside AND.
     let bad_ip = tempdir().unwrap();
-    fs::write(
-        bad_ip.path().join("Direct.list"),
+    write_raw_lists(
+        bad_ip.path(),
         "AND,((IP-CIDR,192.168.0.0/16),(PROCESS-NAME,WeChat))\n",
-    )
-    .unwrap();
-    fs::write(bad_ip.path().join("AI.list"), "").unwrap();
-    fs::write(bad_ip.path().join("Proxy.list"), "").unwrap();
-    assert!(verify_routing_dir(bad_ip.path(), &overrides, 0, 0, 0, false).is_err());
+        "",
+        "",
+        "",
+        "",
+    );
+    assert!(
+        verify_routing_dir(
+            bad_ip.path(),
+            &overrides,
+            RoutingThresholds::default(),
+            false
+        )
+        .is_err()
+    );
 }
 
 fn arb_domain() -> impl Strategy<Value = String> {
@@ -861,10 +979,12 @@ proptest! {
     #![proptest_config(ProptestConfig::with_cases(64))]
 
     #[test]
-    fn prop_proxy_strictly_supersets_ai(
+    fn prop_clean_split_is_disjoint_union_and_proxy_superset(
         direct_rules in prop::collection::vec(arb_routing_rule(), 0..20),
-        ai_rules in prop::collection::vec(arb_routing_rule(), 1..25),
-        proxy_rules in prop::collection::vec(arb_routing_rule(), 0..25),
+        ai_rules in prop::collection::vec(arb_routing_rule(), 1..20),
+        payment_rules in prop::collection::vec(arb_routing_rule(), 0..20),
+        telemetry_rules in prop::collection::vec(arb_routing_rule(), 0..20),
+        proxy_rules in prop::collection::vec(arb_routing_rule(), 0..20),
     ) {
         let overrides = RoutingOverrides {
             schema_version: 1,
@@ -875,7 +995,46 @@ proptest! {
             force_entries: Vec::new(),
             exclude_entries: Vec::new(),
         };
-        let sources = vec![
+        let split_sources = vec![
+            ParsedRoutingSource {
+                source_id: "d".to_string(),
+                target: RoutingTarget::Direct,
+                lineage: "d".to_string(),
+                weight: 70,
+                rules: direct_rules.clone(),
+            },
+            ParsedRoutingSource {
+                source_id: "a".to_string(),
+                target: RoutingTarget::Ai,
+                lineage: "a".to_string(),
+                weight: 90,
+                rules: ai_rules.clone(),
+            },
+            ParsedRoutingSource {
+                source_id: "pay".to_string(),
+                target: RoutingTarget::Payment,
+                lineage: "pay".to_string(),
+                weight: 90,
+                rules: payment_rules.clone(),
+            },
+            ParsedRoutingSource {
+                source_id: "tel".to_string(),
+                target: RoutingTarget::Telemetry,
+                lineage: "tel".to_string(),
+                weight: 90,
+                rules: telemetry_rules.clone(),
+            },
+            ParsedRoutingSource {
+                source_id: "p".to_string(),
+                target: RoutingTarget::Proxy,
+                lineage: "p".to_string(),
+                weight: 90,
+                rules: proxy_rules.clone(),
+            },
+        ];
+
+        // Reference unified pre-split build where all three clean feeds target `Ai` with the same lineages.
+        let unified_sources = vec![
             ParsedRoutingSource {
                 source_id: "d".to_string(),
                 target: RoutingTarget::Direct,
@@ -891,6 +1050,20 @@ proptest! {
                 rules: ai_rules,
             },
             ParsedRoutingSource {
+                source_id: "pay_as_ai".to_string(),
+                target: RoutingTarget::Ai,
+                lineage: "pay".to_string(),
+                weight: 90,
+                rules: payment_rules,
+            },
+            ParsedRoutingSource {
+                source_id: "tel_as_ai".to_string(),
+                target: RoutingTarget::Ai,
+                lineage: "tel".to_string(),
+                weight: 90,
+                rules: telemetry_rules,
+            },
+            ParsedRoutingSource {
                 source_id: "p".to_string(),
                 target: RoutingTarget::Proxy,
                 lineage: "p".to_string(),
@@ -899,24 +1072,50 @@ proptest! {
             },
         ];
 
-        let compiled = compile_routing(
-            &sources,
+        let split = compile_routing(
+            &split_sources,
             &overrides,
             &AdblockOverrides::empty(),
             RoutingSourceCounts::default(),
         );
-        let dir = tempdir().unwrap();
-        fs::write(dir.path().join("Direct.list"), &compiled.direct_text).unwrap();
-        fs::write(dir.path().join("AI.list"), &compiled.ai_text).unwrap();
-        fs::write(dir.path().join("Proxy.list"), &compiled.proxy_text).unwrap();
+        let unified = compile_routing(
+            &unified_sources,
+            &overrides,
+            &AdblockOverrides::empty(),
+            RoutingSourceCounts::default(),
+        );
 
-        prop_assert!(verify_routing_dir(dir.path(), &overrides, 0, 0, 0, false).is_ok());
+        let ai_set = rule_lines(&split.ai_text);
+        let pay_set = rule_lines(&split.payment_text);
+        let tel_set = rule_lines(&split.telemetry_text);
+        let unified_set = rule_lines(&unified.ai_text);
+
+        // Pairwise disjointness of emitted lines
+        prop_assert!(ai_set.is_disjoint(&pay_set));
+        prop_assert!(ai_set.is_disjoint(&tel_set));
+        prop_assert!(pay_set.is_disjoint(&tel_set));
+        prop_assert_eq!(ai_set.len() + pay_set.len() + tel_set.len(), unified_set.len());
+
+        // Union of the 3 split rule sets equals 100% of the unified rule set
+        let mut union_set = ai_set;
+        union_set.extend(pay_set);
+        union_set.extend(tel_set);
+        prop_assert_eq!(union_set, unified_set);
+
+        // Direct.list and Proxy.list remain 100% unchanged
+        prop_assert_eq!(rule_lines(&split.direct_text), rule_lines(&unified.direct_text));
+        prop_assert_eq!(rule_lines(&split.proxy_text), rule_lines(&unified.proxy_text));
+
+        let dir = tempdir().unwrap();
+        write_compiled_dir(dir.path(), &split);
+        prop_assert!(verify_routing_dir(dir.path(), &overrides, RoutingThresholds::default(), false).is_ok());
     }
 
     #[test]
     fn prop_ai_never_captures_shared_infra_apexes(
         extra_rules in prop::collection::vec(arb_routing_rule(), 0..15),
         shared_idx in 0usize..6,
+        target_idx in 0usize..3,
         forced in any::<bool>(),
     ) {
         let shared_roots = [
@@ -927,7 +1126,13 @@ proptest! {
             "azure.com",
             "apple.com",
         ];
+        let clean_targets = [
+            RoutingTarget::Ai,
+            RoutingTarget::Payment,
+            RoutingTarget::Telemetry,
+        ];
         let picked = shared_roots[shared_idx];
+        let chosen_target = clean_targets[target_idx];
         let overrides = RoutingOverrides {
             schema_version: 1,
             shared_infra_roots: shared_roots
@@ -939,7 +1144,7 @@ proptest! {
                 .collect(),
             force_entries: if forced {
                 vec![RoutingRuleOverride {
-                    target: RoutingTarget::Ai,
+                    target: chosen_target,
                     kind: RoutingRuleKind::DomainSuffix,
                     value: picked.to_string(),
                     extended_matching: false,
@@ -951,22 +1156,22 @@ proptest! {
             exclude_entries: Vec::new(),
         };
 
-        let mut ai_rules = extra_rules;
-        ai_rules.push(rule(RoutingRuleKind::DomainSuffix, picked, false));
-        ai_rules.push(rule(RoutingRuleKind::Domain, picked, false));
-        ai_rules.push(rule(
+        let mut clean_rules = extra_rules;
+        clean_rules.push(rule(RoutingRuleKind::DomainSuffix, picked, false));
+        clean_rules.push(rule(RoutingRuleKind::Domain, picked, false));
+        clean_rules.push(rule(
             RoutingRuleKind::DomainWildcard,
             &format!("*.{}", picked),
             false,
         ));
-        ai_rules.push(rule(RoutingRuleKind::DomainKeyword, "amazon", false));
+        clean_rules.push(rule(RoutingRuleKind::DomainKeyword, "amazon", false));
 
         let sources = vec![ParsedRoutingSource {
-            source_id: "ai".to_string(),
-            target: RoutingTarget::Ai,
-            lineage: "ai".to_string(),
+            source_id: "clean".to_string(),
+            target: chosen_target,
+            lineage: "clean".to_string(),
             weight: 95,
-            rules: ai_rules,
+            rules: clean_rules,
         }];
 
         let compiled = compile_routing(
@@ -976,11 +1181,9 @@ proptest! {
             RoutingSourceCounts::default(),
         );
         let dir = tempdir().unwrap();
-        fs::write(dir.path().join("Direct.list"), &compiled.direct_text).unwrap();
-        fs::write(dir.path().join("AI.list"), &compiled.ai_text).unwrap();
-        fs::write(dir.path().join("Proxy.list"), &compiled.proxy_text).unwrap();
+        write_compiled_dir(dir.path(), &compiled);
 
-        prop_assert!(verify_routing_dir(dir.path(), &overrides, 0, 0, 0, false).is_ok());
+        prop_assert!(verify_routing_dir(dir.path(), &overrides, RoutingThresholds::default(), false).is_ok());
     }
 
     #[test]
@@ -1042,10 +1245,8 @@ proptest! {
         }
 
         let dir = tempdir().unwrap();
-        fs::write(dir.path().join("Direct.list"), &compiled.direct_text).unwrap();
-        fs::write(dir.path().join("AI.list"), &compiled.ai_text).unwrap();
-        fs::write(dir.path().join("Proxy.list"), &compiled.proxy_text).unwrap();
-        prop_assert!(verify_routing_dir(dir.path(), &overrides, 0, 0, 0, false).is_ok());
+        write_compiled_dir(dir.path(), &compiled);
+        prop_assert!(verify_routing_dir(dir.path(), &overrides, RoutingThresholds::default(), false).is_ok());
     }
 
     #[test]

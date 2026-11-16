@@ -129,16 +129,7 @@ jobs:
       - name: Verify generated MMDB artifacts
         run: cargo run --release -- geoip verify --dir dist
 
-      - name: Build Adblock RULE-SET & Surge Module
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUST_LOG: info
-        run: cargo run --release -- adblock build --max-cache-age-secs 300 --output dist
-
-      - name: Verify generated Adblock artifacts
-        run: cargo run --release -- adblock verify --dir dist
-
-      - name: Build Routing RULE-SETs (Direct.list, AI.list, Proxy.list)
+      - name: Build Routing RULE-SETs (Direct.list, AI.list, Payment.list, Telemetry.list, Proxy.list)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUST_LOG: info
@@ -147,9 +138,18 @@ jobs:
       - name: Verify generated Routing artifacts
         run: cargo run --release -- routing verify --dir dist
 
-      - name: Combine release notes and validate all 9 artifacts
+      - name: Build Adblock & Privacy RULE-SETs (Adblock.list, Privacy.list) & Surge Module
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUST_LOG: info
+        run: cargo run --release -- adblock build --max-cache-age-secs 300 --output dist
+
+      - name: Verify generated Adblock & Privacy artifacts
+        run: cargo run --release -- adblock verify --dir dist
+
+      - name: Combine release notes and validate all 12 artifacts
         run: |
-          for f in Country.mmdb Country-only.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Adblock.sgmodule Direct.list AI.list Proxy.list; do
+          for f in Country.mmdb Country-only.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Privacy.list Adblock.sgmodule Direct.list AI.list Payment.list Telemetry.list Proxy.list; do
             test -s "dist/${f}"
           done
           {
@@ -188,7 +188,7 @@ jobs:
               --cache-control "${4}" \
               --only-show-errors
           }
-          ARTIFACTS=(Country.mmdb Country-only.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Adblock.sgmodule Direct.list AI.list Proxy.list)
+          ARTIFACTS=(Country.mmdb Country-only.mmdb Country-cn.mmdb ASN.mmdb Adblock.list Privacy.list Adblock.sgmodule Direct.list AI.list Payment.list Telemetry.list Proxy.list)
           for f in "${ARTIFACTS[@]}"; do
             case "${f}" in
               *.mmdb) r2_put "dist/${f}" "${f}" "application/octet-stream" "public, max-age=3600, stale-while-revalidate=86400" ;;
@@ -222,9 +222,12 @@ jobs:
             dist/Country-cn.mmdb
             dist/ASN.mmdb
             dist/Adblock.list
+            dist/Privacy.list
             dist/Adblock.sgmodule
             dist/Direct.list
             dist/AI.list
+            dist/Payment.list
+            dist/Telemetry.list
             dist/Proxy.list
 
       - name: Prune older GitHub Releases and tags (retain latest 1)

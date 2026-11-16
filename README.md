@@ -13,10 +13,13 @@
 | `Country-cn.mmdb` | 中国大陆（`CN`）专属双栈 GeoIP 库 | [Country-cn.mmdb](https://rule-set.ygxz.de/Country-cn.mmdb) |
 | `ASN.mmdb` | 全球公网自治系统（ASN）库 | [ASN.mmdb](https://rule-set.ygxz.de/ASN.mmdb) |
 | `Adblock.sgmodule` | 去广告与隐私净化模块（重写、脚本、Map Local 与 HTTPDNS 拦截） | [Adblock.sgmodule](https://rule-set.ygxz.de/Adblock.sgmodule) · <kbd>[一键导入](https://rule-set.ygxz.de/install.html)</kbd> |
-| `Adblock.list` | 广告与跟踪域名/IP 兜底拦截规则集 | [Adblock.list](https://rule-set.ygxz.de/Adblock.list) |
+| `Adblock.list` | 广告网络、恶意软件、钓鱼诈骗与挖矿域名/IP 拦截规则集 | [Adblock.list](https://rule-set.ygxz.de/Adblock.list) |
+| `Privacy.list` | 隐私跟踪、统计分析、CNAME 伪装与设备遥测拦截规则集 | [Privacy.list](https://rule-set.ygxz.de/Privacy.list) |
 | `Direct.list` | 中国大陆服务、国内流媒体、国产 AI 及境外服务国内 CDN 直连规则集 | [Direct.list](https://rule-set.ygxz.de/Direct.list) |
-| `AI.list` | 境外 AI、境外银行支付、PayPal、风控与遥测规则集 | [AI.list](https://rule-set.ygxz.de/AI.list) |
-| `Proxy.list` | 境外服务与海外流媒体全量代理规则集（已包含 `AI.list`） | [Proxy.list](https://rule-set.ygxz.de/Proxy.list) |
+| `AI.list` | 境外 AI 应用、模型 API、Coding Agent 与 Apple Intelligence 规则集 | [AI.list](https://rule-set.ygxz.de/AI.list) |
+| `Payment.list` | 境外银行、支付网关（PayPal / Stripe）、卡组织与券商规则集 | [Payment.list](https://rule-set.ygxz.de/Payment.list) |
+| `Telemetry.list` | 境外风控反欺诈、人机验证（CAPTCHA）与系统遥测规则集 | [Telemetry.list](https://rule-set.ygxz.de/Telemetry.list) |
+| `Proxy.list` | 境外服务与海外流媒体全量代理规则集（已包含 `AI.list`、`Payment.list`、`Telemetry.list`） | [Proxy.list](https://rule-set.ygxz.de/Proxy.list) |
 
 ## Surge 配置示例
 
@@ -29,8 +32,11 @@ disable-geoip-db-auto-update = false
 
 [Rule]
 RULE-SET,https://rule-set.ygxz.de/Adblock.list,REJECT,extended-matching
+RULE-SET,https://rule-set.ygxz.de/Privacy.list,REJECT,extended-matching
 RULE-SET,https://rule-set.ygxz.de/Direct.list,DIRECT
 RULE-SET,https://rule-set.ygxz.de/AI.list,AI,extended-matching
+RULE-SET,https://rule-set.ygxz.de/Payment.list,Payment,extended-matching
+RULE-SET,https://rule-set.ygxz.de/Telemetry.list,Telemetry,extended-matching
 RULE-SET,https://rule-set.ygxz.de/Proxy.list,Proxy
 GEOIP,CN,DIRECT
 FINAL,Proxy,dns-failed
@@ -42,7 +48,7 @@ FINAL,Proxy,dns-failed
 
 <!-- sources:start -->
 <details>
-<summary>去广告模块与高级重写数据源（共 24 项）</summary>
+<summary>去广告模块与高级重写数据源（Adblock.sgmodule）（共 24 项）</summary>
 
 ```text
 app2smile YouTube Adblock Module, https://raw.githubusercontent.com/app2smile/rules/master/module/youtube.sgmodule
@@ -74,21 +80,17 @@ fmz200 Wool Scripts BlockAds Module, https://raw.githubusercontent.com/fmz200/wo
 </details>
 
 <details>
-<summary>去广告与隐私安全拦截数据源（共 164 项）</summary>
+<summary>广告与安全威胁拦截数据源（Adblock.list）（共 134 项）</summary>
 
 ```text
 AdGuard Mobile Ads Filter (CoreLibs), https://filters.adtidy.org/windows/filters/11.txt
 AdGuard Base Filter (CoreLibs), https://filters.adtidy.org/windows/filters/2.txt
 AdGuard Chinese Filter (CoreLibs), https://filters.adtidy.org/windows/filters/224.txt
-AdGuard Tracking Protection Filter (CoreLibs), https://filters.adtidy.org/windows/filters/3.txt
-AdGuard Social Media Filter (CoreLibs), https://filters.adtidy.org/windows/filters/4.txt
 AdGuard Annoyances Filter (CoreLibs Combined 18-22), https://filters.adtidy.org/windows/filters/14.txt
 AdGuard Online Malicious URL Blocklist (CoreLibs), https://filters.adtidy.org/windows/filters/208.txt
 AdGuard DNS Filter, https://filters.adtidy.org/windows/filters/15.txt
 AdGuard DNS Popup Hosts Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_59.txt
 AdGuard CNAME Disguised Ads List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_ads.txt
-AdGuard CNAME Disguised Trackers List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_trackers.txt
-AdGuard CNAME Disguised Clickthroughs List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_clickthroughs.txt
 AdGuard Japanese Filter (CoreLibs), https://filters.adtidy.org/windows/filters/7.txt
 List-KR Korean Filter (AdGuard CoreLibs), https://filters.adtidy.org/windows/filters/227.txt
 AdGuard German Filter (CoreLibs), https://filters.adtidy.org/windows/filters/6.txt
@@ -101,17 +103,14 @@ AdGuard Ukrainian Filter (CoreLibs), https://filters.adtidy.org/windows/filters/
 AdGuard Italian Filter (CoreLibs), https://filters.adtidy.org/windows/filters/26.txt
 AdGuard Polish Filter (CoreLibs), https://filters.adtidy.org/windows/filters/27.txt
 uBlock Origin Built-in Filters (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/filters.min.txt
-uBlock Origin Privacy Filters (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt
 uBlock Origin Badware Risks (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/badware.min.txt
 uBlock Origin Resource Abuse Filter, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt
 uBlock Origin Cookie Notices Filter, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/annoyances-cookies.txt
 uBlock Origin Annoyances Filter, https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/annoyances-others.txt
 Brave First-Party Adblock Filters, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty.txt
 Brave First-Party Regional Adblock Filters, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-regional.txt
-Brave First-Party CNAME Cloaking Trackers, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-cname.txt
 Brave Specific Adblock Rules, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-specific.txt
 Brave iOS Specific Adblock Rules, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-ios-specific.txt
-EasyPrivacy Official, https://easylist.to/easylist/easyprivacy.txt
 EasyList Official, https://easylist.to/easylist/easylist.txt
 EasyList China, https://raw.githubusercontent.com/easylist/easylistchina/master/easylistchina.txt
 Fanboy's Annoyance List, https://secure.fanboy.co.nz/fanboy-annoyance.txt
@@ -143,25 +142,10 @@ HaGeZi Anti-Pop-Up Ads Blocklist, https://raw.githubusercontent.com/hagezi/dns-b
 HaGeZi Fake Stores & Scam Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/fake.txt
 HaGeZi Badware Hoster Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/hoster.txt
 HaGeZi Threat Intelligence Feeds (Full), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt
-HaGeZi Native Referral Tracker Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/blocklist-referral-native.txt
-HaGeZi Native Tracker Blocklist (Apple), https://adguardteam.github.io/HostlistsRegistry/assets/filter_67.txt
-HaGeZi Native Tracker Blocklist (Xiaomi), https://adguardteam.github.io/HostlistsRegistry/assets/filter_60.txt
-HaGeZi Native Tracker Blocklist (Huawei), https://adguardteam.github.io/HostlistsRegistry/assets/filter_73.txt
-HaGeZi Native Tracker Blocklist (OPPO & Realme), https://adguardteam.github.io/HostlistsRegistry/assets/filter_66.txt
-HaGeZi Native Tracker Blocklist (vivo), https://adguardteam.github.io/HostlistsRegistry/assets/filter_65.txt
-HaGeZi Native Tracker Blocklist (Samsung), https://adguardteam.github.io/HostlistsRegistry/assets/filter_61.txt
-HaGeZi Native Tracker Blocklist (Windows & Office), https://adguardteam.github.io/HostlistsRegistry/assets/filter_63.txt
-HaGeZi Native Tracker Blocklist (TikTok Extended), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.extended.txt
-HaGeZi Native Tracker Blocklist (Amazon), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.amazon.txt
-HaGeZi Native Tracker Blocklist (LG webOS), https://adguardteam.github.io/HostlistsRegistry/assets/filter_72.txt
-HaGeZi Native Tracker Blocklist (Roku), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.roku.txt
 OISD Blocklist Big, https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt
 1Hosts (Xtra), https://raw.githubusercontent.com/badmojr/1Hosts/master/Xtra/adblock.txt
 hBlock Unified Ad · Tracking & Malware Domains, https://hblock.molinero.dev/hosts_domains.txt
 NEO DEV HOST Adblocker, https://raw.githubusercontent.com/neodevpro/neodevhost/master/adblocker
-Frogeye First-Party Trackers Hosts, https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt
-Frogeye Multi-Party Trackers Hosts, https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt
-Quidsup NoTrack Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-blocklist.txt
 Quidsup NoTrack Malware Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-malware.txt
 wBlock Ad and Tracking Hosts, https://raw.githubusercontent.com/0xCUB3/wBlock/main/filters/ad-tracking-hosts.txt
 KADhosts Polish Ad & Fraud Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_14.txt
@@ -176,18 +160,11 @@ Dandelion Sprout Game Console Adblock List, https://adguardteam.github.io/Hostli
 Perflyst & Dandelion Sprout Smart-TV Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_7.txt
 Dandelion Sprout Anti Push Notifications, https://adguardteam.github.io/HostlistsRegistry/assets/filter_39.txt
 celenityy BadBlock Ad & Tracking Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/badblock.txt
-celenityy BadBlock Click-Tracking Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/click-tracking.txt
-celenityy BadBlock Data Brokers Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/data-brokers.txt
-Yokoffing Click2Load Filter, https://raw.githubusercontent.com/yokoffing/filterlists/main/click2load.txt
-Yokoffing Privacy Essentials, https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt
 Suurp Crypto Faucet & Scam Ad Filter, https://raw.githubusercontent.com/Suurp/uBlock-CustomFilters/main/filters-faucets.txt
 Suurp Monetized Ad-Shortlink Filter, https://raw.githubusercontent.com/Suurp/uBlock-CustomFilters/main/filters-shortlinks.txt
 NoCoin Cryptomining Filter List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_8.txt
 zachlagden Custom Advertising Domains, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/advertising.txt
-zachlagden Custom Tracking Domains, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/tracking.txt
-ShadowWhisperer Tracking List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_69.txt
 ShadowWhisperer Malware List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_42.txt
-AssoEchap Stalkerware Indicators List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_31.txt
 DurableNapkin Scam Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_10.txt
 Dandelion Sprout Anti-Malware List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_12.txt
 abuse.ch URLHaus Malicious URL Blocklist, https://malware-filter.gitlab.io/malware-filter/urlhaus-filter-agh-online.txt
@@ -196,7 +173,6 @@ Phishing Army Extended Blocklist, https://phishing.army/download/phishing_army_b
 CERT Polska Malicious & Phishing Domains, https://adguardteam.github.io/HostlistsRegistry/assets/filter_41.txt
 PhishDestroy Content-Verified Active Phishing Blocklist, https://raw.githubusercontent.com/phishdestroy/destroylist/main/dns/content_active.txt
 PhishIndex Malicious Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/Malicious%20Domains/adblock/phishindex_domains-adblock.txt
-PhishIndex IP Logger Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt
 PersianBlocker Regional Adblock Filter, https://adguardteam.github.io/HostlistsRegistry/assets/filter_19.txt
 Macedonian Pi-hole Adblock List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_20.txt
 turk-adlist Turkish DNS Blocklist, https://adguardteam.github.io/HostlistsRegistry/assets/filter_26.txt
@@ -246,7 +222,45 @@ RPiList Specials Phishing Blocklist, https://raw.githubusercontent.com/RPiList/s
 </details>
 
 <details>
-<summary>去广告防误伤白名单数据源（共 74 项）</summary>
+<summary>隐私跟踪与遥测拦截数据源（Privacy.list）（共 30 项）</summary>
+
+```text
+AdGuard Tracking Protection Filter (CoreLibs), https://filters.adtidy.org/windows/filters/3.txt
+AdGuard Social Media Filter (CoreLibs), https://filters.adtidy.org/windows/filters/4.txt
+AdGuard CNAME Disguised Trackers List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_trackers.txt
+AdGuard CNAME Disguised Clickthroughs List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_clickthroughs.txt
+uBlock Origin Privacy Filters (Pre-Expanded), https://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt
+Brave First-Party CNAME Cloaking Trackers, https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-cname.txt
+EasyPrivacy Official, https://easylist.to/easylist/easyprivacy.txt
+HaGeZi Native Referral Tracker Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/blocklist-referral-native.txt
+HaGeZi Native Tracker Blocklist (Apple), https://adguardteam.github.io/HostlistsRegistry/assets/filter_67.txt
+HaGeZi Native Tracker Blocklist (Xiaomi), https://adguardteam.github.io/HostlistsRegistry/assets/filter_60.txt
+HaGeZi Native Tracker Blocklist (Huawei), https://adguardteam.github.io/HostlistsRegistry/assets/filter_73.txt
+HaGeZi Native Tracker Blocklist (OPPO & Realme), https://adguardteam.github.io/HostlistsRegistry/assets/filter_66.txt
+HaGeZi Native Tracker Blocklist (vivo), https://adguardteam.github.io/HostlistsRegistry/assets/filter_65.txt
+HaGeZi Native Tracker Blocklist (Samsung), https://adguardteam.github.io/HostlistsRegistry/assets/filter_61.txt
+HaGeZi Native Tracker Blocklist (Windows & Office), https://adguardteam.github.io/HostlistsRegistry/assets/filter_63.txt
+HaGeZi Native Tracker Blocklist (TikTok Extended), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.extended.txt
+HaGeZi Native Tracker Blocklist (Amazon), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.amazon.txt
+HaGeZi Native Tracker Blocklist (LG webOS), https://adguardteam.github.io/HostlistsRegistry/assets/filter_72.txt
+HaGeZi Native Tracker Blocklist (Roku), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.roku.txt
+Frogeye First-Party Trackers Hosts, https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt
+Frogeye Multi-Party Trackers Hosts, https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt
+Quidsup NoTrack Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-blocklist.txt
+celenityy BadBlock Click-Tracking Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/click-tracking.txt
+celenityy BadBlock Data Brokers Filter, https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/data-brokers.txt
+Yokoffing Click2Load Filter, https://raw.githubusercontent.com/yokoffing/filterlists/main/click2load.txt
+Yokoffing Privacy Essentials, https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt
+zachlagden Custom Tracking Domains, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/tracking.txt
+ShadowWhisperer Tracking List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_69.txt
+AssoEchap Stalkerware Indicators List, https://adguardteam.github.io/HostlistsRegistry/assets/filter_31.txt
+PhishIndex IP Logger Domains, https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt
+```
+
+</details>
+
+<details>
+<summary>去广告与隐私防误伤白名单数据源（共 74 项）</summary>
 
 ```text
 uBlock Origin Unbreak Allowlist, https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt
@@ -404,7 +418,7 @@ MetaCubeX category-number-verification-cn (Carrier SIM Auth), https://raw.github
 </details>
 
 <details>
-<summary>境外 AI、支付与风控数据源（AI.list）（共 72 项）</summary>
+<summary>境外 AI 应用数据源（AI.list）（共 47 项）</summary>
 
 ```text
 VPSDance ai-proxy-rules Global AI, https://raw.githubusercontent.com/VPSDance/ai-proxy-rules/main/rules/surge/global.list
@@ -429,14 +443,6 @@ max1874 funnysurge Apple Intelligence rules, https://raw.githubusercontent.com/m
 blankmagic Surge AI list, https://raw.githubusercontent.com/blankmagic/Surge/main/rule/ai.list
 ACL4SSR AI ruleset, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AI.list
 Repcz Tool AI Surge ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/AI.list
-MetaCubeX paypal, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal.list
-MetaCubeX stripe, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/stripe.list
-MetaCubeX wise, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wise.list
-MetaCubeX hsbc, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hsbc.list
-MetaCubeX visa, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/visa.list
-MetaCubeX mastercard, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/mastercard.list
-MetaCubeX intuit, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/intuit.list
-MetaCubeX hcaptcha, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hcaptcha.list
 TannayeJ AI Global Vendor Rules, https://raw.githubusercontent.com/TannayeJ/ai-vendor-rules/main/generated/clash/all-ai-global.yaml
 NSZA156 Surge GeoX category-ai-!cn, https://raw.githubusercontent.com/NSZA156/surge-geox-rules/release/geo/geosite/category-ai-!cn.conf
 qianchongyang OpenClash AI Rules, https://raw.githubusercontent.com/qianchongyang/openclash-ai-rules/main/Rules/AI.list
@@ -459,6 +465,24 @@ MetaCubeX elevenlabs, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat
 MetaCubeX huggingface, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/huggingface.list
 itdoginfo Google AI & Gemini Regional Bypass Domains, https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Services/google_ai.lst
 UT1 Toulouse University AI Domains (Repurposed as AI Inventory), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/ai/domains
+MetaCubeX category-ai-!cn@telemetry (AI Attestation & Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ai-%21cn%40telemetry.list
+MetaCubeX openai@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/openai%40telemetry.list
+MetaCubeX anthropic@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic%40telemetry.list
+```
+
+</details>
+
+<details>
+<summary>境外银行与支付数据源（Payment.list）（共 20 项）</summary>
+
+```text
+MetaCubeX paypal, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal.list
+MetaCubeX stripe, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/stripe.list
+MetaCubeX wise, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wise.list
+MetaCubeX hsbc, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hsbc.list
+MetaCubeX visa, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/visa.list
+MetaCubeX mastercard, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/mastercard.list
+MetaCubeX intuit, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/intuit.list
 Repcz Tool PayPal Surge Ruleset, https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/PayPal.list
 MetaCubeX ibkr (Interactive Brokers), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/ibkr.list
 MetaCubeX schwab (Charles Schwab), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/schwab.list
@@ -471,20 +495,25 @@ MetaCubeX straitsx (Singapore Payment Gateway), https://raw.githubusercontent.co
 MetaCubeX category-finance (Overseas Finance & Exchanges), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-finance.list
 UT1 Toulouse University Global Banking Inventory (Repurposed), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bank/domains
 UT1 Toulouse University Global Financial Inventory (Repurposed), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/financial/domains
+MetaCubeX paypal@telemetry (PayPal Risk & Device Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal%40telemetry.list
+```
+
+</details>
+
+<details>
+<summary>境外风控与遥测数据源（Telemetry.list）（共 4 项）</summary>
+
+```text
+MetaCubeX hcaptcha, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hcaptcha.list
 MetaCubeX category-ip-geo-detect (IP Risk & Geo Scoring), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ip-geo-detect.list
 BadBlock CAPTCHA Verification Allowlist (Repurposed for Risk-Control), https://raw.githubusercontent.com/celenityy/BadBlock/pages/wildcards-no-star/captcha_whitelist.txt
-MetaCubeX category-password-management (Passkey & Vault Sync), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list
-MetaCubeX category-ai-!cn@telemetry (AI Attestation & Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ai-%21cn%40telemetry.list
-MetaCubeX openai@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/openai%40telemetry.list
-MetaCubeX anthropic@telemetry, https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/anthropic%40telemetry.list
-MetaCubeX paypal@telemetry (PayPal Risk & Device Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal%40telemetry.list
 MetaCubeX category-telemetry (Overseas OS & SDK Telemetry), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-telemetry.list
 ```
 
 </details>
 
 <details>
-<summary>境外代理与流媒体数据源（Proxy.list）（共 125 项）</summary>
+<summary>境外代理与流媒体数据源（Proxy.list）（共 126 项）</summary>
 
 ```text
 Loyalsoldier surge-rules proxy ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/proxy.txt
@@ -612,6 +641,7 @@ Sinfonietta Gambling Hosts Inventory, https://raw.githubusercontent.com/Sinfonie
 Sinfonietta Adult Media Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts
 Sinfonietta Global Social Media Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/social-hosts
 hostsVN Overseas Gambling Extension, https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/gambling/hosts
+MetaCubeX category-password-management (Passkey & Vault Sync), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list
 ```
 
 </details>

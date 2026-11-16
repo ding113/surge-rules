@@ -9,7 +9,7 @@ use surge_rules::adblock::verify::verify_adblock_dir;
 use surge_rules::adblock::{BuildAdblockOptions, build_adblock_pipeline};
 use surge_rules::fetch::FetchOptions;
 use surge_rules::routing::config::RoutingOverrides;
-use surge_rules::routing::verify::verify_routing_dir;
+use surge_rules::routing::verify::{RoutingThresholds, verify_routing_dir};
 use surge_rules::routing::{BuildRoutingOptions, build_routing_pipeline};
 use surge_rules::verify::verify_artifact_dir;
 use surge_rules::{BuildGeoIpOptions, build_geoip_pipeline, inspect_ip_in_dir};
@@ -32,12 +32,12 @@ enum TopCommand {
         #[command(subcommand)]
         action: GeoipCommand,
     },
-    /// Build or verify Surge Adblock RULE-SET (Adblock.list) and Module (Adblock.sgmodule)
+    /// Build or verify Surge Adblock & Privacy RULE-SETs (Adblock.list, Privacy.list) and Module (Adblock.sgmodule)
     Adblock {
         #[command(subcommand)]
         action: AdblockCommand,
     },
-    /// Build or verify Surge Routing RULE-SETs (Direct.list, AI.list, Proxy.list)
+    /// Build or verify Surge Routing RULE-SETs (Direct.list, AI.list, Payment.list, Telemetry.list, Proxy.list)
     Routing {
         #[command(subcommand)]
         action: RoutingCommand,
@@ -46,7 +46,7 @@ enum TopCommand {
 
 #[derive(Subcommand)]
 enum RoutingCommand {
-    /// Fetch upstream routing feeds, compile Direct.list/AI.list/Proxy.list, and run verification
+    /// Fetch upstream routing feeds, compile Direct/AI/Payment/Telemetry/Proxy RULE-SETs, and run verification
     Build {
         #[arg(long, default_value = "sources/generated/routing-sources.json")]
         catalog: PathBuf,
@@ -65,7 +65,7 @@ enum RoutingCommand {
         #[arg(long, default_value_t = 1800)]
         max_cache_age_secs: u64,
     },
-    /// Verify generated Direct.list, AI.list, and Proxy.list in a directory
+    /// Verify generated Direct.list, AI.list, Payment.list, Telemetry.list, and Proxy.list in a directory
     Verify {
         #[arg(long, default_value = "dist")]
         dir: PathBuf,
@@ -75,6 +75,10 @@ enum RoutingCommand {
         min_direct_lines: usize,
         #[arg(long, default_value_t = 200)]
         min_ai_lines: usize,
+        #[arg(long, default_value_t = 200)]
+        min_payment_lines: usize,
+        #[arg(long, default_value_t = 100)]
+        min_telemetry_lines: usize,
         #[arg(long, default_value_t = 5_000)]
         min_proxy_lines: usize,
     },
@@ -82,7 +86,7 @@ enum RoutingCommand {
 
 #[derive(Subcommand)]
 enum AdblockCommand {
-    /// Fetch upstream adblock/module feeds, compile Surge RULE-SET and Module, and run verification
+    /// Fetch upstream adblock/module feeds, compile Adblock.list, Privacy.list, and Adblock.sgmodule, and run verification
     Build {
         #[arg(long, default_value = "sources/generated/adblock-sources.json")]
         catalog: PathBuf,
@@ -99,7 +103,7 @@ enum AdblockCommand {
         #[arg(long, default_value_t = 1800)]
         max_cache_age_secs: u64,
     },
-    /// Verify generated Adblock.list and Adblock.sgmodule in a directory
+    /// Verify generated Adblock.list, Privacy.list, and Adblock.sgmodule in a directory
     Verify {
         #[arg(long, default_value = "dist")]
         dir: PathBuf,
@@ -107,6 +111,8 @@ enum AdblockCommand {
         overrides: PathBuf,
         #[arg(long, default_value_t = 10_000)]
         min_ruleset_lines: usize,
+        #[arg(long, default_value_t = 2_000)]
+        min_privacy_lines: usize,
     },
 }
 
@@ -235,13 +241,17 @@ async fn main() -> Result<()> {
                         timeout_secs: 120,
                     },
                     min_ruleset_lines: 10_000,
+                    min_privacy_lines: 2_000,
                 };
                 let report = build_adblock_pipeline(opts).await?;
                 println!(
-                    "Built and verified {} ({} rules, {} B), {} ({} scripts, {} MITM hosts, {} B) [{} canaries passed]",
+                    "Built and verified {} ({} rules, {} B), {} ({} rules, {} B), {} ({} scripts, {} MITM hosts, {} B) [{} canaries passed]",
                     report.ruleset.file_name,
                     report.ruleset_total,
                     report.ruleset.size_bytes,
+                    report.privacy_ruleset.file_name,
+                    report.privacy_ruleset_total,
+                    report.privacy_ruleset.size_bytes,
                     report.module.file_name,
                     report.module_scripts,
                     report.module_mitm_hosts,
@@ -253,13 +263,16 @@ async fn main() -> Result<()> {
                 dir,
                 overrides,
                 min_ruleset_lines,
+                min_privacy_lines,
             } => {
                 let ov = AdblockOverrides::load_from_path(&overrides)?;
-                let report = verify_adblock_dir(&dir, &ov, min_ruleset_lines)?;
+                let report = verify_adblock_dir(&dir, &ov, min_ruleset_lines, min_privacy_lines)?;
                 println!(
-                    "Verified {} ({} rules), {} ({} scripts, {} MITM hosts) [{} canaries passed]",
+                    "Verified {} ({} rules), {} ({} rules), {} ({} scripts, {} MITM hosts) [{} canaries passed]",
                     report.ruleset.file_name,
                     report.ruleset_total,
+                    report.privacy_ruleset.file_name,
+                    report.privacy_ruleset_total,
                     report.module.file_name,
                     report.module_scripts,
                     report.module_mitm_hosts,
@@ -294,13 +307,19 @@ async fn main() -> Result<()> {
                 };
                 let report = build_routing_pipeline(opts).await?;
                 println!(
-                    "Built and verified {} ({} rules, {} B), {} ({} rules, {} B), {} ({} rules, {} B) [{} canaries passed]",
+                    "Built and verified {} ({} rules, {} B), {} ({} rules, {} B), {} ({} rules, {} B), {} ({} rules, {} B), {} ({} rules, {} B) [{} canaries passed]",
                     report.direct.file_name,
                     report.direct_total,
                     report.direct.size_bytes,
                     report.ai.file_name,
                     report.ai_total,
                     report.ai.size_bytes,
+                    report.payment.file_name,
+                    report.payment_total,
+                    report.payment.size_bytes,
+                    report.telemetry.file_name,
+                    report.telemetry_total,
+                    report.telemetry.size_bytes,
                     report.proxy.file_name,
                     report.proxy_total,
                     report.proxy.size_bytes,
@@ -312,23 +331,33 @@ async fn main() -> Result<()> {
                 overrides,
                 min_direct_lines,
                 min_ai_lines,
+                min_payment_lines,
+                min_telemetry_lines,
                 min_proxy_lines,
             } => {
                 let ov = RoutingOverrides::load_from_path(&overrides)?;
                 let report = verify_routing_dir(
                     &dir,
                     &ov,
-                    min_direct_lines,
-                    min_ai_lines,
-                    min_proxy_lines,
+                    RoutingThresholds {
+                        min_direct_lines,
+                        min_ai_lines,
+                        min_payment_lines,
+                        min_telemetry_lines,
+                        min_proxy_lines,
+                    },
                     true,
                 )?;
                 println!(
-                    "Verified {} ({} rules), {} ({} rules), {} ({} rules) [{} canaries passed]",
+                    "Verified {} ({} rules), {} ({} rules), {} ({} rules), {} ({} rules), {} ({} rules) [{} canaries passed]",
                     report.direct.file_name,
                     report.direct_total,
                     report.ai.file_name,
                     report.ai_total,
+                    report.payment.file_name,
+                    report.payment_total,
+                    report.telemetry.file_name,
+                    report.telemetry_total,
                     report.proxy.file_name,
                     report.proxy_total,
                     report.canaries_checked

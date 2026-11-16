@@ -9,8 +9,11 @@ const ARTIFACT_NAMES = [
   "ASN.mmdb",
   "Adblock.sgmodule",
   "Adblock.list",
+  "Privacy.list",
   "Direct.list",
   "AI.list",
+  "Payment.list",
+  "Telemetry.list",
   "Proxy.list",
 ] as const;
 

@@ -15,7 +15,7 @@ describe("build-release-meta", () => {
     expect(escaped).toContain("&lt;test&gt;&amp;&quot;&apos;");
   });
 
-  it("writes updated-at.svg, build-meta.json, and release README.md for all 9 artifacts", async () => {
+  it("writes updated-at.svg, build-meta.json, and release README.md for all 12 artifacts", async () => {
     const root = await mkdtemp(join(tmpdir(), "surge-release-meta-"));
     try {
       const distDir = join(root, "dist");
@@ -32,8 +32,11 @@ describe("build-release-meta", () => {
         "ASN.mmdb",
         "Adblock.sgmodule",
         "Adblock.list",
+        "Privacy.list",
         "Direct.list",
         "AI.list",
+        "Payment.list",
+        "Telemetry.list",
         "Proxy.list",
       ];
       for (const name of names) {
@@ -65,7 +68,7 @@ describe("build-release-meta", () => {
       };
       expect(meta.tag).toBe("release-20261116-0417");
       expect(meta.updatedAtCn).toBe("2026-11-16 12:17");
-      expect(meta.artifacts).toHaveLength(9);
+      expect(meta.artifacts).toHaveLength(12);
       expect(readme).toContain("# surge-rules (`release-20261116-0417`)");
       expect(readme).toContain("`7229121`");
       expect(readme).toContain("## Summary");

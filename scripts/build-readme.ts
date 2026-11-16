@@ -241,26 +241,41 @@ async function main(): Promise<void> {
   const complexLines = formatNamedEntries(
     adblock.sources.filter((s) => s.role === "complex_first"),
   );
-  const rulesetLines = formatNamedEntries(
-    adblock.sources.filter((s) => s.role === "ruleset_fallback"),
+  const adRulesetLines = formatNamedEntries(
+    adblock.sources.filter(
+      (s) => s.role === "ruleset_fallback" && (s.category === "ad" || s.category === "ad_mixed"),
+    ),
+  );
+  const privacyRulesetLines = formatNamedEntries(
+    adblock.sources.filter((s) => s.role === "ruleset_fallback" && s.category === "privacy"),
   );
   const allowlistLines = formatNamedEntries(adblock.sources.filter((s) => s.role === "allowlist"));
   const directLines = formatNamedEntries(routing.sources.filter((s) => s.target === "direct"));
   const aiLines = formatNamedEntries(routing.sources.filter((s) => s.target === "ai"));
+  const paymentLines = formatNamedEntries(routing.sources.filter((s) => s.target === "payment"));
+  const telemetryLines = formatNamedEntries(
+    routing.sources.filter((s) => s.target === "telemetry"),
+  );
   const proxyLines = formatNamedEntries(routing.sources.filter((s) => s.target === "proxy"));
   const geoLines = formatGeoIpAndMetadataEntries(geoip.sources);
 
   const renderedCatalog = [
     START_MARKER,
-    renderDetailsBlock("去广告模块与高级重写数据源", complexLines),
+    renderDetailsBlock("去广告模块与高级重写数据源（Adblock.sgmodule）", complexLines),
     "",
-    renderDetailsBlock("去广告与隐私安全拦截数据源", rulesetLines),
+    renderDetailsBlock("广告与安全威胁拦截数据源（Adblock.list）", adRulesetLines),
     "",
-    renderDetailsBlock("去广告防误伤白名单数据源", allowlistLines),
+    renderDetailsBlock("隐私跟踪与遥测拦截数据源（Privacy.list）", privacyRulesetLines),
+    "",
+    renderDetailsBlock("去广告与隐私防误伤白名单数据源", allowlistLines),
     "",
     renderDetailsBlock("国内直连分流数据源（Direct.list）", directLines),
     "",
-    renderDetailsBlock("境外 AI、支付与风控数据源（AI.list）", aiLines),
+    renderDetailsBlock("境外 AI 应用数据源（AI.list）", aiLines),
+    "",
+    renderDetailsBlock("境外银行与支付数据源（Payment.list）", paymentLines),
+    "",
+    renderDetailsBlock("境外风控与遥测数据源（Telemetry.list）", telemetryLines),
     "",
     renderDetailsBlock("境外代理与流媒体数据源（Proxy.list）", proxyLines),
     "",
@@ -283,10 +298,13 @@ async function main(): Promise<void> {
 
   const totalCount =
     complexLines.length +
-    rulesetLines.length +
+    adRulesetLines.length +
+    privacyRulesetLines.length +
     allowlistLines.length +
     directLines.length +
     aiLines.length +
+    paymentLines.length +
+    telemetryLines.length +
     proxyLines.length +
     geoLines.length;
 

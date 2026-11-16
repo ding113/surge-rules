@@ -11,6 +11,8 @@ export interface ProtectedApexDomainEntry {
   readonly rationale: string;
 }
 
+export type AdblockRuleTarget = "ad" | "privacy";
+
 export type ForceRuleSetKind =
   | "DOMAIN"
   | "DOMAIN-SUFFIX"
@@ -23,6 +25,7 @@ export type ForceRuleSetKind =
   | "PROCESS-NAME";
 
 export interface ForceRuleSetEntry {
+  readonly target: AdblockRuleTarget;
   readonly kind: ForceRuleSetKind;
   readonly value: string;
   readonly rationale: string;

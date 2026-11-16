@@ -9,8 +9,8 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 
 use crate::adblock::compiler::{
-    DomainTrie, overlaps_reserved_v4, overlaps_reserved_v6, overlaps_shared_cdn_or_dns_v4,
-    overlaps_shared_cdn_or_dns_v6,
+    DomainTrie, TelemetryProtectionSet, overlaps_reserved_v4, overlaps_reserved_v6,
+    overlaps_shared_cdn_or_dns_v4, overlaps_shared_cdn_or_dns_v6,
 };
 use crate::adblock::config::AdblockOverrides;
 use crate::adblock::model::{MAX_BINARY_SCRIPT_MAX_SIZE, MAX_SCRIPT_TIMEOUT_SECS};
@@ -30,9 +30,11 @@ pub struct AdblockFileSummary {
 #[derive(Clone, Debug, Serialize)]
 pub struct AdblockVerificationReport {
     pub ruleset: AdblockFileSummary,
+    pub privacy_ruleset: AdblockFileSummary,
     pub module: AdblockFileSummary,
     pub canaries_checked: usize,
     pub ruleset_total: usize,
+    pub privacy_ruleset_total: usize,
     pub module_scripts: usize,
     pub module_mitm_hosts: usize,
 }
@@ -40,9 +42,15 @@ pub struct AdblockVerificationReport {
 const PURE_AD_CANARIES: &[&str] = &[
     "doubleclick.net",
     "googlesyndication.com",
-    "app-measurement.com",
+    "pangolin-sdk-toutiao.com",
     "mobads.baidu.com",
     "pos.baidu.com",
+];
+
+const PRIVACY_TRACKER_CANARIES: &[&str] = &[
+    "app-measurement.com",
+    "scorecardresearch.com",
+    "hm.baidu.com",
 ];
 
 const BENIGN_PROTECTED_CANARIES: &[&str] = &[
@@ -73,21 +81,113 @@ const BENIGN_PROTECTED_CANARIES: &[&str] = &[
     "qq.com",
 ];
 
-/// Verifies `Adblock.list` and `Adblock.sgmodule` against official Surge syntax and protection invariants.
+struct VerifiedRuleset {
+    trie: DomainTrie,
+    total: usize,
+    lines: FxHashSet<String>,
+    domains: Vec<String>,
+    cidrs_v4: Vec<Ipv4Net>,
+    cidrs_v6: Vec<Ipv6Net>,
+}
+
+/// Verifies `Adblock.list`, `Privacy.list`, and `Adblock.sgmodule` against official Surge syntax,
+/// strict mutual disjointness (`Adblock.list ∩ Privacy.list = ∅`), and 4-tier protection invariants.
 pub fn verify_adblock_dir(
     dir: &Path,
     overrides: &AdblockOverrides,
     min_ruleset_lines: usize,
+    min_privacy_lines: usize,
 ) -> Result<AdblockVerificationReport> {
     let ruleset_path = dir.join("Adblock.list");
+    let privacy_path = dir.join("Privacy.list");
     let module_path = dir.join("Adblock.sgmodule");
 
     let ruleset_raw = fs::read_to_string(&ruleset_path)
         .with_context(|| format!("missing generated ruleset {}", ruleset_path.display()))?;
+    let privacy_raw = fs::read_to_string(&privacy_path)
+        .with_context(|| format!("missing generated ruleset {}", privacy_path.display()))?;
     let module_raw = fs::read_to_string(&module_path)
         .with_context(|| format!("missing generated module {}", module_path.display()))?;
 
-    let (domain_trie, ruleset_total) = verify_ruleset_text(&ruleset_raw, min_ruleset_lines)?;
+    let ad_verified = verify_ruleset_text("Adblock.list", &ruleset_raw, min_ruleset_lines)?;
+    let priv_verified = verify_ruleset_text("Privacy.list", &privacy_raw, min_privacy_lines)?;
+
+    // Enforce strict mutual disjointness across lines, domain hierarchies, and IPv4/IPv6 CIDRs
+    for line in &priv_verified.lines {
+        if ad_verified.lines.contains(line) {
+            bail!(
+                "Adblock.list and Privacy.list must be strictly disjoint, found shared rule '{}'",
+                line
+            );
+        }
+    }
+    for d in &priv_verified.domains {
+        if ad_verified.trie.matches_domain(d) {
+            bail!(
+                "Privacy.list domain '{}' overlaps with Adblock.list domain/suffix rule",
+                d
+            );
+        }
+    }
+    for d in &ad_verified.domains {
+        if priv_verified.trie.matches_domain(d) {
+            bail!(
+                "Adblock.list domain '{}' overlaps with Privacy.list domain/suffix rule",
+                d
+            );
+        }
+    }
+    verify_disjoint_cidrs_v4(&ad_verified.cidrs_v4, &priv_verified.cidrs_v4)?;
+    verify_disjoint_cidrs_v6(&ad_verified.cidrs_v6, &priv_verified.cidrs_v6)?;
+
+    // When Telemetry.list is present in the artifact directory, strictly enforce zero conflict
+    // between Telemetry.list and both Adblock.list and Privacy.list.
+    let telemetry_path = dir.join("Telemetry.list");
+    if telemetry_path.exists() {
+        let tel_raw = fs::read_to_string(&telemetry_path).with_context(|| {
+            format!(
+                "failed reading Telemetry.list at {}",
+                telemetry_path.display()
+            )
+        })?;
+        let tel_set = TelemetryProtectionSet::from_ruleset_text(&tel_raw);
+        let mut tel_trie = DomainTrie::default();
+        for d in &tel_set.exact_domains {
+            tel_trie.insert_exact(d);
+        }
+        for s in &tel_set.suffix_domains {
+            tel_trie.insert_suffix(s);
+        }
+        for d in tel_set
+            .exact_domains
+            .iter()
+            .chain(tel_set.suffix_domains.iter())
+        {
+            if ad_verified.trie.matches_domain(d) {
+                bail!(
+                    "Telemetry.list domain '{}' is conflicted/blocked by Adblock.list",
+                    d
+                );
+            }
+            if priv_verified.trie.matches_domain(d) {
+                bail!(
+                    "Telemetry.list domain '{}' is conflicted/blocked by Privacy.list",
+                    d
+                );
+            }
+        }
+        for d in &ad_verified.domains {
+            if tel_trie.matches_domain(d) {
+                bail!("Adblock.list domain '{}' conflicts with Telemetry.list", d);
+            }
+        }
+        for d in &priv_verified.domains {
+            if tel_trie.matches_domain(d) {
+                bail!("Privacy.list domain '{}' conflicts with Telemetry.list", d);
+            }
+        }
+    }
+
     let (module_scripts, module_mitm_hosts, mitm_exclusions_seen) =
         verify_module_text_inner(&module_raw)?;
 
@@ -103,19 +203,41 @@ pub fn verify_adblock_dir(
 
     let mut canaries_checked = 0usize;
     for ad in PURE_AD_CANARIES {
-        if min_ruleset_lines > 0 && !domain_trie.matches_domain(ad) {
+        if min_ruleset_lines > 0 && !ad_verified.trie.matches_domain(ad) {
             bail!(
                 "expected pure ad canary '{}' to be blocked by Adblock.list",
+                ad
+            );
+        }
+        if priv_verified.trie.matches_domain(ad) {
+            bail!(
+                "pure ad canary '{}' must belong to Adblock.list, not Privacy.list",
                 ad
             );
         }
         canaries_checked += 1;
     }
 
-    for benign in BENIGN_PROTECTED_CANARIES {
-        if domain_trie.matches_domain(benign) {
+    for tracker in PRIVACY_TRACKER_CANARIES {
+        if min_privacy_lines > 0 && !priv_verified.trie.matches_domain(tracker) {
             bail!(
-                "protected / first-party functional domain '{}' must NEVER be blocked by Adblock.list",
+                "expected privacy/tracker canary '{}' to be blocked by Privacy.list",
+                tracker
+            );
+        }
+        if ad_verified.trie.matches_domain(tracker) {
+            bail!(
+                "privacy/tracker canary '{}' must belong to Privacy.list, not Adblock.list",
+                tracker
+            );
+        }
+        canaries_checked += 1;
+    }
+
+    for benign in BENIGN_PROTECTED_CANARIES {
+        if ad_verified.trie.matches_domain(benign) || priv_verified.trie.matches_domain(benign) {
+            bail!(
+                "protected / first-party functional domain '{}' must NEVER be blocked by Adblock.list or Privacy.list",
                 benign
             );
         }
@@ -128,9 +250,9 @@ pub fn verify_adblock_dir(
             .trim()
             .trim_end_matches('.')
             .to_ascii_lowercase();
-        if domain_trie.matches_domain(&dom) {
+        if ad_verified.trie.matches_domain(&dom) || priv_verified.trie.matches_domain(&dom) {
             bail!(
-                "override allowDomain '{}' was unexpectedly matched by Adblock.list",
+                "override allowDomain '{}' was unexpectedly matched by Adblock.list or Privacy.list",
                 dom
             );
         }
@@ -143,9 +265,9 @@ pub fn verify_adblock_dir(
             .trim()
             .trim_end_matches('.')
             .to_ascii_lowercase();
-        if domain_trie.matches_domain(&dom) {
+        if ad_verified.trie.matches_domain(&dom) || priv_verified.trie.matches_domain(&dom) {
             bail!(
-                "override protectedApexDomain '{}' was unexpectedly matched by Adblock.list",
+                "override protectedApexDomain '{}' was unexpectedly matched by Adblock.list or Privacy.list",
                 dom
             );
         }
@@ -153,22 +275,90 @@ pub fn verify_adblock_dir(
     }
 
     Ok(AdblockVerificationReport {
-        ruleset: file_summary("Adblock.list", ruleset_raw.as_bytes(), ruleset_total),
+        ruleset: file_summary("Adblock.list", ruleset_raw.as_bytes(), ad_verified.total),
+        privacy_ruleset: file_summary("Privacy.list", privacy_raw.as_bytes(), priv_verified.total),
         module: file_summary(
             "Adblock.sgmodule",
             module_raw.as_bytes(),
             module_raw.lines().count(),
         ),
         canaries_checked,
-        ruleset_total,
+        ruleset_total: ad_verified.total,
+        privacy_ruleset_total: priv_verified.total,
         module_scripts,
         module_mitm_hosts,
     })
 }
 
-fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTrie, usize)> {
+fn verify_disjoint_cidrs_v4(ad_cidrs: &[Ipv4Net], priv_cidrs: &[Ipv4Net]) -> Result<()> {
+    let mut intervals: Vec<(u32, u32, bool, Ipv4Net)> =
+        Vec::with_capacity(ad_cidrs.len() + priv_cidrs.len());
+    for &n in ad_cidrs {
+        intervals.push((u32::from(n.network()), u32::from(n.broadcast()), false, n));
+    }
+    for &n in priv_cidrs {
+        intervals.push((u32::from(n.network()), u32::from(n.broadcast()), true, n));
+    }
+    intervals.sort_by_key(|x| (x.0, std::cmp::Reverse(x.1)));
+    let mut prev: Option<(u32, bool, Ipv4Net)> = None;
+    for (start, end, is_priv, net) in intervals {
+        if let Some((prev_end, prev_priv, prev_net)) = prev
+            && start <= prev_end
+            && is_priv != prev_priv
+        {
+            bail!(
+                "IPv4 CIDR overlap between Adblock.list and Privacy.list: '{}' vs '{}'",
+                prev_net,
+                net
+            );
+        }
+        if prev.is_none_or(|(pe, _, _)| end > pe) {
+            prev = Some((end, is_priv, net));
+        }
+    }
+    Ok(())
+}
+
+fn verify_disjoint_cidrs_v6(ad_cidrs: &[Ipv6Net], priv_cidrs: &[Ipv6Net]) -> Result<()> {
+    let mut intervals: Vec<(u128, u128, bool, Ipv6Net)> =
+        Vec::with_capacity(ad_cidrs.len() + priv_cidrs.len());
+    for &n in ad_cidrs {
+        intervals.push((u128::from(n.network()), u128::from(n.broadcast()), false, n));
+    }
+    for &n in priv_cidrs {
+        intervals.push((u128::from(n.network()), u128::from(n.broadcast()), true, n));
+    }
+    intervals.sort_by_key(|x| (x.0, std::cmp::Reverse(x.1)));
+    let mut prev: Option<(u128, bool, Ipv6Net)> = None;
+    for (start, end, is_priv, net) in intervals {
+        if let Some((prev_end, prev_priv, prev_net)) = prev
+            && start <= prev_end
+            && is_priv != prev_priv
+        {
+            bail!(
+                "IPv6 CIDR overlap between Adblock.list and Privacy.list: '{}' vs '{}'",
+                prev_net,
+                net
+            );
+        }
+        if prev.is_none_or(|(pe, _, _)| end > pe) {
+            prev = Some((end, is_priv, net));
+        }
+    }
+    Ok(())
+}
+
+fn verify_ruleset_text(
+    file_label: &str,
+    text: &str,
+    min_ruleset_lines: usize,
+) -> Result<VerifiedRuleset> {
     let mut trie = DomainTrie::default();
     let mut total = 0usize;
+    let mut lines: FxHashSet<String> = FxHashSet::default();
+    let mut domains: Vec<String> = Vec::new();
+    let mut cidrs_v4: Vec<Ipv4Net> = Vec::new();
+    let mut cidrs_v6: Vec<Ipv6Net> = Vec::new();
 
     for (line_no, raw_line) in text.lines().enumerate() {
         let line = raw_line.trim();
@@ -197,40 +387,58 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
         ] {
             if line.contains(forbidden) {
                 bail!(
-                    "Adblock.list line {} contains illegal token '{}': {}",
+                    "{} line {} contains illegal token '{}': {}",
+                    file_label,
                     line_no + 1,
                     forbidden,
                     line
                 );
             }
         }
+        if !lines.insert(line.to_string()) {
+            bail!(
+                "{} line {} duplicate rule '{}'",
+                file_label,
+                line_no + 1,
+                line
+            );
+        }
         let parts: Vec<&str> = line.split(',').map(str::trim).collect();
         if parts.len() < 2 {
-            bail!("Adblock.list line {} malformed: {}", line_no + 1, line);
+            bail!("{} line {} malformed: {}", file_label, line_no + 1, line);
         }
         let rtype = parts[0];
         let val = parts[1];
         match rtype {
             "DOMAIN" => {
                 if !is_valid_domain(val) {
-                    bail!("Adblock.list line {} invalid DOMAIN: {}", line_no + 1, val);
+                    bail!(
+                        "{} line {} invalid DOMAIN: {}",
+                        file_label,
+                        line_no + 1,
+                        val
+                    );
                 }
                 trie.insert_exact(val);
+                domains.push(val.to_ascii_lowercase());
             }
             "DOMAIN-SUFFIX" => {
                 if !is_valid_domain(val) {
                     bail!(
-                        "Adblock.list line {} invalid DOMAIN-SUFFIX: {}",
+                        "{} line {} invalid DOMAIN-SUFFIX: {}",
+                        file_label,
                         line_no + 1,
                         val
                     );
                 }
                 trie.insert_suffix(val);
+                domains.push(val.to_ascii_lowercase());
             }
             "DOMAIN-KEYWORD" => {
                 if val.is_empty() || val.contains(char::is_whitespace) {
                     bail!(
-                        "Adblock.list line {} invalid DOMAIN-KEYWORD: {}",
+                        "{} line {} invalid DOMAIN-KEYWORD: {}",
+                        file_label,
                         line_no + 1,
                         val
                     );
@@ -239,7 +447,8 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
             "DOMAIN-WILDCARD" => {
                 if !is_valid_domain_wildcard(val) {
                     bail!(
-                        "Adblock.list line {} invalid DOMAIN-WILDCARD: {}",
+                        "{} line {} invalid DOMAIN-WILDCARD: {}",
+                        file_label,
                         line_no + 1,
                         val
                     );
@@ -248,70 +457,86 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
             "IP-CIDR" => {
                 let net: Ipv4Net = val.parse().with_context(|| {
                     format!(
-                        "Adblock.list line {} invalid IP-CIDR '{}'",
+                        "{} line {} invalid IP-CIDR '{}'",
+                        file_label,
                         line_no + 1,
                         val
                     )
                 })?;
                 if net.trunc() != net {
                     bail!(
-                        "Adblock.list line {} non-canonical IP-CIDR '{}'",
+                        "{} line {} non-canonical IP-CIDR '{}'",
+                        file_label,
                         line_no + 1,
                         val
                     );
                 }
                 if overlaps_reserved_v4(net) || overlaps_shared_cdn_or_dns_v4(net) {
                     bail!(
-                        "Adblock.list line {} overlaps reserved/private/shared-CDN/DNS range '{}'",
+                        "{} line {} overlaps reserved/private/shared-CDN/DNS range '{}'",
+                        file_label,
                         line_no + 1,
                         val
                     );
                 }
                 if parts.get(2).copied() != Some("no-resolve") {
                     bail!(
-                        "Adblock.list line {} IP-CIDR missing no-resolve: {}",
+                        "{} line {} IP-CIDR missing no-resolve: {}",
+                        file_label,
                         line_no + 1,
                         line
                     );
                 }
+                cidrs_v4.push(net);
             }
             "IP-CIDR6" => {
                 let net: Ipv6Net = val.parse().with_context(|| {
                     format!(
-                        "Adblock.list line {} invalid IP-CIDR6 '{}'",
+                        "{} line {} invalid IP-CIDR6 '{}'",
+                        file_label,
                         line_no + 1,
                         val
                     )
                 })?;
                 if net.trunc() != net {
                     bail!(
-                        "Adblock.list line {} non-canonical IP-CIDR6 '{}'",
+                        "{} line {} non-canonical IP-CIDR6 '{}'",
+                        file_label,
                         line_no + 1,
                         val
                     );
                 }
                 if overlaps_reserved_v6(net) || overlaps_shared_cdn_or_dns_v6(net) {
                     bail!(
-                        "Adblock.list line {} overlaps reserved/private/shared-CDN/DNS range '{}'",
+                        "{} line {} overlaps reserved/private/shared-CDN/DNS range '{}'",
+                        file_label,
                         line_no + 1,
                         val
                     );
                 }
                 if parts.get(2).copied() != Some("no-resolve") {
                     bail!(
-                        "Adblock.list line {} IP-CIDR6 missing no-resolve: {}",
+                        "{} line {} IP-CIDR6 missing no-resolve: {}",
+                        file_label,
                         line_no + 1,
                         line
                     );
                 }
+                cidrs_v6.push(net);
             }
             "IP-ASN" => {
                 let asn: u32 = val.parse().with_context(|| {
-                    format!("Adblock.list line {} invalid IP-ASN '{}'", line_no + 1, val)
+                    format!(
+                        "{} line {} invalid IP-ASN '{}'",
+                        file_label,
+                        line_no + 1,
+                        val
+                    )
                 })?;
                 if asn == 0 || parts.get(2).copied() != Some("no-resolve") {
                     bail!(
-                        "Adblock.list line {} invalid IP-ASN line: {}",
+                        "{} line {} invalid IP-ASN line: {}",
+                        file_label,
                         line_no + 1,
                         line
                     );
@@ -319,12 +544,13 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
             }
             "USER-AGENT" | "PROCESS-NAME" => {
                 if val.is_empty() {
-                    bail!("Adblock.list line {} empty {}", line_no + 1, rtype);
+                    bail!("{} line {} empty {}", file_label, line_no + 1, rtype);
                 }
             }
             other => {
                 bail!(
-                    "Adblock.list line {} unsupported rule type '{}'",
+                    "{} line {} unsupported rule type '{}'",
+                    file_label,
                     line_no + 1,
                     other
                 );
@@ -335,13 +561,21 @@ fn verify_ruleset_text(text: &str, min_ruleset_lines: usize) -> Result<(DomainTr
 
     if total < min_ruleset_lines {
         bail!(
-            "Adblock.list contains only {} rules (minimum expected: {})",
+            "{} contains only {} rules (minimum expected: {})",
+            file_label,
             total,
             min_ruleset_lines
         );
     }
 
-    Ok((trie, total))
+    Ok(VerifiedRuleset {
+        trie,
+        total,
+        lines,
+        domains,
+        cidrs_v4,
+        cidrs_v6,
+    })
 }
 
 /// Validates an emitted `Adblock.sgmodule` strictly against Surge's official module specification.
@@ -721,22 +955,27 @@ pub fn render_adblock_release_notes(
 ) -> String {
     format!(
         "## Adblock & Privacy\n\
-        - 活跃上游数据源：`{active} / {total}`\n\
-        - `Adblock.list`：共 `{rules}` 条 Surge RULE-SET 规则（自动保护与白名单过滤 `{suppr}` 条、前缀树 subsumption 去重 `{subsumed}` 条），大小 `{rbytes}` B，SHA-256 `{rsha}`\n\
+        - 活跃上游数据源：`{active} / {total}`（自动保护与作用域白名单过滤 `{suppr}` 条、统一前缀树 subsumption 去重 `{subsumed}` 条）\n\
+        - `Adblock.list`（广告与安全威胁）：共 `{ad_rules}` 条 Surge RULE-SET 规则，大小 `{rbytes}` B，SHA-256 `{rsha}`\n\
+        - `Privacy.list`（隐私跟踪与遥测）：共 `{priv_rules}` 条 Surge RULE-SET 规则，大小 `{pbytes}` B，SHA-256 `{psha}`\n\
         - `Adblock.sgmodule`：包含 `{scripts}` 条无冲突脚本规则与 `{mitm}` 个 MITM 解密域名（`-` 固定证书域名均置顶排除），大小 `{mbytes}` B，SHA-256 `{msha}`\n\
-        - 校验通过：`{canaries}` 项正反金丝雀断言与 Surge 模块格式严格校验全部通过\n\n\
+        - 校验通过：`Adblock.list ∩ Privacy.list = ∅` 严格互不重合，且 `{canaries}` 项正反金丝雀断言与 Surge 模块格式校验全部通过\n\n\
         ```ini\n\
         [Rule]\n\
         RULE-SET,https://github.com/ding113/surge-rules/releases/latest/download/Adblock.list,REJECT,extended-matching\n\
+        RULE-SET,https://github.com/ding113/surge-rules/releases/latest/download/Privacy.list,REJECT,extended-matching\n\
         ```\n\
         模块直链：`https://github.com/ding113/surge-rules/releases/latest/download/Adblock.sgmodule`\n",
         active = active_sources,
         total = total_sources,
-        rules = report.ruleset_total,
+        ad_rules = report.ruleset_total,
+        priv_rules = report.privacy_ruleset_total,
         suppr = suppressed_by_protection,
         subsumed = subsumed_by_trie,
         rbytes = report.ruleset.size_bytes,
         rsha = report.ruleset.sha256,
+        pbytes = report.privacy_ruleset.size_bytes,
+        psha = report.privacy_ruleset.sha256,
         scripts = report.module_scripts,
         mitm = report.module_mitm_hosts,
         mbytes = report.module.size_bytes,

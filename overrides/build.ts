@@ -214,11 +214,27 @@ function validateAdblockOverrides(): void {
     seenApex.add(dom);
   }
 
+  const seenForceRuleSet = new Map<string, string>();
   for (const item of ADBLOCK_OVERRIDES.forceRuleSetEntries) {
+    if (item.target !== "ad" && item.target !== "privacy") {
+      throw new Error(
+        `[forceRuleSetEntries] Invalid target '${String(item.target)}' on '${item.value}'`,
+      );
+    }
     const v = item.value.trim();
     if (v.length === 0 || /[\r\n]/.test(v)) {
       throw new Error(`[forceRuleSetEntries] Invalid value '${item.value}'`);
     }
+    const canonicalVal =
+      item.kind === "USER-AGENT" || item.kind === "PROCESS-NAME" ? v : v.toLowerCase();
+    const dedupKey = `${item.kind}:${canonicalVal}`;
+    const prevTarget = seenForceRuleSet.get(dedupKey);
+    if (prevTarget !== undefined) {
+      throw new Error(
+        `[forceRuleSetEntries] Duplicate or conflicting entry '${dedupKey}' across '${prevTarget}' and '${item.target}'`,
+      );
+    }
+    seenForceRuleSet.set(dedupKey, item.target);
     switch (item.kind) {
       case "DOMAIN":
       case "DOMAIN-SUFFIX": {
@@ -576,6 +592,7 @@ function validateRoutingOverrides(): void {
   }
 
   const seenForce = new Set<string>();
+  const seenCleanForceOwner = new Map<string, string>();
   for (const item of ROUTING_OVERRIDES.forceEntries) {
     if (item.rationale.trim().length === 0) {
       throw new Error(`[routingForce:${item.target}:${item.value}] Rationale must not be empty`);
@@ -596,6 +613,17 @@ function validateRoutingOverrides(): void {
       throw new Error(`[routingForce] Duplicate entry '${key}'`);
     }
     seenForce.add(key);
+
+    if (item.target === "ai" || item.target === "payment" || item.target === "telemetry") {
+      const ruleOnlyKey = routingDedupKey("clean", item.kind, item.value);
+      const prevOwner = seenCleanForceOwner.get(ruleOnlyKey);
+      if (prevOwner !== undefined && prevOwner !== item.target) {
+        throw new Error(
+          `[routingForce] Disjointness violation: '${item.kind},${item.value}' forced in both '${prevOwner}' and '${item.target}'`,
+        );
+      }
+      seenCleanForceOwner.set(ruleOnlyKey, item.target);
+    }
   }
 
   const seenExclude = new Set<string>();

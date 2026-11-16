@@ -6,13 +6,15 @@ use proptest::prelude::*;
 use tempfile::TempDir;
 
 use surge_rules::adblock::compiler::{
-    DomainTrie, compile_adblock, overlaps_reserved_v4, overlaps_reserved_v6,
-    overlaps_shared_cdn_or_dns_v4, overlaps_shared_cdn_or_dns_v6,
+    DomainTrie, TelemetryProtectionSet, compile_adblock, compile_adblock_with_telemetry_guard,
+    overlaps_reserved_v4, overlaps_reserved_v6, overlaps_shared_cdn_or_dns_v4,
+    overlaps_shared_cdn_or_dns_v6,
 };
 use surge_rules::adblock::config::{
-    AdblockOverrides, AdblockPlatformScope, AdblockSourceCatalog, AdblockSourceConfig,
-    AdblockSourceFormat, AdblockSourceRole, AllowDomainMatchType, AllowDomainOverride,
-    ForceRuleSetOverride, MitmHostOverride, ProtectedApexDomainOverride,
+    AdblockCategory, AdblockOverrides, AdblockPlatformScope, AdblockRuleTarget,
+    AdblockSourceCatalog, AdblockSourceConfig, AdblockSourceFormat, AdblockSourceRole,
+    AllowDomainMatchType, AllowDomainOverride, ForceRuleSetOverride, MitmHostOverride,
+    ProtectedApexDomainOverride,
 };
 use surge_rules::adblock::jq_transpile::transpile_jsonprune_to_jq;
 use surge_rules::adblock::model::{
@@ -35,6 +37,11 @@ fn dummy_adblock_source(
     AdblockSourceConfig {
         id: id.to_string(),
         role,
+        category: if role == AdblockSourceRole::Allowlist {
+            AdblockCategory::Both
+        } else {
+            AdblockCategory::Ad
+        },
         format,
         platform: AdblockPlatformScope::Universal,
         lineage: format!("test:{}", id),
@@ -73,9 +80,39 @@ fn real_adblock_catalog_and_overrides_load_cleanly() {
         "expected at least one allowlist feed"
     );
 
+    assert!(
+        catalog
+            .sources
+            .iter()
+            .any(|s| s.role == AdblockSourceRole::RulesetFallback
+                && s.category == AdblockCategory::Ad
+                && s.core),
+        "expected at least one core 'ad' ruleset feed"
+    );
+    assert!(
+        catalog
+            .sources
+            .iter()
+            .any(|s| s.role == AdblockSourceRole::RulesetFallback
+                && s.category == AdblockCategory::Privacy
+                && s.core),
+        "expected at least one core 'privacy' ruleset feed"
+    );
+
     let overrides =
         AdblockOverrides::load_from_path(Path::new("overrides/generated/adblock-overrides.json"))
             .expect("overrides/generated/adblock-overrides.json should load cleanly");
+    assert!(
+        overrides
+            .force_rule_set_entries
+            .iter()
+            .any(|f| f.target == AdblockRuleTarget::Ad)
+            && overrides
+                .force_rule_set_entries
+                .iter()
+                .any(|f| f.target == AdblockRuleTarget::Privacy),
+        "expected forceRuleSetEntries covering both 'ad' and 'privacy' targets"
+    );
     assert!(
         overrides.allow_domains.len() >= 30,
         "expected curated allowDomains in overrides"
@@ -476,20 +513,35 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
     assert_eq!(scripts, 2);
     assert_eq!(mitm_hosts, 1);
 
-    // Also test full directory verifier + negative corruption checks
+    // Also test full directory verifier + negative overlap/corruption checks
     let tmp = TempDir::new().unwrap();
     let adblock_min_ruleset = compiled.ruleset_text.clone();
-    // Inject required PURE_AD_CANARIES so verify_adblock_dir can run full canary suite on small test fixture
-    let padded_ruleset = format!(
-        "{}DOMAIN-SUFFIX,googlesyndication.com\nDOMAIN-SUFFIX,app-measurement.com\nDOMAIN-SUFFIX,mobads.baidu.com\nDOMAIN-SUFFIX,pos.baidu.com\n",
+    let padded_ad_ruleset = format!(
+        "{}DOMAIN-SUFFIX,googlesyndication.com\nDOMAIN-SUFFIX,pangolin-sdk-toutiao.com\nDOMAIN-SUFFIX,mobads.baidu.com\nDOMAIN-SUFFIX,pos.baidu.com\n",
         adblock_min_ruleset
     );
-    fs::write(tmp.path().join("Adblock.list"), &padded_ruleset).unwrap();
+    let padded_priv_ruleset =
+        "DOMAIN,app-measurement.com\nDOMAIN-SUFFIX,scorecardresearch.com\nDOMAIN,hm.baidu.com\n";
+    fs::write(tmp.path().join("Adblock.list"), &padded_ad_ruleset).unwrap();
+    fs::write(tmp.path().join("Privacy.list"), padded_priv_ruleset).unwrap();
     fs::write(tmp.path().join("Adblock.sgmodule"), &compiled.module_text).unwrap();
 
-    let report =
-        verify_adblock_dir(tmp.path(), &overrides, 5).expect("directory verification should pass");
+    let report = verify_adblock_dir(tmp.path(), &overrides, 5, 3)
+        .expect("directory verification should pass");
     assert_eq!(report.module_scripts, 2);
+    assert_eq!(report.privacy_ruleset_total, 3);
+
+    // Injecting an overlapping domain/subdomain into Privacy.list must fail disjointness check
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        format!("{}DOMAIN,sub.doubleclick.net\n", padded_priv_ruleset),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "overlapping domain hierarchy across Adblock.list and Privacy.list must fail verifier"
+    );
+    fs::write(tmp.path().join("Privacy.list"), padded_priv_ruleset).unwrap();
 
     // Corrupting Adblock.list with a policy token must fail verification
     fs::write(
@@ -498,7 +550,7 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
     )
     .unwrap();
     assert!(
-        verify_adblock_dir(tmp.path(), &overrides, 0).is_err(),
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
         "RULE-SET with policy column must fail verifier"
     );
 
@@ -624,11 +676,13 @@ fn scoped_abp_and_fallback_paths_do_not_pollute_mitm_or_suppress_forced_ad_domai
         rationale: "Apple core must stay allowed".to_string(),
     });
     overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
         kind: "DOMAIN-SUFFIX".to_string(),
         value: "doubleclick.net".to_string(),
         rationale: "Force pure ad domain even if a submodule references a child path".to_string(),
     });
     overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
         kind: "DOMAIN-SUFFIX".to_string(),
         value: "apple.com".to_string(),
         rationale: "Conflict check: allowlist must still beat forceRuleSetEntries".to_string(),
@@ -900,12 +954,14 @@ fn four_tier_precedence_protects_canaries_from_noisy_upstream_allowlists() {
         rationale: "AI service domain must never be blocked in Adblock.list".to_string(),
     });
     overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
         kind: "DOMAIN-SUFFIX".to_string(),
         value: "openai.com".to_string(),
         rationale: "Verify P0a Human Allow beats P0b Force".to_string(),
     });
     // P0b: Human Force beats P1 Upstream Allowlist (e.g. affiliate allowlist unblocking doubleclick)
     overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
         kind: "DOMAIN-SUFFIX".to_string(),
         value: "doubleclick.net".to_string(),
         rationale: "Pure ad canary must stay blocked".to_string(),
@@ -1424,6 +1480,7 @@ proptest! {
         }
         for hf in &human_forces {
             overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+                target: AdblockRuleTarget::Ad,
                 kind: "DOMAIN-SUFFIX".to_string(),
                 value: hf.clone(),
                 rationale: "pbt human force".to_string(),
@@ -1578,5 +1635,442 @@ $cookie=keep_session;maxAge=3600\n\
             "header script must not buffer body: {}",
             line
         );
+    }
+}
+
+#[test]
+fn ad_and_privacy_split_enforces_scoped_allowlists_conflict_precedence_and_disjointness() {
+    let mut overrides = AdblockOverrides::empty();
+    // P0a human allow protects both sides
+    overrides.allow_domains.push(AllowDomainOverride {
+        match_type: AllowDomainMatchType::Suffix,
+        domain: "safe-os.example.com".to_string(),
+        rationale: "OS functional endpoint".to_string(),
+    });
+    // P0b forced Privacy beats Ad allowlist and AdMixed
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Privacy,
+        kind: "DOMAIN".to_string(),
+        value: "app-measurement.com".to_string(),
+        rationale: "Forced analytics canary".to_string(),
+    });
+
+    // Global unbreak allowlist (`Both`) protects both Ad and Privacy
+    let mut allow_both = ParsedAdblockSource {
+        category: AdblockCategory::Both,
+        lineage: "unbreak_both".to_string(),
+        weight: 99,
+        ..Default::default()
+    };
+    allow_both
+        .allow_suffix_domains
+        .insert("unbreak-shared.example.org".to_string());
+
+    // Ad-only allowlist (`Ad`) suppresses Ad & AdMixed, NOT dedicated Privacy
+    let mut allow_ad = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "easylist_allow".to_string(),
+        weight: 96,
+        ..Default::default()
+    };
+    allow_ad
+        .allow_suffix_domains
+        .insert("pure-tracker-unblocked-by-ad-allow.example.net".to_string());
+    allow_ad
+        .allow_suffix_domains
+        .insert("legit-ad-cdn.example.net".to_string());
+
+    // Privacy-only allowlist (`Privacy`, e.g. ethical analytics) suppresses Privacy & AdMixed, NOT dedicated Ad
+    let mut allow_priv = ParsedAdblockSource {
+        category: AdblockCategory::Privacy,
+        lineage: "ethical_allow".to_string(),
+        weight: 95,
+        ..Default::default()
+    };
+    allow_priv
+        .allow_suffix_domains
+        .insert("plausible-like.example.io".to_string());
+    allow_priv
+        .allow_suffix_domains
+        .insert("pure-ad-unblocked-by-referral-allow.example.net".to_string());
+
+    // Dedicated Ad feed
+    let mut src_ad = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "adguard_base".to_string(),
+        weight: 93,
+        ..Default::default()
+    };
+    src_ad.ruleset_suffixes.extend([
+        "pure-ad.example.com".to_string(),
+        "pure-ad-unblocked-by-referral-allow.example.net".to_string(),
+        "legit-ad-cdn.example.net".to_string(),
+        "unbreak-shared.example.org".to_string(),
+        "safe-os.example.com".to_string(),
+    ]);
+    src_ad
+        .ruleset_cidrs_v4
+        .insert("45.33.40.0/25".parse().unwrap());
+
+    // Dedicated Privacy feed
+    let mut src_priv = ParsedAdblockSource {
+        category: AdblockCategory::Privacy,
+        lineage: "easyprivacy".to_string(),
+        weight: 92,
+        ..Default::default()
+    };
+    src_priv.ruleset_suffixes.extend([
+        "pure-tracker.example.com".to_string(),
+        "pure-tracker-unblocked-by-ad-allow.example.net".to_string(),
+        "plausible-like.example.io".to_string(),
+        "unbreak-shared.example.org".to_string(),
+        "safe-os.example.com".to_string(),
+    ]);
+    src_priv
+        .ruleset_cidrs_v4
+        .insert("45.33.40.128/25".parse().unwrap());
+    src_priv
+        .ruleset_cidrs_v4
+        .insert("45.33.50.0/24".parse().unwrap());
+
+    // Mixed aggregate bundle (`AdMixed`) claiming trackers, ethical analytics, and fallback domains
+    let mut src_mixed = ParsedAdblockSource {
+        category: AdblockCategory::AdMixed,
+        lineage: "hagezi_ultimate".to_string(),
+        weight: 91,
+        ..Default::default()
+    };
+    src_mixed.ruleset_suffixes.extend([
+        "pure-tracker.example.com".to_string(),
+        "plausible-like.example.io".to_string(),
+        "mixed-only-ad.example.com".to_string(),
+    ]);
+    // Child domain of pure-ad.example.com claimed by Privacy -> must be subsumed by unified trie without overlap
+    src_priv
+        .ruleset_domains
+        .insert("pixel.pure-ad.example.com".to_string());
+
+    let compiled = compile_adblock(
+        &[
+            allow_both, allow_ad, allow_priv, src_ad, src_priv, src_mixed,
+        ],
+        &overrides,
+        6,
+        6,
+    );
+
+    // 1. Dedicated Privacy wins over AdMixed on pure-tracker.example.com
+    assert!(
+        compiled
+            .privacy_ruleset_text
+            .contains("DOMAIN-SUFFIX,pure-tracker.example.com\n")
+    );
+    assert!(!compiled.ruleset_text.contains("pure-tracker.example.com"));
+
+    // 2. Mixed-only rule stays in Adblock.list (zero rule loss)
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,mixed-only-ad.example.com\n")
+    );
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("mixed-only-ad.example.com")
+    );
+
+    // 3. Scoped allowlist isolation:
+    //    - Ad allowlist does NOT suppress dedicated Privacy tracker
+    assert!(
+        compiled
+            .privacy_ruleset_text
+            .contains("DOMAIN-SUFFIX,pure-tracker-unblocked-by-ad-allow.example.net\n")
+    );
+    //    - Privacy allowlist does NOT suppress dedicated Ad domain
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,pure-ad-unblocked-by-referral-allow.example.net\n")
+    );
+    //    - Privacy allowlist DOES suppress both Privacy and AdMixed for ethical analytics (`plausible-like.example.io`)
+    assert!(!compiled.ruleset_text.contains("plausible-like.example.io"));
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("plausible-like.example.io")
+    );
+    //    - Ad allowlist suppresses Ad (`legit-ad-cdn.example.net`), Both allowlist & Human allowlist suppress both
+    assert!(!compiled.ruleset_text.contains("legit-ad-cdn.example.net"));
+    assert!(!compiled.ruleset_text.contains("unbreak-shared.example.org"));
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("unbreak-shared.example.org")
+    );
+    assert!(!compiled.ruleset_text.contains("safe-os.example.com"));
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("safe-os.example.com")
+    );
+
+    // 4. Forced Privacy entry lands in Privacy.list
+    assert!(
+        compiled
+            .privacy_ruleset_text
+            .contains("DOMAIN,app-measurement.com\n")
+    );
+    assert!(!compiled.ruleset_text.contains("app-measurement.com"));
+
+    // 5. Unified trie compression & CIDR aggregation produce zero overlap
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("pixel.pure-ad.example.com"),
+        "child domain must be subsumed by parent suffix in Adblock.list"
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("IP-CIDR,45.33.40.0/24,no-resolve\n"),
+        "adjacent /25s coalesce into /24 and tie-break to Ad"
+    );
+    assert!(!compiled.privacy_ruleset_text.contains("45.33.40."));
+    assert!(
+        compiled
+            .privacy_ruleset_text
+            .contains("IP-CIDR,45.33.50.0/24,no-resolve\n")
+    );
+}
+
+#[test]
+fn telemetry_guard_prevents_conflicts_with_privacy_and_adblock_and_verifier_enforces_it() {
+    let overrides = AdblockOverrides::empty();
+    let telemetry_raw = "\
+# Telemetry.list fixture\n\
+DOMAIN,browser-intake-us5-datadoghq.com\n\
+DOMAIN-SUFFIX,ipinfo.io,extended-matching\n\
+DOMAIN-SUFFIX,arkoselabs.com,extended-matching\n";
+    let tguard = TelemetryProtectionSet::from_ruleset_text(telemetry_raw);
+
+    let mut src_ad = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "ad_feed".to_string(),
+        weight: 90,
+        ..Default::default()
+    };
+    src_ad.ruleset_domains.insert("api.ipinfo.io".to_string());
+    src_ad
+        .ruleset_suffixes
+        .insert("doubleclick.net".to_string());
+
+    let mut src_priv = ParsedAdblockSource {
+        category: AdblockCategory::Privacy,
+        lineage: "priv_feed".to_string(),
+        weight: 91,
+        ..Default::default()
+    };
+    src_priv
+        .ruleset_domains
+        .insert("browser-intake-us5-datadoghq.com".to_string());
+    src_priv.ruleset_suffixes.insert("ipinfo.io".to_string());
+    src_priv
+        .ruleset_domains
+        .insert("client-api.arkoselabs.com".to_string());
+    src_priv
+        .ruleset_suffixes
+        .insert("scorecardresearch.com".to_string());
+
+    let compiled =
+        compile_adblock_with_telemetry_guard(&[src_ad, src_priv], &overrides, Some(&tguard), 2, 2);
+
+    assert!(!compiled.ruleset_text.contains("ipinfo.io"));
+    assert!(!compiled.privacy_ruleset_text.contains("ipinfo.io"));
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("browser-intake-us5-datadoghq.com")
+    );
+    assert!(!compiled.privacy_ruleset_text.contains("arkoselabs.com"));
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,doubleclick.net\n")
+    );
+    assert!(
+        compiled
+            .privacy_ruleset_text
+            .contains("DOMAIN-SUFFIX,scorecardresearch.com\n")
+    );
+
+    // Verify directory passes when Telemetry.list and Privacy.list / Adblock.list are disjoint,
+    // and fails immediately if Privacy.list blocks any Telemetry.list domain or subdomain.
+    let tmp = TempDir::new().unwrap();
+    fs::write(tmp.path().join("Telemetry.list"), telemetry_raw).unwrap();
+    fs::write(tmp.path().join("Adblock.list"), &compiled.ruleset_text).unwrap();
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        &compiled.privacy_ruleset_text,
+    )
+    .unwrap();
+    fs::write(tmp.path().join("Adblock.sgmodule"), &compiled.module_text).unwrap();
+
+    verify_adblock_dir(tmp.path(), &overrides, 0, 0)
+        .expect("disjoint Telemetry.list + Privacy.list + Adblock.list must pass");
+
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        format!("{}DOMAIN,v.ipinfo.io\n", compiled.privacy_ruleset_text),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "Privacy.list subdomain colliding with Telemetry.list suffix must fail verifier"
+    );
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(192))]
+
+    // Property 7: Splitting Adblock into Adblock.list and Privacy.list produces strictly disjoint
+    // rule sets (syntactically and hierarchically) while conserving 100% of pre-split blocked hosts.
+    #[test]
+    fn prop_ad_and_privacy_split_is_disjoint_and_never_loses_pre_split_rules(
+        ad_doms in prop::collection::vec(arb_domain(), 1..15),
+        priv_doms in prop::collection::vec(arb_domain(), 1..15),
+        mixed_doms in prop::collection::vec(arb_domain(), 1..15),
+        both_allows in prop::collection::vec(arb_domain(), 0..5),
+        ad_allows in prop::collection::vec(arb_domain(), 0..5),
+        priv_allows in prop::collection::vec(arb_domain(), 0..5),
+    ) {
+        let overrides = AdblockOverrides::empty();
+
+        let mut src_both_allow = ParsedAdblockSource {
+            category: AdblockCategory::Both,
+            lineage: "both_allow".to_string(),
+            weight: 98,
+            ..Default::default()
+        };
+        src_both_allow.allow_suffix_domains.extend(both_allows.iter().cloned());
+
+        let mut src_ad_allow = ParsedAdblockSource {
+            category: AdblockCategory::Ad,
+            lineage: "ad_allow".to_string(),
+            weight: 96,
+            ..Default::default()
+        };
+        src_ad_allow.allow_suffix_domains.extend(ad_allows.iter().cloned());
+
+        let mut src_priv_allow = ParsedAdblockSource {
+            category: AdblockCategory::Privacy,
+            lineage: "priv_allow".to_string(),
+            weight: 96,
+            ..Default::default()
+        };
+        src_priv_allow.allow_suffix_domains.extend(priv_allows.iter().cloned());
+
+        let mut src_ad = ParsedAdblockSource {
+            category: AdblockCategory::Ad,
+            lineage: "pure_ad".to_string(),
+            weight: 92,
+            ..Default::default()
+        };
+        for d in &ad_doms {
+            src_ad.ruleset_suffixes.insert(d.clone());
+        }
+
+        let mut src_priv = ParsedAdblockSource {
+            category: AdblockCategory::Privacy,
+            lineage: "pure_priv".to_string(),
+            weight: 91,
+            ..Default::default()
+        };
+        for d in &priv_doms {
+            src_priv.ruleset_suffixes.insert(d.clone());
+            src_priv.ruleset_domains.insert(format!("trk.{}", d));
+        }
+
+        let mut src_mixed = ParsedAdblockSource {
+            category: AdblockCategory::AdMixed,
+            lineage: "mixed_bundle".to_string(),
+            weight: 88,
+            ..Default::default()
+        };
+        for d in &mixed_doms {
+            src_mixed.ruleset_suffixes.insert(d.clone());
+        }
+
+        let split = compile_adblock(
+            &[
+                src_both_allow.clone(),
+                src_ad_allow.clone(),
+                src_priv_allow.clone(),
+                src_ad.clone(),
+                src_priv.clone(),
+                src_mixed.clone(),
+            ],
+            &overrides,
+            6,
+            6,
+        );
+
+        // Build pooled pre-split equivalent (where all allowlists apply globally)
+        let mut pooled_ad = src_ad;
+        pooled_ad.category = AdblockCategory::AdMixed;
+        let mut pooled_priv = src_priv;
+        pooled_priv.category = AdblockCategory::AdMixed;
+        let pre_split = compile_adblock(
+            &[
+                src_both_allow,
+                src_ad_allow,
+                src_priv_allow,
+                pooled_ad,
+                pooled_priv,
+                src_mixed,
+            ],
+            &overrides,
+            6,
+            6,
+        );
+
+        let parse_trie_and_domains = |txt: &str| -> (DomainTrie, Vec<String>) {
+            let mut t = DomainTrie::default();
+            let mut ds = Vec::new();
+            for line in txt.lines() {
+                if let Some(d) = line.strip_prefix("DOMAIN,") {
+                    t.insert_exact(d);
+                    ds.push(d.to_string());
+                } else if let Some(s) = line.strip_prefix("DOMAIN-SUFFIX,") {
+                    t.insert_suffix(s);
+                    ds.push(s.to_string());
+                }
+            }
+            (t, ds)
+        };
+
+        let (ad_trie, ad_list) = parse_trie_and_domains(&split.ruleset_text);
+        let (priv_trie, priv_list) = parse_trie_and_domains(&split.privacy_ruleset_text);
+        let (_pre_trie, pre_list) = parse_trie_and_domains(&pre_split.ruleset_text);
+
+        // Invariant A: Strict mutual disjointness (neither exact nor ancestor/descendant overlap)
+        for d in &ad_list {
+            prop_assert!(!priv_trie.matches_domain(d), "Ad domain '{}' overlapped Privacy", d);
+        }
+        for d in &priv_list {
+            prop_assert!(!ad_trie.matches_domain(d), "Privacy domain '{}' overlapped Ad", d);
+        }
+
+        // Invariant B: Zero rule loss relative to pre-split (every pre-split rule is matched by Ad XOR Privacy)
+        for d in &pre_list {
+            let in_ad = ad_trie.matches_domain(d);
+            let in_priv = priv_trie.matches_domain(d);
+            prop_assert!(
+                in_ad ^ in_priv,
+                "pre-split domain '{}' must match exactly one of Ad ({}) or Privacy ({})",
+                d,
+                in_ad,
+                in_priv
+            );
+        }
     }
 }

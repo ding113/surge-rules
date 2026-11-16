@@ -21,7 +21,9 @@ use crate::routing::config::{
 };
 use crate::routing::model::ParsedRoutingSource;
 use crate::routing::parsers::parse_routing_source;
-use crate::routing::verify::{RoutingVerificationReport, render_routing_notes, verify_routing_dir};
+use crate::routing::verify::{
+    RoutingThresholds, RoutingVerificationReport, render_routing_notes, verify_routing_dir,
+};
 
 pub struct BuildRoutingOptions {
     pub catalog_path: PathBuf,
@@ -29,9 +31,7 @@ pub struct BuildRoutingOptions {
     pub adblock_overrides_path: PathBuf,
     pub output_dir: PathBuf,
     pub fetch: FetchOptions,
-    pub min_direct_lines: usize,
-    pub min_ai_lines: usize,
-    pub min_proxy_lines: usize,
+    pub thresholds: RoutingThresholds,
 }
 
 impl Default for BuildRoutingOptions {
@@ -48,9 +48,13 @@ impl Default for BuildRoutingOptions {
                 max_cache_age_secs: 1800,
                 timeout_secs: 120,
             },
-            min_direct_lines: 5_000,
-            min_ai_lines: 200,
-            min_proxy_lines: 5_000,
+            thresholds: RoutingThresholds {
+                min_direct_lines: 5_000,
+                min_ai_lines: 200,
+                min_payment_lines: 200,
+                min_telemetry_lines: 100,
+                min_proxy_lines: 5_000,
+            },
         }
     }
 }
@@ -83,6 +87,16 @@ pub async fn build_routing_pipeline(
         .iter()
         .filter(|s| s.target == RoutingTarget::Ai)
         .count();
+    let total_payment = catalog
+        .sources
+        .iter()
+        .filter(|s| s.target == RoutingTarget::Payment)
+        .count();
+    let total_telemetry = catalog
+        .sources
+        .iter()
+        .filter(|s| s.target == RoutingTarget::Telemetry)
+        .count();
     let total_proxy = catalog
         .sources
         .iter()
@@ -109,6 +123,8 @@ pub async fn build_routing_pipeline(
     let mut parsed_sources = Vec::with_capacity(parsed_results.len());
     let mut active_direct = 0usize;
     let mut active_ai = 0usize;
+    let mut active_payment = 0usize;
+    let mut active_telemetry = 0usize;
     let mut active_proxy = 0usize;
 
     for (id, is_core, target, res) in parsed_results {
@@ -124,6 +140,8 @@ pub async fn build_routing_pipeline(
                 match target {
                     RoutingTarget::Direct => active_direct += 1,
                     RoutingTarget::Ai => active_ai += 1,
+                    RoutingTarget::Payment => active_payment += 1,
+                    RoutingTarget::Telemetry => active_telemetry += 1,
                     RoutingTarget::Proxy => active_proxy += 1,
                 }
                 parsed_sources.push(parsed);
@@ -140,6 +158,8 @@ pub async fn build_routing_pipeline(
     info!(
         direct = format!("{}/{}", active_direct, total_direct),
         ai = format!("{}/{}", active_ai, total_ai),
+        payment = format!("{}/{}", active_payment, total_payment),
+        telemetry = format!("{}/{}", active_telemetry, total_telemetry),
         proxy = format!("{}/{}", active_proxy, total_proxy),
         "parsed routing sources; compiling RULE-SET artifacts"
     );
@@ -153,6 +173,10 @@ pub async fn build_routing_pipeline(
             total_direct,
             active_ai,
             total_ai,
+            active_payment,
+            total_payment,
+            active_telemetry,
+            total_telemetry,
             active_proxy,
             total_proxy,
         },
@@ -161,10 +185,12 @@ pub async fn build_routing_pipeline(
     info!(
         direct = compiled.direct_stats.total_rules,
         ai = compiled.ai_stats.total_rules,
+        payment = compiled.payment_stats.total_rules,
+        telemetry = compiled.telemetry_stats.total_rules,
         proxy = compiled.proxy_stats.total_rules,
         ad_filtered = compiled.ad_domains_filtered,
         conflicts = compiled.conflicts_resolved,
-        ai_merged = compiled.ai_merged_into_proxy,
+        clean_merged = compiled.ai_merged_into_proxy,
         "compiled routing RULE-SETs; writing and verifying artifacts"
     );
 
@@ -177,18 +203,19 @@ pub async fn build_routing_pipeline(
         &compiled.ai_text,
     )?;
     fs::write(
+        opts.output_dir.join(RoutingTarget::Payment.filename()),
+        &compiled.payment_text,
+    )?;
+    fs::write(
+        opts.output_dir.join(RoutingTarget::Telemetry.filename()),
+        &compiled.telemetry_text,
+    )?;
+    fs::write(
         opts.output_dir.join(RoutingTarget::Proxy.filename()),
         &compiled.proxy_text,
     )?;
 
-    let report = verify_routing_dir(
-        &opts.output_dir,
-        &overrides,
-        opts.min_direct_lines,
-        opts.min_ai_lines,
-        opts.min_proxy_lines,
-        true,
-    )?;
+    let report = verify_routing_dir(&opts.output_dir, &overrides, opts.thresholds, true)?;
     let notes = render_routing_notes(&report);
     fs::write(opts.output_dir.join("routing-notes.md"), &notes)?;
 
@@ -196,6 +223,8 @@ pub async fn build_routing_pipeline(
         elapsed_secs = started.elapsed().as_secs_f32(),
         direct = report.direct_total,
         ai = report.ai_total,
+        payment = report.payment_total,
+        telemetry = report.telemetry_total,
         proxy = report.proxy_total,
         "routing build and verification succeeded"
     );

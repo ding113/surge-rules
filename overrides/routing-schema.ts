@@ -21,7 +21,7 @@ export type RoutingExclusionKind =
   | "IP-ASN"
   | "PROCESS-NAME";
 
-export type RoutingOverrideTarget = "direct" | "ai" | "proxy";
+export type RoutingOverrideTarget = "direct" | "ai" | "payment" | "telemetry" | "proxy";
 
 export interface RoutingRuleOverride {
   readonly target: RoutingOverrideTarget;

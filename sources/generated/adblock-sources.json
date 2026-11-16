@@ -5,6 +5,7 @@
       "id": "ubo_unbreak",
       "name": "uBlock Origin Unbreak Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -25,6 +26,7 @@
       "id": "ubo_quick_fixes",
       "name": "uBlock Origin Quick Fixes",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -45,6 +47,7 @@
       "id": "brave_unbreak",
       "name": "Brave Adblock Unbreak List",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "brave_adblock",
@@ -65,6 +68,7 @@
       "id": "adguard_sdns_exceptions",
       "name": "AdGuard DNS Filter Exceptions",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_dns",
@@ -85,6 +89,7 @@
       "id": "adguard_sdns_exclusions",
       "name": "AdGuard DNS Filter Exclusions",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_dns",
@@ -105,6 +110,7 @@
       "id": "adguard_base_allowlist",
       "name": "AdGuard Base Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -125,6 +131,7 @@
       "id": "adguard_stealth_allowlist",
       "name": "AdGuard Base Stealth Protection Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -145,6 +152,7 @@
       "id": "adguard_spyware_allowlist",
       "name": "AdGuard Tracking Protection Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -165,6 +173,7 @@
       "id": "adguard_spyware_mobile_allowlist",
       "name": "AdGuard Mobile Tracking Protection Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "adguard_filters",
@@ -185,6 +194,7 @@
       "id": "adguard_trackparam_allowlist",
       "name": "AdGuard URL Tracking Protection Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -205,6 +215,7 @@
       "id": "adguard_mobile_app_allowlist",
       "name": "AdGuard Mobile Ads App Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "adguard_filters",
@@ -225,6 +236,7 @@
       "id": "adguard_mobile_web_allowlist",
       "name": "AdGuard Mobile Ads Web Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "adguard_filters",
@@ -245,6 +257,7 @@
       "id": "adguard_chinese_allowlist",
       "name": "AdGuard Chinese Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -265,6 +278,7 @@
       "id": "adguard_social_allowlist",
       "name": "AdGuard Social Media Filter Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -285,6 +299,7 @@
       "id": "adguard_cookies_allowlist",
       "name": "AdGuard Cookie Notices Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -305,6 +320,7 @@
       "id": "adguard_spyware_cookies_allowlist",
       "name": "AdGuard Tracking Protection Cookies Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -325,6 +341,7 @@
       "id": "adguard_japanese_allowlist",
       "name": "AdGuard Japanese Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -345,6 +362,7 @@
       "id": "adguard_german_allowlist",
       "name": "AdGuard German Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -365,6 +383,7 @@
       "id": "adguard_french_allowlist",
       "name": "AdGuard French Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -385,6 +404,7 @@
       "id": "adguard_russian_allowlist",
       "name": "AdGuard Russian Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -405,6 +425,7 @@
       "id": "adguard_spanish_allowlist",
       "name": "AdGuard Spanish/Portuguese Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -425,6 +446,7 @@
       "id": "adguard_turkish_allowlist",
       "name": "AdGuard Turkish Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -445,6 +467,7 @@
       "id": "adguard_dutch_allowlist",
       "name": "AdGuard Dutch Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -465,6 +488,7 @@
       "id": "adguard_ukrainian_allowlist",
       "name": "AdGuard Ukrainian Filter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -485,6 +509,7 @@
       "id": "easylist_allowlist",
       "name": "EasyList Official Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -505,6 +530,7 @@
       "id": "easyprivacy_allowlist",
       "name": "EasyPrivacy Official Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -525,6 +551,7 @@
       "id": "easyprivacy_intl_allowlist",
       "name": "EasyPrivacy International Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -545,6 +572,7 @@
       "id": "easylist_cookie_allowlist",
       "name": "EasyList Cookie Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -565,6 +593,7 @@
       "id": "list_kr_allowlist",
       "name": "List-KR Shared Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "list_kr",
@@ -585,6 +614,7 @@
       "id": "cats_dns_allowlist",
       "name": "Cats-Team AdRules DNS Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "cats_adrules",
@@ -605,6 +635,7 @@
       "id": "goodbyeads_allow",
       "name": "8680 GOODBYEADS Allow Rules",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "goodbyeads",
@@ -625,6 +656,7 @@
       "id": "goodbyeads_mod_whitelist",
       "name": "8680 GOODBYEADS Curated Mod Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "goodbyeads",
@@ -645,6 +677,7 @@
       "id": "ad_filter_045200_whitelist",
       "name": "045200 ad-filter Curated Mod Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ad_filter_045200",
@@ -665,6 +698,7 @@
       "id": "yuki2718_jp_dns_unbreak",
       "name": "Yuki2718 Japanese DNS Unbreak",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "yuki2718_adblock2",
@@ -685,6 +719,7 @@
       "id": "hagezi_urlshortener_allow",
       "name": "HaGeZi Legitimate URL Shortener Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -705,6 +740,7 @@
       "id": "hagezi_referral_allow",
       "name": "HaGeZi Referral & Affiliate Tracking Unbreak Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -725,6 +761,7 @@
       "id": "hagezi_referral_native_allow",
       "name": "HaGeZi Native Referral Unbreak Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -745,6 +782,7 @@
       "id": "hagezi_spamtlds_allow",
       "name": "HaGeZi Abused TLDs Legitimate Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -765,6 +803,7 @@
       "id": "dandelion_legitimate_shorteners",
       "name": "Dandelion Sprout Legitimate URL Shorteners",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -785,6 +824,7 @@
       "id": "dandelion_shortener_affiliate_allow",
       "name": "Dandelion Sprout Legitimate URL Shortener Affiliate Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -805,6 +845,7 @@
       "id": "pihole_optimized_whitelist",
       "name": "zachlagden Pi-hole Optimized Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "zachlagden_pihole",
@@ -825,6 +866,7 @@
       "id": "onehosts_exclude_all",
       "name": "1Hosts Global Exclusion Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "onehosts",
@@ -845,6 +887,7 @@
       "id": "onehosts_exclude_mini_lite",
       "name": "1Hosts Mini & Lite Exclusion Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "onehosts",
@@ -865,6 +908,7 @@
       "id": "neodevhost_allow",
       "name": "NEO DEV HOST Official Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "neodevhost",
@@ -885,6 +929,7 @@
       "id": "shadowwhisperer_whitelist",
       "name": "ShadowWhisperer Curated Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "shadowwhisperer",
@@ -905,6 +950,7 @@
       "id": "uhb_whitelist",
       "name": "Ultimate Hosts Blacklist Official Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "uhb_whitelist",
@@ -925,6 +971,7 @@
       "id": "sefinek_whitelist",
       "name": "Sefinek Blocklist Collection Main Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "sefinek_whitelist",
@@ -941,6 +988,7 @@
       "id": "cpbl_whitelist",
       "name": "Combined Privacy Block Lists Official Whitelist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "cpbl_whitelist",
@@ -957,6 +1005,7 @@
       "id": "ut1_liste_blanche",
       "name": "UT1 Toulouse University Official Allowlist (liste_blanche)",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "ut1_blacklists",
@@ -973,6 +1022,7 @@
       "id": "acl4ssr_unban",
       "name": "ACL4SSR UnBan False-Positive Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "acl4ssr",
@@ -989,6 +1039,7 @@
       "id": "dandelion_nordic_allowlist",
       "name": "Dandelion Sprout Nordic Domains Allowlist",
       "role": "allowlist",
+      "category": "both",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -1009,6 +1060,7 @@
       "id": "easylist_fanboy_social_allowlist",
       "name": "EasyList Fanboy Social Allowlist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -1029,6 +1081,7 @@
       "id": "easylist_fanboy_notifications_allowlist",
       "name": "EasyList Fanboy Notifications Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -1049,6 +1102,7 @@
       "id": "easylist_fanboy_newsletter_allowlist",
       "name": "EasyList Fanboy Newsletter Allowlist",
       "role": "allowlist",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -1069,6 +1123,7 @@
       "id": "badblock_apple_whitelist",
       "name": "BadBlock Apple Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1089,6 +1144,7 @@
       "id": "badblock_browser_whitelist",
       "name": "BadBlock Browser Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1109,6 +1165,7 @@
       "id": "badblock_captcha_whitelist",
       "name": "BadBlock CAPTCHA Verification Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1129,6 +1186,7 @@
       "id": "badblock_captive_whitelist",
       "name": "BadBlock Captive Portal Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1149,6 +1207,7 @@
       "id": "badblock_certs_whitelist",
       "name": "BadBlock PKI / OCSP / CRL Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1169,6 +1228,7 @@
       "id": "badblock_content_blocking_whitelist",
       "name": "BadBlock Filter Update Mirrors Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1189,6 +1249,7 @@
       "id": "badblock_emergency_whitelist",
       "name": "BadBlock Emergency Alert Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1209,6 +1270,7 @@
       "id": "badblock_lan_whitelist",
       "name": "BadBlock Local Network Discovery Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1229,6 +1291,7 @@
       "id": "badblock_microsoft_whitelist",
       "name": "BadBlock Microsoft Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1249,6 +1312,7 @@
       "id": "badblock_mobile_whitelist",
       "name": "BadBlock Mobile App Infrastructure Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "celenityy_badblock",
@@ -1269,6 +1333,7 @@
       "id": "badblock_mozilla_whitelist",
       "name": "BadBlock Mozilla Firefox Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1289,6 +1354,7 @@
       "id": "badblock_push_whitelist",
       "name": "BadBlock Push Notification Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1309,6 +1375,7 @@
       "id": "badblock_safebrowsing_whitelist",
       "name": "BadBlock Safe Browsing Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1329,6 +1396,7 @@
       "id": "badblock_time_whitelist",
       "name": "BadBlock NTP Time Sync Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1349,6 +1417,7 @@
       "id": "badblock_main_whitelist",
       "name": "BadBlock Combined Unbreak Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1365,6 +1434,7 @@
       "id": "badblock_android_whitelist",
       "name": "BadBlock Android System Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "celenityy_badblock",
@@ -1381,6 +1451,7 @@
       "id": "badblock_linux_whitelist",
       "name": "BadBlock Linux Distro & Package Mirror Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "desktop",
       "lineage": "celenityy_badblock",
@@ -1397,6 +1468,7 @@
       "id": "badblock_nintendo_whitelist",
       "name": "BadBlock Nintendo Online Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1413,6 +1485,7 @@
       "id": "badblock_ethical_whitelist",
       "name": "BadBlock Privacy-Respecting Analytics Whitelist",
       "role": "allowlist",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1429,6 +1502,7 @@
       "id": "badblock_misc_whitelist",
       "name": "BadBlock Miscellaneous Functional Services Whitelist",
       "role": "allowlist",
+      "category": "both",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -1445,6 +1519,7 @@
       "id": "app2smile_youtube",
       "name": "app2smile YouTube Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "universal",
       "lineage": "app2smile_rules",
@@ -1465,6 +1540,7 @@
       "id": "walvez_startup_ads",
       "name": "Walvez Surge StartUp Ads Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "walvez_startup_ads",
@@ -1485,6 +1561,7 @@
       "id": "app2smile_spotify",
       "name": "app2smile Spotify Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "universal",
       "lineage": "app2smile_rules",
@@ -1505,6 +1582,7 @@
       "id": "app2smile_zhihu",
       "name": "app2smile Zhihu Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "universal",
       "lineage": "app2smile_rules",
@@ -1525,6 +1603,7 @@
       "id": "app2smile_tieba",
       "name": "app2smile Baidu Tieba Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "app2smile_rules",
@@ -1545,6 +1624,7 @@
       "id": "app2smile_baidumap",
       "name": "app2smile Baidu Map Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "app2smile_rules",
@@ -1565,6 +1645,7 @@
       "id": "app2smile_qidian",
       "name": "app2smile Qidian Reader Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "app2smile_rules",
@@ -1585,6 +1666,7 @@
       "id": "adguard_url_tracking",
       "name": "AdGuard URL Tracking Protection Filter (CoreLibs)",
       "role": "complex_first",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -1603,6 +1685,7 @@
       "id": "ubo_privacy_removeparam",
       "name": "uBlock Origin Privacy Query Parameter Stripping ($removeparam)",
       "role": "complex_first",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -1625,6 +1708,7 @@
       "id": "adguard_spyware_general_extensions",
       "name": "AdGuard Spyware Filter General Extensions ($removeparam / $removeheader)",
       "role": "complex_first",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -1647,6 +1731,7 @@
       "id": "adguard_dandelion_shorteners",
       "name": "AdGuard Legitimate URL Shortener Filter ($removeparam Pre-Compiled)",
       "role": "complex_first",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -1669,6 +1754,7 @@
       "id": "adguard_dandelion_annoyances",
       "name": "AdGuard Dandelion Sprout Annoyances ($removeparam Pre-Compiled)",
       "role": "complex_first",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -1691,6 +1777,7 @@
       "id": "ruadlist_cntblock",
       "name": "RU AdList Counter & Parameter Block ($removeparam)",
       "role": "complex_first",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -1713,6 +1800,7 @@
       "id": "app2smile_qqnews",
       "name": "app2smile Tencent News Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "app2smile_rules",
@@ -1729,6 +1817,7 @@
       "id": "maasea_keep_ads",
       "name": "Maasea Keep Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "maasea_sgmodule",
@@ -1745,6 +1834,7 @@
       "id": "app2smile_adsense",
       "name": "app2smile Google AdSense Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "universal",
       "lineage": "app2smile_rules",
@@ -1761,6 +1851,7 @@
       "id": "fmz200_x_web_ads",
       "name": "fmz200 X (Twitter) Web Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "universal",
       "lineage": "fmz200_wool_scripts",
@@ -1777,6 +1868,7 @@
       "id": "adguard_mail_tracking",
       "name": "AdGuard Mail Tracking Protection Filter (CoreLibs)",
       "role": "complex_first",
+      "category": "privacy",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -1795,6 +1887,7 @@
       "id": "repcz_kelee_remove_ads",
       "name": "Repcz / Kelee General Adblock Surge Module",
       "role": "complex_first",
+      "category": "ad_mixed",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "repcz_tool",
@@ -1811,6 +1904,7 @@
       "id": "repcz_kelee_wx_mini",
       "name": "Repcz / Kelee WeChat Mini-Programs Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "repcz_tool",
@@ -1827,6 +1921,7 @@
       "id": "repcz_kelee_block_advertisers",
       "name": "Repcz / Kelee Mobile Ad SDKs Module",
       "role": "complex_first",
+      "category": "ad_mixed",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "repcz_tool",
@@ -1843,6 +1938,7 @@
       "id": "aioneas_qqzone_adblock",
       "name": "Aioneas Qzone Adblock Module",
       "role": "complex_first",
+      "category": "ad",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "aioneas_surge",
@@ -1859,6 +1955,7 @@
       "id": "zirawell_rstore_all_adblock",
       "name": "zirawell R-Store All-in-One Surge Adblock Module",
       "role": "complex_first",
+      "category": "ad_mixed",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "zirawell_rstore",
@@ -1879,6 +1976,7 @@
       "id": "fmz200_blockads_module",
       "name": "fmz200 Wool Scripts BlockAds Module",
       "role": "complex_first",
+      "category": "ad_mixed",
       "format": "surge_module",
       "platform": "mobile",
       "lineage": "fmz200_wool_scripts",
@@ -1895,6 +1993,7 @@
       "id": "adguard_mobile_ads",
       "name": "AdGuard Mobile Ads Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "adguard_filters",
@@ -1913,6 +2012,7 @@
       "id": "adguard_base",
       "name": "AdGuard Base Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -1931,6 +2031,7 @@
       "id": "adguard_chinese",
       "name": "AdGuard Chinese Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -1946,45 +2047,10 @@
       ]
     },
     {
-      "id": "adguard_tracking",
-      "name": "AdGuard Tracking Protection Filter (CoreLibs)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "adguard_filters",
-      "weight": 92,
-      "core": true,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://filters.adtidy.org/windows/filters/3.txt"
-        }
-      ]
-    },
-    {
-      "id": "adguard_social",
-      "name": "AdGuard Social Media Filter (CoreLibs)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "adguard_filters",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://filters.adtidy.org/windows/filters/4.txt"
-        }
-      ]
-    },
-    {
       "id": "adguard_annoyances",
       "name": "AdGuard Annoyances Filter (CoreLibs Combined 18-22)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2003,6 +2069,7 @@
       "id": "adguard_malicious_urls",
       "name": "AdGuard Online Malicious URL Blocklist (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2021,6 +2088,7 @@
       "id": "adguard_dns_filter",
       "name": "AdGuard DNS Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_dns",
@@ -2043,6 +2111,7 @@
       "id": "adguard_dns_popup_hosts",
       "name": "AdGuard DNS Popup Hosts Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_dns",
@@ -2061,6 +2130,7 @@
       "id": "adguard_cname_ads",
       "name": "AdGuard CNAME Disguised Ads List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_cname",
@@ -2080,53 +2150,10 @@
       ]
     },
     {
-      "id": "adguard_cname_trackers",
-      "name": "AdGuard CNAME Disguised Trackers List",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "adguard_cname",
-      "weight": 92,
-      "core": true,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_trackers.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/cname-trackers@master/data/combined_disguised_trackers.txt"
-        }
-      ]
-    },
-    {
-      "id": "adguard_cname_clickthroughs",
-      "name": "AdGuard CNAME Disguised Clickthroughs List",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "adguard_cname",
-      "weight": 91,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_clickthroughs.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/cname-trackers@master/data/combined_disguised_clickthroughs.txt"
-        }
-      ]
-    },
-    {
       "id": "adguard_japanese",
       "name": "AdGuard Japanese Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2145,6 +2172,7 @@
       "id": "list_kr_adguard",
       "name": "List-KR Korean Filter (AdGuard CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "list_kr",
@@ -2167,6 +2195,7 @@
       "id": "adguard_german",
       "name": "AdGuard German Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2185,6 +2214,7 @@
       "id": "adguard_french",
       "name": "AdGuard French Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2203,6 +2233,7 @@
       "id": "adguard_russian",
       "name": "AdGuard Russian Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2221,6 +2252,7 @@
       "id": "adguard_spanish_portuguese",
       "name": "AdGuard Spanish/Portuguese Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2239,6 +2271,7 @@
       "id": "adguard_turkish",
       "name": "AdGuard Turkish Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2257,6 +2290,7 @@
       "id": "adguard_dutch",
       "name": "AdGuard Dutch Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2275,6 +2309,7 @@
       "id": "adguard_ukrainian",
       "name": "AdGuard Ukrainian Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2293,6 +2328,7 @@
       "id": "adguard_italian",
       "name": "AdGuard Italian Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2311,6 +2347,7 @@
       "id": "adguard_polish",
       "name": "AdGuard Polish Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adguard_filters",
@@ -2329,6 +2366,7 @@
       "id": "ubo_filters",
       "name": "uBlock Origin Built-in Filters (Pre-Expanded)",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -2348,31 +2386,10 @@
       ]
     },
     {
-      "id": "ubo_privacy",
-      "name": "uBlock Origin Privacy Filters (Pre-Expanded)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "ubo_uassets",
-      "weight": 92,
-      "core": true,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/privacy.min.txt"
-        }
-      ]
-    },
-    {
       "id": "ubo_badware",
       "name": "uBlock Origin Badware Risks (Pre-Expanded)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -2395,6 +2412,7 @@
       "id": "ubo_resource_abuse",
       "name": "uBlock Origin Resource Abuse Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -2417,6 +2435,7 @@
       "id": "ubo_annoyances_cookies",
       "name": "uBlock Origin Cookie Notices Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -2435,6 +2454,7 @@
       "id": "ubo_annoyances_others",
       "name": "uBlock Origin Annoyances Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ubo_uassets",
@@ -2453,6 +2473,7 @@
       "id": "brave_firstparty",
       "name": "Brave First-Party Adblock Filters",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "brave_adblock",
@@ -2475,6 +2496,7 @@
       "id": "brave_firstparty_regional",
       "name": "Brave First-Party Regional Adblock Filters",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "brave_adblock",
@@ -2494,31 +2516,10 @@
       ]
     },
     {
-      "id": "brave_firstparty_cname",
-      "name": "Brave First-Party CNAME Cloaking Trackers",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "brave_adblock",
-      "weight": 91,
-      "core": false,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-cname.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/brave/adblock-lists@master/brave-lists/brave-firstparty-cname.txt"
-        }
-      ]
-    },
-    {
       "id": "brave_specific",
       "name": "Brave Specific Adblock Rules",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "brave_adblock",
@@ -2541,6 +2542,7 @@
       "id": "brave_ios_specific",
       "name": "Brave iOS Specific Adblock Rules",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "brave_adblock",
@@ -2560,27 +2562,10 @@
       ]
     },
     {
-      "id": "easyprivacy",
-      "name": "EasyPrivacy Official",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "easylist_official",
-      "weight": 90,
-      "core": true,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://easylist.to/easylist/easyprivacy.txt"
-        }
-      ]
-    },
-    {
       "id": "easylist",
       "name": "EasyList Official",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -2599,6 +2584,7 @@
       "id": "easylist_china",
       "name": "EasyList China",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -2621,6 +2607,7 @@
       "id": "fanboy_annoyance",
       "name": "Fanboy's Annoyance List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -2639,6 +2626,7 @@
       "id": "fanboy_cookiemonster",
       "name": "EasyList / Fanboy Cookie Monster (uBO)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -2657,6 +2645,7 @@
       "id": "fanboy_mobile_notifications",
       "name": "Fanboy Mobile App Promo & Notifications Blocker",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "mobile",
       "lineage": "easylist_official",
@@ -2675,6 +2664,7 @@
       "id": "easylist_antiadblock",
       "name": "Anti-Adblock Killer / EasyList Anti-Adblock Filters",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -2693,6 +2683,7 @@
       "id": "awavenue_ads_surge",
       "name": "AWAvenue Ads Rule (Surge RULE-SET)",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "awavenue_ads",
@@ -2714,6 +2705,7 @@
       "id": "awavenue_ads_abp",
       "name": "AWAvenue Ads Rule (ABP Filter)",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "awavenue_ads",
@@ -2736,6 +2728,7 @@
       "id": "sukka_reject_ruleset",
       "name": "SukkaW Reject Ruleset",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "sukka_ruleset",
@@ -2753,6 +2746,7 @@
       "id": "sukka_reject_drop",
       "name": "SukkaW Reject-Drop Ruleset",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "sukka_ruleset",
@@ -2770,6 +2764,7 @@
       "id": "sukka_reject_domainset",
       "name": "SukkaW Reject DomainSet",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_domainset",
       "platform": "universal",
       "lineage": "sukka_ruleset",
@@ -2787,6 +2782,7 @@
       "id": "sukka_reject_ip",
       "name": "SukkaW Reject IP Ruleset",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "sukka_ruleset",
@@ -2804,6 +2800,7 @@
       "id": "goodbyeads_adblock",
       "name": "8680 GOODBYEADS Adblock Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "goodbyeads",
@@ -2826,6 +2823,7 @@
       "id": "goodbyeads_dns",
       "name": "8680 GOODBYEADS DNS Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "goodbyeads",
@@ -2844,6 +2842,7 @@
       "id": "heidai_adblock_surge_full",
       "name": "217heidai AdBlock Filters Full Release",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "heidai_adblock",
@@ -2862,6 +2861,7 @@
       "id": "cats_adrules_domainset",
       "name": "Cats-Team AdRules Surge DomainSet",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_domainset",
       "platform": "universal",
       "lineage": "cats_adrules",
@@ -2883,6 +2883,7 @@
       "id": "cats_jiekou_ad",
       "name": "Cats-Team / damengzhu jiekouAD Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "cats_adrules",
@@ -2905,6 +2906,7 @@
       "id": "anti_ad_surge",
       "name": "anti-AD Surge Ruleset",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "anti_ad",
@@ -2926,6 +2928,7 @@
       "id": "halflife_ad",
       "name": "HalfLife Merged Adblock Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "halflife_list",
@@ -2948,6 +2951,7 @@
       "id": "cjx_annoyance",
       "name": "cjxlist Annoyance Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "cjxlist",
@@ -2966,6 +2970,7 @@
       "id": "acl4ssr_ban_program_ad",
       "name": "ACL4SSR BanProgramAD",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "acl4ssr",
@@ -2983,6 +2988,7 @@
       "id": "acl4ssr_ban_ad",
       "name": "ACL4SSR BanAD",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "acl4ssr",
@@ -3000,6 +3006,7 @@
       "id": "geekdada_ads",
       "name": "geekdada Surge Ads List",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "geekdada",
@@ -3017,6 +3024,7 @@
       "id": "yuki2718_jpf_plus",
       "name": "Yuki2718 Japanese Filters Plus",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "yuki2718_adblock2",
@@ -3039,6 +3047,7 @@
       "id": "yuki2718_jpfp_ag",
       "name": "Yuki2718 Japanese Filters Plus (AdGuard Modifiers)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "yuki2718_adblock2",
@@ -3061,6 +3070,7 @@
       "id": "youslist_kor",
       "name": "YousList Korean Adblock Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "youslist",
@@ -3079,6 +3089,7 @@
       "id": "hagezi_ultimate",
       "name": "HaGeZi Multi ULTIMATE DNS Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -3101,6 +3112,7 @@
       "id": "hagezi_popupads",
       "name": "HaGeZi Anti-Pop-Up Ads Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -3123,6 +3135,7 @@
       "id": "hagezi_fake",
       "name": "HaGeZi Fake Stores & Scam Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -3145,6 +3158,7 @@
       "id": "hagezi_hoster",
       "name": "HaGeZi Badware Hoster Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -3167,6 +3181,7 @@
       "id": "hagezi_tif_full",
       "name": "HaGeZi Threat Intelligence Feeds (Full)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -3186,273 +3201,10 @@
       ]
     },
     {
-      "id": "hagezi_referral_native_block",
-      "name": "HaGeZi Native Referral Tracker Blocklist",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "hagezi_dns",
-      "weight": 89,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/blocklist-referral-native.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/blocklist-referral-native.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_apple",
-      "name": "HaGeZi Native Tracker Blocklist (Apple)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "hagezi_dns",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_67.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.apple.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_xiaomi",
-      "name": "HaGeZi Native Tracker Blocklist (Xiaomi)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "mobile",
-      "lineage": "hagezi_dns",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_60.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.xiaomi.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_huawei",
-      "name": "HaGeZi Native Tracker Blocklist (Huawei)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "mobile",
-      "lineage": "hagezi_dns",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_73.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.huawei.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_oppo_realme",
-      "name": "HaGeZi Native Tracker Blocklist (OPPO & Realme)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "mobile",
-      "lineage": "hagezi_dns",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_66.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.oppo-realme.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_vivo",
-      "name": "HaGeZi Native Tracker Blocklist (vivo)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "mobile",
-      "lineage": "hagezi_dns",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_65.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.vivo.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_samsung",
-      "name": "HaGeZi Native Tracker Blocklist (Samsung)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "mobile",
-      "lineage": "hagezi_dns",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_61.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.samsung.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_winoffice",
-      "name": "HaGeZi Native Tracker Blocklist (Windows & Office)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "desktop",
-      "lineage": "hagezi_dns",
-      "weight": 90,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_63.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.winoffice.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_tiktok_extended",
-      "name": "HaGeZi Native Tracker Blocklist (TikTok Extended)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "hagezi_dns",
-      "weight": 89,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.extended.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.tiktok.extended.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_amazon",
-      "name": "HaGeZi Native Tracker Blocklist (Amazon)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "hagezi_dns",
-      "weight": 89,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.amazon.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.amazon.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_lgwebos",
-      "name": "HaGeZi Native Tracker Blocklist (LG webOS)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "hagezi_dns",
-      "weight": 89,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_72.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.lgwebos.txt"
-        }
-      ]
-    },
-    {
-      "id": "hagezi_native_roku",
-      "name": "HaGeZi Native Tracker Blocklist (Roku)",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "hagezi_dns",
-      "weight": 89,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.roku.txt"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.roku.txt"
-        }
-      ]
-    },
-    {
       "id": "oisd_big",
       "name": "OISD Blocklist Big",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "oisd",
@@ -3475,6 +3227,7 @@
       "id": "onehosts_xtra",
       "name": "1Hosts (Xtra)",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "onehosts",
@@ -3497,6 +3250,7 @@
       "id": "hblock_domains",
       "name": "hBlock Unified Ad · Tracking & Malware Domains",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "hblock",
@@ -3514,6 +3268,7 @@
       "id": "neodevhost_adblocker",
       "name": "NEO DEV HOST Adblocker",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "neodevhost",
@@ -3533,60 +3288,10 @@
       ]
     },
     {
-      "id": "frogeye_firstparty_trackers",
-      "name": "Frogeye First-Party Trackers Hosts",
-      "role": "ruleset_fallback",
-      "format": "hosts",
-      "platform": "universal",
-      "lineage": "frogeye",
-      "weight": 89,
-      "core": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt"
-        }
-      ]
-    },
-    {
-      "id": "frogeye_multiparty_trackers",
-      "name": "Frogeye Multi-Party Trackers Hosts",
-      "role": "ruleset_fallback",
-      "format": "hosts",
-      "platform": "universal",
-      "lineage": "frogeye",
-      "weight": 88,
-      "core": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt"
-        }
-      ]
-    },
-    {
-      "id": "quidsup_notrack_blocklist",
-      "name": "Quidsup NoTrack Blocklist",
-      "role": "ruleset_fallback",
-      "format": "domain_list",
-      "platform": "universal",
-      "lineage": "quidsup_notrack",
-      "weight": 88,
-      "core": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-blocklist.txt"
-        }
-      ]
-    },
-    {
       "id": "quidsup_notrack_malware",
       "name": "Quidsup NoTrack Malware Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "quidsup_notrack",
@@ -3604,6 +3309,7 @@
       "id": "wblock_ad_tracking",
       "name": "wBlock Ad and Tracking Hosts",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "wblock",
@@ -3626,6 +3332,7 @@
       "id": "kadhosts_polish",
       "name": "KADhosts Polish Ad & Fraud Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "kadhosts",
@@ -3644,6 +3351,7 @@
       "id": "abpvn_vietnam",
       "name": "ABPVN Vietnamese Adblock Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "abpvn",
@@ -3662,6 +3370,7 @@
       "id": "abpindo_indonesia",
       "name": "ABPindo Indonesian Adblock Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "abpindo",
@@ -3680,6 +3389,7 @@
       "id": "dandelion_nordic",
       "name": "Dandelion Sprout Nordic Filters",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -3698,6 +3408,7 @@
       "id": "frellwit_swedish",
       "name": "Frellwit's Swedish Hosts Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "frellwit",
@@ -3716,6 +3427,7 @@
       "id": "stevenblack_hosts",
       "name": "StevenBlack Unified Hosts",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "hosts",
       "platform": "universal",
       "lineage": "stevenblack",
@@ -3737,6 +3449,7 @@
       "id": "peter_lowe",
       "name": "Peter Lowe's Ad and Tracking Server List",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "peter_lowe",
@@ -3758,6 +3471,7 @@
       "id": "dan_pollock_hosts",
       "name": "Dan Pollock's someonewhocares Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dan_pollock",
@@ -3775,6 +3489,7 @@
       "id": "dandelion_game_console",
       "name": "Dandelion Sprout Game Console Adblock List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -3796,6 +3511,7 @@
       "id": "perflyst_smart_tv",
       "name": "Perflyst & Dandelion Sprout Smart-TV Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "perflyst_smarttv",
@@ -3813,6 +3529,7 @@
       "id": "dandelion_anti_push",
       "name": "Dandelion Sprout Anti Push Notifications",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -3830,6 +3547,7 @@
       "id": "badblock_main",
       "name": "celenityy BadBlock Ad & Tracking Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "celenityy_badblock",
@@ -3849,81 +3567,10 @@
       ]
     },
     {
-      "id": "badblock_click_tracking",
-      "name": "celenityy BadBlock Click-Tracking Filter",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "celenityy_badblock",
-      "weight": 87,
-      "core": false,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/click-tracking.txt"
-        }
-      ]
-    },
-    {
-      "id": "badblock_data_brokers",
-      "name": "celenityy BadBlock Data Brokers Filter",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "celenityy_badblock",
-      "weight": 87,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/data-brokers.txt"
-        }
-      ]
-    },
-    {
-      "id": "yokoffing_click2load",
-      "name": "Yokoffing Click2Load Filter",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "yokoffing",
-      "weight": 87,
-      "core": false,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/yokoffing/filterlists/main/click2load.txt"
-        }
-      ]
-    },
-    {
-      "id": "yokoffing_privacy_essentials",
-      "name": "Yokoffing Privacy Essentials",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "yokoffing",
-      "weight": 88,
-      "core": false,
-      "extractComplexNetworkRules": true,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt"
-        }
-      ]
-    },
-    {
       "id": "suurp_faucets",
       "name": "Suurp Crypto Faucet & Scam Ad Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "suurp_custom",
@@ -3946,6 +3593,7 @@
       "id": "suurp_shortlinks",
       "name": "Suurp Monetized Ad-Shortlink Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "suurp_custom",
@@ -3968,6 +3616,7 @@
       "id": "nocoin_filter",
       "name": "NoCoin Cryptomining Filter List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "nocoin",
@@ -3990,6 +3639,7 @@
       "id": "pihole_opt_custom_ads",
       "name": "zachlagden Custom Advertising Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "zachlagden_pihole",
@@ -4004,44 +3654,10 @@
       ]
     },
     {
-      "id": "pihole_opt_custom_tracking",
-      "name": "zachlagden Custom Tracking Domains",
-      "role": "ruleset_fallback",
-      "format": "domain_list",
-      "platform": "universal",
-      "lineage": "zachlagden_pihole",
-      "weight": 85,
-      "core": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/tracking.txt"
-        }
-      ]
-    },
-    {
-      "id": "shadowwhisperer_tracking",
-      "name": "ShadowWhisperer Tracking List",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "shadowwhisperer",
-      "weight": 86,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_69.txt"
-        }
-      ]
-    },
-    {
       "id": "shadowwhisperer_malware",
       "name": "ShadowWhisperer Malware List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "shadowwhisperer",
@@ -4057,27 +3673,10 @@
       ]
     },
     {
-      "id": "stalkerware_indicators",
-      "name": "AssoEchap Stalkerware Indicators List",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "mobile",
-      "lineage": "stalkerware",
-      "weight": 91,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_31.txt"
-        }
-      ]
-    },
-    {
       "id": "durablenapkin_scam",
       "name": "DurableNapkin Scam Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "durablenapkin",
@@ -4096,6 +3695,7 @@
       "id": "dandelion_antimalware",
       "name": "Dandelion Sprout Anti-Malware List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -4114,6 +3714,7 @@
       "id": "urlhaus_malicious",
       "name": "abuse.ch URLHaus Malicious URL Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "abuse_ch",
@@ -4136,6 +3737,7 @@
       "id": "phishing_url_blocklist",
       "name": "PhishTank & OpenPhish Phishing URL Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "malware_filter",
@@ -4158,6 +3760,7 @@
       "id": "phishing_army_extended",
       "name": "Phishing Army Extended Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "phishing_army",
@@ -4179,6 +3782,7 @@
       "id": "cert_polska_malicious",
       "name": "CERT Polska Malicious & Phishing Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "cert_polska",
@@ -4201,6 +3805,7 @@
       "id": "phishdestroy_active",
       "name": "PhishDestroy Content-Verified Active Phishing Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "phishdestroy",
@@ -4222,6 +3827,7 @@
       "id": "phishindex_domains",
       "name": "PhishIndex Malicious Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "phishindex",
@@ -4237,27 +3843,10 @@
       ]
     },
     {
-      "id": "phishindex_iploggers",
-      "name": "PhishIndex IP Logger Domains",
-      "role": "ruleset_fallback",
-      "format": "abp_filter",
-      "platform": "universal",
-      "lineage": "phishindex",
-      "weight": 89,
-      "core": false,
-      "extractComplexNetworkRules": false,
-      "extractFallbackDomainRules": true,
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt"
-        }
-      ]
-    },
-    {
       "id": "persianblocker_iran",
       "name": "PersianBlocker Regional Adblock Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "persianblocker",
@@ -4276,6 +3865,7 @@
       "id": "macedonian_pihole",
       "name": "Macedonian Pi-hole Adblock List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "macedonian_pihole",
@@ -4294,6 +3884,7 @@
       "id": "turk_adlist",
       "name": "turk-adlist Turkish DNS Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "turk_adlist",
@@ -4312,6 +3903,7 @@
       "id": "hufilter_hungarian",
       "name": "Hufilter Hungarian Adblock List",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hufilter",
@@ -4330,6 +3922,7 @@
       "id": "easylist_lithuania",
       "name": "EasyList Lithuania DNS Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -4348,6 +3941,7 @@
       "id": "turkish_ad_hosts",
       "name": "Turkish Ad Hosts Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "turkish_ad_hosts",
@@ -4366,6 +3960,7 @@
       "id": "easylist_hebrew",
       "name": "EasyList Hebrew DNS Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -4384,6 +3979,7 @@
       "id": "ukrainian_security_filter",
       "name": "Ukrainian Security & Phishing Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "ukrainian_security",
@@ -4402,6 +3998,7 @@
       "id": "pihole_opt_custom_malicious",
       "name": "zachlagden Custom Malicious Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "zachlagden_pihole",
@@ -4419,6 +4016,7 @@
       "id": "adguard_adblockid",
       "name": "AdBlockID Plus Indonesian Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "adblockid",
@@ -4441,6 +4039,7 @@
       "id": "abpvn_adguard_corelibs",
       "name": "ABPVN Vietnamese AdGuard Advanced Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "abpvn",
@@ -4463,6 +4062,7 @@
       "id": "majkiit_polish_adguard",
       "name": "MajkiIT Official Polish AdGuard Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "majkiit_polish",
@@ -4485,6 +4085,7 @@
       "id": "filtersheroes_kad",
       "name": "FiltersHeroes KAD Polish Anti-Scam & Fraud Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "kadhosts",
@@ -4507,6 +4108,7 @@
       "id": "filtersheroes_polish_annoyances",
       "name": "FiltersHeroes Polish Annoyances Filters (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "filtersheroes_paf",
@@ -4525,6 +4127,7 @@
       "id": "easylist_czech_slovak",
       "name": "EasyList Czech and Slovak",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_cs",
@@ -4547,6 +4150,7 @@
       "id": "finnish_easylist",
       "name": "Adblock List for Finland",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "finnish_easylist",
@@ -4569,6 +4173,7 @@
       "id": "easylist_thailand",
       "name": "EasyList Thailand",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_th",
@@ -4591,6 +4196,7 @@
       "id": "gioxx_xfiles_italian",
       "name": "Xfiles Italian Adblock Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "gioxx_xfiles",
@@ -4613,6 +4219,7 @@
       "id": "dandelion_serbocroatian",
       "name": "Dandelion Sprout Serbo-Croatian Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "dandelion_adfilt",
@@ -4631,6 +4238,7 @@
       "id": "indianlist_adguard",
       "name": "IndianList Regional Adblock Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -4649,6 +4257,7 @@
       "id": "liste_ar_arabic",
       "name": "Liste AR Arabic Adblock Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -4667,6 +4276,7 @@
       "id": "easylist_italy",
       "name": "EasyList Italy (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -4685,6 +4295,7 @@
       "id": "easylist_portuguese",
       "name": "EasyList Portuguese (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "easylist_official",
@@ -4703,6 +4314,7 @@
       "id": "greek_adblock_filter",
       "name": "Greek AdBlock Filter (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "greek_adblock",
@@ -4721,6 +4333,7 @@
       "id": "bulgarian_adblock_list",
       "name": "Bulgarian Adblock List (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "bulgarian_adblock",
@@ -4739,6 +4352,7 @@
       "id": "latvian_adblock_list",
       "name": "Latvian Adblock List (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "latvian_adblock",
@@ -4757,6 +4371,7 @@
       "id": "icelandic_abp_list",
       "name": "Icelandic ABP Adblock List (CoreLibs)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "icelandic_abp",
@@ -4775,6 +4390,7 @@
       "id": "loyalsoldier_surge_reject",
       "name": "Loyalsoldier surge-rules reject ruleset",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "v2fly_dlc",
@@ -4792,6 +4408,7 @@
       "id": "gmoogway_sr_reject",
       "name": "GMOogway Shadowrocket Reject List",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "gmoogway",
@@ -4809,6 +4426,7 @@
       "id": "metacubex_httpdns_cn",
       "name": "MetaCubeX category-httpdns-cn (Anti-HTTPDNS Bypass)",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "surge_ruleset",
       "platform": "universal",
       "lineage": "v2fly_dlc",
@@ -4826,6 +4444,7 @@
       "id": "cpbl_abp_list",
       "name": "Combined Privacy Block Lists (ABP)",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "cpbl",
@@ -4844,6 +4463,7 @@
       "id": "hostsvn_adservers",
       "name": "hostsVN Vietnamese & Global Adservers Filter",
       "role": "ruleset_fallback",
+      "category": "ad_mixed",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hostsvn",
@@ -4862,6 +4482,7 @@
       "id": "hostsvn_threat",
       "name": "hostsVN Malicious & Threat Extension Filter",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hostsvn",
@@ -4880,6 +4501,7 @@
       "id": "fmhy_filterlist",
       "name": "FMHY Unsafe · Fake-Download & Scamware Filterlist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "fmhy_filterlist",
@@ -4898,6 +4520,7 @@
       "id": "metamask_eth_phishing",
       "name": "MetaMask Web3 & Crypto Drainer Phishing Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "hosts",
       "platform": "universal",
       "lineage": "metamask_phishing",
@@ -4915,6 +4538,7 @@
       "id": "global_anti_scam_org",
       "name": "Global Anti-Scam Organization (GASO) Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "gaso_scam",
@@ -4933,6 +4557,7 @@
       "id": "shadowwhisperer_scam",
       "name": "ShadowWhisperer Scam & Fraud Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "shadowwhisperer",
@@ -4950,6 +4575,7 @@
       "id": "shadowwhisperer_typo",
       "name": "ShadowWhisperer Typosquatting & Homograph Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "shadowwhisperer",
@@ -4967,6 +4593,7 @@
       "id": "hagezi_abused_tlds",
       "name": "HaGeZi The World's Most Abused TLDs",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "abp_filter",
       "platform": "universal",
       "lineage": "hagezi_dns",
@@ -4989,6 +4616,7 @@
       "id": "ut1_malware",
       "name": "UT1 Toulouse University Malware Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "ut1_blacklists",
@@ -5006,6 +4634,7 @@
       "id": "ut1_phishing",
       "name": "UT1 Toulouse University Phishing Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "ut1_blacklists",
@@ -5023,6 +4652,7 @@
       "id": "ut1_cryptojacking",
       "name": "UT1 Toulouse University Cryptojacking Domains",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "ut1_blacklists",
@@ -5040,6 +4670,7 @@
       "id": "rpilist_malware",
       "name": "RPiList Specials Malware Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "rpilist",
@@ -5057,6 +4688,7 @@
       "id": "rpilist_phishing",
       "name": "RPiList Specials Phishing Blocklist",
       "role": "ruleset_fallback",
+      "category": "ad",
       "format": "domain_list",
       "platform": "universal",
       "lineage": "rpilist",
@@ -5067,6 +4699,636 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe"
+        }
+      ]
+    },
+    {
+      "id": "adguard_tracking",
+      "name": "AdGuard Tracking Protection Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 92,
+      "core": true,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/3.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_social",
+      "name": "AdGuard Social Media Filter (CoreLibs)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_filters",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://filters.adtidy.org/windows/filters/4.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_cname_trackers",
+      "name": "AdGuard CNAME Disguised Trackers List",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_cname",
+      "weight": 92,
+      "core": true,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_trackers.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/cname-trackers@master/data/combined_disguised_trackers.txt"
+        }
+      ]
+    },
+    {
+      "id": "adguard_cname_clickthroughs",
+      "name": "AdGuard CNAME Disguised Clickthroughs List",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "adguard_cname",
+      "weight": 91,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_clickthroughs.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/AdguardTeam/cname-trackers@master/data/combined_disguised_clickthroughs.txt"
+        }
+      ]
+    },
+    {
+      "id": "ubo_privacy",
+      "name": "uBlock Origin Privacy Filters (Pre-Expanded)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "ubo_uassets",
+      "weight": 92,
+      "core": true,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/privacy.min.txt"
+        }
+      ]
+    },
+    {
+      "id": "brave_firstparty_cname",
+      "name": "Brave First-Party CNAME Cloaking Trackers",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "brave_adblock",
+      "weight": 91,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty-cname.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/brave/adblock-lists@master/brave-lists/brave-firstparty-cname.txt"
+        }
+      ]
+    },
+    {
+      "id": "easyprivacy",
+      "name": "EasyPrivacy Official",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "easylist_official",
+      "weight": 90,
+      "core": true,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://easylist.to/easylist/easyprivacy.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_referral_native_block",
+      "name": "HaGeZi Native Referral Tracker Blocklist",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/blocklist-referral-native.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/blocklist-referral-native.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_apple",
+      "name": "HaGeZi Native Tracker Blocklist (Apple)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_67.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.apple.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_xiaomi",
+      "name": "HaGeZi Native Tracker Blocklist (Xiaomi)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "hagezi_dns",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_60.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.xiaomi.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_huawei",
+      "name": "HaGeZi Native Tracker Blocklist (Huawei)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "hagezi_dns",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_73.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.huawei.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_oppo_realme",
+      "name": "HaGeZi Native Tracker Blocklist (OPPO & Realme)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "hagezi_dns",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_66.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.oppo-realme.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_vivo",
+      "name": "HaGeZi Native Tracker Blocklist (vivo)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "hagezi_dns",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_65.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.vivo.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_samsung",
+      "name": "HaGeZi Native Tracker Blocklist (Samsung)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "hagezi_dns",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_61.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.samsung.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_winoffice",
+      "name": "HaGeZi Native Tracker Blocklist (Windows & Office)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "desktop",
+      "lineage": "hagezi_dns",
+      "weight": 90,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_63.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.winoffice.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_tiktok_extended",
+      "name": "HaGeZi Native Tracker Blocklist (TikTok Extended)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.tiktok.extended.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.tiktok.extended.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_amazon",
+      "name": "HaGeZi Native Tracker Blocklist (Amazon)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.amazon.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.amazon.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_lgwebos",
+      "name": "HaGeZi Native Tracker Blocklist (LG webOS)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_72.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.lgwebos.txt"
+        }
+      ]
+    },
+    {
+      "id": "hagezi_native_roku",
+      "name": "HaGeZi Native Tracker Blocklist (Roku)",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "hagezi_dns",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.roku.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@main/adblock/native.roku.txt"
+        }
+      ]
+    },
+    {
+      "id": "frogeye_firstparty_trackers",
+      "name": "Frogeye First-Party Trackers Hosts",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "hosts",
+      "platform": "universal",
+      "lineage": "frogeye",
+      "weight": 89,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt"
+        }
+      ]
+    },
+    {
+      "id": "frogeye_multiparty_trackers",
+      "name": "Frogeye Multi-Party Trackers Hosts",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "hosts",
+      "platform": "universal",
+      "lineage": "frogeye",
+      "weight": 88,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://hostfiles.frogeye.fr/multiparty-trackers-hosts.txt"
+        }
+      ]
+    },
+    {
+      "id": "quidsup_notrack_blocklist",
+      "name": "Quidsup NoTrack Blocklist",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "quidsup_notrack",
+      "weight": 88,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-blocklist.txt"
+        }
+      ]
+    },
+    {
+      "id": "badblock_click_tracking",
+      "name": "celenityy BadBlock Click-Tracking Filter",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "celenityy_badblock",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/click-tracking.txt"
+        }
+      ]
+    },
+    {
+      "id": "badblock_data_brokers",
+      "name": "celenityy BadBlock Data Brokers Filter",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "celenityy_badblock",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/celenityy/BadBlock/pages/abp/data-brokers.txt"
+        }
+      ]
+    },
+    {
+      "id": "yokoffing_click2load",
+      "name": "Yokoffing Click2Load Filter",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "yokoffing",
+      "weight": 87,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/yokoffing/filterlists/main/click2load.txt"
+        }
+      ]
+    },
+    {
+      "id": "yokoffing_privacy_essentials",
+      "name": "Yokoffing Privacy Essentials",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "yokoffing",
+      "weight": 88,
+      "core": false,
+      "extractComplexNetworkRules": true,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt"
+        }
+      ]
+    },
+    {
+      "id": "pihole_opt_custom_tracking",
+      "name": "zachlagden Custom Tracking Domains",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "domain_list",
+      "platform": "universal",
+      "lineage": "zachlagden_pihole",
+      "weight": 85,
+      "core": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/tracking.txt"
+        }
+      ]
+    },
+    {
+      "id": "shadowwhisperer_tracking",
+      "name": "ShadowWhisperer Tracking List",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "shadowwhisperer",
+      "weight": 86,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_69.txt"
+        }
+      ]
+    },
+    {
+      "id": "stalkerware_indicators",
+      "name": "AssoEchap Stalkerware Indicators List",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "mobile",
+      "lineage": "stalkerware",
+      "weight": 91,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_31.txt"
+        }
+      ]
+    },
+    {
+      "id": "phishindex_iploggers",
+      "name": "PhishIndex IP Logger Domains",
+      "role": "ruleset_fallback",
+      "category": "privacy",
+      "format": "abp_filter",
+      "platform": "universal",
+      "lineage": "phishindex",
+      "weight": 89,
+      "core": false,
+      "extractComplexNetworkRules": false,
+      "extractFallbackDomainRules": true,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/PhishIndex/phishindex-blocklist/main/Data/IP%20Logger%20Domains/ip_logger_domains-adblock.txt"
         }
       ]
     }

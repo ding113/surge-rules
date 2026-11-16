@@ -20,16 +20,31 @@ use crate::routing::model::{
     parse_logical_and_clauses,
 };
 
+#[derive(Clone, Copy, Debug, Default)]
+pub struct RoutingThresholds {
+    pub min_direct_lines: usize,
+    pub min_ai_lines: usize,
+    pub min_payment_lines: usize,
+    pub min_telemetry_lines: usize,
+    pub min_proxy_lines: usize,
+}
+
 #[derive(Clone, Debug)]
 pub struct RoutingVerificationReport {
     pub direct: AdblockFileSummary,
     pub ai: AdblockFileSummary,
+    pub payment: AdblockFileSummary,
+    pub telemetry: AdblockFileSummary,
     pub proxy: AdblockFileSummary,
     pub direct_total: usize,
     pub ai_total: usize,
+    pub payment_total: usize,
+    pub telemetry_total: usize,
     pub proxy_total: usize,
     pub direct_extended_count: usize,
     pub ai_extended_count: usize,
+    pub payment_extended_count: usize,
+    pub telemetry_extended_count: usize,
     pub proxy_extended_count: usize,
     pub canaries_checked: usize,
 }
@@ -117,25 +132,38 @@ impl ParsedListIndex {
 pub fn verify_routing_dir(
     dir: &Path,
     overrides: &RoutingOverrides,
-    min_direct_lines: usize,
-    min_ai_lines: usize,
-    min_proxy_lines: usize,
+    thresholds: RoutingThresholds,
     check_canaries: bool,
 ) -> Result<RoutingVerificationReport> {
     let direct_path = dir.join(RoutingTarget::Direct.filename());
     let ai_path = dir.join(RoutingTarget::Ai.filename());
+    let payment_path = dir.join(RoutingTarget::Payment.filename());
+    let telemetry_path = dir.join(RoutingTarget::Telemetry.filename());
     let proxy_path = dir.join(RoutingTarget::Proxy.filename());
 
     let direct_raw = fs::read_to_string(&direct_path)
         .with_context(|| format!("missing {}", direct_path.display()))?;
     let ai_raw =
         fs::read_to_string(&ai_path).with_context(|| format!("missing {}", ai_path.display()))?;
+    let payment_raw = fs::read_to_string(&payment_path)
+        .with_context(|| format!("missing {}", payment_path.display()))?;
+    let telemetry_raw = fs::read_to_string(&telemetry_path)
+        .with_context(|| format!("missing {}", telemetry_path.display()))?;
     let proxy_raw = fs::read_to_string(&proxy_path)
         .with_context(|| format!("missing {}", proxy_path.display()))?;
 
-    let direct_idx = parse_and_validate_ruleset("Direct.list", &direct_raw, min_direct_lines)?;
-    let ai_idx = parse_and_validate_ruleset("AI.list", &ai_raw, min_ai_lines)?;
-    let proxy_idx = parse_and_validate_ruleset("Proxy.list", &proxy_raw, min_proxy_lines)?;
+    let direct_idx =
+        parse_and_validate_ruleset("Direct.list", &direct_raw, thresholds.min_direct_lines)?;
+    let ai_idx = parse_and_validate_ruleset("AI.list", &ai_raw, thresholds.min_ai_lines)?;
+    let payment_idx =
+        parse_and_validate_ruleset("Payment.list", &payment_raw, thresholds.min_payment_lines)?;
+    let telemetry_idx = parse_and_validate_ruleset(
+        "Telemetry.list",
+        &telemetry_raw,
+        thresholds.min_telemetry_lines,
+    )?;
+    let proxy_idx =
+        parse_and_validate_ruleset("Proxy.list", &proxy_raw, thresholds.min_proxy_lines)?;
 
     if direct_idx.extended_count != 0 {
         bail!(
@@ -144,12 +172,32 @@ pub fn verify_routing_dir(
         );
     }
 
-    verify_shared_infra_safety(&ai_idx, overrides)?;
-    verify_ai_subset_of_proxy(&ai_idx, &proxy_idx)?;
-    verify_reserved_ip_absence(&direct_idx, &ai_idx, &proxy_idx)?;
+    for (label, idx) in [
+        ("AI.list", &ai_idx),
+        ("Payment.list", &payment_idx),
+        ("Telemetry.list", &telemetry_idx),
+    ] {
+        verify_shared_infra_safety(label, idx, overrides)?;
+        verify_subset_of_proxy(label, idx, &proxy_idx)?;
+    }
+
+    verify_clean_targets_disjoint(&ai_idx, &payment_idx, &telemetry_idx)?;
+    verify_reserved_ip_absence(&[
+        ("Direct.list", &direct_idx),
+        ("AI.list", &ai_idx),
+        ("Payment.list", &payment_idx),
+        ("Telemetry.list", &telemetry_idx),
+        ("Proxy.list", &proxy_idx),
+    ])?;
 
     let canaries_checked = if check_canaries {
-        run_production_canaries(&direct_idx, &ai_idx, &proxy_idx)?
+        run_production_canaries(
+            &direct_idx,
+            &ai_idx,
+            &payment_idx,
+            &telemetry_idx,
+            &proxy_idx,
+        )?
     } else {
         0
     };
@@ -157,12 +205,26 @@ pub fn verify_routing_dir(
     Ok(RoutingVerificationReport {
         direct: file_summary("Direct.list", direct_raw.as_bytes(), direct_idx.total_rules),
         ai: file_summary("AI.list", ai_raw.as_bytes(), ai_idx.total_rules),
+        payment: file_summary(
+            "Payment.list",
+            payment_raw.as_bytes(),
+            payment_idx.total_rules,
+        ),
+        telemetry: file_summary(
+            "Telemetry.list",
+            telemetry_raw.as_bytes(),
+            telemetry_idx.total_rules,
+        ),
         proxy: file_summary("Proxy.list", proxy_raw.as_bytes(), proxy_idx.total_rules),
         direct_total: direct_idx.total_rules,
         ai_total: ai_idx.total_rules,
+        payment_total: payment_idx.total_rules,
+        telemetry_total: telemetry_idx.total_rules,
         proxy_total: proxy_idx.total_rules,
         direct_extended_count: direct_idx.extended_count,
         ai_extended_count: ai_idx.extended_count,
+        payment_extended_count: payment_idx.extended_count,
+        telemetry_extended_count: telemetry_idx.extended_count,
         proxy_extended_count: proxy_idx.extended_count,
         canaries_checked,
     })
@@ -429,7 +491,8 @@ fn parse_and_validate_ruleset(
 }
 
 fn verify_shared_infra_safety(
-    ai_idx: &ParsedListIndex,
+    label: &str,
+    idx: &ParsedListIndex,
     overrides: &RoutingOverrides,
 ) -> Result<()> {
     for entry in &overrides.shared_infra_roots {
@@ -438,14 +501,15 @@ fn verify_shared_infra_safety(
             .trim()
             .trim_end_matches('.')
             .to_ascii_lowercase();
-        if ai_idx.exact_domains.contains_key(&root) || ai_idx.suffix_domains.contains_key(&root) {
+        if idx.exact_domains.contains_key(&root) || idx.suffix_domains.contains_key(&root) {
             bail!(
-                "AI.list unlawfully captures shared infrastructure apex '{}'",
+                "{} unlawfully captures shared infrastructure apex '{}'",
+                label,
                 root
             );
         }
     }
-    for non_ai_host in [
+    for non_clean_host in [
         "s3.amazonaws.com",
         "console.aws.amazon.com",
         "gist.github.com",
@@ -457,10 +521,11 @@ fn verify_shared_infra_safety(
         "auth0.com",
         "sentry.io",
     ] {
-        if ai_idx.covers_domain(non_ai_host) {
+        if idx.covers_domain(non_clean_host) {
             bail!(
-                "AI.list false-positive captures shared non-AI host '{}'",
-                non_ai_host
+                "{} false-positive captures shared multi-tenant host '{}'",
+                label,
+                non_clean_host
             );
         }
     }
@@ -469,9 +534,9 @@ fn verify_shared_infra_safety(
         .iter()
         .map(|e| e.domain.trim().trim_end_matches('.').to_ascii_lowercase())
         .collect();
-    for and_val in &ai_idx.logical_ands {
+    for and_val in &idx.logical_ands {
         let Some(clauses) = parse_logical_and_clauses(and_val) else {
-            bail!("AI.list contains unparseable AND rule '{}'", and_val);
+            bail!("{} contains unparseable AND rule '{}'", label, and_val);
         };
         let has_context_guard = clauses.iter().any(|(k, _, _)| {
             matches!(k, RoutingRuleKind::ProcessName | RoutingRuleKind::UserAgent)
@@ -490,7 +555,8 @@ fn verify_shared_infra_safety(
         });
         if touches_shared && !has_context_guard {
             bail!(
-                "AI.list AND rule '{}' references shared infrastructure without PROCESS-NAME/USER-AGENT",
+                "{} AND rule '{}' references shared infrastructure without PROCESS-NAME/USER-AGENT",
+                label,
                 and_val
             );
         }
@@ -498,35 +564,195 @@ fn verify_shared_infra_safety(
     Ok(())
 }
 
-fn verify_ai_subset_of_proxy(ai_idx: &ParsedListIndex, proxy_idx: &ParsedListIndex) -> Result<()> {
-    for (dom, &ext) in &ai_idx.exact_domains {
+/// Verifies that `AI.list`, `Payment.list`, and `Telemetry.list` are pairwise mutually disjoint
+/// across exact rule keys, `DomainTrie` suffix hierarchies, `*.tail` wildcards, and IPv4/IPv6 CIDRs.
+fn verify_clean_targets_disjoint(
+    ai_idx: &ParsedListIndex,
+    payment_idx: &ParsedListIndex,
+    telemetry_idx: &ParsedListIndex,
+) -> Result<()> {
+    let targets = [
+        ("AI.list", ai_idx),
+        ("Payment.list", payment_idx),
+        ("Telemetry.list", telemetry_idx),
+    ];
+    for (i, (label_a, a)) in targets.iter().enumerate() {
+        for (j, (label_b, b)) in targets.iter().enumerate() {
+            if i == j {
+                continue;
+            }
+            for dom in a.exact_domains.keys() {
+                if b.exact_domains.contains_key(dom) || b.trie.matches_domain(dom) {
+                    bail!(
+                        "disjointness violation between {} and {}: DOMAIN '{}' overlaps",
+                        label_a,
+                        label_b,
+                        dom
+                    );
+                }
+            }
+            for sfx in a.suffix_domains.keys() {
+                if b.suffix_domains.contains_key(sfx) || b.trie.matches_domain(sfx) {
+                    bail!(
+                        "disjointness violation between {} and {}: DOMAIN-SUFFIX '{}' overlaps",
+                        label_a,
+                        label_b,
+                        sfx
+                    );
+                }
+            }
+            for kw in a.keywords.keys() {
+                if b.keywords.contains_key(kw) {
+                    bail!(
+                        "disjointness violation between {} and {}: shared DOMAIN-KEYWORD '{}'",
+                        label_a,
+                        label_b,
+                        kw
+                    );
+                }
+            }
+            for wc in a.wildcards.keys() {
+                if b.wildcards.contains_key(wc) {
+                    bail!(
+                        "disjointness violation between {} and {}: shared DOMAIN-WILDCARD '{}'",
+                        label_a,
+                        label_b,
+                        wc
+                    );
+                }
+                if let Some(tail) = wc.strip_prefix("*.")
+                    && !tail.contains('*')
+                    && !tail.contains('?')
+                    && b.trie.has_suffix_ancestor_or_eq(tail)
+                {
+                    bail!(
+                        "disjointness violation between {} and {}: DOMAIN-WILDCARD '{}' covered by suffix in {}",
+                        label_a,
+                        label_b,
+                        wc,
+                        label_b
+                    );
+                }
+            }
+            for re in a.url_regexes.keys() {
+                if b.url_regexes.contains_key(re) {
+                    bail!(
+                        "disjointness violation between {} and {}: shared URL-REGEX '{}'",
+                        label_a,
+                        label_b,
+                        re
+                    );
+                }
+            }
+            for ua in &a.user_agents {
+                if b.user_agents.contains(ua) {
+                    bail!(
+                        "disjointness violation between {} and {}: shared USER-AGENT '{}'",
+                        label_a,
+                        label_b,
+                        ua
+                    );
+                }
+            }
+            for proc_name in &a.process_names {
+                if b.process_names.contains(proc_name) {
+                    bail!(
+                        "disjointness violation between {} and {}: shared PROCESS-NAME '{}'",
+                        label_a,
+                        label_b,
+                        proc_name
+                    );
+                }
+            }
+            for and_val in &a.logical_ands {
+                if b.logical_ands.contains(and_val) {
+                    bail!(
+                        "disjointness violation between {} and {}: shared AND '{}'",
+                        label_a,
+                        label_b,
+                        and_val
+                    );
+                }
+            }
+            for asn in &a.asns {
+                if b.asns.contains(asn) {
+                    bail!(
+                        "disjointness violation between {} and {}: shared IP-ASN,{}",
+                        label_a,
+                        label_b,
+                        asn
+                    );
+                }
+            }
+            if i < j {
+                for net_a in &a.v4_cidrs {
+                    for net_b in &b.v4_cidrs {
+                        if net_a.contains(&net_b.network()) || net_b.contains(&net_a.network()) {
+                            bail!(
+                                "disjointness violation between {} and {}: IP-CIDR {} overlaps {}",
+                                label_a,
+                                label_b,
+                                net_a,
+                                net_b
+                            );
+                        }
+                    }
+                }
+                for net_a in &a.v6_cidrs {
+                    for net_b in &b.v6_cidrs {
+                        if net_a.contains(&net_b.network()) || net_b.contains(&net_a.network()) {
+                            bail!(
+                                "disjointness violation between {} and {}: IP-CIDR6 {} overlaps {}",
+                                label_a,
+                                label_b,
+                                net_a,
+                                net_b
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+fn verify_subset_of_proxy(
+    label: &str,
+    sub_idx: &ParsedListIndex,
+    proxy_idx: &ParsedListIndex,
+) -> Result<()> {
+    for (dom, &ext) in &sub_idx.exact_domains {
         if !proxy_idx.covers_domain_with_ext(dom, ext) {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing or weaker DOMAIN '{}' (extended={})",
+                "Proxy.list is not a strict superset of {}: missing or weaker DOMAIN '{}' (extended={})",
+                label,
                 dom,
                 ext
             );
         }
     }
-    for (sfx, &ext) in &ai_idx.suffix_domains {
+    for (sfx, &ext) in &sub_idx.suffix_domains {
         if !proxy_idx.covers_suffix_with_ext(sfx, ext) {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing or weaker DOMAIN-SUFFIX '{}' (extended={})",
+                "Proxy.list is not a strict superset of {}: missing or weaker DOMAIN-SUFFIX '{}' (extended={})",
+                label,
                 sfx,
                 ext
             );
         }
     }
-    for (kw, &ext) in &ai_idx.keywords {
+    for (kw, &ext) in &sub_idx.keywords {
         match proxy_idx.keywords.get(kw) {
             Some(&p_ext) if !ext || p_ext => {}
             _ => bail!(
-                "Proxy.list is not a strict superset of AI.list: missing DOMAIN-KEYWORD '{}'",
+                "Proxy.list is not a strict superset of {}: missing DOMAIN-KEYWORD '{}'",
+                label,
                 kw
             ),
         }
     }
-    for (wc, &ext) in &ai_idx.wildcards {
+    for (wc, &ext) in &sub_idx.wildcards {
         let exact_ok = proxy_idx
             .wildcards
             .get(wc)
@@ -537,72 +763,80 @@ fn verify_ai_subset_of_proxy(ai_idx: &ParsedListIndex, proxy_idx: &ParsedListInd
             .is_some_and(|tail| proxy_idx.covers_suffix_with_ext(tail, ext));
         if !exact_ok && !suffix_ok {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing DOMAIN-WILDCARD '{}'",
+                "Proxy.list is not a strict superset of {}: missing DOMAIN-WILDCARD '{}'",
+                label,
                 wc
             );
         }
     }
-    for (re, &ext) in &ai_idx.url_regexes {
+    for (re, &ext) in &sub_idx.url_regexes {
         match proxy_idx.url_regexes.get(re) {
             Some(&p_ext) if !ext || p_ext => {}
             _ => bail!(
-                "Proxy.list is not a strict superset of AI.list: missing URL-REGEX '{}'",
+                "Proxy.list is not a strict superset of {}: missing URL-REGEX '{}'",
+                label,
                 re
             ),
         }
     }
-    for ua in &ai_idx.user_agents {
+    for ua in &sub_idx.user_agents {
         if !proxy_idx.user_agents.contains(ua) {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing USER-AGENT '{}'",
+                "Proxy.list is not a strict superset of {}: missing USER-AGENT '{}'",
+                label,
                 ua
             );
         }
     }
-    for proc_name in &ai_idx.process_names {
+    for proc_name in &sub_idx.process_names {
         if !proxy_idx.process_names.contains(proc_name) {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing PROCESS-NAME '{}'",
+                "Proxy.list is not a strict superset of {}: missing PROCESS-NAME '{}'",
+                label,
                 proc_name
             );
         }
     }
-    for and_val in &ai_idx.logical_ands {
+    for and_val in &sub_idx.logical_ands {
         if !proxy_idx.logical_ands.contains(and_val) {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing AND '{}'",
+                "Proxy.list is not a strict superset of {}: missing AND '{}'",
+                label,
                 and_val
             );
         }
     }
-    for ai_v4 in &ai_idx.v4_cidrs {
+    for sub_v4 in &sub_idx.v4_cidrs {
         if !proxy_idx
             .v4_cidrs
             .iter()
-            .any(|p| p.prefix_len() <= ai_v4.prefix_len() && p.contains(&ai_v4.network()))
+            .any(|p| p.prefix_len() <= sub_v4.prefix_len() && p.contains(&sub_v4.network()))
         {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing IP-CIDR {}",
-                ai_v4
+                "Proxy.list is not a strict superset of {}: missing IP-CIDR {}",
+                label,
+                sub_v4
             );
         }
     }
-    for ai_v6 in &ai_idx.v6_cidrs {
+    for sub_v6 in &sub_idx.v6_cidrs {
         if !proxy_idx
             .v6_cidrs
             .iter()
-            .any(|p| p.prefix_len() <= ai_v6.prefix_len() && p.contains(&ai_v6.network()))
+            .any(|p| p.prefix_len() <= sub_v6.prefix_len() && p.contains(&sub_v6.network()))
         {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing IP-CIDR6 {}",
-                ai_v6
+                "Proxy.list is not a strict superset of {}: missing IP-CIDR6 {}",
+                label,
+                sub_v6
             );
         }
     }
-    for asn in &ai_idx.asns {
+    for asn in &sub_idx.asns {
         if !proxy_idx.asns.contains(asn) {
             bail!(
-                "Proxy.list is not a strict superset of AI.list: missing IP-ASN,{}",
+                "Proxy.list is not a strict superset of {}: missing IP-ASN,{}",
+                label,
                 asn
             );
         }
@@ -610,11 +844,7 @@ fn verify_ai_subset_of_proxy(ai_idx: &ParsedListIndex, proxy_idx: &ParsedListInd
     Ok(())
 }
 
-fn verify_reserved_ip_absence(
-    direct_idx: &ParsedListIndex,
-    ai_idx: &ParsedListIndex,
-    proxy_idx: &ParsedListIndex,
-) -> Result<()> {
+fn verify_reserved_ip_absence(lists: &[(&str, &ParsedListIndex)]) -> Result<()> {
     for reserved_ip in [
         "10.0.0.1",
         "172.16.0.1",
@@ -627,11 +857,7 @@ fn verify_reserved_ip_absence(
         "fd01::1",
     ] {
         let ip: IpAddr = reserved_ip.parse()?;
-        for (name, idx) in [
-            ("Direct.list", direct_idx),
-            ("AI.list", ai_idx),
-            ("Proxy.list", proxy_idx),
-        ] {
+        for (name, idx) in lists {
             if idx.covers_ip(ip) {
                 bail!("{} unlawfully matches reserved/mesh IP {}", name, ip);
             }
@@ -643,6 +869,8 @@ fn verify_reserved_ip_absence(
 fn run_production_canaries(
     direct_idx: &ParsedListIndex,
     ai_idx: &ParsedListIndex,
+    payment_idx: &ParsedListIndex,
+    telemetry_idx: &ParsedListIndex,
     proxy_idx: &ParsedListIndex,
 ) -> Result<usize> {
     let mut checked = 0usize;
@@ -685,16 +913,23 @@ fn run_production_canaries(
         if !direct_idx.covers_domain(dom) {
             bail!("canary failed: Direct.list does not match '{}'", dom);
         }
-        if ai_idx.covers_domain_exact_or_suffix(dom) {
-            bail!(
-                "canary failed: AI.list must NOT match domestic/direct domain '{}'",
-                dom
-            );
+        for (label, clean_idx) in [
+            ("AI.list", ai_idx),
+            ("Payment.list", payment_idx),
+            ("Telemetry.list", telemetry_idx),
+        ] {
+            if clean_idx.covers_domain_exact_or_suffix(dom) {
+                bail!(
+                    "canary failed: {} must NOT match domestic/direct domain '{}'",
+                    label,
+                    dom
+                );
+            }
         }
-        checked += 2;
+        checked += 4;
     }
 
-    // 2. Overseas AI, overseas banking, PayPal, risk-control & telemetry (must match BOTH AI.list AND Proxy.list)
+    // 2. Overseas AI applications & AI-dedicated feature flags (must match AI.list + Proxy.list ONLY)
     for dom in [
         "chatgpt.com",
         "api.openai.com",
@@ -727,27 +962,6 @@ fn run_production_canaries(
         "oaistatsig.com",
         "statsig.anthropic.com",
         "prodregistryv2.org",
-        "challenges.cloudflare.com",
-        "www.paypal.com",
-        "www.paypalobjects.com",
-        "api.stripe.com",
-        "m.stripe.network",
-        "wise.com",
-        "www.revolut.com",
-        "www.hsbc.com.hk",
-        "www.bochk.com",
-        "www.zabank.com",
-        "www.chase.com",
-        "www.citi.com",
-        "www.americanexpress.com",
-        "www.interactivebrokers.com",
-        "h.online-metrix.net",
-        "songbird.cardinalcommerce.com",
-        "api.sift.com",
-        "cdn.riskified.com",
-        "api.fpjs.io",
-        "client-api.arkoselabs.com",
-        "hcaptcha.com",
     ] {
         if !ai_idx.covers_domain(dom) {
             bail!("canary failed: AI.list does not match '{}'", dom);
@@ -758,13 +972,99 @@ fn run_production_canaries(
                 dom
             );
         }
+        if payment_idx.covers_domain(dom) || telemetry_idx.covers_domain(dom) {
+            bail!(
+                "canary failed: AI canary '{}' leaked into Payment.list or Telemetry.list",
+                dom
+            );
+        }
         if direct_idx.covers_domain_exact_or_suffix(dom) {
             bail!("canary failed: Direct.list must NOT match '{}'", dom);
         }
-        checked += 3;
+        checked += 5;
     }
 
-    // 3. Overseas streaming & overseas editions of domestic media (must match Proxy.list, NOT AI.list, NOT Direct.list)
+    // 3. Overseas banking, payments, brokerages & payment-exclusive risk/3DS (Payment.list + Proxy.list ONLY)
+    for dom in [
+        "www.paypal.com",
+        "www.paypalobjects.com",
+        "paypalbeacon.com",
+        "api.stripe.com",
+        "m.stripe.network",
+        "pay.google.com",
+        "payments.google.com",
+        "apple-pay-gateway.apple.com",
+        "wise.com",
+        "www.revolut.com",
+        "www.hsbc.com.hk",
+        "www.bochk.com",
+        "www.zabank.com",
+        "www.chase.com",
+        "www.citi.com",
+        "www.americanexpress.com",
+        "www.visa.com",
+        "www.mastercard.com",
+        "www.interactivebrokers.com",
+        "songbird.cardinalcommerce.com",
+    ] {
+        if !payment_idx.covers_domain(dom) {
+            bail!("canary failed: Payment.list does not match '{}'", dom);
+        }
+        if !proxy_idx.covers_domain(dom) {
+            bail!(
+                "canary failed: Proxy.list does not match Payment canary '{}'",
+                dom
+            );
+        }
+        if ai_idx.covers_domain(dom) || telemetry_idx.covers_domain(dom) {
+            bail!(
+                "canary failed: Payment canary '{}' leaked into AI.list or Telemetry.list",
+                dom
+            );
+        }
+        if direct_idx.covers_domain_exact_or_suffix(dom) {
+            bail!("canary failed: Direct.list must NOT match '{}'", dom);
+        }
+        checked += 5;
+    }
+
+    // 4. General risk-control, CAPTCHA, IP-geo-detect & telemetry (Telemetry.list + Proxy.list ONLY)
+    for dom in [
+        "challenges.cloudflare.com",
+        "client-api.arkoselabs.com",
+        "hcaptcha.com",
+        "h.online-metrix.net",
+        "api.sift.com",
+        "cdn.riskified.com",
+        "api.fpjs.io",
+        "withpersona.com",
+        "scamalytics.com",
+        "ipinfo.io",
+        "static.cloudflareinsights.com",
+        "firebaseappcheck.googleapis.com",
+    ] {
+        if !telemetry_idx.covers_domain(dom) {
+            bail!("canary failed: Telemetry.list does not match '{}'", dom);
+        }
+        if !proxy_idx.covers_domain(dom) {
+            bail!(
+                "canary failed: Proxy.list does not match Telemetry canary '{}'",
+                dom
+            );
+        }
+        if ai_idx.covers_domain(dom) || payment_idx.covers_domain(dom) {
+            bail!(
+                "canary failed: Telemetry canary '{}' leaked into AI.list or Payment.list",
+                dom
+            );
+        }
+        if direct_idx.covers_domain_exact_or_suffix(dom) {
+            bail!("canary failed: Direct.list must NOT match '{}'", dom);
+        }
+        checked += 5;
+    }
+
+    // 5. Overseas streaming & password managers (must match Proxy.list ONLY)
     for dom in [
         "www.netflix.com",
         "www.disneyplus.com",
@@ -779,29 +1079,38 @@ fn run_production_canaries(
         "www.iq.com",
         "wetv.vip",
         "www.joox.com",
+        "1password.com",
+        "bitwarden.com",
     ] {
         if !proxy_idx.covers_domain(dom) {
             bail!(
-                "canary failed: Proxy.list does not match streaming domain '{}'",
+                "canary failed: Proxy.list does not match proxy-only domain '{}'",
                 dom
             );
         }
-        if ai_idx.covers_domain_exact_or_suffix(dom) {
-            bail!(
-                "canary failed: AI.list must NOT match streaming domain '{}'",
-                dom
-            );
+        for (label, clean_idx) in [
+            ("AI.list", ai_idx),
+            ("Payment.list", payment_idx),
+            ("Telemetry.list", telemetry_idx),
+        ] {
+            if clean_idx.covers_domain_exact_or_suffix(dom) {
+                bail!(
+                    "canary failed: {} must NOT match proxy-only domain '{}'",
+                    label,
+                    dom
+                );
+            }
         }
         if direct_idx.covers_domain_exact_or_suffix(dom) {
             bail!(
-                "canary failed: Direct.list must NOT match overseas streaming domain '{}'",
+                "canary failed: Direct.list must NOT match overseas proxy domain '{}'",
                 dom
             );
         }
-        checked += 3;
+        checked += 5;
     }
 
-    // 4. General overseas Proxy domains (must match Proxy.list and NOT Direct.list)
+    // 6. General overseas Proxy domains (must match Proxy.list and NOT Direct.list)
     for dom in [
         "www.google.com",
         "github.com",
@@ -823,7 +1132,7 @@ fn run_production_canaries(
         checked += 2;
     }
 
-    // 4. IP / ASN canaries
+    // 7. IP / ASN / Process / AND canaries
     let cn_dns_ip: IpAddr = "114.114.114.114".parse()?;
     if !direct_idx.covers_ip(cn_dns_ip) {
         bail!("canary failed: Direct.list does not cover CN IP 114.114.114.114");
@@ -868,8 +1177,10 @@ pub fn render_routing_notes(report: &RoutingVerificationReport) -> String {
 | :--- | ---: | ---: | ---: | :--- |\n\
 | `{}` | {} | {} | {} B | `{}` |\n\
 | `{}` | {} | {} | {} B | `{}` |\n\
+| `{}` | {} | {} | {} B | `{}` |\n\
+| `{}` | {} | {} | {} B | `{}` |\n\
 | `{}` | {} | {} | {} B | `{}` |\n\n\
-Verified invariants: `AI.list ⊆ Proxy.list` (100% syntactic & semantic subset), `sharedInfraRoots` apex protection active, reserved/LAN/Fake-IP/Tailscale/Cloudflare-Mesh CIDRs excluded, all IP/ASN entries emit `no-resolve`, and {} production canaries passed.\n",
+Verified invariants: `(AI.list ∪ Payment.list ∪ Telemetry.list) ⊆ Proxy.list` (100% syntactic & semantic subset), `AI.list`, `Payment.list`, and `Telemetry.list` pairwise disjoint, `sharedInfraRoots` apex protection active, reserved/LAN/Fake-IP/Tailscale/Cloudflare-Mesh CIDRs excluded, all IP/ASN entries emit `no-resolve`, and {} production canaries passed.\n",
         report.direct.file_name,
         report.direct_total,
         report.direct_extended_count,
@@ -880,6 +1191,16 @@ Verified invariants: `AI.list ⊆ Proxy.list` (100% syntactic & semantic subset)
         report.ai_extended_count,
         report.ai.size_bytes,
         report.ai.sha256,
+        report.payment.file_name,
+        report.payment_total,
+        report.payment_extended_count,
+        report.payment.size_bytes,
+        report.payment.sha256,
+        report.telemetry.file_name,
+        report.telemetry_total,
+        report.telemetry_extended_count,
+        report.telemetry.size_bytes,
+        report.telemetry.sha256,
         report.proxy.file_name,
         report.proxy_total,
         report.proxy_extended_count,

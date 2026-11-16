@@ -1,6 +1,6 @@
 import type { SourceEndpoint } from "./schema.ts";
 
-export type RoutingTarget = "direct" | "ai" | "proxy";
+export type RoutingTarget = "direct" | "ai" | "payment" | "telemetry" | "proxy";
 
 export type RoutingSourceFormat =
   | "surge_ruleset"

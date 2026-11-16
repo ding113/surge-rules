@@ -4,10 +4,12 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use ipnet::{Ipv4Net, Ipv6Net};
 use regex::Regex;
-use rustc_hash::FxHashSet;
+use rustc_hash::{FxHashMap, FxHashSet};
 
-use crate::adblock::config::AllowDomainMatchType;
-use crate::adblock::config::{AdblockOverrides, ModuleScriptOverride};
+use crate::adblock::config::{
+    AdblockCategory, AdblockOverrides, AdblockRuleTarget, AllowDomainMatchType,
+    ModuleScriptOverride,
+};
 use crate::adblock::model::{
     AdguardTransformOp, AdguardTransformRule, BodyRewriteKind, BodyRewriteRule, HeaderAction,
     HeaderDirection, HeaderModException, HeaderModKind, HeaderModRule, HeaderRewriteRule,
@@ -110,8 +112,10 @@ impl DomainTrie {
 #[derive(Clone, Debug)]
 pub struct CompiledAdblockArtifacts {
     pub ruleset_text: String,
+    pub privacy_ruleset_text: String,
     pub module_text: String,
     pub ruleset_counts: RulesetStats,
+    pub privacy_ruleset_counts: RulesetStats,
     pub module_counts: ModuleStats,
 }
 
@@ -147,20 +151,225 @@ pub struct ModuleStats {
 pub const REMOVEPARAM_SCRIPT_URL: &str = "https://rule-set.ygxz.de/surge-removeparam.js";
 pub const ADGUARD_SCRIPT_URL: &str = "https://rule-set.ygxz.de/surge-adguard.js";
 
-/// Compiles parsed upstream feeds and TypeScript human overrides into `Adblock.list` and `Adblock.sgmodule`.
+#[derive(Default)]
+struct AllowScope {
+    exact_set: FxHashSet<String>,
+    suffix_set: FxHashSet<String>,
+    point_trie: DomainTrie,
+    suffix_trie: DomainTrie,
+}
+
+impl AllowScope {
+    fn from_sets(exact_set: FxHashSet<String>, suffix_set: FxHashSet<String>) -> Self {
+        let mut point_trie = DomainTrie::default();
+        for d in &exact_set {
+            point_trie.insert_exact(d);
+        }
+        let mut suffix_trie = DomainTrie::default();
+        for s in &suffix_set {
+            suffix_trie.insert_suffix(s);
+        }
+        Self {
+            exact_set,
+            suffix_set,
+            point_trie,
+            suffix_trie,
+        }
+    }
+
+    fn blocks_suffix(&self, s: &str) -> bool {
+        self.suffix_trie.has_suffix_ancestor_or_eq(s)
+            || self.suffix_trie.has_mark_at_or_below(s)
+            || self.point_trie.has_mark_at_or_below(s)
+    }
+
+    fn blocks_domain(&self, d: &str) -> bool {
+        self.suffix_trie.has_suffix_ancestor_or_eq(d) || self.exact_set.contains(d)
+    }
+
+    fn blocks_keyword(&self, kw: &str, trimmed: &str) -> bool {
+        (trimmed.contains('.') && self.suffix_trie.has_suffix_ancestor_or_eq(trimmed))
+            || self
+                .exact_set
+                .iter()
+                .chain(self.suffix_set.iter())
+                .any(|dom| dom.contains(kw))
+    }
+
+    fn blocks_wildcard(&self, wc: &str, static_tail: Option<&str>) -> bool {
+        static_tail.is_some_and(|tail| self.suffix_trie.has_suffix_ancestor_or_eq(tail))
+            || self
+                .exact_set
+                .iter()
+                .chain(self.suffix_set.iter())
+                .any(|dom| wildcard_matches_domain(wc, dom))
+    }
+}
+
+const CLAIM_HAS_MIXED: u8 = 1 << 0;
+const CLAIM_FORCED_AD: u8 = 1 << 1;
+const CLAIM_FORCED_PRIV: u8 = 1 << 2;
+
+#[derive(Clone, Copy, Default)]
+struct RuleClaim {
+    ad_mask: [u64; 4],
+    priv_mask: [u64; 4],
+    ad_max_w: u16,
+    priv_max_w: u16,
+    flags: u8,
+}
+
+impl RuleClaim {
+    fn ingest(&mut self, category: AdblockCategory, lineage_idx: usize, weight: u16) {
+        let effective_w = weight.max(1);
+        match category {
+            AdblockCategory::Ad | AdblockCategory::Both => {
+                let word = lineage_idx / 64;
+                if word < 4 {
+                    self.ad_mask[word] |= 1u64 << (lineage_idx % 64);
+                }
+                self.ad_max_w = self.ad_max_w.max(effective_w);
+            }
+            AdblockCategory::Privacy => {
+                let word = lineage_idx / 64;
+                if word < 4 {
+                    self.priv_mask[word] |= 1u64 << (lineage_idx % 64);
+                }
+                self.priv_max_w = self.priv_max_w.max(effective_w);
+            }
+            AdblockCategory::AdMixed => {
+                self.flags |= CLAIM_HAS_MIXED;
+            }
+        }
+    }
+
+    fn force(&mut self, target: AdblockRuleTarget) {
+        match target {
+            AdblockRuleTarget::Ad => self.flags |= CLAIM_FORCED_AD,
+            AdblockRuleTarget::Privacy => self.flags |= CLAIM_FORCED_PRIV,
+        }
+    }
+
+    fn merge_from(&mut self, other: &Self) {
+        for i in 0..4 {
+            self.ad_mask[i] |= other.ad_mask[i];
+            self.priv_mask[i] |= other.priv_mask[i];
+        }
+        self.ad_max_w = self.ad_max_w.max(other.ad_max_w);
+        self.priv_max_w = self.priv_max_w.max(other.priv_max_w);
+        self.flags |= other.flags;
+    }
+
+    fn lineage_score(mask: &[u64; 4], max_w: u16) -> u16 {
+        let count: u32 = mask.iter().map(|w| w.count_ones()).sum();
+        let extra = (count.saturating_sub(1) as u16).saturating_mul(12);
+        max_w.saturating_add(extra).min(200)
+    }
+
+    fn owner(&self) -> AdblockRuleTarget {
+        if (self.flags & CLAIM_FORCED_PRIV) != 0 && (self.flags & CLAIM_FORCED_AD) == 0 {
+            return AdblockRuleTarget::Privacy;
+        }
+        if (self.flags & CLAIM_FORCED_AD) != 0 {
+            return AdblockRuleTarget::Ad;
+        }
+        let has_ad = self.ad_max_w > 0;
+        let has_priv = self.priv_max_w > 0;
+        match (has_ad, has_priv) {
+            (false, true) => AdblockRuleTarget::Privacy,
+            (true, false) => AdblockRuleTarget::Ad,
+            (true, true) => {
+                let priv_score = Self::lineage_score(&self.priv_mask, self.priv_max_w);
+                let ad_score = Self::lineage_score(&self.ad_mask, self.ad_max_w);
+                if priv_score > ad_score {
+                    AdblockRuleTarget::Privacy
+                } else {
+                    AdblockRuleTarget::Ad
+                }
+            }
+            (false, false) => AdblockRuleTarget::Ad,
+        }
+    }
+}
+
+/// Domain and suffix rules imported from `Telemetry.list` so that `Adblock.list` and `Privacy.list`
+/// never conflict with or reject clean-exit risk-control, CAPTCHA, IP-geo, and OS/SDK telemetry rules.
+#[derive(Clone, Default, Debug)]
+pub struct TelemetryProtectionSet {
+    pub exact_domains: FxHashSet<String>,
+    pub suffix_domains: FxHashSet<String>,
+}
+
+impl TelemetryProtectionSet {
+    pub fn from_ruleset_text(text: &str) -> Self {
+        let mut out = Self::default();
+        for raw_line in text.lines() {
+            let line = raw_line.trim();
+            if line.is_empty()
+                || line.starts_with('#')
+                || line.starts_with("//")
+                || line.starts_with(';')
+            {
+                continue;
+            }
+            let mut parts = line.split(',').map(str::trim);
+            let Some(kind) = parts.next() else {
+                continue;
+            };
+            let Some(val) = parts.next() else {
+                continue;
+            };
+            let clean = val
+                .trim_start_matches('.')
+                .trim_end_matches('.')
+                .to_ascii_lowercase();
+            if !is_valid_domain(&clean) {
+                continue;
+            }
+            match kind {
+                "DOMAIN" => {
+                    out.exact_domains.insert(clean);
+                }
+                "DOMAIN-SUFFIX" => {
+                    out.suffix_domains.insert(clean);
+                }
+                _ => {}
+            }
+        }
+        out
+    }
+}
+
+/// Compiles parsed upstream feeds and TypeScript human overrides into `Adblock.list`, `Privacy.list`, and `Adblock.sgmodule`.
 pub fn compile_adblock(
     sources: &[ParsedAdblockSource],
     overrides: &AdblockOverrides,
     active_sources: usize,
     total_sources: usize,
 ) -> CompiledAdblockArtifacts {
-    // 1. Assemble 4-tier protection / allowlist sets:
-    //    P0a: Human allowDomains & protectedApexDomains (always win, even over forceRuleSetEntries)
-    //    P0b: Human forceRuleSetEntries (beat upstream allowlists and complex_protected_hosts)
-    //    P1/P2: Upstream allowlists & complex_protected_hosts (suppress upstream blocklists)
-    //    P3: Upstream fallback blocklists
+    compile_adblock_with_telemetry_guard(sources, overrides, None, active_sources, total_sources)
+}
+
+/// Compiles `Adblock.list`, `Privacy.list`, and `Adblock.sgmodule` while guaranteeing zero conflict
+/// against an optional `Telemetry.list` protection set (`Telemetry.list ∩ (Adblock ∪ Privacy) = ∅`).
+pub fn compile_adblock_with_telemetry_guard(
+    sources: &[ParsedAdblockSource],
+    overrides: &AdblockOverrides,
+    telemetry_guard: Option<&TelemetryProtectionSet>,
+    active_sources: usize,
+    total_sources: usize,
+) -> CompiledAdblockArtifacts {
+    // 1. Assemble 4-tier protection / scoped allowlist sets:
+    //    P0a: Human allowDomains, protectedApexDomains, and Telemetry.list clean-exit guard
+    //    P0b: Human forceRuleSetEntries (beat upstream allowlists and complex_protected_hosts; target = ad | privacy)
+    //    P1/P2: Category-scoped upstream allowlists (`both` / `ad` / `privacy`) & complex_protected_hosts
+    //    P3: Upstream blocklists (`ad` / `privacy` / `ad_mixed`)
     let mut human_allow_exact_set: FxHashSet<String> = FxHashSet::default();
     let mut human_allow_suffix_set: FxHashSet<String> = FxHashSet::default();
+    let mut ad_allow_exact_set: FxHashSet<String> = FxHashSet::default();
+    let mut ad_allow_suffix_set: FxHashSet<String> = FxHashSet::default();
+    let mut priv_allow_exact_set: FxHashSet<String> = FxHashSet::default();
+    let mut priv_allow_suffix_set: FxHashSet<String> = FxHashSet::default();
     let mut upstream_allow_exact_set: FxHashSet<String> = FxHashSet::default();
     let mut upstream_allow_suffix_set: FxHashSet<String> = FxHashSet::default();
     let mut protected_apex_set: FxHashSet<String> = FxHashSet::default();
@@ -181,6 +390,29 @@ pub fn compile_adblock(
             }
         }
     }
+    if let Some(tguard) = telemetry_guard {
+        let forced_domain_vals: FxHashSet<String> = overrides
+            .force_rule_set_entries
+            .iter()
+            .map(|f| {
+                f.value
+                    .trim()
+                    .trim_start_matches('.')
+                    .trim_end_matches('.')
+                    .to_ascii_lowercase()
+            })
+            .collect();
+        for d in &tguard.exact_domains {
+            if !forced_domain_vals.contains(d) {
+                human_allow_exact_set.insert(d.clone());
+            }
+        }
+        for s in &tguard.suffix_domains {
+            if !forced_domain_vals.contains(s) {
+                human_allow_suffix_set.insert(s.clone());
+            }
+        }
+    }
     for apex in &overrides.protected_apex_domains {
         protected_apex_set.insert(
             apex.domain
@@ -192,6 +424,23 @@ pub fn compile_adblock(
     for src in sources {
         upstream_allow_exact_set.extend(src.allow_exact_domains.iter().cloned());
         upstream_allow_suffix_set.extend(src.allow_suffix_domains.iter().cloned());
+        match src.category {
+            AdblockCategory::Both => {
+                ad_allow_exact_set.extend(src.allow_exact_domains.iter().cloned());
+                ad_allow_suffix_set.extend(src.allow_suffix_domains.iter().cloned());
+                priv_allow_exact_set.extend(src.allow_exact_domains.iter().cloned());
+                priv_allow_suffix_set.extend(src.allow_suffix_domains.iter().cloned());
+            }
+            AdblockCategory::Ad => {
+                ad_allow_exact_set.extend(src.allow_exact_domains.iter().cloned());
+                ad_allow_suffix_set.extend(src.allow_suffix_domains.iter().cloned());
+            }
+            AdblockCategory::Privacy => {
+                priv_allow_exact_set.extend(src.allow_exact_domains.iter().cloned());
+                priv_allow_suffix_set.extend(src.allow_suffix_domains.iter().cloned());
+            }
+            AdblockCategory::AdMixed => {}
+        }
         complex_host_set.extend(src.complex_protected_hosts.iter().cloned());
     }
 
@@ -297,59 +546,156 @@ pub fn compile_adblock(
         &mut script_candidates,
     );
 
-    // 3. Compile fallback RULE-SET (`Adblock.list`) with 4-tier domain precedence and trie compression
-    let mut human_allow_suffix_trie = DomainTrie::default();
-    for s in &human_allow_suffix_set {
-        human_allow_suffix_trie.insert_suffix(s);
-    }
-    let mut human_allow_point_trie = DomainTrie::default();
-    for d in &human_allow_exact_set {
-        human_allow_point_trie.insert_exact(d);
-    }
-
-    let mut upstream_allow_suffix_trie = DomainTrie::default();
-    for s in &upstream_allow_suffix_set {
-        upstream_allow_suffix_trie.insert_suffix(s);
-    }
-    let mut upstream_allow_point_trie = DomainTrie::default();
-    for d in &upstream_allow_exact_set {
-        upstream_allow_point_trie.insert_exact(d);
-    }
-
-    let mut all_allow_exact_set = human_allow_exact_set.clone();
-    all_allow_exact_set.extend(upstream_allow_exact_set.iter().cloned());
-    let mut all_allow_suffix_set = human_allow_suffix_set.clone();
-    all_allow_suffix_set.extend(upstream_allow_suffix_set.iter().cloned());
-    let mut all_allow_suffix_trie = DomainTrie::default();
-    for s in &all_allow_suffix_set {
-        all_allow_suffix_trie.insert_suffix(s);
-    }
+    // 3. Compile disjoint fallback RULE-SETs (`Adblock.list` + `Privacy.list`) with 4-tier domain
+    //    precedence, category-scoped allowlists, unified trie compression, and CIDR aggregation.
+    let human_allow_scope = AllowScope::from_sets(
+        human_allow_exact_set.clone(),
+        human_allow_suffix_set.clone(),
+    );
+    let ad_allow_scope = AllowScope::from_sets(ad_allow_exact_set, ad_allow_suffix_set);
+    let priv_allow_scope = AllowScope::from_sets(priv_allow_exact_set, priv_allow_suffix_set);
+    let all_upstream_allow_scope =
+        AllowScope::from_sets(upstream_allow_exact_set, upstream_allow_suffix_set);
 
     let mut complex_point_trie = DomainTrie::default();
     for d in &complex_host_set {
         complex_point_trie.insert_exact(d);
     }
 
-    let mut candidate_domains: FxHashSet<String> = FxHashSet::default();
-    let mut candidate_suffixes: FxHashSet<String> = FxHashSet::default();
-    let mut candidate_keywords: BTreeSet<String> = BTreeSet::new();
-    let mut candidate_wildcards: BTreeSet<String> = BTreeSet::new();
-    let mut raw_v4: Vec<Ipv4Net> = Vec::new();
-    let mut raw_v6: Vec<Ipv6Net> = Vec::new();
-    let mut candidate_asns: BTreeSet<u32> = BTreeSet::new();
-    let mut candidate_uas: BTreeSet<String> = BTreeSet::new();
-    let mut candidate_procs: BTreeSet<String> = BTreeSet::new();
+    let mut lineage_index: FxHashMap<String, usize> = FxHashMap::default();
+    let mut next_lineage_idx = 0usize;
+    let mut get_lineage_idx = |lin: &str| -> usize {
+        let key = if lin.is_empty() { "default" } else { lin };
+        if let Some(&idx) = lineage_index.get(key) {
+            idx
+        } else {
+            let idx = next_lineage_idx;
+            next_lineage_idx += 1;
+            lineage_index.insert(key.to_string(), idx);
+            idx
+        }
+    };
+
+    let mut raw_seen_domains: FxHashSet<String> = FxHashSet::default();
+    let mut raw_seen_suffixes: FxHashSet<String> = FxHashSet::default();
+    let mut domain_claims: FxHashMap<String, RuleClaim> = FxHashMap::default();
+    let mut suffix_claims: FxHashMap<String, RuleClaim> = FxHashMap::default();
+    let mut keyword_claims: BTreeMap<String, RuleClaim> = BTreeMap::new();
+    let mut wildcard_claims: BTreeMap<String, RuleClaim> = BTreeMap::new();
+    let mut v4_claims: FxHashMap<Ipv4Net, RuleClaim> = FxHashMap::default();
+    let mut v6_claims: FxHashMap<Ipv6Net, RuleClaim> = FxHashMap::default();
+    let mut asn_claims: BTreeMap<u32, RuleClaim> = BTreeMap::new();
+    let mut ua_claims: BTreeMap<String, RuleClaim> = BTreeMap::new();
+    let mut proc_claims: BTreeMap<String, RuleClaim> = BTreeMap::new();
 
     for src in sources {
-        candidate_domains.extend(src.ruleset_domains.iter().cloned());
-        candidate_suffixes.extend(src.ruleset_suffixes.iter().cloned());
-        candidate_keywords.extend(src.ruleset_keywords.iter().cloned());
-        candidate_wildcards.extend(src.ruleset_wildcards.iter().cloned());
-        raw_v4.extend(src.ruleset_cidrs_v4.iter().copied());
-        raw_v6.extend(src.ruleset_cidrs_v6.iter().copied());
-        candidate_asns.extend(src.ruleset_asns.iter().copied());
-        candidate_uas.extend(src.ruleset_user_agents.iter().cloned());
-        candidate_procs.extend(src.ruleset_process_names.iter().cloned());
+        let lin_idx = get_lineage_idx(&src.lineage);
+        let scope = match src.category {
+            AdblockCategory::Ad | AdblockCategory::Both => &ad_allow_scope,
+            AdblockCategory::Privacy => &priv_allow_scope,
+            AdblockCategory::AdMixed => &all_upstream_allow_scope,
+        };
+
+        for s in &src.ruleset_suffixes {
+            raw_seen_suffixes.insert(s.clone());
+            let blocked = human_allow_scope.blocks_suffix(s)
+                || protected_apex_set.contains(s)
+                || complex_point_trie.has_mark_at_or_below(s)
+                || scope.blocks_suffix(s);
+            if !blocked {
+                suffix_claims.entry(s.clone()).or_default().ingest(
+                    src.category,
+                    lin_idx,
+                    src.weight,
+                );
+            }
+        }
+
+        for d in &src.ruleset_domains {
+            raw_seen_domains.insert(d.clone());
+            let blocked = human_allow_scope.blocks_domain(d)
+                || protected_apex_set.contains(d)
+                || complex_host_set.contains(d)
+                || scope.blocks_domain(d);
+            if !blocked {
+                domain_claims.entry(d.clone()).or_default().ingest(
+                    src.category,
+                    lin_idx,
+                    src.weight,
+                );
+            }
+        }
+
+        for kw in &src.ruleset_keywords {
+            if kw.contains("made_by_") || kw.contains("7h1s_rul3") {
+                continue;
+            }
+            let trimmed = kw.trim_matches(|c: char| !c.is_ascii_alphanumeric());
+            let blocked = human_allow_scope.blocks_keyword(kw, trimmed)
+                || scope.blocks_keyword(kw, trimmed)
+                || protected_apex_set
+                    .iter()
+                    .chain(complex_host_set.iter())
+                    .any(|dom| dom.contains(kw.as_str()));
+            if !blocked {
+                keyword_claims.entry(kw.clone()).or_default().ingest(
+                    src.category,
+                    lin_idx,
+                    src.weight,
+                );
+            }
+        }
+
+        for wc in &src.ruleset_wildcards {
+            let static_tail = wildcard_static_suffix(wc);
+            let blocked = human_allow_scope.blocks_wildcard(wc, static_tail)
+                || scope.blocks_wildcard(wc, static_tail)
+                || complex_host_set
+                    .iter()
+                    .any(|dom| wildcard_matches_domain(wc, dom));
+            if !blocked {
+                wildcard_claims.entry(wc.clone()).or_default().ingest(
+                    src.category,
+                    lin_idx,
+                    src.weight,
+                );
+            }
+        }
+
+        for &net in &src.ruleset_cidrs_v4 {
+            if !overlaps_reserved_v4(net) && !overlaps_shared_cdn_or_dns_v4(net) {
+                v4_claims
+                    .entry(net)
+                    .or_default()
+                    .ingest(src.category, lin_idx, src.weight);
+            }
+        }
+        for &net in &src.ruleset_cidrs_v6 {
+            if !overlaps_reserved_v6(net) && !overlaps_shared_cdn_or_dns_v6(net) {
+                v6_claims
+                    .entry(net)
+                    .or_default()
+                    .ingest(src.category, lin_idx, src.weight);
+            }
+        }
+        for &asn in &src.ruleset_asns {
+            asn_claims
+                .entry(asn)
+                .or_default()
+                .ingest(src.category, lin_idx, src.weight);
+        }
+        for ua in &src.ruleset_user_agents {
+            ua_claims
+                .entry(ua.clone())
+                .or_default()
+                .ingest(src.category, lin_idx, src.weight);
+        }
+        for p in &src.ruleset_process_names {
+            proc_claims
+                .entry(p.clone())
+                .or_default()
+                .ingest(src.category, lin_idx, src.weight);
+        }
     }
 
     let mut forced_domains: FxHashSet<String> = FxHashSet::default();
@@ -360,8 +706,11 @@ pub fn compile_adblock(
             "DOMAIN" => {
                 let d = v.trim_end_matches('.').to_ascii_lowercase();
                 if is_valid_domain(&d) {
-                    candidate_domains.insert(d.clone());
-                    forced_domains.insert(d);
+                    raw_seen_domains.insert(d.clone());
+                    forced_domains.insert(d.clone());
+                    if !(human_allow_scope.blocks_domain(&d) || protected_apex_set.contains(&d)) {
+                        domain_claims.entry(d).or_default().force(f.target);
+                    }
                 }
             }
             "DOMAIN-SUFFIX" => {
@@ -370,129 +719,189 @@ pub fn compile_adblock(
                     .trim_end_matches('.')
                     .to_ascii_lowercase();
                 if is_valid_domain(&s) {
-                    candidate_suffixes.insert(s.clone());
-                    forced_suffixes.insert(s);
+                    raw_seen_suffixes.insert(s.clone());
+                    forced_suffixes.insert(s.clone());
+                    if !(human_allow_scope.blocks_suffix(&s) || protected_apex_set.contains(&s)) {
+                        suffix_claims.entry(s).or_default().force(f.target);
+                    }
                 }
             }
             "DOMAIN-KEYWORD" => {
-                candidate_keywords.insert(v.to_ascii_lowercase());
+                let kw = v.to_ascii_lowercase();
+                let trimmed = kw.trim_matches(|c: char| !c.is_ascii_alphanumeric());
+                if !(human_allow_scope.blocks_keyword(&kw, trimmed)
+                    || protected_apex_set.iter().any(|dom| dom.contains(&kw)))
+                {
+                    keyword_claims.entry(kw).or_default().force(f.target);
+                }
             }
             "DOMAIN-WILDCARD" => {
-                candidate_wildcards.insert(v.to_ascii_lowercase());
+                let wc = v.to_ascii_lowercase();
+                let static_tail = wildcard_static_suffix(&wc);
+                if !human_allow_scope.blocks_wildcard(&wc, static_tail) {
+                    wildcard_claims.entry(wc).or_default().force(f.target);
+                }
             }
             "IP-CIDR" => {
-                if let Ok(net) = v.parse::<Ipv4Net>() {
-                    raw_v4.push(net.trunc());
+                if let Ok(raw_net) = v.parse::<Ipv4Net>() {
+                    let net = raw_net.trunc();
+                    if !overlaps_reserved_v4(net) && !overlaps_shared_cdn_or_dns_v4(net) {
+                        v4_claims.entry(net).or_default().force(f.target);
+                    }
                 }
             }
             "IP-CIDR6" => {
-                if let Ok(net) = v.parse::<Ipv6Net>() {
-                    raw_v6.push(net.trunc());
+                if let Ok(raw_net) = v.parse::<Ipv6Net>() {
+                    let net = raw_net.trunc();
+                    if !overlaps_reserved_v6(net) && !overlaps_shared_cdn_or_dns_v6(net) {
+                        v6_claims.entry(net).or_default().force(f.target);
+                    }
                 }
             }
             "IP-ASN" => {
                 if let Ok(asn) = v.parse::<u32>() {
-                    candidate_asns.insert(asn);
+                    asn_claims.entry(asn).or_default().force(f.target);
                 }
             }
             "USER-AGENT" => {
-                candidate_uas.insert(v.to_string());
+                ua_claims.entry(v.to_string()).or_default().force(f.target);
             }
             "PROCESS-NAME" => {
-                candidate_procs.insert(v.to_string());
+                proc_claims
+                    .entry(v.to_string())
+                    .or_default()
+                    .force(f.target);
             }
             _ => {}
         }
     }
 
-    let mut suppressed_by_protection = 0usize;
-    let mut surviving_suffixes: Vec<String> = Vec::new();
-    for s in candidate_suffixes {
-        let is_forced = forced_suffixes.contains(&s);
-        let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
-            || human_allow_suffix_trie.has_mark_at_or_below(&s)
-            || human_allow_point_trie.has_mark_at_or_below(&s)
-            || protected_apex_set.contains(&s);
-        let blocked_by_upstream_or_complex = !is_forced
-            && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
-                || upstream_allow_suffix_trie.has_mark_at_or_below(&s)
-                || upstream_allow_point_trie.has_mark_at_or_below(&s)
-                || complex_point_trie.has_mark_at_or_below(&s));
-        if blocked_by_human || blocked_by_upstream_or_complex {
-            suppressed_by_protection += 1;
-        } else {
-            surviving_suffixes.push(s);
+    // Propagate exact DOMAIN force flags onto matching DOMAIN-SUFFIX entries so an unforced suffix
+    // at the same hostname always honors the human-forced target before subsuming the exact DOMAIN.
+    for (d, d_claim) in &domain_claims {
+        let force_bits = d_claim.flags & (CLAIM_FORCED_AD | CLAIM_FORCED_PRIV);
+        if force_bits != 0
+            && let Some(s_claim) = suffix_claims.get_mut(d)
+        {
+            s_claim.flags |= force_bits;
         }
     }
 
-    // Build suffix trie and compress redundant descendant suffixes first
+    let suppressed_by_protection = raw_seen_suffixes.len().saturating_sub(suffix_claims.len())
+        + raw_seen_domains.len().saturating_sub(domain_claims.len());
+
+    // Build unified suffix trie and partition into mutually disjoint Ad vs Privacy suffix sets
+    let mut surviving_suffixes: Vec<(String, RuleClaim)> = suffix_claims.into_iter().collect();
     surviving_suffixes.sort_by(|a, b| {
-        a.split('.')
+        a.0.split('.')
             .count()
-            .cmp(&b.split('.').count())
-            .then_with(|| a.cmp(b))
+            .cmp(&b.0.split('.').count())
+            .then_with(|| a.0.cmp(&b.0))
     });
     let mut final_suffix_trie = DomainTrie::default();
-    let mut compressed_suffixes: BTreeSet<String> = BTreeSet::new();
+    let mut ad_suffixes: BTreeSet<String> = BTreeSet::new();
+    let mut priv_suffixes: BTreeSet<String> = BTreeSet::new();
     let mut subsumed_by_trie = 0usize;
 
-    for s in surviving_suffixes {
+    for (s, claim) in surviving_suffixes {
         if final_suffix_trie.has_suffix_ancestor_or_eq(&s) {
             subsumed_by_trie += 1;
             continue;
         }
         final_suffix_trie.insert_suffix(&s);
-        compressed_suffixes.insert(s);
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_suffixes.insert(s);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_suffixes.insert(s);
+            }
+        }
     }
 
     let mut compressed_domains: BTreeSet<String> = BTreeSet::new();
-    for d in candidate_domains {
-        let is_forced = forced_domains.contains(&d);
-        let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
-            || human_allow_exact_set.contains(&d)
-            || protected_apex_set.contains(&d);
-        let blocked_by_upstream_or_complex = !is_forced
-            && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
-                || upstream_allow_exact_set.contains(&d)
-                || complex_host_set.contains(&d));
-        if blocked_by_human || blocked_by_upstream_or_complex {
-            suppressed_by_protection += 1;
-            continue;
-        }
+    let mut ad_domains: BTreeSet<String> = BTreeSet::new();
+    let mut priv_domains: BTreeSet<String> = BTreeSet::new();
+    for (d, claim) in domain_claims {
         if final_suffix_trie.has_suffix_ancestor_or_eq(&d) {
             subsumed_by_trie += 1;
             continue;
         }
-        compressed_domains.insert(d);
+        compressed_domains.insert(d.clone());
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_domains.insert(d);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_domains.insert(d);
+            }
+        }
     }
 
-    // Drop unsafe domain-keywords or wildcards that collide with protected/allowed domains
-    candidate_keywords.retain(|kw| {
-        if kw.contains("made_by_") || kw.contains("7h1s_rul3") {
-            return false;
+    let mut ad_keywords: BTreeSet<String> = BTreeSet::new();
+    let mut priv_keywords: BTreeSet<String> = BTreeSet::new();
+    for (kw, claim) in keyword_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_keywords.insert(kw);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_keywords.insert(kw);
+            }
         }
-        let trimmed = kw.trim_matches(|c: char| !c.is_ascii_alphanumeric());
-        if trimmed.contains('.') && all_allow_suffix_trie.has_suffix_ancestor_or_eq(trimmed) {
-            return false;
+    }
+
+    let mut ad_wildcards: BTreeSet<String> = BTreeSet::new();
+    let mut priv_wildcards: BTreeSet<String> = BTreeSet::new();
+    for (wc, claim) in wildcard_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_wildcards.insert(wc);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_wildcards.insert(wc);
+            }
         }
-        !all_allow_exact_set
-            .iter()
-            .chain(all_allow_suffix_set.iter())
-            .chain(protected_apex_set.iter())
-            .chain(complex_host_set.iter())
-            .any(|dom| dom.contains(kw.as_str()))
-    });
-    candidate_wildcards.retain(|wc| {
-        let static_tail = wildcard_static_suffix(wc);
-        let covered_by_allow_suffix =
-            static_tail.is_some_and(|tail| all_allow_suffix_trie.has_suffix_ancestor_or_eq(tail));
-        !covered_by_allow_suffix
-            && !all_allow_exact_set
-                .iter()
-                .chain(all_allow_suffix_set.iter())
-                .chain(complex_host_set.iter())
-                .any(|dom| wildcard_matches_domain(wc, dom))
-    });
+    }
+
+    let mut ad_asns: BTreeSet<u32> = BTreeSet::new();
+    let mut priv_asns: BTreeSet<u32> = BTreeSet::new();
+    for (asn, claim) in asn_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_asns.insert(asn);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_asns.insert(asn);
+            }
+        }
+    }
+
+    let mut ad_uas: BTreeSet<String> = BTreeSet::new();
+    let mut priv_uas: BTreeSet<String> = BTreeSet::new();
+    for (ua, claim) in ua_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_uas.insert(ua);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_uas.insert(ua);
+            }
+        }
+    }
+
+    let mut ad_procs: BTreeSet<String> = BTreeSet::new();
+    let mut priv_procs: BTreeSet<String> = BTreeSet::new();
+    for (proc_name, claim) in proc_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_procs.insert(proc_name);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_procs.insert(proc_name);
+            }
+        }
+    }
 
     // Enforce 4-tier domain precedence and reserved/shared-CDN CIDR guards on module `[Rule]` REJECT entries too
     module_rule_map.retain(|line, _| {
@@ -507,12 +916,10 @@ pub fn compile_adblock(
             "DOMAIN" => {
                 let d = parts[1].trim_end_matches('.').to_ascii_lowercase();
                 let is_forced = forced_domains.contains(&d);
-                let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
-                    || human_allow_exact_set.contains(&d)
-                    || protected_apex_set.contains(&d);
+                let blocked_by_human =
+                    human_allow_scope.blocks_domain(&d) || protected_apex_set.contains(&d);
                 let blocked_by_upstream = !is_forced
-                    && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&d)
-                        || upstream_allow_exact_set.contains(&d)
+                    && (all_upstream_allow_scope.blocks_domain(&d)
                         || complex_host_set.contains(&d));
                 !(blocked_by_human || blocked_by_upstream)
             }
@@ -522,14 +929,10 @@ pub fn compile_adblock(
                     .trim_end_matches('.')
                     .to_ascii_lowercase();
                 let is_forced = forced_suffixes.contains(&s);
-                let blocked_by_human = human_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
-                    || human_allow_suffix_trie.has_mark_at_or_below(&s)
-                    || human_allow_point_trie.has_mark_at_or_below(&s)
-                    || protected_apex_set.contains(&s);
+                let blocked_by_human =
+                    human_allow_scope.blocks_suffix(&s) || protected_apex_set.contains(&s);
                 let blocked_by_upstream = !is_forced
-                    && (upstream_allow_suffix_trie.has_suffix_ancestor_or_eq(&s)
-                        || upstream_allow_suffix_trie.has_mark_at_or_below(&s)
-                        || upstream_allow_point_trie.has_mark_at_or_below(&s)
+                    && (all_upstream_allow_scope.blocks_suffix(&s)
                         || complex_point_trie.has_mark_at_or_below(&s));
                 !(blocked_by_human || blocked_by_upstream)
             }
@@ -551,27 +954,96 @@ pub fn compile_adblock(
         }
     });
 
-    // Exclude RFC 6890 private / LAN / Fake-IP / Tailscale AND shared Anycast CDN / public DNS CIDRs
-    raw_v4.retain(|net| !overlaps_reserved_v4(*net) && !overlaps_shared_cdn_or_dns_v4(*net));
-    raw_v6.retain(|net| !overlaps_reserved_v6(*net) && !overlaps_shared_cdn_or_dns_v6(*net));
-    let coalesced_v4 = Ipv4Net::aggregate(&raw_v4);
-    let coalesced_v6 = Ipv6Net::aggregate(&raw_v6);
+    // Coalesce IPv4 and IPv6 CIDRs globally first, then partition aggregated blocks disjointly
+    let raw_v4_keys: Vec<Ipv4Net> = v4_claims.keys().copied().collect();
+    let coalesced_v4 = Ipv4Net::aggregate(&raw_v4_keys);
+    let mut sorted_v4: Vec<(u32, u32, RuleClaim)> = v4_claims
+        .into_iter()
+        .map(|(n, c)| (u32::from(n.network()), u32::from(n.broadcast()), c))
+        .collect();
+    sorted_v4.sort_by_key(|x| (x.0, x.1));
+
+    let mut ad_v4: Vec<Ipv4Net> = Vec::new();
+    let mut priv_v4: Vec<Ipv4Net> = Vec::new();
+    for agg in coalesced_v4 {
+        let a_start = u32::from(agg.network());
+        let a_end = u32::from(agg.broadcast());
+        let idx = sorted_v4.partition_point(|x| x.0 < a_start);
+        let mut merged = RuleClaim::default();
+        for &(s, e, ref c) in &sorted_v4[idx..] {
+            if s > a_end {
+                break;
+            }
+            if e <= a_end {
+                merged.merge_from(c);
+            }
+        }
+        match merged.owner() {
+            AdblockRuleTarget::Ad => ad_v4.push(agg),
+            AdblockRuleTarget::Privacy => priv_v4.push(agg),
+        }
+    }
+
+    let raw_v6_keys: Vec<Ipv6Net> = v6_claims.keys().copied().collect();
+    let coalesced_v6 = Ipv6Net::aggregate(&raw_v6_keys);
+    let mut sorted_v6: Vec<(u128, u128, RuleClaim)> = v6_claims
+        .into_iter()
+        .map(|(n, c)| (u128::from(n.network()), u128::from(n.broadcast()), c))
+        .collect();
+    sorted_v6.sort_by_key(|x| (x.0, x.1));
+
+    let mut ad_v6: Vec<Ipv6Net> = Vec::new();
+    let mut priv_v6: Vec<Ipv6Net> = Vec::new();
+    for agg in coalesced_v6 {
+        let a_start = u128::from(agg.network());
+        let a_end = u128::from(agg.broadcast());
+        let idx = sorted_v6.partition_point(|x| x.0 < a_start);
+        let mut merged = RuleClaim::default();
+        for &(s, e, ref c) in &sorted_v6[idx..] {
+            if s > a_end {
+                break;
+            }
+            if e <= a_end {
+                merged.merge_from(c);
+            }
+        }
+        match merged.owner() {
+            AdblockRuleTarget::Ad => ad_v6.push(agg),
+            AdblockRuleTarget::Privacy => priv_v6.push(agg),
+        }
+    }
 
     let (ruleset_text, mut ruleset_counts) = render_ruleset(
-        &compressed_domains,
-        &compressed_suffixes,
-        &candidate_keywords,
-        &candidate_wildcards,
-        &coalesced_v4,
-        &coalesced_v6,
-        &candidate_asns,
-        &candidate_uas,
-        &candidate_procs,
+        "Adblock",
+        &ad_domains,
+        &ad_suffixes,
+        &ad_keywords,
+        &ad_wildcards,
+        &ad_v4,
+        &ad_v6,
+        &ad_asns,
+        &ad_uas,
+        &ad_procs,
         active_sources,
         total_sources,
     );
     ruleset_counts.suppressed_by_protection = suppressed_by_protection;
     ruleset_counts.subsumed_by_trie = subsumed_by_trie;
+
+    let (privacy_ruleset_text, privacy_ruleset_counts) = render_ruleset(
+        "Privacy",
+        &priv_domains,
+        &priv_suffixes,
+        &priv_keywords,
+        &priv_wildcards,
+        &priv_v4,
+        &priv_v6,
+        &priv_asns,
+        &priv_uas,
+        &priv_procs,
+        active_sources,
+        total_sources,
+    );
 
     // 4. Promote surgical rules from RulesetFallback feeds ONLY when their target hosts are NOT already
     //    blocked in Adblock.list and NOT excluded from MITM.
@@ -723,8 +1195,10 @@ pub fn compile_adblock(
 
     CompiledAdblockArtifacts {
         ruleset_text,
+        privacy_ruleset_text,
         module_text,
         ruleset_counts,
+        privacy_ruleset_counts,
         module_counts,
     }
 }
@@ -2383,6 +2857,7 @@ fn wildcard_static_suffix(wc: &str) -> Option<&str> {
 
 #[allow(clippy::too_many_arguments)]
 fn render_ruleset(
+    header_title: &str,
     domains: &BTreeSet<String>,
     suffixes: &BTreeSet<String>,
     keywords: &BTreeSet<String>,
@@ -2406,7 +2881,10 @@ fn render_ruleset(
         + process_names.len();
 
     let mut out = String::with_capacity(total_rules * 34 + 256);
-    out.push_str("# surge-rules Adblock & Privacy RULE-SET (iOS / tvOS / macOS)\n");
+    out.push_str(&format!(
+        "# surge-rules {} RULE-SET (iOS / tvOS / macOS)\n",
+        header_title
+    ));
     out.push_str(&format!(
         "# Active upstream feeds: {}/{} | Total rules: {}\n\n",
         active_sources, total_sources, total_rules

@@ -109,6 +109,18 @@ function validateAdblockSource(src: AdblockSourceEntry, seenIds: Set<string>): v
   }
   seenIds.add(src.id);
 
+  if (src.role === "allowlist") {
+    if (src.category !== "both" && src.category !== "ad" && src.category !== "privacy") {
+      throw new Error(
+        `[${src.id}] Allowlist source category must be 'both' | 'ad' | 'privacy', got '${src.category}'`,
+      );
+    }
+  } else if (src.category !== "ad" && src.category !== "privacy" && src.category !== "ad_mixed") {
+    throw new Error(
+      `[${src.id}] Blocklist/complex source category must be 'ad' | 'privacy' | 'ad_mixed', got '${src.category}'`,
+    );
+  }
+
   if (!ID_RE.test(src.lineage)) {
     throw new Error(`[${src.id}] Lineage must match ${ID_RE}, got '${src.lineage}'`);
   }
@@ -172,8 +184,23 @@ function validateAll(): void {
     throw new Error("Adblock source catalog contains zero sources");
   }
   const seenAdblockIds = new Set<string>();
+  let coreAdRulesets = 0;
+  let corePrivacyRulesets = 0;
   for (const src of ADBLOCK_SOURCES.sources) {
     validateAdblockSource(src, seenAdblockIds);
+    if (src.role === "ruleset_fallback" && src.core) {
+      if (src.category === "ad" || src.category === "ad_mixed") {
+        coreAdRulesets += 1;
+      } else if (src.category === "privacy") {
+        corePrivacyRulesets += 1;
+      }
+    }
+  }
+  if (coreAdRulesets === 0) {
+    throw new Error("Adblock 'ad' ruleset catalog requires at least one core: true source");
+  }
+  if (corePrivacyRulesets === 0) {
+    throw new Error("Adblock 'privacy' ruleset catalog requires at least one core: true source");
   }
 
   if (ROUTING_SOURCES.sources.length === 0) {
@@ -183,6 +210,8 @@ function validateAll(): void {
   const coreByTarget = new Map<RoutingTarget, number>([
     ["direct", 0],
     ["ai", 0],
+    ["payment", 0],
+    ["telemetry", 0],
     ["proxy", 0],
   ]);
   for (const src of ROUTING_SOURCES.sources) {

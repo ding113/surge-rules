@@ -73,6 +73,10 @@ pub struct RoutingSourceCounts {
     pub total_direct: usize,
     pub active_ai: usize,
     pub total_ai: usize,
+    pub active_payment: usize,
+    pub total_payment: usize,
+    pub active_telemetry: usize,
+    pub total_telemetry: usize,
     pub active_proxy: usize,
     pub total_proxy: usize,
 }
@@ -81,9 +85,13 @@ pub struct RoutingSourceCounts {
 pub struct CompiledRoutingArtifacts {
     pub direct_text: String,
     pub ai_text: String,
+    pub payment_text: String,
+    pub telemetry_text: String,
     pub proxy_text: String,
     pub direct_stats: TargetStats,
     pub ai_stats: TargetStats,
+    pub payment_stats: TargetStats,
+    pub telemetry_stats: TargetStats,
     pub proxy_stats: TargetStats,
     pub ad_domains_filtered: usize,
     pub conflicts_resolved: usize,
@@ -115,6 +123,21 @@ impl CandidateRule {
         self.extended_matching |= extended;
     }
 
+    fn merge_from(&mut self, other: &Self) {
+        for (lin, &w) in &other.lineage_weights {
+            self.lineage_weights
+                .entry(lin.clone())
+                .and_modify(|prev| {
+                    if w > *prev {
+                        *prev = w;
+                    }
+                })
+                .or_insert(w);
+        }
+        self.extended_matching |= other.extended_matching;
+        self.forced |= other.forced;
+    }
+
     fn score(&self) -> u16 {
         if self.forced {
             return 250;
@@ -122,6 +145,115 @@ impl CandidateRule {
         let max_w = self.lineage_weights.values().copied().max().unwrap_or(0);
         let extra = (self.lineage_weights.len().saturating_sub(1) as u16).saturating_mul(12);
         max_w.saturating_add(extra).min(200)
+    }
+}
+
+const CLEAN_TARGETS: [RoutingTarget; 3] = [
+    RoutingTarget::Ai,
+    RoutingTarget::Payment,
+    RoutingTarget::Telemetry,
+];
+
+fn clean_slot(target: RoutingTarget) -> Option<usize> {
+    match target {
+        RoutingTarget::Ai => Some(0),
+        RoutingTarget::Payment => Some(1),
+        RoutingTarget::Telemetry => Some(2),
+        RoutingTarget::Direct | RoutingTarget::Proxy => None,
+    }
+}
+
+#[derive(Clone, Debug, Default)]
+struct CleanCandidate {
+    claims: [Option<CandidateRule>; 3],
+}
+
+impl CleanCandidate {
+    fn ingest(&mut self, target: RoutingTarget, lineage: &str, weight: u16, extended: bool) {
+        let slot = clean_slot(target).expect("CleanCandidate only accepts clean-egress targets");
+        self.claims[slot]
+            .get_or_insert_with(CandidateRule::default)
+            .ingest(lineage, weight, extended);
+    }
+
+    fn force(&mut self, target: RoutingTarget, extended: bool) {
+        let slot = clean_slot(target).expect("CleanCandidate only accepts clean-egress targets");
+        self.claims[slot]
+            .get_or_insert_with(CandidateRule::default)
+            .force(extended);
+    }
+
+    fn merge_from(&mut self, other: &Self) {
+        for (dst, src) in self.claims.iter_mut().zip(&other.claims) {
+            if let Some(s) = src {
+                dst.get_or_insert_with(CandidateRule::default).merge_from(s);
+            }
+        }
+    }
+
+    fn has_any_claim(&self) -> bool {
+        self.claims.iter().any(Option::is_some)
+    }
+
+    fn is_forced(&self) -> bool {
+        self.claims.iter().flatten().any(|c| c.forced)
+    }
+
+    fn extended_matching(&self) -> bool {
+        self.claims.iter().flatten().any(|c| c.extended_matching)
+    }
+
+    fn pooled_lineages(&self) -> FxHashMap<String, u16> {
+        let mut merged: FxHashMap<String, u16> = FxHashMap::default();
+        for claim in self.claims.iter().flatten() {
+            for (lin, &w) in &claim.lineage_weights {
+                merged
+                    .entry(lin.clone())
+                    .and_modify(|prev| {
+                        if w > *prev {
+                            *prev = w;
+                        }
+                    })
+                    .or_insert(w);
+            }
+        }
+        merged
+    }
+
+    fn pooled_score(&self) -> u16 {
+        if self.is_forced() {
+            return 250;
+        }
+        let merged = self.pooled_lineages();
+        let max_w = merged.values().copied().max().unwrap_or(0);
+        let extra = (merged.len().saturating_sub(1) as u16).saturating_mul(12);
+        max_w.saturating_add(extra).min(200)
+    }
+
+    fn to_proxy_candidate(&self) -> CandidateRule {
+        CandidateRule {
+            lineage_weights: self.pooled_lineages(),
+            extended_matching: self.extended_matching(),
+            forced: self.is_forced(),
+        }
+    }
+
+    /// Deterministically assigns a unique owner in `{Ai, Payment, Telemetry}`.
+    /// Forced overrides take precedence; for unforced cross-feed overlaps (e.g. bundled AI feeds
+    /// that also include Stripe/PayPal or CAPTCHA/telemetry domains), dedicated Telemetry and
+    /// Payment catalogs take ownership so `AI.list` stays scoped strictly to AI applications.
+    fn owner(&self) -> RoutingTarget {
+        for &slot in &[2usize, 1, 0] {
+            if self.claims[slot].as_ref().is_some_and(|c| c.forced) {
+                return CLEAN_TARGETS[slot];
+            }
+        }
+        for &slot in &[2usize, 1, 0] {
+            if self.claims[slot].is_some() {
+                return CLEAN_TARGETS[slot];
+            }
+        }
+        RoutingTarget::Ai
     }
 }
 
@@ -232,21 +364,40 @@ pub fn compile_routing(
     source_counts: RoutingSourceCounts,
 ) -> CompiledRoutingArtifacts {
     let mut direct_map: FxHashMap<RoutingRuleKey, CandidateRule> = FxHashMap::default();
-    let mut ai_map: FxHashMap<RoutingRuleKey, CandidateRule> = FxHashMap::default();
+    let mut clean_map: FxHashMap<RoutingRuleKey, CleanCandidate> = FxHashMap::default();
     let mut proxy_map: FxHashMap<RoutingRuleKey, CandidateRule> = FxHashMap::default();
 
     for src in sources {
-        let target_map = match src.target {
-            RoutingTarget::Direct => &mut direct_map,
-            RoutingTarget::Ai => &mut ai_map,
-            RoutingTarget::Proxy => &mut proxy_map,
-        };
-        for rule in &src.rules {
-            target_map.entry(rule.key.clone()).or_default().ingest(
-                &src.lineage,
-                src.weight,
-                rule.extended_matching,
-            );
+        match src.target {
+            RoutingTarget::Direct => {
+                for rule in &src.rules {
+                    direct_map.entry(rule.key.clone()).or_default().ingest(
+                        &src.lineage,
+                        src.weight,
+                        rule.extended_matching,
+                    );
+                }
+            }
+            RoutingTarget::Proxy => {
+                for rule in &src.rules {
+                    proxy_map.entry(rule.key.clone()).or_default().ingest(
+                        &src.lineage,
+                        src.weight,
+                        rule.extended_matching,
+                    );
+                }
+            }
+            target if target.is_clean_egress() => {
+                for rule in &src.rules {
+                    clean_map.entry(rule.key.clone()).or_default().ingest(
+                        target,
+                        &src.lineage,
+                        src.weight,
+                        rule.extended_matching,
+                    );
+                }
+            }
+            _ => {}
         }
     }
 
@@ -266,20 +417,21 @@ pub fn compile_routing(
                 direct_forced.insert_key(&key);
                 direct_map.entry(key).or_default().force(extended);
             }
-            RoutingTarget::Ai => {
-                ai_map.entry(key).or_default().force(extended);
-            }
             RoutingTarget::Proxy => {
                 proxy_forced.insert_key(&key);
                 proxy_map.entry(key).or_default().force(extended);
             }
+            target if target.is_clean_egress() => {
+                clean_map.entry(key).or_default().force(target, extended);
+            }
+            _ => {}
         }
     }
 
     // Strip known pure-ad/tracker domains unless explicitly forced by routing overrides.
     let ad_guard = AdGuard::from_overrides(adblock_overrides);
     let mut ad_domains_filtered = 0usize;
-    for map in [&mut direct_map, &mut ai_map, &mut proxy_map] {
+    for map in [&mut direct_map, &mut proxy_map] {
         let before = map.len();
         map.retain(|key, cand| {
             if cand.forced {
@@ -294,8 +446,23 @@ pub fn compile_routing(
         });
         ad_domains_filtered += before - map.len();
     }
+    {
+        let before = clean_map.len();
+        clean_map.retain(|key, cand| {
+            if cand.is_forced() {
+                return true;
+            }
+            match key.kind {
+                RoutingRuleKind::Domain | RoutingRuleKind::DomainSuffix => {
+                    !ad_guard.is_ad_domain(&key.value)
+                }
+                _ => true,
+            }
+        });
+        ad_domains_filtered += before - clean_map.len();
+    }
 
-    // Protect shared cloud/auth/repo apexes inside AI.list so non-AI traffic is never hijacked.
+    // Protect shared cloud/auth/repo apexes across AI.list, Payment.list, and Telemetry.list.
     let mut shared_infra_set: FxHashSet<String> = overrides
         .shared_infra_roots
         .iter()
@@ -315,13 +482,14 @@ pub fn compile_routing(
         "www.apple.com",
     ];
 
-    ai_map.retain(|key, cand| {
+    clean_map.retain(|key, cand| {
+        let forced = cand.is_forced();
         match key.kind {
             RoutingRuleKind::Domain | RoutingRuleKind::DomainSuffix => {
                 if shared_infra_set.contains(&key.value) || is_cn_or_generic_tld(&key.value) {
                     return false;
                 }
-                if !cand.forced && direct_forced.matches_key(key) {
+                if !forced && direct_forced.matches_key(key) {
                     return false;
                 }
             }
@@ -351,7 +519,7 @@ pub fn compile_routing(
                 if is_shared_wildcard || is_cn_wildcard(&key.value) {
                     return false;
                 }
-                if !cand.forced && direct_forced.matches_key(key) {
+                if !forced && direct_forced.matches_key(key) {
                     return false;
                 }
             }
@@ -381,12 +549,12 @@ pub fn compile_routing(
                 if touches_shared_or_cn && !has_context_guard {
                     return false;
                 }
-                if !cand.forced && direct_forced.matches_key(key) {
+                if !forced && direct_forced.matches_key(key) {
                     return false;
                 }
             }
             _ => {
-                if !cand.forced && direct_forced.matches_key(key) {
+                if !forced && direct_forced.matches_key(key) {
                     return false;
                 }
             }
@@ -396,7 +564,7 @@ pub fn compile_routing(
 
     // Apply target-specific explicit exclusions before cross-target reconciliation.
     let mut direct_exclude = RuleMatcher::default();
-    let mut ai_exclude = RuleMatcher::default();
+    let mut clean_excludes: [RuleMatcher; 3] = Default::default();
     let mut proxy_exclude = RuleMatcher::default();
     for ex in &overrides.exclude_entries {
         let Some(val) = normalize_rule_value(ex.kind, &ex.value) else {
@@ -408,18 +576,29 @@ pub fn compile_routing(
         };
         match ex.target {
             RoutingTarget::Direct => direct_exclude.insert_key(&key),
-            RoutingTarget::Ai => ai_exclude.insert_key(&key),
             RoutingTarget::Proxy => proxy_exclude.insert_key(&key),
+            target => {
+                if let Some(slot) = clean_slot(target) {
+                    clean_excludes[slot].insert_key(&key);
+                }
+            }
         }
     }
     direct_map.retain(|k, c| c.forced || !is_excluded(&direct_exclude, k));
-    ai_map.retain(|k, c| c.forced || !is_excluded(&ai_exclude, k));
+    clean_map.retain(|k, cand| {
+        for (slot, ex_matcher) in clean_excludes.iter().enumerate() {
+            if cand.claims[slot].as_ref().is_some_and(|c| !c.forced) && is_excluded(ex_matcher, k) {
+                cand.claims[slot] = None;
+            }
+        }
+        cand.has_any_claim()
+    });
     proxy_map.retain(|k, c| c.forced || !is_excluded(&proxy_exclude, k));
 
-    // Resolve overlaps between Direct and AI:
-    // 1. Non-forced AI rules yield when Direct has strictly higher multi-lineage domestic consensus
-    //    (e.g., global topical lists repurposed into AI.list that incidentally include CN domains).
-    // 2. Surviving AI rules take precedence over remaining non-forced Direct rules.
+    // Resolve overlaps between Direct and Clean-Egress ({AI, Payment, Telemetry}):
+    // 1. Non-forced clean-egress rules yield when Direct has strictly higher multi-lineage domestic consensus
+    //    (e.g., global topical lists repurposed into Payment/Telemetry/AI that incidentally include CN domains).
+    // 2. Surviving clean-egress rules take precedence over remaining non-forced Direct rules.
     let mut pre_direct_exact_scores: FxHashMap<String, u16> = FxHashMap::default();
     let mut pre_direct_suffix_scores: FxHashMap<String, u16> = FxHashMap::default();
     for (dk, dc) in &direct_map {
@@ -442,11 +621,11 @@ pub fn compile_routing(
     }
 
     let mut conflicts_resolved = 0usize;
-    ai_map.retain(|k, c| {
-        if c.forced {
+    clean_map.retain(|k, c| {
+        if c.is_forced() {
             return true;
         }
-        let ai_score = c.score();
+        let clean_score = c.pooled_score();
         let check_dom = match k.kind {
             RoutingRuleKind::Domain | RoutingRuleKind::DomainSuffix => Some(k.value.as_str()),
             RoutingRuleKind::DomainWildcard => k
@@ -458,13 +637,13 @@ pub fn compile_routing(
         if let Some(dom) = check_dom {
             if let Some(&d_score) = pre_direct_exact_scores.get(dom)
                 && k.kind == RoutingRuleKind::Domain
-                && d_score > ai_score
+                && d_score > clean_score
             {
                 conflicts_resolved += 1;
                 return false;
             }
             if let Some(&d_score) = pre_direct_suffix_scores.get(dom)
-                && d_score > ai_score
+                && d_score > clean_score
             {
                 conflicts_resolved += 1;
                 return false;
@@ -472,7 +651,7 @@ pub fn compile_routing(
             for (idx, _) in dom.match_indices('.') {
                 let anc = &dom[idx + 1..];
                 if let Some(&d_score) = pre_direct_suffix_scores.get(anc)
-                    && d_score > ai_score
+                    && d_score > clean_score
                 {
                     conflicts_resolved += 1;
                     return false;
@@ -482,12 +661,12 @@ pub fn compile_routing(
         true
     });
 
-    let mut ai_matcher = RuleMatcher::default();
-    for key in ai_map.keys() {
-        ai_matcher.insert_key(key);
+    let mut clean_matcher = RuleMatcher::default();
+    for key in clean_map.keys() {
+        clean_matcher.insert_key(key);
     }
     direct_map.retain(|k, c| {
-        if !c.forced && ai_matcher.matches_key(k) {
+        if !c.forced && clean_matcher.matches_key(k) {
             conflicts_resolved += 1;
             false
         } else {
@@ -619,16 +798,16 @@ pub fn compile_routing(
         }
     });
 
-    // Enforce AI.list as a strict subset of Proxy.list BEFORE compression and rendering.
+    // Enforce (AI.list ∪ Payment.list ∪ Telemetry.list) as a strict subset of Proxy.list BEFORE compression.
     let mut ai_merged_into_proxy = 0usize;
-    for (key, ai_cand) in &ai_map {
+    for (key, clean_cand) in &clean_map {
         match proxy_map.get_mut(key) {
             Some(proxy_cand) => {
-                proxy_cand.extended_matching |= ai_cand.extended_matching;
-                proxy_cand.forced |= ai_cand.forced;
+                proxy_cand.extended_matching |= clean_cand.extended_matching();
+                proxy_cand.forced |= clean_cand.is_forced();
             }
             None => {
-                proxy_map.insert(key.clone(), ai_cand.clone());
+                proxy_map.insert(key.clone(), clean_cand.to_proxy_candidate());
                 ai_merged_into_proxy += 1;
             }
         }
@@ -640,12 +819,11 @@ pub fn compile_routing(
         source_counts.active_direct,
         source_counts.total_direct,
     );
-    let (ai_text, ai_stats) = compress_and_render(
-        RoutingTarget::Ai,
-        ai_map,
-        source_counts.active_ai,
-        source_counts.total_ai,
-    );
+    let [
+        (ai_text, ai_stats),
+        (payment_text, payment_stats),
+        (telemetry_text, telemetry_stats),
+    ] = compress_and_partition_clean(clean_map, source_counts);
     let (proxy_text, proxy_stats) = compress_and_render(
         RoutingTarget::Proxy,
         proxy_map,
@@ -656,9 +834,13 @@ pub fn compile_routing(
     CompiledRoutingArtifacts {
         direct_text,
         ai_text,
+        payment_text,
+        telemetry_text,
         proxy_text,
         direct_stats,
         ai_stats,
+        payment_stats,
+        telemetry_stats,
         proxy_stats,
         ad_domains_filtered,
         conflicts_resolved,
@@ -692,10 +874,10 @@ fn label_count(dom: &str) -> usize {
 
 /// Walks domain labels from broadest TLD suffix inward to `dom` itself, stopping at the broadest
 /// matching suffix already inserted into `surviving_suffixes`.
-fn find_broadest_suffix_ancestor<'a>(
+fn find_broadest_suffix_ancestor<'a, V>(
     dom: &str,
-    surviving_suffixes: &'a mut BTreeMap<String, bool>,
-) -> Option<&'a mut bool> {
+    surviving_suffixes: &'a mut BTreeMap<String, V>,
+) -> Option<&'a mut V> {
     let dot_positions: Vec<usize> = dom.match_indices('.').map(|(idx, _)| idx).collect();
     for idx in dot_positions.into_iter().rev() {
         let candidate = &dom[idx + 1..];
@@ -704,6 +886,345 @@ fn find_broadest_suffix_ancestor<'a>(
         }
     }
     surviving_suffixes.get_mut(dom)
+}
+
+/// Compresses the pooled clean-egress rules (`{Ai, Payment, Telemetry}`) using a single unified
+/// `DomainTrie` and CIDR aggregation pass, then partitions the surviving rules into three strictly
+/// disjoint rule sets (`AI.list`, `Payment.list`, `Telemetry.list`) whose union equals 100% of the
+/// compressed clean-egress pool.
+fn compress_and_partition_clean(
+    rules: FxHashMap<RoutingRuleKey, CleanCandidate>,
+    counts: RoutingSourceCounts,
+) -> [(String, TargetStats); 3] {
+    let mut exact_domains: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut suffix_domains: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut keywords: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut wildcards: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut url_regexes: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut user_agents: BTreeMap<String, RoutingTarget> = BTreeMap::new();
+    let mut process_names: BTreeMap<String, RoutingTarget> = BTreeMap::new();
+    let mut logical_ands: BTreeMap<String, RoutingTarget> = BTreeMap::new();
+    let mut raw_v4: Vec<(Ipv4Net, CleanCandidate)> = Vec::new();
+    let mut raw_v6: Vec<(Ipv6Net, CleanCandidate)> = Vec::new();
+    let mut asns: BTreeMap<u32, RoutingTarget> = BTreeMap::new();
+
+    for (key, cand) in rules {
+        let owner = cand.owner();
+        let ext = cand.extended_matching() && key.kind.supports_extended_matching();
+        match key.kind {
+            RoutingRuleKind::Domain => {
+                exact_domains.insert(key.value, (owner, ext));
+            }
+            RoutingRuleKind::DomainSuffix => {
+                suffix_domains.insert(key.value, (owner, ext));
+            }
+            RoutingRuleKind::DomainKeyword => {
+                keywords.insert(key.value, (owner, ext));
+            }
+            RoutingRuleKind::DomainWildcard => {
+                wildcards.insert(key.value, (owner, ext));
+            }
+            RoutingRuleKind::UrlRegex => {
+                url_regexes.insert(key.value, (owner, ext));
+            }
+            RoutingRuleKind::UserAgent => {
+                user_agents.insert(key.value, owner);
+            }
+            RoutingRuleKind::ProcessName => {
+                process_names.insert(key.value, owner);
+            }
+            RoutingRuleKind::And => {
+                logical_ands.insert(key.value, owner);
+            }
+            RoutingRuleKind::IpCidr => {
+                if let Some(ipnet::IpNet::V4(v4)) = parse_canonical_cidr(&key.value) {
+                    raw_v4.push((v4, cand));
+                }
+            }
+            RoutingRuleKind::IpCidr6 => {
+                if let Some(ipnet::IpNet::V6(v6)) = parse_canonical_cidr(&key.value) {
+                    raw_v6.push((v6, cand));
+                }
+            }
+            RoutingRuleKind::IpAsn => {
+                if let Ok(asn) = key.value.parse::<u32>() {
+                    asns.insert(asn, owner);
+                }
+            }
+        }
+    }
+
+    let mut stats: [TargetStats; 3] = Default::default();
+
+    // 1. Compress DOMAIN-SUFFIX tree and propagate extended-matching flags upward to surviving ancestors.
+    let mut sorted_suffixes: Vec<(String, (RoutingTarget, bool))> =
+        suffix_domains.into_iter().collect();
+    sorted_suffixes.sort_by(|a, b| {
+        label_count(&a.0)
+            .cmp(&label_count(&b.0))
+            .then(a.0.cmp(&b.0))
+    });
+
+    let mut trie = DomainTrie::default();
+    let mut surviving_suffixes: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+
+    for (dom, (owner, ext)) in sorted_suffixes {
+        if !trie.has_suffix_ancestor_or_eq(&dom) {
+            trie.insert_suffix(&dom);
+            surviving_suffixes.insert(dom, (owner, ext));
+        } else if let Some((anc_owner, anc_ext)) =
+            find_broadest_suffix_ancestor(&dom, &mut surviving_suffixes)
+        {
+            *anc_ext |= ext;
+            if let Some(slot) = clean_slot(*anc_owner) {
+                stats[slot].subsumed_by_trie += 1;
+            }
+        }
+    }
+
+    // 2. Subsume exact DOMAIN entries already covered by a surviving DOMAIN-SUFFIX, preserving extended-matching.
+    let mut surviving_exact: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    for (dom, (owner, ext)) in exact_domains {
+        if trie.matches_domain(&dom) {
+            if let Some((anc_owner, anc_ext)) =
+                find_broadest_suffix_ancestor(&dom, &mut surviving_suffixes)
+            {
+                *anc_ext |= ext;
+                if let Some(slot) = clean_slot(*anc_owner) {
+                    stats[slot].subsumed_by_trie += 1;
+                }
+            }
+        } else {
+            surviving_exact.insert(dom, (owner, ext));
+        }
+    }
+
+    // 3. Subsume simple `*.tail` DOMAIN-WILDCARD entries covered by a surviving DOMAIN-SUFFIX ancestor.
+    let mut surviving_wildcards: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    for (wc, (owner, ext)) in wildcards {
+        if let Some(tail) = wc.strip_prefix("*.")
+            && !tail.contains('*')
+            && !tail.contains('?')
+            && trie.has_suffix_ancestor_or_eq(tail)
+        {
+            if let Some((anc_owner, anc_ext)) =
+                find_broadest_suffix_ancestor(tail, &mut surviving_suffixes)
+            {
+                *anc_ext |= ext;
+                if let Some(slot) = clean_slot(*anc_owner) {
+                    stats[slot].subsumed_by_trie += 1;
+                }
+            }
+        } else {
+            surviving_wildcards.insert(wc, (owner, ext));
+        }
+    }
+
+    // 4. Filter private/LAN/Fake-IP/Tailscale/Cloudflare-Mesh bogon CIDRs before aggregating.
+    raw_v4.retain(|(net, cand)| {
+        if overlaps_reserved_v4(*net) {
+            if let Some(slot) = clean_slot(cand.owner()) {
+                stats[slot].reserved_cidrs_dropped += 1;
+            }
+            false
+        } else {
+            true
+        }
+    });
+    raw_v6.retain(|(net, cand)| {
+        if overlaps_reserved_v6(*net) {
+            if let Some(slot) = clean_slot(cand.owner()) {
+                stats[slot].reserved_cidrs_dropped += 1;
+            }
+            false
+        } else {
+            true
+        }
+    });
+
+    let v4_nets: Vec<Ipv4Net> = raw_v4.iter().map(|(n, _)| *n).collect();
+    let v6_nets: Vec<Ipv6Net> = raw_v6.iter().map(|(n, _)| *n).collect();
+    let coalesced_v4 = Ipv4Net::aggregate(&v4_nets);
+    let coalesced_v6 = Ipv6Net::aggregate(&v6_nets);
+
+    let mut owned_v4: Vec<(Ipv4Net, RoutingTarget)> = Vec::with_capacity(coalesced_v4.len());
+    for agg in coalesced_v4 {
+        let mut merged = CleanCandidate::default();
+        for (net, cand) in &raw_v4 {
+            if agg.prefix_len() <= net.prefix_len() && agg.contains(&net.network()) {
+                merged.merge_from(cand);
+            }
+        }
+        owned_v4.push((agg, merged.owner()));
+    }
+
+    let mut owned_v6: Vec<(Ipv6Net, RoutingTarget)> = Vec::with_capacity(coalesced_v6.len());
+    for agg in coalesced_v6 {
+        let mut merged = CleanCandidate::default();
+        for (net, cand) in &raw_v6 {
+            if agg.prefix_len() <= net.prefix_len() && agg.contains(&net.network()) {
+                merged.merge_from(cand);
+            }
+        }
+        owned_v6.push((agg, merged.owner()));
+    }
+
+    let mut rendered_lines: [Vec<String>; 3] = Default::default();
+
+    for (proc_name, owner) in process_names {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].process_name_count += 1;
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::ProcessName,
+                value: proc_name,
+            },
+            extended_matching: false,
+        }));
+    }
+    for (ua, owner) in user_agents {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].user_agent_count += 1;
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::UserAgent,
+                value: ua,
+            },
+            extended_matching: false,
+        }));
+    }
+    for (and_val, owner) in logical_ands {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].logical_and_count += 1;
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::And,
+                value: and_val,
+            },
+            extended_matching: false,
+        }));
+    }
+    for (dom, (owner, ext)) in surviving_exact {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].domain_count += 1;
+        if ext {
+            stats[slot].extended_matching_count += 1;
+        }
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::Domain,
+                value: dom,
+            },
+            extended_matching: ext,
+        }));
+    }
+    for (dom, (owner, ext)) in surviving_suffixes {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].domain_suffix_count += 1;
+        if ext {
+            stats[slot].extended_matching_count += 1;
+        }
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::DomainSuffix,
+                value: dom,
+            },
+            extended_matching: ext,
+        }));
+    }
+    for (kw, (owner, ext)) in keywords {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].domain_keyword_count += 1;
+        if ext {
+            stats[slot].extended_matching_count += 1;
+        }
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::DomainKeyword,
+                value: kw,
+            },
+            extended_matching: ext,
+        }));
+    }
+    for (wc, (owner, ext)) in surviving_wildcards {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].domain_wildcard_count += 1;
+        if ext {
+            stats[slot].extended_matching_count += 1;
+        }
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::DomainWildcard,
+                value: wc,
+            },
+            extended_matching: ext,
+        }));
+    }
+    for (re, (owner, ext)) in url_regexes {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].url_regex_count += 1;
+        if ext {
+            stats[slot].extended_matching_count += 1;
+        }
+        rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
+            key: RoutingRuleKey {
+                kind: RoutingRuleKind::UrlRegex,
+                value: re,
+            },
+            extended_matching: ext,
+        }));
+    }
+    for (v4, owner) in owned_v4 {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].ip_cidr_count += 1;
+        rendered_lines[slot].push(format!("IP-CIDR,{},no-resolve", v4));
+    }
+    for (v6, owner) in owned_v6 {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].ip_cidr6_count += 1;
+        rendered_lines[slot].push(format!("IP-CIDR6,{},no-resolve", v6));
+    }
+    for (asn, owner) in asns {
+        let slot = clean_slot(owner).unwrap();
+        stats[slot].ip_asn_count += 1;
+        rendered_lines[slot].push(format!("IP-ASN,{},no-resolve", asn));
+    }
+
+    let src_pairs = [
+        (counts.active_ai, counts.total_ai),
+        (counts.active_payment, counts.total_payment),
+        (counts.active_telemetry, counts.total_telemetry),
+    ];
+
+    let [lines0, lines1, lines2] = rendered_lines;
+    let [mut st0, mut st1, mut st2] = stats;
+    st0.total_rules = lines0.len();
+    st1.total_rules = lines1.len();
+    st2.total_rules = lines2.len();
+
+    let text0 = format_ruleset_file(
+        RoutingTarget::Ai,
+        &lines0,
+        &st0,
+        src_pairs[0].0,
+        src_pairs[0].1,
+    );
+    let text1 = format_ruleset_file(
+        RoutingTarget::Payment,
+        &lines1,
+        &st1,
+        src_pairs[1].0,
+        src_pairs[1].1,
+    );
+    let text2 = format_ruleset_file(
+        RoutingTarget::Telemetry,
+        &lines2,
+        &st2,
+        src_pairs[2].0,
+        src_pairs[2].1,
+    );
+
+    [(text0, st0), (text1, st1), (text2, st2)]
 }
 
 fn compress_and_render(
@@ -977,7 +1498,23 @@ fn compress_and_render(
     }
 
     stats.total_rules = rendered_lines.len();
+    let out = format_ruleset_file(
+        target,
+        &rendered_lines,
+        &stats,
+        active_sources,
+        total_sources,
+    );
+    (out, stats)
+}
 
+fn format_ruleset_file(
+    target: RoutingTarget,
+    rendered_lines: &[String],
+    stats: &TargetStats,
+    active_sources: usize,
+    total_sources: usize,
+) -> String {
     let mut out = String::with_capacity(stats.total_rules * 36 + 512);
     out.push_str(&format!(
         "# Surge External RULE-SET: {}\n",
@@ -997,9 +1534,8 @@ fn compress_and_render(
     );
     out.push_str("# Repository: https://github.com/ding113/surge-rules\n\n");
     for line in rendered_lines {
-        out.push_str(&line);
+        out.push_str(line);
         out.push('\n');
     }
-
-    (out, stats)
+    out
 }

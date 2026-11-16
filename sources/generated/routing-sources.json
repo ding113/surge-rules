@@ -1902,182 +1902,6 @@
       ]
     },
     {
-      "id": "metacubex_paypal",
-      "name": "MetaCubeX paypal",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 94,
-      "core": true,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/paypal.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_stripe",
-      "name": "MetaCubeX stripe",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/stripe.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/stripe.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_wise",
-      "name": "MetaCubeX wise",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wise.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/wise.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_hsbc",
-      "name": "MetaCubeX hsbc",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hsbc.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/hsbc.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_visa",
-      "name": "MetaCubeX visa",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/visa.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/visa.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_mastercard",
-      "name": "MetaCubeX mastercard",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/mastercard.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/mastercard.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_intuit",
-      "name": "MetaCubeX intuit",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 88,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/intuit.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/intuit.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_hcaptcha",
-      "name": "MetaCubeX hcaptcha",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hcaptcha.list"
-        },
-        {
-          "kind": "direct",
-          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/hcaptcha.list"
-        }
-      ]
-    },
-    {
       "id": "tannayej_ai_global",
       "name": "TannayeJ AI Global Vendor Rules",
       "target": "ai",
@@ -2486,280 +2310,6 @@
       ]
     },
     {
-      "id": "repcz_paypal",
-      "name": "Repcz Tool PayPal Surge Ruleset",
-      "target": "ai",
-      "lineage": "repcz",
-      "format": "surge_ruleset",
-      "weight": 93,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "MIT",
-      "homepage": "https://github.com/Repcz/Tool",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/PayPal.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_ibkr",
-      "name": "MetaCubeX ibkr (Interactive Brokers)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 94,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/ibkr.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_schwab",
-      "name": "MetaCubeX schwab (Charles Schwab)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 94,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/schwab.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_standardchartered",
-      "name": "MetaCubeX standardchartered",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 93,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/standardchartered.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_citic_not_cn",
-      "name": "MetaCubeX citic@!cn (CITIC Bank International HK)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 93,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/citic%40%21cn.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_bank_jp",
-      "name": "MetaCubeX category-bank-jp (Japanese Banking)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 91,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-bank-jp.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_squareup",
-      "name": "MetaCubeX squareup (Square / Block Payments)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/squareup.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_redotpay",
-      "name": "MetaCubeX redotpay (Overseas Card & Payment)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 92,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/redotpay.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_straitsx",
-      "name": "MetaCubeX straitsx (Singapore Payment Gateway)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 91,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/straitsx.list"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_category_finance",
-      "name": "MetaCubeX category-finance (Overseas Finance & Exchanges)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 82,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-finance.list"
-        }
-      ],
-      "notes": "Domestic CN finance domains automatically yield to higher-scored Direct consensus"
-    },
-    {
-      "id": "ut1_bank_repurposed",
-      "name": "UT1 Toulouse University Global Banking Inventory (Repurposed)",
-      "target": "ai",
-      "lineage": "ut1_blacklists",
-      "format": "domain_suffix_set",
-      "weight": 82,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "CC-BY-SA-4.0",
-      "homepage": "https://github.com/olbat/ut1-blacklists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bank/domains"
-        }
-      ],
-      "notes": "Global bank domain inventory repurposed for clean overseas banking risk-control egress"
-    },
-    {
-      "id": "ut1_financial_repurposed",
-      "name": "UT1 Toulouse University Global Financial Inventory (Repurposed)",
-      "target": "ai",
-      "lineage": "ut1_blacklists",
-      "format": "domain_suffix_set",
-      "weight": 82,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "CC-BY-SA-4.0",
-      "homepage": "https://github.com/olbat/ut1-blacklists",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/financial/domains"
-        }
-      ]
-    },
-    {
-      "id": "metacubex_ip_geo_detect",
-      "name": "MetaCubeX category-ip-geo-detect (IP Risk & Geo Scoring)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 84,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ip-geo-detect.list"
-        }
-      ],
-      "notes": "Routes overseas IP/fraud-scoring checks via AI residential exit while CN IP-lookup sites yield to Direct consensus"
-    },
-    {
-      "id": "badblock_captcha_repurposed",
-      "name": "BadBlock CAPTCHA Verification Allowlist (Repurposed for Risk-Control)",
-      "target": "ai",
-      "lineage": "celenityy_badblock",
-      "format": "domain_suffix_set",
-      "weight": 91,
-      "core": false,
-      "updateCadence": "daily",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/celenityy/BadBlock",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/celenityy/BadBlock/pages/wildcards-no-star/captcha_whitelist.txt"
-        }
-      ],
-      "notes": "Repurposes curated CAPTCHA allowlist so human-verification challenges match AI exit IP"
-    },
-    {
-      "id": "metacubex_password_management",
-      "name": "MetaCubeX category-password-management (Passkey & Vault Sync)",
-      "target": "ai",
-      "lineage": "v2fly_dlc",
-      "format": "clash_classical",
-      "weight": 90,
-      "core": false,
-      "updateCadence": "6h",
-      "license": "GPL-3.0",
-      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
-      "endpoints": [
-        {
-          "kind": "direct",
-          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list"
-        }
-      ]
-    },
-    {
       "id": "metacubex_ai_not_cn_telemetry",
       "name": "MetaCubeX category-ai-!cn@telemetry (AI Attestation & Telemetry)",
       "target": "ai",
@@ -2814,9 +2364,381 @@
       ]
     },
     {
+      "id": "metacubex_paypal",
+      "name": "MetaCubeX paypal",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": true,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/paypal.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/paypal.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_stripe",
+      "name": "MetaCubeX stripe",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/stripe.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/stripe.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_wise",
+      "name": "MetaCubeX wise",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/wise.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/wise.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_hsbc",
+      "name": "MetaCubeX hsbc",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hsbc.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/hsbc.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_visa",
+      "name": "MetaCubeX visa",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/visa.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/visa.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_mastercard",
+      "name": "MetaCubeX mastercard",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/mastercard.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/mastercard.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_intuit",
+      "name": "MetaCubeX intuit",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 88,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/intuit.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/intuit.list"
+        }
+      ]
+    },
+    {
+      "id": "repcz_paypal",
+      "name": "Repcz Tool PayPal Surge Ruleset",
+      "target": "payment",
+      "lineage": "repcz",
+      "format": "surge_ruleset",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "MIT",
+      "homepage": "https://github.com/Repcz/Tool",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/Repcz/Tool/X/Surge/Rules/PayPal.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ibkr",
+      "name": "MetaCubeX ibkr (Interactive Brokers)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/ibkr.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_schwab",
+      "name": "MetaCubeX schwab (Charles Schwab)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 94,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/schwab.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_standardchartered",
+      "name": "MetaCubeX standardchartered",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/standardchartered.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_citic_not_cn",
+      "name": "MetaCubeX citic@!cn (CITIC Bank International HK)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 93,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/citic%40%21cn.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_bank_jp",
+      "name": "MetaCubeX category-bank-jp (Japanese Banking)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-bank-jp.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_squareup",
+      "name": "MetaCubeX squareup (Square / Block Payments)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/squareup.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_redotpay",
+      "name": "MetaCubeX redotpay (Overseas Card & Payment)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/redotpay.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_straitsx",
+      "name": "MetaCubeX straitsx (Singapore Payment Gateway)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/straitsx.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_category_finance",
+      "name": "MetaCubeX category-finance (Overseas Finance & Exchanges)",
+      "target": "payment",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 82,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-finance.list"
+        }
+      ],
+      "notes": "Domestic CN finance domains automatically yield to higher-scored Direct consensus"
+    },
+    {
+      "id": "ut1_bank_repurposed",
+      "name": "UT1 Toulouse University Global Banking Inventory (Repurposed)",
+      "target": "payment",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 82,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bank/domains"
+        }
+      ],
+      "notes": "Global bank domain inventory repurposed for clean overseas banking risk-control egress"
+    },
+    {
+      "id": "ut1_financial_repurposed",
+      "name": "UT1 Toulouse University Global Financial Inventory (Repurposed)",
+      "target": "payment",
+      "lineage": "ut1_blacklists",
+      "format": "domain_suffix_set",
+      "weight": 82,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "CC-BY-SA-4.0",
+      "homepage": "https://github.com/olbat/ut1-blacklists",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/financial/domains"
+        }
+      ]
+    },
+    {
       "id": "metacubex_paypal_telemetry",
       "name": "MetaCubeX paypal@telemetry (PayPal Risk & Device Telemetry)",
-      "target": "ai",
+      "target": "payment",
       "lineage": "v2fly_dlc",
       "format": "clash_classical",
       "weight": 91,
@@ -2832,9 +2754,69 @@
       ]
     },
     {
+      "id": "metacubex_hcaptcha",
+      "name": "MetaCubeX hcaptcha",
+      "target": "telemetry",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 92,
+      "core": true,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/hcaptcha.list"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/classical/hcaptcha.list"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_ip_geo_detect",
+      "name": "MetaCubeX category-ip-geo-detect (IP Risk & Geo Scoring)",
+      "target": "telemetry",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 84,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-ip-geo-detect.list"
+        }
+      ],
+      "notes": "Routes overseas IP/fraud-scoring checks via clean exit while CN IP-lookup sites yield to Direct consensus"
+    },
+    {
+      "id": "badblock_captcha_repurposed",
+      "name": "BadBlock CAPTCHA Verification Allowlist (Repurposed for Risk-Control)",
+      "target": "telemetry",
+      "lineage": "celenityy_badblock",
+      "format": "domain_suffix_set",
+      "weight": 91,
+      "core": false,
+      "updateCadence": "daily",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/celenityy/BadBlock",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/celenityy/BadBlock/pages/wildcards-no-star/captcha_whitelist.txt"
+        }
+      ],
+      "notes": "Repurposes curated CAPTCHA allowlist so human-verification challenges match clean exit IP"
+    },
+    {
       "id": "metacubex_category_telemetry",
       "name": "MetaCubeX category-telemetry (Overseas OS & SDK Telemetry)",
-      "target": "ai",
+      "target": "telemetry",
       "lineage": "v2fly_dlc",
       "format": "clash_classical",
       "weight": 80,
@@ -5285,6 +5267,24 @@
         {
           "kind": "direct",
           "url": "https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/gambling/hosts"
+        }
+      ]
+    },
+    {
+      "id": "metacubex_password_management",
+      "name": "MetaCubeX category-password-management (Passkey & Vault Sync)",
+      "target": "proxy",
+      "lineage": "v2fly_dlc",
+      "format": "clash_classical",
+      "weight": 90,
+      "core": false,
+      "updateCadence": "6h",
+      "license": "GPL-3.0",
+      "homepage": "https://github.com/MetaCubeX/meta-rules-dat",
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list"
         }
       ]
     }

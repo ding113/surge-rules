@@ -4,7 +4,7 @@ import type { RoutingSourceEntry } from "./routing-schema.ts";
  * Upstream sources for dist/Proxy.list covering global overseas services, overseas streaming media
  * (including overseas editions of domestic media platforms), GFW/GreatFire blocked lists,
  * non-CN TLD/geolocation baselines, and Telegram/CDN infrastructure.
- * Compiled Proxy.list also strictly includes 100% of compiled AI.list rules.
+ * Compiled Proxy.list also strictly includes 100% of compiled AI.list, Payment.list, and Telemetry.list rules.
  */
 export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
   {
@@ -2453,6 +2453,24 @@ export const PROXY_ROUTING_SOURCES: readonly RoutingSourceEntry[] = [
       {
         kind: "direct",
         url: "https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/gambling/hosts",
+      },
+    ],
+  },
+  {
+    id: "metacubex_password_management",
+    name: "MetaCubeX category-password-management (Passkey & Vault Sync)",
+    target: "proxy",
+    lineage: "v2fly_dlc",
+    format: "clash_classical",
+    weight: 90,
+    core: false,
+    updateCadence: "6h",
+    license: "GPL-3.0",
+    homepage: "https://github.com/MetaCubeX/meta-rules-dat",
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list",
       },
     ],
   },

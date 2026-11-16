@@ -14,6 +14,8 @@ use crate::fetch::FetchableSource;
 pub enum RoutingTarget {
     Direct,
     Ai,
+    Payment,
+    Telemetry,
     Proxy,
 }
 
@@ -22,6 +24,8 @@ impl RoutingTarget {
         match self {
             Self::Direct => "direct",
             Self::Ai => "ai",
+            Self::Payment => "payment",
+            Self::Telemetry => "telemetry",
             Self::Proxy => "proxy",
         }
     }
@@ -30,8 +34,14 @@ impl RoutingTarget {
         match self {
             Self::Direct => "Direct.list",
             Self::Ai => "AI.list",
+            Self::Payment => "Payment.list",
+            Self::Telemetry => "Telemetry.list",
             Self::Proxy => "Proxy.list",
         }
+    }
+
+    pub fn is_clean_egress(self) -> bool {
+        matches!(self, Self::Ai | Self::Payment | Self::Telemetry)
     }
 }
 

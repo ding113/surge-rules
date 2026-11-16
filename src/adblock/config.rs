@@ -16,6 +16,24 @@ pub enum AdblockSourceRole {
     RulesetFallback,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Default, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AdblockCategory {
+    #[default]
+    Ad,
+    Privacy,
+    AdMixed,
+    Both,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Default, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AdblockRuleTarget {
+    #[default]
+    Ad,
+    Privacy,
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AdblockSourceFormat {
@@ -41,6 +59,8 @@ pub enum AdblockPlatformScope {
 pub struct AdblockSourceConfig {
     pub id: String,
     pub role: AdblockSourceRole,
+    #[serde(default)]
+    pub category: AdblockCategory,
     pub format: AdblockSourceFormat,
     pub platform: AdblockPlatformScope,
     pub lineage: String,
@@ -103,6 +123,24 @@ impl AdblockSourceCatalog {
             if src.endpoints.is_empty() {
                 bail!("adblock source '{}' has zero endpoints", src.id);
             }
+            match src.role {
+                AdblockSourceRole::Allowlist => {
+                    if src.category == AdblockCategory::AdMixed {
+                        bail!(
+                            "allowlist source '{}' cannot use category 'ad_mixed'",
+                            src.id
+                        );
+                    }
+                }
+                AdblockSourceRole::ComplexFirst | AdblockSourceRole::RulesetFallback => {
+                    if src.category == AdblockCategory::Both {
+                        bail!(
+                            "blocklist/complex source '{}' cannot use category 'both'",
+                            src.id
+                        );
+                    }
+                }
+            }
         }
         Ok(catalog)
     }
@@ -135,6 +173,8 @@ pub struct ProtectedApexDomainOverride {
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ForceRuleSetOverride {
+    #[serde(default)]
+    pub target: AdblockRuleTarget,
     pub kind: String,
     pub value: String,
     #[allow(dead_code)]

@@ -2,7 +2,7 @@ import type { RoutingExclusionOverride, RoutingRuleOverride } from "./routing-sc
 
 /**
  * Curated global non-CN developer, search, social, academic, cloud, and Telegram rules
- * for dist/Proxy.list (which also inherits 100% of compiled dist/AI.list rules).
+ * for dist/Proxy.list (which also inherits 100% of compiled AI.list, Payment.list, and Telemetry.list rules).
  */
 export const PROXY_FORCE_ENTRIES: readonly RoutingRuleOverride[] = [
   // Google Core & Scholar

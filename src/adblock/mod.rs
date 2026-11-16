@@ -16,7 +16,7 @@ use rayon::prelude::*;
 use rustc_hash::FxHashMap;
 use tracing::{info, warn};
 
-use crate::adblock::compiler::compile_adblock;
+use crate::adblock::compiler::{TelemetryProtectionSet, compile_adblock_with_telemetry_guard};
 use crate::adblock::config::{AdblockOverrides, AdblockSourceCatalog, AdblockSourceConfig};
 use crate::adblock::model::ParsedAdblockSource;
 use crate::adblock::parsers::parse_adblock_source;
@@ -31,6 +31,7 @@ pub struct BuildAdblockOptions {
     pub output_dir: PathBuf,
     pub fetch: FetchOptions,
     pub min_ruleset_lines: usize,
+    pub min_privacy_lines: usize,
 }
 
 impl Default for BuildAdblockOptions {
@@ -45,6 +46,7 @@ impl Default for BuildAdblockOptions {
                 ..FetchOptions::default()
             },
             min_ruleset_lines: 10_000,
+            min_privacy_lines: 2_000,
         }
     }
 }
@@ -103,18 +105,52 @@ pub async fn build_adblock_pipeline(
         );
     }
 
+    let telemetry_path = opts.output_dir.join("Telemetry.list");
+    let telemetry_guard = if telemetry_path.exists() {
+        let tel_raw = fs::read_to_string(&telemetry_path).with_context(|| {
+            format!(
+                "failed reading Telemetry.list at {}",
+                telemetry_path.display()
+            )
+        })?;
+        let guard = TelemetryProtectionSet::from_ruleset_text(&tel_raw);
+        info!(
+            telemetry_exact = guard.exact_domains.len(),
+            telemetry_suffixes = guard.suffix_domains.len(),
+            "loaded Telemetry.list protection guard for Adblock & Privacy compilation"
+        );
+        Some(guard)
+    } else {
+        None
+    };
+
     let active_sources = parsed_sources.len();
-    let compiled = compile_adblock(&parsed_sources, &overrides, active_sources, total_sources);
+    let compiled = compile_adblock_with_telemetry_guard(
+        &parsed_sources,
+        &overrides,
+        telemetry_guard.as_ref(),
+        active_sources,
+        total_sources,
+    );
 
     fs::create_dir_all(&opts.output_dir)
         .with_context(|| format!("failed creating {}", opts.output_dir.display()))?;
     fs::write(opts.output_dir.join("Adblock.list"), &compiled.ruleset_text)?;
     fs::write(
+        opts.output_dir.join("Privacy.list"),
+        &compiled.privacy_ruleset_text,
+    )?;
+    fs::write(
         opts.output_dir.join("Adblock.sgmodule"),
         &compiled.module_text,
     )?;
 
-    let report = verify_adblock_dir(&opts.output_dir, &overrides, opts.min_ruleset_lines)?;
+    let report = verify_adblock_dir(
+        &opts.output_dir,
+        &overrides,
+        opts.min_ruleset_lines,
+        opts.min_privacy_lines,
+    )?;
     let notes = render_adblock_release_notes(
         &report,
         active_sources,
@@ -126,11 +162,12 @@ pub async fn build_adblock_pipeline(
 
     info!(
         total_secs = t0.elapsed().as_secs_f64(),
-        ruleset_rules = report.ruleset_total,
+        adblock_rules = report.ruleset_total,
+        privacy_rules = report.privacy_ruleset_total,
         module_scripts = report.module_scripts,
         module_mitm = report.module_mitm_hosts,
         canaries = report.canaries_checked,
-        "Adblock build and verification succeeded"
+        "Adblock & Privacy build and verification succeeded"
     );
 
     Ok(report)

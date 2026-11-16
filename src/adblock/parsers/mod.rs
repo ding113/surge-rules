@@ -11,7 +11,12 @@ use crate::adblock::model::ParsedAdblockSource;
 /// Parses raw upstream feed bytes according to its declared Adblock source format and role.
 pub fn parse_adblock_source(src: &AdblockSourceConfig, raw: &[u8]) -> Result<ParsedAdblockSource> {
     let text = String::from_utf8_lossy(raw);
-    let mut parsed = ParsedAdblockSource::default();
+    let mut parsed = ParsedAdblockSource {
+        category: src.category,
+        lineage: src.lineage.clone(),
+        weight: src.weight,
+        ..Default::default()
+    };
 
     match src.format {
         AdblockSourceFormat::AbpFilter => {

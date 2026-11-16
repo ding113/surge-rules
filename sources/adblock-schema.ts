@@ -2,6 +2,8 @@ import type { SourceEndpoint } from "./schema.ts";
 
 export type AdblockSourceRole = "allowlist" | "complex_first" | "ruleset_fallback";
 
+export type AdblockCategory = "ad" | "privacy" | "ad_mixed" | "both";
+
 export type AdblockSourceFormat =
   | "surge_module"
   | "qx_rewrite"
@@ -17,6 +19,7 @@ export interface AdblockSourceEntry {
   readonly id: string;
   readonly name?: string;
   readonly role: AdblockSourceRole;
+  readonly category: AdblockCategory;
   readonly format: AdblockSourceFormat;
   readonly platform: AdblockPlatformScope;
   readonly lineage: string;

@@ -1,6 +1,7 @@
 use ipnet::{Ipv4Net, Ipv6Net};
 use rustc_hash::FxHashSet;
 
+use crate::adblock::config::AdblockCategory;
 use crate::adblock::regex_util::canonical_url_pattern_key;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
@@ -464,6 +465,9 @@ pub struct HeaderModException {
 
 #[derive(Default, Clone, Debug)]
 pub struct ParsedAdblockSource {
+    pub category: AdblockCategory,
+    pub lineage: String,
+    pub weight: u16,
     pub allow_exact_domains: FxHashSet<String>,
     pub allow_suffix_domains: FxHashSet<String>,
     pub complex_protected_hosts: FxHashSet<String>,

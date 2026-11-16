@@ -1853,6 +1853,837 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
   { matchType: "suffix", domain: "zuowenwang.net", rationale: "Student essay education portal" },
   { matchType: "suffix", domain: "114chn.com", rationale: "114 China directory portal" },
 
+  // 风控校验、人机验证（CAPTCHA/WAF）、崩溃诊断（Crash/APM）、特性开关（Feature Flags）与系统/应用遥测放行白名单
+  {
+    matchType: "suffix",
+    domain: "statsig.com",
+    rationale: "Statsig feature-flag & experimentation platform (OpenAI / Notion / Claude)",
+  },
+  {
+    matchType: "suffix",
+    domain: "statsigapi.net",
+    rationale: "Statsig feature-flag evaluation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "launchdarkly.com",
+    rationale: "LaunchDarkly feature-flag SDK (Anthropic / Slack / Atlassian)",
+  },
+  {
+    matchType: "suffix",
+    domain: "split.io",
+    rationale: "Split.io feature-flag and release-toggle SDK",
+  },
+  {
+    matchType: "suffix",
+    domain: "configcat.com",
+    rationale: "ConfigCat remote feature-flag service",
+  },
+  {
+    matchType: "suffix",
+    domain: "growthbook.io",
+    rationale: "GrowthBook feature-flag and experimentation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "optimizely.com",
+    rationale: "Optimizely web/app experimentation & feature-flag config CDN",
+  },
+  {
+    matchType: "suffix",
+    domain: "lab.amplitude.com",
+    rationale: "Amplitude Experiment feature-flag evaluation endpoint",
+  },
+  {
+    matchType: "exact",
+    domain: "regionconfig.amplitude.com",
+    rationale: "Amplitude SDK regional configuration endpoint",
+  },
+  {
+    matchType: "exact",
+    domain: "sr-client-cfg.amplitude.com",
+    rationale: "Amplitude client remote configuration endpoint",
+  },
+  {
+    matchType: "exact",
+    domain: "sr-client-cfg.eu.amplitude.com",
+    rationale: "Amplitude EU client remote configuration endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "clerk-telemetry.com",
+    rationale: "Clerk authentication SDK telemetry endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "stytch.com",
+    rationale: "Stytch authentication & session attestation platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "sheerid.com",
+    rationale: "SheerID student & academic eligibility verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "openaimerge.com",
+    rationale: "OpenAI internal asset/telemetry merge domain",
+  },
+  {
+    matchType: "exact",
+    domain: "openai.qualtrics.com",
+    rationale: "OpenAI official user research & feedback portal",
+  },
+  {
+    matchType: "suffix",
+    domain: "sentry.io",
+    rationale: "Sentry application crash & error-boundary reporting",
+  },
+  {
+    matchType: "suffix",
+    domain: "sentry-cdn.com",
+    rationale: "Sentry browser error-boundary SDK CDN",
+  },
+  {
+    matchType: "suffix",
+    domain: "datadoghq.com",
+    rationale: "Datadog APM, RUM & log intake platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "datadoghq.eu",
+    rationale: "Datadog EU APM, RUM & log intake platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "browser-intake-datadoghq.com",
+    rationale: "Datadog global browser RUM intake",
+  },
+  {
+    matchType: "suffix",
+    domain: "browser-intake-datadoghq.eu",
+    rationale: "Datadog EU browser RUM intake",
+  },
+  {
+    matchType: "suffix",
+    domain: "browser-intake-us3-datadoghq.com",
+    rationale: "Datadog US3 browser RUM intake",
+  },
+  {
+    matchType: "suffix",
+    domain: "browser-intake-us5-datadoghq.com",
+    rationale: "Datadog US5 browser RUM intake",
+  },
+  {
+    matchType: "suffix",
+    domain: "browser-intake-ap1-datadoghq.com",
+    rationale: "Datadog AP1 browser RUM intake",
+  },
+  {
+    matchType: "suffix",
+    domain: "bugsnag.com",
+    rationale: "Bugsnag mobile/web crash diagnostics SDK",
+  },
+  {
+    matchType: "suffix",
+    domain: "rollbar.com",
+    rationale: "Rollbar error tracking & crash diagnostics",
+  },
+  {
+    matchType: "suffix",
+    domain: "newrelic.com",
+    rationale: "New Relic APM observability platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "nr-data.net",
+    rationale: "New Relic APM & browser telemetry beacon",
+  },
+  {
+    matchType: "suffix",
+    domain: "honeycomb.io",
+    rationale: "Honeycomb distributed tracing & observability",
+  },
+  {
+    matchType: "suffix",
+    domain: "crashlytics.com",
+    rationale: "Firebase Crashlytics mobile crash reporting",
+  },
+  {
+    matchType: "exact",
+    domain: "crashlytics.163.com",
+    rationale: "NetEase mobile app crash diagnostics",
+  },
+  {
+    matchType: "suffix",
+    domain: "bugly.qq.com",
+    rationale: "Tencent Bugly mobile crash diagnostics SDK",
+  },
+  {
+    matchType: "suffix",
+    domain: "bytedapm.com",
+    rationale: "ByteDance APM & client stability diagnostics",
+  },
+  {
+    matchType: "suffix",
+    domain: "appcenter.ms",
+    rationale: "Microsoft Visual Studio App Center diagnostics & crash SDK",
+  },
+  {
+    matchType: "suffix",
+    domain: "applicationinsights.io",
+    rationale: "Azure Application Insights SDK & telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "applicationinsights.azure.com",
+    rationale: "Azure Application Insights ingestion endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "monitor.azure.com",
+    rationale: "Azure Monitor observability endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "nelreports.net",
+    rationale: "W3C Network Error Logging (NEL) transport diagnostics",
+  },
+  {
+    matchType: "suffix",
+    domain: "cloudflareinsights.com",
+    rationale: "Cloudflare privacy-first Web Analytics beacon",
+  },
+  {
+    matchType: "suffix",
+    domain: "usefathom.com",
+    rationale: "Fathom cookieless privacy-first analytics",
+  },
+  {
+    matchType: "suffix",
+    domain: "plausible.io",
+    rationale: "Plausible open-source privacy-first analytics",
+  },
+  {
+    matchType: "suffix",
+    domain: "telemetrydeck.com",
+    rationale: "TelemetryDeck privacy-first app telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "telemetryapp.io",
+    rationale: "TelemetryDeck ingestion domain",
+  },
+  {
+    matchType: "suffix",
+    domain: "incapsula.com",
+    rationale: "Imperva Incapsula WAF challenge verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "imperva.com",
+    rationale: "Imperva security verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "mtcaptcha.com",
+    rationale: "MTCaptcha human verification widget",
+  },
+  {
+    matchType: "suffix",
+    domain: "awswaf.com",
+    rationale: "AWS WAF bot-control token challenge",
+  },
+  {
+    matchType: "suffix",
+    domain: "akstat.io",
+    rationale: "Akamai mPulse & Bot Manager performance/risk sensor",
+  },
+  {
+    matchType: "suffix",
+    domain: "geetest.com",
+    rationale: "GeeTest interactive CAPTCHA verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "paypalbeacon.com",
+    rationale: "PayPal anti-fraud telemetry beacon",
+  },
+  {
+    matchType: "suffix",
+    domain: "veriff.me",
+    rationale: "Veriff KYC session endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "id.me",
+    rationale: "ID.me digital identity verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "maxmind.com",
+    rationale: "MaxMind GeoIP & minFraud device verification",
+  },
+  {
+    matchType: "suffix",
+    domain: "fraudlogix.com",
+    rationale: "Fraudlogix IP risk scoring",
+  },
+  {
+    matchType: "suffix",
+    domain: "51degrees.com",
+    rationale: "51Degrees device detection service",
+  },
+  {
+    matchType: "suffix",
+    domain: "ipqs.com",
+    rationale: "IPQualityScore risk verification asset domain",
+  },
+  {
+    matchType: "suffix",
+    domain: "ipinfo.io",
+    rationale: "IPinfo geolocation and ASN lookup API",
+  },
+  {
+    matchType: "suffix",
+    domain: "ipdata.co",
+    rationale: "ipdata IP intelligence API",
+  },
+  {
+    matchType: "suffix",
+    domain: "vpnapi.io",
+    rationale: "VPNAPI proxy/VPN risk detection",
+  },
+  {
+    matchType: "suffix",
+    domain: "proxycheck.io",
+    rationale: "proxycheck.io IP risk scoring",
+  },
+  {
+    matchType: "suffix",
+    domain: "ipgeolocation.io",
+    rationale: "ipgeolocation.io API used by web/AI clients",
+  },
+  {
+    matchType: "suffix",
+    domain: "whoisxmlapi.com",
+    rationale: "WhoisXML IP/domain intelligence API",
+  },
+  {
+    matchType: "suffix",
+    domain: "ip.sb",
+    rationale: "ip.sb dual-stack public IP lookup",
+  },
+  {
+    matchType: "suffix",
+    domain: "ping0.cc",
+    rationale: "ping0.cc IP risk & purity diagnostic service",
+  },
+  {
+    matchType: "suffix",
+    domain: "icanhazip.com",
+    rationale: "Cloudflare-operated public IP lookup",
+  },
+  {
+    matchType: "suffix",
+    domain: "geojs.io",
+    rationale: "GeoJS public IP geolocation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "db-ip.com",
+    rationale: "DB-IP geolocation lookup API",
+  },
+  {
+    matchType: "suffix",
+    domain: "ip2location.com",
+    rationale: "IP2Location geolocation lookup service",
+  },
+  {
+    matchType: "suffix",
+    domain: "ipinfodb.com",
+    rationale: "IPInfoDB geolocation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "iplocation.net",
+    rationale: "IPLocation network diagnostic tool",
+  },
+  {
+    matchType: "suffix",
+    domain: "ipquery.io",
+    rationale: "ipquery public IP & risk API",
+  },
+  {
+    matchType: "suffix",
+    domain: "iplocate.io",
+    rationale: "IPLocate geolocation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "ipwhois.app",
+    rationale: "ipwhois geolocation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "freegeoip.io",
+    rationale: "FreeGeoIP geolocation lookup API",
+  },
+  {
+    matchType: "suffix",
+    domain: "api-bdc.io",
+    rationale: "BigDataCloud IP geolocation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "api-bdc.net",
+    rationale: "BigDataCloud client geolocation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "apiip.net",
+    rationale: "apiip geolocation API",
+  },
+  {
+    matchType: "suffix",
+    domain: "pool.ntp.org",
+    rationale: "NTP Pool Project global time synchronization servers",
+  },
+  {
+    matchType: "suffix",
+    domain: "aaplimg.com",
+    rationale: "Apple OS MDM/SCEP enrollment, XP trials, Weather/Stocks & diagnostics CDN",
+  },
+  {
+    matchType: "exact",
+    domain: "diagnostics.apple.com",
+    rationale: "Apple hardware & OS diagnostics",
+  },
+  {
+    matchType: "exact",
+    domain: "idiagnostics.apple.com",
+    rationale: "iOS diagnostics submission",
+  },
+  {
+    matchType: "exact",
+    domain: "iphonesubmissions.apple.com",
+    rationale: "Apple iOS crash/diagnostic submission",
+  },
+  {
+    matchType: "exact",
+    domain: "radarsubmissions.apple.com",
+    rationale: "Apple Feedback Assistant / Radar submission",
+  },
+  {
+    matchType: "exact",
+    domain: "metrics.icloud.com",
+    rationale: "iCloud client reliability metrics",
+  },
+  {
+    matchType: "exact",
+    domain: "metrics.apple.com",
+    rationale: "Apple system reliability metrics",
+  },
+  {
+    matchType: "exact",
+    domain: "pancake.apple.com",
+    rationale: "Apple system configuration endpoint",
+  },
+  {
+    matchType: "exact",
+    domain: "smoot.apple.com",
+    rationale: "Apple Spotlight / Siri search suggestions",
+  },
+  {
+    matchType: "exact",
+    domain: "fmip.me.com",
+    rationale: "Apple Find My iPhone (FMIP) location service",
+  },
+  {
+    matchType: "suffix",
+    domain: "connectivity.me.com",
+    rationale: "Apple iCloud connectivity check",
+  },
+  {
+    matchType: "suffix",
+    domain: "guzzoni-apple.com.akadns.net",
+    rationale: "Apple Siri voice assistant Akamai CNAME",
+  },
+  {
+    matchType: "suffix",
+    domain: "ls-apple.com.akadns.net",
+    rationale: "Apple CoreLocation & Maps GPS Akamai CNAME",
+  },
+  {
+    matchType: "suffix",
+    domain: "itunes-apple.com.akadns.net",
+    rationale: "Apple App Store / iTunes Akamai CNAME",
+  },
+  {
+    matchType: "suffix",
+    domain: "apps-apple.com.akadns.net",
+    rationale: "Apple App Store Akamai CNAME",
+  },
+  {
+    matchType: "suffix",
+    domain: "lb-apple.com.akadns.net",
+    rationale: "Apple load-balancer Akamai CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "diagnostics.apple.com.akadns.net",
+    rationale: "Apple diagnostics Akamai CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "idiagnostics.apple.com.akadns.net",
+    rationale: "iOS diagnostics Akamai CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "iphonesubmissions.apple.com.akadns.net",
+    rationale: "iOS crash submission Akamai CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "radarsubmissions.apple.com.akadns.net",
+    rationale: "Apple Feedback Assistant Akamai CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "cstat-lb.apple.com.akadns.net",
+    rationale: "Apple CStat reliability Akamai CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "diagassets-lb.apple.com.akadns.net",
+    rationale: "Apple diagnostic assets Akamai CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "lcdn-locator.apple.com.akadns.net",
+    rationale: "Apple Content Caching locator CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "lcdn-registration.apple.com.akadns.net",
+    rationale: "Apple Content Caching registration CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "ab.apple.com.akadns.net",
+    rationale: "Apple A/B configuration CNAME",
+  },
+  {
+    matchType: "suffix",
+    domain: "data.microsoft.com",
+    rationale: "Microsoft Windows/Office functional telemetry & settings sync",
+  },
+  {
+    matchType: "exact",
+    domain: "telemetry.microsoft.com",
+    rationale: "Microsoft OS telemetry endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "events.data.msn.com",
+    rationale: "Microsoft Edge/MSN client telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "officeapps.live.com",
+    rationale: "Microsoft Office Online document apps & telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "service.signalr.net",
+    rationale: "Microsoft Azure SignalR real-time WebSocket service",
+  },
+  {
+    matchType: "suffix",
+    domain: "snowflakecomputing.com",
+    rationale: "Snowflake cloud data platform & Azure OpenAI PrivateLink",
+  },
+  {
+    matchType: "suffix",
+    domain: "bingviz.microsoftapp.net",
+    rationale: "Microsoft Bing/Copilot visualization gateway",
+  },
+  {
+    matchType: "exact",
+    domain: "c.bingapis.com",
+    rationale: "Microsoft Bing/Copilot client API",
+  },
+  {
+    matchType: "exact",
+    domain: "wns.notify.windows.com.akadns.net",
+    rationale: "Windows Push Notification Service (WNS) CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "config.office.com.akadns.net",
+    rationale: "Microsoft 365 Office remote configuration CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "config.office.akadns.net",
+    rationale: "Microsoft Office configuration CNAME",
+  },
+  {
+    matchType: "exact",
+    domain: "diagnostics.support.microsoft.akadns.net",
+    rationale: "Microsoft Support diagnostics CNAME",
+  },
+  {
+    matchType: "suffix",
+    domain: "clients6.google.com",
+    rationale: "Google Cloud Console, Gemini API, Vertex AI & Firebase RPC endpoints",
+  },
+  {
+    matchType: "exact",
+    domain: "firebaseinstallations.googleapis.com",
+    rationale: "Firebase Installations SDK token service",
+  },
+  {
+    matchType: "exact",
+    domain: "firebaseremoteconfig.googleapis.com",
+    rationale: "Firebase Remote Config SDK",
+  },
+  {
+    matchType: "exact",
+    domain: "firebaseremoteconfigrealtime.googleapis.com",
+    rationale: "Firebase Realtime Remote Config SDK",
+  },
+  {
+    matchType: "exact",
+    domain: "firebaseappcheck.googleapis.com",
+    rationale: "Firebase App Check device attestation API",
+  },
+  {
+    matchType: "exact",
+    domain: "content-firebaseappcheck.googleapis.com",
+    rationale: "Firebase App Check attestation API",
+  },
+  {
+    matchType: "exact",
+    domain: "firebaselogging.googleapis.com",
+    rationale: "Firebase SDK reliability logging",
+  },
+  {
+    matchType: "exact",
+    domain: "firebaselogging-pa.googleapis.com",
+    rationale: "Firebase SDK reliability logging",
+  },
+  {
+    matchType: "exact",
+    domain: "crashlyticsreports-pa.googleapis.com",
+    rationale: "Firebase Crashlytics report upload API",
+  },
+  {
+    matchType: "exact",
+    domain: "clientmetrics-pa.googleapis.com",
+    rationale: "Google client metrics reliability endpoint",
+  },
+  {
+    matchType: "suffix",
+    domain: "console.aws.a2z.com",
+    rationale: "AWS Management Console & regional cell telemetry",
+  },
+  {
+    matchType: "exact",
+    domain: "client-telemetry.us-east-1.amazonaws.com",
+    rationale: "AWS client SDK telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "kiro.dev",
+    rationale: "AWS Kiro AI IDE & desktop telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "kiro.aws.dev",
+    rationale: "AWS Kiro AI IDE telemetry",
+  },
+  {
+    matchType: "exact",
+    domain: "windsurf-telemetry.codeium.com",
+    rationale: "Windsurf / Codeium AI IDE telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "sider.ai",
+    rationale: "Sider AI assistant API, file CDN & events",
+  },
+  {
+    matchType: "suffix",
+    domain: "genspark.ai",
+    rationale: "Genspark AI search & agent platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "kimi.ai",
+    rationale: "Moonshot Kimi AI overseas platform & file service",
+  },
+  {
+    matchType: "suffix",
+    domain: "qwen.ai",
+    rationale: "Alibaba Qwen AI platform & telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "hailuoai.video",
+    rationale: "MiniMax Hailuo AI video platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "manus.im",
+    rationale: "Manus AI agent platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "character.ai",
+    rationale: "Character.AI platform & client events",
+  },
+  {
+    matchType: "suffix",
+    domain: "gamma.app",
+    rationale: "Gamma AI presentation platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "warp.dev",
+    rationale: "Warp AI terminal & telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "zed.dev",
+    rationale: "Zed AI code editor & telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "wandb.ai",
+    rationale: "Weights & Biases MLops platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "langchain.com",
+    rationale: "LangChain / LangSmith AI platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "openclaw.ai",
+    rationale: "OpenClaw AI platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "nousresearch.com",
+    rationale: "Nous Research AI platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "coderabbit.ai",
+    rationale: "CodeRabbit AI code-review platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "openspec.dev",
+    rationale: "OpenSpec AI developer platform",
+  },
+  {
+    matchType: "suffix",
+    domain: "telemetry.mozilla.org",
+    rationale: "Mozilla Firefox browser reliability telemetry",
+  },
+  {
+    matchType: "exact",
+    domain: "incoming-telemetry.thunderbird.net",
+    rationale: "Mozilla Thunderbird reliability telemetry",
+  },
+  {
+    matchType: "exact",
+    domain: "client-telemetry.roblox.com",
+    rationale: "Roblox anti-cheat & client stability telemetry",
+  },
+  {
+    matchType: "suffix",
+    domain: "telemetry.ros.rockstargames.com",
+    rationale: "Rockstar Games online service telemetry",
+  },
+  {
+    matchType: "exact",
+    domain: "auth.api.gitv.tv",
+    rationale: "Xiaomi TV / GITV license authentication",
+  },
+  {
+    matchType: "exact",
+    domain: "appstore.ptmi.gitv.tv",
+    rationale: "Xiaomi TV app store",
+  },
+  {
+    matchType: "exact",
+    domain: "ota.ptqy.gitv.tv",
+    rationale: "Xiaomi TV / GITV OTA firmware update",
+  },
+  {
+    matchType: "exact",
+    domain: "openapi.vip.ptqy.gitv.tv",
+    rationale: "GITV / iQIYI TV VIP playback API",
+  },
+  {
+    matchType: "exact",
+    domain: "sdk.ptqy.gitv.tv",
+    rationale: "GITV / iQIYI TV playback SDK",
+  },
+  {
+    matchType: "exact",
+    domain: "static.ptqy.gitv.tv",
+    rationale: "GITV / iQIYI TV static assets",
+  },
+  {
+    matchType: "exact",
+    domain: "time.video.ptqy.gitv.tv",
+    rationale: "GITV / iQIYI TV time sync",
+  },
+  {
+    matchType: "suffix",
+    domain: "sec.miui.com",
+    rationale: "Xiaomi MIUI security & authentication service",
+  },
+  {
+    matchType: "suffix",
+    domain: "sec.intl.miui.com",
+    rationale: "Xiaomi MIUI international security service",
+  },
+  {
+    matchType: "suffix",
+    domain: "coloros.com",
+    rationale: "OPPO / OnePlus ColorOS OTA update & system services",
+  },
+  {
+    matchType: "suffix",
+    domain: "allawnos.com",
+    rationale: "OPPO / Realme COTA system configuration",
+  },
+  {
+    matchType: "suffix",
+    domain: "heytapdl.com",
+    rationale: "OPPO / HeyTap push & system download CDN",
+  },
+  {
+    matchType: "suffix",
+    domain: "vivoglobal.com",
+    rationale: "vivo global COTA & App Store configuration",
+  },
+  {
+    matchType: "suffix",
+    domain: "appstore.vivo.com.cn",
+    rationale: "vivo domestic App Store",
+  },
+  {
+    matchType: "suffix",
+    domain: "platform.hihonorcloud.com",
+    rationale: "Honor MagicOS remote configuration",
+  },
   // 手动矫正白名单：实测阻断会导致核心网页/银行 App 功能异常
   // 拦截 .safelinks.protection.outlook.com 会破坏 Microsoft Defender Safe Links 跳转，导致 Outlook 网页版邮件内链接无法打开及部分功能异常
   {
