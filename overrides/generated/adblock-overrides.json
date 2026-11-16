@@ -4425,6 +4425,11 @@
       "matchType": "suffix",
       "domain": "pay.ldxp.cn",
       "rationale": "Legitimate digital-goods card shop storefront and checkout; blocking breaks shop pages and order payment"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "cdn.sportnanoapi.com",
+      "rationale": "Legitimate sports live-streaming and match data CDN; blocking breaks live broadcasts and score feeds"
     }
   ],
   "protectedApexDomains": [

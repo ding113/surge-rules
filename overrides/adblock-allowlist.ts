@@ -2711,6 +2711,13 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale:
       "Legitimate digital-goods card shop storefront and checkout; blocking breaks shop pages and order payment",
   },
+  // cdn.sportnanoapi.com 为正常体育赛事直播 CDN，被广告规则误拦截会导致赛事直播与比分数据无法加载
+  {
+    matchType: "suffix",
+    domain: "cdn.sportnanoapi.com",
+    rationale:
+      "Legitimate sports live-streaming and match data CDN; blocking breaks live broadcasts and score feeds",
+  },
 ];
 
 /**
