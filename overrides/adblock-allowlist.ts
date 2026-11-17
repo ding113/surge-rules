@@ -2790,6 +2790,13 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale:
       "User report: Adblock.list suffix .sciopen.com rejected a normal research site with REJECT-TINYGIF",
   },
+  // 用户报告 blob.superlogical.com 被父域后缀拦截，并明确授权放行整个 superlogical.com
+  {
+    matchType: "suffix",
+    domain: "superlogical.com",
+    rationale:
+      "User report: blob.superlogical.com was blocked by Adblock.list suffix .superlogical.com; user authorized suffix allow of the whole superlogical.com zone",
+  },
 ];
 
 /**

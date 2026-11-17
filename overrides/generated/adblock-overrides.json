@@ -4485,6 +4485,11 @@
       "matchType": "suffix",
       "domain": "sciopen.com",
       "rationale": "User report: Adblock.list suffix .sciopen.com rejected a normal research site with REJECT-TINYGIF"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "superlogical.com",
+      "rationale": "User report: blob.superlogical.com was blocked by Adblock.list suffix .superlogical.com; user authorized suffix allow of the whole superlogical.com zone"
     }
   ],
   "protectedApexDomains": [
