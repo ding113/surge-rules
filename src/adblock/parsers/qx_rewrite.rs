@@ -4,7 +4,7 @@ use crate::adblock::model::{
 };
 use crate::adblock::parsers::surge_module::sanitize_script_name;
 use crate::adblock::regex_util::{
-    extract_hosts_from_regex, is_valid_mitm_host, normalize_surge_regex,
+    extract_hosts_from_regex, is_valid_positive_mitm_host, normalize_surge_regex,
 };
 
 /// Parses Quantumult X `[rewrite_local]` / `.conf` rules into official Surge Module IR.
@@ -26,8 +26,12 @@ pub fn parse_qx_rewrite(text: &str, weight: u16, out: &mut ParsedAdblockSource) 
             let rhs = rest.trim_start();
             if let Some(hosts) = rhs.strip_prefix('=') {
                 for item in hosts.split(',').map(str::trim) {
-                    if !item.is_empty() && !item.starts_with('-') && is_valid_mitm_host(item) {
-                        out.mitm_hosts.insert(item.to_ascii_lowercase());
+                    let clean = item.to_ascii_lowercase();
+                    if !clean.is_empty()
+                        && !clean.starts_with('-')
+                        && is_valid_positive_mitm_host(&clean)
+                    {
+                        out.mitm_hosts.insert(clean);
                     }
                 }
                 continue;

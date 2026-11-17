@@ -503,7 +503,7 @@ pub struct ParsedAdblockSource {
 
 impl ParsedAdblockSource {
     pub fn register_host_info(&mut self, info: crate::adblock::regex_util::RegexHostInfo) {
-        for h in info.mitm_patterns {
+        for h in info.positive_mitm_hosts {
             self.mitm_hosts.insert(h);
         }
         for ch in info.concrete_hosts {

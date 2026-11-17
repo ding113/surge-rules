@@ -285,6 +285,27 @@ function validateAdblockOverrides(): void {
     }
   }
 
+  for (const entry of ADBLOCK_OVERRIDES.mitmAddedHosts) {
+    const p = entry.pattern.trim().toLowerCase();
+    const colonIdx = p.lastIndexOf(":");
+    const hostPart = colonIdx > 0 ? p.slice(0, colonIdx) : p;
+    const portPart = colonIdx > 0 ? p.slice(colonIdx + 1) : undefined;
+    if (
+      p.includes("*") ||
+      p.includes("?") ||
+      p.startsWith("<") ||
+      p.includes("[") ||
+      isIP(hostPart) !== 0 ||
+      !ROUTING_DOMAIN_RE.test(hostPart) ||
+      (portPart !== undefined &&
+        (!/^\d+$/.test(portPart) || Number(portPart) < 1 || Number(portPart) > 65535))
+    ) {
+      throw new Error(
+        `[mitmAddedHosts] Wildcard, IP, or non-exact MITM host disallowed: '${entry.pattern}'`,
+      );
+    }
+  }
+
   for (const rule of ADBLOCK_OVERRIDES.urlRewrites) {
     validateAdblockRegex(rule.pattern, "urlRewrites");
     if (rule.mode === "reject" && rule.replacement !== "_") {

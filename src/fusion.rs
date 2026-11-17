@@ -299,14 +299,21 @@ pub fn apply_asn_overrides_to_arena(
             .and_then(|c| metadata.validate_iso(c));
 
         let mut traits = TraitFlags::EMPTY;
-        if ov.is_hosting == Some(true) {
-            traits.insert(TraitFlags::IS_HOSTING);
+        let mut clear_traits = TraitFlags::EMPTY;
+        match ov.is_hosting {
+            Some(true) => traits.insert(TraitFlags::IS_HOSTING),
+            Some(false) => clear_traits.insert(TraitFlags::IS_HOSTING),
+            None => {}
         }
-        if ov.is_cdn == Some(true) {
-            traits.insert(TraitFlags::IS_CDN);
+        match ov.is_cdn {
+            Some(true) => traits.insert(TraitFlags::IS_CDN),
+            Some(false) => clear_traits.insert(TraitFlags::IS_CDN),
+            None => {}
         }
-        if ov.is_anycast == Some(true) {
-            traits.insert(TraitFlags::IS_ANYCAST);
+        match ov.is_anycast {
+            Some(true) => traits.insert(TraitFlags::IS_ANYCAST),
+            Some(false) => clear_traits.insert(TraitFlags::IS_ANYCAST),
+            None => {}
         }
 
         let entry = arena.asn_dict.entry(asn).or_default();
@@ -325,7 +332,8 @@ pub fn apply_asn_overrides_to_arena(
         if !prov_id.is_empty() {
             entry.province_hint_zh = prov_id;
         }
-        entry.traits = entry.traits.union(traits);
+        entry.traits = entry.traits.union(traits).without(clear_traits);
+        entry.clear_traits = entry.clear_traits.union(clear_traits);
     }
 }
 
@@ -1513,7 +1521,7 @@ fn resolve_atomic_interval(
             if !meta.isp.is_empty() {
                 rec.isp = meta.isp;
             }
-            rec.traits = rec.traits.union(meta.traits);
+            rec.traits = rec.traits.union(meta.traits).without(meta.clear_traits);
 
             // If CN record lacks provincial subdivision, apply provincial ASN hint (e.g. AS4812 -> Shanghai)
             if rec.country == Some(IsoCode::CN)

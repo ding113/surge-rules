@@ -6,12 +6,11 @@ use crate::adblock::jq_transpile::transpile_jsonprune_to_jq;
 use crate::adblock::model::{
     AdguardTransformOp, AdguardTransformRule, BodyRewriteKind, BodyRewriteRule, HeaderAction,
     HeaderDirection, HeaderModException, HeaderModKind, HeaderModRule, HeaderRewriteRule,
-    MapLocalDataType, MapLocalRule, ParsedAdblockSource, RemoveParamRule, UrlRewriteMode,
-    UrlRewriteRule,
+    MapLocalDataType, MapLocalRule, ParsedAdblockSource, RemoveParamRule,
 };
 use crate::adblock::regex_util::{
     abp_surgical_pattern_to_surge_regex, abp_url_pattern_to_surge_regex, extract_hosts_from_regex,
-    is_valid_domain, is_valid_domain_wildcard,
+    is_valid_domain, is_valid_domain_wildcard, is_valid_positive_mitm_host,
 };
 
 const SAFE_GLOBAL_TRACKING_PARAMS: &[&str] = &[
@@ -506,7 +505,7 @@ fn register_complex_target(
         return;
     }
     let info = extract_hosts_from_regex(regex);
-    for m in info.mitm_patterns {
+    for m in info.positive_mitm_hosts {
         out.mitm_hosts.insert(m);
     }
     for ch in info.concrete_hosts {
@@ -515,7 +514,9 @@ fn register_complex_target(
     for ch in concrete_hosts {
         if is_valid_domain(ch) {
             out.complex_protected_hosts.insert(ch.clone());
-            out.mitm_hosts.insert(ch.clone());
+            if is_valid_positive_mitm_host(ch) {
+                out.mitm_hosts.insert(ch.clone());
+            }
         }
     }
 }
@@ -714,7 +715,9 @@ fn parse_complex_network_modifiers(
             {
                 if is_complex_first && let Some(ref host) = host_opt {
                     out.complex_protected_hosts.insert(host.clone());
-                    out.mitm_hosts.insert(host.clone());
+                    if is_valid_positive_mitm_host(host) {
+                        out.mitm_hosts.insert(host.clone());
+                    }
                 }
                 let rule = MapLocalRule {
                     pattern: regex,
@@ -850,41 +853,7 @@ fn parse_complex_network_modifiers(
         }
     }
 
-    if handled {
-        return true;
-    }
-
-    // Path-specific block `||host/path/segments` from complex-first feeds with no restrictive `$domain=`/`$image`-only modifiers
-    if is_complex_first
-        && !has_any_domain_scope
-        && is_whole_request_blocking_mods(&mod_tokens)
-        && pat.starts_with("||")
-        && let Some((regex, Some(host))) = abp_url_pattern_to_surge_regex(pat)
-        && has_non_trivial_path_segment(&regex)
-    {
-        out.complex_protected_hosts.insert(host.clone());
-        out.mitm_hosts.insert(host);
-        out.url_rewrites.push(UrlRewriteRule {
-            pattern: regex,
-            replacement: "_".to_string(),
-            mode: UrlRewriteMode::Reject,
-            weight: src.weight,
-        });
-        return true;
-    }
-
-    false
-}
-
-fn has_non_trivial_path_segment(regex: &str) -> bool {
-    if let Some(idx) = regex.find("://") {
-        let rest = &regex[idx + 3..];
-        if let Some(slash) = rest.find('/') {
-            let path = &rest[slash..];
-            return path.len() >= 4;
-        }
-    }
-    false
+    handled
 }
 
 fn is_whole_request_blocking_mods(mods: &[&str]) -> bool {

@@ -17,8 +17,9 @@ use crate::adblock::model::{
     UrlRewriteMode, UrlRewriteRule,
 };
 use crate::adblock::regex_util::{
-    canonical_url_pattern_key, extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host,
-    sample_urls_for_regex_subsumption,
+    canonical_url_pattern_key, extract_authority_regex, extract_hosts_from_regex,
+    is_http_only_url_regex, is_https_only_url_regex, is_valid_domain, is_valid_mitm_host,
+    is_valid_positive_mitm_host, sample_urls_for_regex_subsumption,
 };
 
 #[derive(Default)]
@@ -582,6 +583,7 @@ pub fn compile_adblock_with_guards(
     let mut header_mod_exceptions: Vec<HeaderModException> = Vec::new();
     let mut removeheader_exceptions: Vec<(HeaderDirection, String, String)> = Vec::new();
     let mut mitm_positive: BTreeSet<String> = BTreeSet::new();
+    let mut upstream_mitm_hints: FxHashSet<String> = FxHashSet::default();
 
     for src in sources {
         for g in &src.module_general_hosts {
@@ -638,8 +640,10 @@ pub fn compile_adblock_with_guards(
         removeheader_exceptions.extend(src.removeheader_exceptions.iter().cloned());
         for mh in &src.mitm_hosts {
             let clean = mh.trim().to_ascii_lowercase();
-            if is_valid_mitm_host(&clean) {
-                mitm_positive.insert(clean);
+            if is_valid_positive_mitm_host(&clean)
+                && !mitm_host_is_excluded(&clean, &mitm_exclusion_set)
+            {
+                upstream_mitm_hints.insert(clean);
             }
         }
     }
@@ -1181,50 +1185,46 @@ pub fn compile_adblock_with_guards(
     //    blocked in Adblock.list and NOT excluded from MITM.
     for src in sources {
         for h in &src.fallback_header_rewrites {
-            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+            if fallback_rule_targets_survive(
                 &h.pattern,
                 &overrides.disabled_url_patterns,
                 &mitm_exclusion_set,
                 &final_suffix_trie,
                 &compressed_domains,
             ) {
-                mitm_positive.extend(mitm_hosts);
                 insert_weighted(&mut header_map, h.dedup_key(), h.clone(), |x| x.weight);
             }
         }
         for ml in &src.fallback_map_locals {
-            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+            if fallback_rule_targets_survive(
                 &ml.pattern,
                 &overrides.disabled_url_patterns,
                 &mitm_exclusion_set,
                 &final_suffix_trie,
                 &compressed_domains,
             ) {
-                mitm_positive.extend(mitm_hosts);
                 insert_weighted(&mut map_local_map, ml.dedup_key(), ml.clone(), |x| x.weight);
             }
         }
         for br in &src.fallback_body_rewrites {
-            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+            if fallback_rule_targets_survive(
                 &br.pattern,
                 &overrides.disabled_url_patterns,
                 &mitm_exclusion_set,
                 &final_suffix_trie,
                 &compressed_domains,
             ) {
-                mitm_positive.extend(mitm_hosts);
                 insert_weighted(&mut body_map, br.dedup_key(), br.clone(), |x| x.weight);
             }
         }
         for ag in &src.fallback_adguard_transforms {
-            if let Some(mitm_hosts) = fallback_rule_targets_survive(
+            if fallback_rule_targets_survive(
                 &ag.pattern,
                 &overrides.disabled_url_patterns,
                 &mitm_exclusion_set,
                 &final_suffix_trie,
                 &compressed_domains,
             ) {
-                mitm_positive.extend(mitm_hosts);
                 adguard_transforms.push(ag.clone());
             }
         }
@@ -1256,8 +1256,8 @@ pub fn compile_adblock_with_guards(
     let mut final_scripts =
         resolve_script_conflicts(script_candidates, &short_circuit_response_keys);
 
-    // 7. Filter MITM hosts against `-` exclusions and prune HTTPS-only module rules targeting excluded hosts
-    mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
+    // 7. Prune HTTPS-only module rules targeting `-` excluded hosts, then derive positive MITM
+    //    domains strictly on-demand from surviving HTTPS-capable rules (zero wildcards, zero orphans).
     header_map.retain(|_, r| {
         if pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set) {
             return false;
@@ -1275,6 +1275,37 @@ pub fn compile_adblock_with_guards(
         .retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
     body_map.retain(|_, r| !pattern_targets_excluded_https_only(&r.pattern, &mitm_exclusion_set));
     final_scripts.retain(|s| !pattern_targets_excluded_https_only(&s.pattern, &mitm_exclusion_set));
+
+    let module_reject_trie = build_module_reject_trie(&module_rule_map);
+    {
+        let all_surviving_patterns = header_map
+            .values()
+            .map(|r| r.pattern.as_str())
+            .chain(url_map.values().map(|r| r.pattern.as_str()))
+            .chain(map_local_map.values().map(|r| r.pattern.as_str()))
+            .chain(body_map.values().map(|r| r.pattern.as_str()))
+            .chain(final_scripts.iter().map(|s| s.pattern.as_str()));
+
+        for pat in all_surviving_patterns {
+            collect_on_demand_mitm_for_pattern(
+                pat,
+                &upstream_mitm_hints,
+                &mitm_exclusion_set,
+                &module_reject_trie,
+                &final_suffix_trie,
+                &compressed_domains,
+                &mut mitm_positive,
+            );
+        }
+    }
+
+    // Drop strictly `https://` / `wss://` rules that have zero surviving positive MITM backing
+    // (e.g. wildcard-only HTTPS authorities after wildcard MITM removal).
+    header_map.retain(|_, r| !https_only_rule_lacks_mitm(&r.pattern, &mitm_positive));
+    url_map.retain(|_, r| !https_only_rule_lacks_mitm(&r.pattern, &mitm_positive));
+    map_local_map.retain(|_, r| !https_only_rule_lacks_mitm(&r.pattern, &mitm_positive));
+    body_map.retain(|_, r| !https_only_rule_lacks_mitm(&r.pattern, &mitm_positive));
+    final_scripts.retain(|s| !https_only_rule_lacks_mitm(&s.pattern, &mitm_positive));
 
     // 8. Append `$removeparam` and advanced header modifier (`$cookie`, `$csp`, `$permissions`) scripts last
     //    so app-specific scripts and body transforms take precedence without unbounded body buffering.
@@ -1308,8 +1339,10 @@ pub fn compile_adblock_with_guards(
         s.normalize_runtime_bounds();
     }
 
-    // Enforce `-` exclusions again in case small-scale removeparam rules introduced MITM hosts
-    mitm_positive.retain(|h| !mitm_host_is_excluded(h, &mitm_exclusion_set));
+    // Final invariant guard: positive MITM hosts must be exact domains and never match `-` exclusions
+    mitm_positive.retain(|h| {
+        is_valid_positive_mitm_host(h) && !mitm_host_is_excluded(h, &mitm_exclusion_set)
+    });
 
     let (module_text, module_counts) = render_module(
         &general_hosts,
@@ -1371,7 +1404,7 @@ fn apply_module_overrides(
 ) {
     for h in &overrides.mitm_added_hosts {
         let p = h.pattern.trim().to_ascii_lowercase();
-        if is_valid_mitm_host(&p) {
+        if is_valid_positive_mitm_host(&p) {
             mitm_positive.insert(p);
         }
     }
@@ -1384,7 +1417,6 @@ fn apply_module_overrides(
             _ => UrlRewriteMode::Reject,
         };
         let info = extract_hosts_from_regex(&r.pattern);
-        mitm_positive.extend(info.mitm_patterns);
         complex_host_set.extend(info.concrete_hosts);
         let rule = UrlRewriteRule {
             pattern: r.pattern.clone(),
@@ -1402,7 +1434,6 @@ fn apply_module_overrides(
             _ => MapLocalDataType::Text,
         };
         let info = extract_hosts_from_regex(&r.pattern);
-        mitm_positive.extend(info.mitm_patterns);
         complex_host_set.extend(info.concrete_hosts);
         let rule = MapLocalRule {
             pattern: r.pattern.clone(),
@@ -1433,7 +1464,6 @@ fn apply_module_overrides(
             _ => HeaderAction::HeaderDel,
         };
         let info = extract_hosts_from_regex(&r.pattern);
-        mitm_positive.extend(info.mitm_patterns);
         complex_host_set.extend(info.concrete_hosts);
         let rule = HeaderRewriteRule {
             direction: dir,
@@ -1455,7 +1485,6 @@ fn apply_module_overrides(
             _ => BodyRewriteKind::HttpResponseJq,
         };
         let info = extract_hosts_from_regex(&r.pattern);
-        mitm_positive.extend(info.mitm_patterns);
         complex_host_set.extend(info.concrete_hosts);
         let rule = BodyRewriteRule {
             kind,
@@ -1470,9 +1499,121 @@ fn apply_module_overrides(
     for s in &overrides.scripts {
         script_candidates.push(script_override_to_rule(s));
         let info = extract_hosts_from_regex(&s.pattern);
-        mitm_positive.extend(info.mitm_patterns);
         complex_host_set.extend(info.concrete_hosts);
     }
+}
+
+fn build_module_reject_trie(module_rule_map: &BTreeMap<String, u16>) -> DomainTrie {
+    let mut trie = DomainTrie::default();
+    for line in module_rule_map.keys() {
+        let parts: Vec<&str> = line.split(',').map(str::trim).collect();
+        if parts.len() < 3 {
+            continue;
+        }
+        let is_reject = parts
+            .iter()
+            .any(|p| p.to_ascii_uppercase().starts_with("REJECT"));
+        if !is_reject {
+            continue;
+        }
+        match parts[0].to_ascii_uppercase().as_str() {
+            "DOMAIN" => {
+                let d = parts[1].trim_end_matches('.').to_ascii_lowercase();
+                if is_valid_domain(&d) {
+                    trie.insert_exact(&d);
+                }
+            }
+            "DOMAIN-SUFFIX" => {
+                let s = parts[1]
+                    .trim_start_matches('.')
+                    .trim_end_matches('.')
+                    .to_ascii_lowercase();
+                if is_valid_domain(&s) {
+                    trie.insert_suffix(&s);
+                }
+            }
+            _ => {}
+        }
+    }
+    trie
+}
+
+fn collect_on_demand_mitm_for_pattern(
+    pattern: &str,
+    upstream_mitm_hints: &FxHashSet<String>,
+    mitm_exclusion_set: &BTreeSet<String>,
+    module_reject_trie: &DomainTrie,
+    final_suffix_trie: &DomainTrie,
+    compressed_domains: &BTreeSet<String>,
+    mitm_positive: &mut BTreeSet<String>,
+) {
+    if is_http_only_url_regex(pattern) {
+        return;
+    }
+
+    let info = extract_hosts_from_regex(pattern);
+    for h in info.positive_mitm_hosts {
+        let bare = h.split(':').next().unwrap_or(&h);
+        if is_valid_positive_mitm_host(&h)
+            && !mitm_host_is_excluded(&h, mitm_exclusion_set)
+            && !module_reject_trie.matches_domain(bare)
+            && !final_suffix_trie.matches_domain(bare)
+            && !compressed_domains.contains(bare)
+        {
+            mitm_positive.insert(h);
+        }
+    }
+
+    // For bounded non-`.*` regex host authorities (such as `vip\d\.kuwo\.cn` or `(ipv4|interface\d?)\.music\.163\.com`),
+    // accept concrete exact upstream hints that match the surviving rule's authority regex.
+    if !upstream_mitm_hints.is_empty()
+        && info
+            .mitm_patterns
+            .iter()
+            .any(|m| m.contains('*') || m.contains('?'))
+        && let Some(auth) = extract_authority_regex(pattern)
+        && !auth.contains(".*")
+        && !auth.contains(".+")
+        && !auth.contains("[^")
+    {
+        let probe = format!("(?i)^(?:{})$", auth.replace("(?>", "(?:"));
+        if let Ok(re) = Regex::new(&probe) {
+            for hint in upstream_mitm_hints {
+                let bare = hint.split(':').next().unwrap_or(hint.as_str());
+                if !module_reject_trie.matches_domain(bare)
+                    && !final_suffix_trie.matches_domain(bare)
+                    && !compressed_domains.contains(bare)
+                    && (re.is_match(hint) || re.is_match(&format!("{}:443", hint)))
+                {
+                    mitm_positive.insert(hint.clone());
+                }
+            }
+        }
+    }
+}
+
+fn https_only_rule_lacks_mitm(pattern: &str, mitm_positive: &BTreeSet<String>) -> bool {
+    if !is_https_only_url_regex(pattern) {
+        return false;
+    }
+    let info = extract_hosts_from_regex(pattern);
+    if info
+        .positive_mitm_hosts
+        .iter()
+        .any(|h| mitm_positive.contains(h))
+    {
+        return false;
+    }
+    let Some(auth) = extract_authority_regex(pattern) else {
+        return false;
+    };
+    let probe = format!("(?i)^(?:{})$", auth.replace("(?>", "(?:"));
+    let Ok(re) = Regex::new(&probe) else {
+        return false;
+    };
+    !mitm_positive
+        .iter()
+        .any(|h| re.is_match(h) || re.is_match(&format!("{}:443", h)))
 }
 
 fn script_override_to_rule(s: &ModuleScriptOverride) -> ScriptRule {
@@ -1503,16 +1644,16 @@ fn fallback_rule_targets_survive(
     mitm_exclusions: &BTreeSet<String>,
     final_suffix_trie: &DomainTrie,
     compressed_domains: &BTreeSet<String>,
-) -> Option<Vec<String>> {
+) -> bool {
     if is_pattern_disabled(pattern, disabled) {
-        return None;
+        return false;
     }
     if pattern_targets_excluded_https_only(pattern, mitm_exclusions) {
-        return None;
+        return false;
     }
     let info = extract_hosts_from_regex(pattern);
     if info.mitm_patterns.is_empty() {
-        return None;
+        return false;
     }
     let check_hosts: Vec<&str> = if !info.concrete_hosts.is_empty() {
         info.concrete_hosts.iter().map(String::as_str).collect()
@@ -1527,18 +1668,13 @@ fn fallback_rule_targets_survive(
             .iter()
             .all(|h| final_suffix_trie.matches_domain(h) || compressed_domains.contains(*h));
     if all_blocked {
-        return None;
+        return false;
     }
-    let surviving_mitm: Vec<String> = info
-        .mitm_patterns
-        .into_iter()
-        .map(|m| m.to_ascii_lowercase())
-        .filter(|m| is_valid_mitm_host(m) && !mitm_host_is_excluded(m, mitm_exclusions))
-        .collect();
-    if surviving_mitm.is_empty() && !pattern.trim_start_matches('^').starts_with("http://") {
-        return None;
-    }
-    Some(surviving_mitm)
+    let has_surviving_exact_mitm = info.positive_mitm_hosts.iter().any(|m| {
+        let lower = m.to_ascii_lowercase();
+        is_valid_positive_mitm_host(&lower) && !mitm_host_is_excluded(&lower, mitm_exclusions)
+    });
+    has_surviving_exact_mitm || is_http_only_url_regex(pattern)
 }
 
 fn percent_encode_uri_component(raw: &str) -> String {
@@ -1705,8 +1841,7 @@ fn resolve_script_conflicts(
 }
 
 fn pattern_targets_excluded_https_only(pattern: &str, exclusions: &BTreeSet<String>) -> bool {
-    let bare = pattern.trim_start_matches('^');
-    if bare.starts_with("http://") {
+    if is_http_only_url_regex(pattern) {
         return false;
     }
     let info = extract_hosts_from_regex(pattern);
@@ -1875,7 +2010,7 @@ fn build_removeparam_scripts(
             }
             continue;
         }
-        if !is_valid_mitm_host(&host)
+        if !is_valid_positive_mitm_host(&host)
             || mitm_host_is_excluded(&host, mitm_exclusion_set)
             || final_suffix_trie.matches_domain(&host)
             || compressed_domains.contains(&host)
@@ -1982,16 +2117,14 @@ fn build_removeparam_scripts(
                 .then_with(|| a.0.cmp(&b.0))
         });
 
-        let mut extra_mitm_budget = 24usize;
+        // In bulk production builds (>32 scoped hosts), only attach host-scoped removeparam
+        // scripts to domains already requiring MITM instead of expanding the MITM surface.
         let mut ranked_scopes: Vec<(String, u16, BTreeSet<String>, bool)> = Vec::new();
         for (host, w, params) in all_ranked {
             if !bulk_mode {
                 ranked_scopes.push((host, w, params, true));
-            } else if mitm_host_is_excluded(&host, mitm_positive) {
+            } else if mitm_positive.contains(&host) {
                 ranked_scopes.push((host, w, params, false));
-            } else if w >= 130 && extra_mitm_budget > 0 {
-                extra_mitm_budget -= 1;
-                ranked_scopes.push((host, w, params, true));
             }
         }
 
@@ -2273,7 +2406,7 @@ fn build_header_modifier_scripts(
             continue;
         }
 
-        if !is_valid_mitm_host(&host)
+        if !is_valid_positive_mitm_host(&host)
             || mitm_host_is_excluded(&host, mitm_exclusion_set)
             || final_suffix_trie.matches_domain(&host)
             || compressed_domains.contains(&host)
@@ -2313,7 +2446,21 @@ fn build_header_modifier_scripts(
     }
 
     let mut scripts: Vec<ScriptRule> = Vec::new();
-    let mut mitm_budget = 160usize;
+    let total_scoped_hosts = scoped_cookies
+        .keys()
+        .chain(scoped_csp.keys())
+        .chain(scoped_perms.keys())
+        .collect::<FxHashSet<_>>()
+        .len();
+    let bulk_mode = total_scoped_hosts > 32;
+    let mut mitm_budget = if bulk_mode {
+        scoped_cookies.retain(|h, _| mitm_positive.contains(h));
+        scoped_csp.retain(|h, _| mitm_positive.contains(h));
+        scoped_perms.retain(|h, _| mitm_positive.contains(h));
+        0usize
+    } else {
+        32usize
+    };
 
     // 1. Host-scoped `$cookie` request shards (`http-request` only, header-only `requires-body=false`)
     if !scoped_cookies.is_empty() {

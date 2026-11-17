@@ -706,7 +706,7 @@ FQrabbit SSTap Roblox Overseas Matchmaking CIDRs (Filtered), https://raw.githubu
 </details>
 
 <details>
-<summary>GeoIP、ASN 与行政区划元数据数据源（共 119 项）</summary>
+<summary>GeoIP、ASN 与行政区划元数据数据源（共 116 项）</summary>
 
 ```text
 Geofeed Harvester, https://github.com/ipanalytics/GeoFeed-Harvester/releases/latest
@@ -790,9 +790,6 @@ Rir Lacnic, https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-la
 Rir Afrinic, https://ftp.afrinic.net/stats/afrinic/delegated-afrinic-extended-latest
 bgp.tools Anycast Prefixes IPv4, https://raw.githubusercontent.com/bgptools/anycast-prefixes/master/anycatch-v4-prefixes.txt
 bgp.tools Anycast Prefixes IPv6, https://raw.githubusercontent.com/bgptools/anycast-prefixes/master/anycatch-v6-prefixes.txt
-Alice39s BGP.Tools-OpenDB VPS & Hosting ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpsh/tags-vpsh.csv
-Alice39s BGP.Tools-OpenDB CDN ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/cdn/tags-cdn.csv
-Alice39s BGP.Tools-OpenDB Anycast ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/anycast/tags-anycast.csv
 Alice39s BGP.Tools-OpenDB Satellite Network ASN Tags, https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/satnet/tags-satnet.csv
 Cloudflare Edge IPv4, https://www.cloudflare.com/ips-v4
 Cloudflare Edge IPv6, https://www.cloudflare.com/ips-v6/

@@ -7,7 +7,8 @@ use crate::adblock::model::{
 };
 use crate::adblock::parsers::ruleset::{insert_ruleset_entry, parse_canonical_cidr};
 use crate::adblock::regex_util::{
-    extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host, normalize_surge_regex,
+    extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host, is_valid_positive_mitm_host,
+    normalize_surge_regex,
 };
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -207,13 +208,7 @@ fn parse_module_rule_line(line: &str, weight: u16, out: &mut ParsedAdblockSource
 
     if rtype == "URL-REGEX" {
         if let Some(regex) = normalize_surge_regex(val) {
-            let host_info = extract_hosts_from_regex(&regex);
-            for h in host_info.mitm_patterns {
-                out.mitm_hosts.insert(h);
-            }
-            for ch in host_info.concrete_hosts {
-                out.complex_protected_hosts.insert(ch);
-            }
+            out.register_host_info(extract_hosts_from_regex(&regex));
             out.url_rewrites.push(UrlRewriteRule {
                 pattern: regex,
                 replacement: "_".to_string(),
@@ -636,8 +631,9 @@ fn parse_mitm_line(line: &str, out: &mut ParsedAdblockSource) {
         if item.is_empty() || item.starts_with('-') {
             continue;
         }
-        if is_valid_mitm_host(item) {
-            out.mitm_hosts.insert(item.to_ascii_lowercase());
+        let clean = item.to_ascii_lowercase();
+        if is_valid_positive_mitm_host(&clean) {
+            out.mitm_hosts.insert(clean);
         }
     }
 }

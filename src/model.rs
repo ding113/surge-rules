@@ -97,6 +97,11 @@ impl TraitFlags {
     }
 
     #[inline]
+    pub fn without(self, other: Self) -> Self {
+        Self(self.0 & !other.0)
+    }
+
+    #[inline]
     pub fn is_empty(self) -> bool {
         self.0 == 0
     }
@@ -597,6 +602,7 @@ pub struct AsnDictionaryEntry {
     pub country_hint: Option<IsoCode>,
     pub province_hint_zh: StrId,
     pub traits: TraitFlags,
+    pub clear_traits: TraitFlags,
 }
 
 /// Global interned arena holding all sources' remapped intervals and strings.

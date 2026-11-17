@@ -17,6 +17,7 @@ use crate::adblock::model::{MAX_BINARY_SCRIPT_MAX_SIZE, MAX_SCRIPT_TIMEOUT_SECS}
 use crate::adblock::parsers::surge_module::{split_surge_script_params, unquote_surge_value};
 use crate::adblock::regex_util::{
     has_balanced_delimiters, is_valid_domain, is_valid_domain_wildcard, is_valid_mitm_host,
+    is_valid_positive_mitm_host,
 };
 
 #[derive(Clone, Debug, Serialize)]
@@ -918,8 +919,11 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                         mitm_exclusions_seen.insert(excluded.to_ascii_lowercase());
                     } else {
                         seen_positive = true;
-                        if !is_valid_mitm_host(item) {
-                            bail!("Adblock.sgmodule [MITM] invalid host '{}'", item);
+                        if !is_valid_positive_mitm_host(item) {
+                            bail!(
+                                "Adblock.sgmodule [MITM] invalid or wildcard positive host '{}' (only exact domains allowed)",
+                                item
+                            );
                         }
                         mitm_hosts_count += 1;
                     }
@@ -959,7 +963,7 @@ pub fn render_adblock_release_notes(
         - 活跃上游数据源：`{active} / {total}`（自动保护与作用域白名单过滤 `{suppr}` 条、统一前缀树 subsumption 去重 `{subsumed}` 条）\n\
         - `Adblock.list`（广告与安全威胁）：共 `{ad_rules}` 条 Surge RULE-SET 规则，大小 `{rbytes}` B，SHA-256 `{rsha}`\n\
         - `Privacy.list`（隐私跟踪与遥测）：共 `{priv_rules}` 条 Surge RULE-SET 规则，大小 `{pbytes}` B，SHA-256 `{psha}`\n\
-        - `Adblock.sgmodule`：包含 `{scripts}` 条无冲突脚本规则与 `{mitm}` 个 MITM 解密域名（`-` 固定证书域名均置顶排除），大小 `{mbytes}` B，SHA-256 `{msha}`\n\
+        - `Adblock.sgmodule`：包含 `{scripts}` 条无冲突脚本规则与 `{mitm}` 个按需精确 MITM 解密域名（无通配符，`-` 固定证书域名均置顶排除），大小 `{mbytes}` B，SHA-256 `{msha}`\n\
         - 校验通过：`Adblock.list ∩ Privacy.list = ∅` 严格互不重合，且 `{canaries}` 项正反金丝雀断言与 Surge 模块格式校验全部通过\n\n\
         ```ini\n\
         [Rule]\n\

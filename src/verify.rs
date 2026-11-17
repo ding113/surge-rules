@@ -298,6 +298,15 @@ pub fn verify_artifact_dir(
                     ip_str
                 );
             }
+            if ip_str == "114.24.27.200"
+                && (doc.pointer("/traits/is_cdn") == Some(&serde_json::json!(true))
+                    || doc.pointer("/traits/is_hosting_provider") == Some(&serde_json::json!(true)))
+            {
+                bail!(
+                    "residential HiNet canary 114.24.27.200 unexpectedly flagged as CDN/hosting: {}",
+                    doc
+                );
+            }
             if ip_str == "168.95.1.1"
                 && doc
                     .pointer("/subdivisions")

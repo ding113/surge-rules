@@ -23,7 +23,8 @@ use surge_rules::adblock::model::{
 };
 use surge_rules::adblock::parsers::parse_adblock_source;
 use surge_rules::adblock::regex_util::{
-    is_valid_domain, is_valid_mitm_host, normalize_surge_regex,
+    extract_hosts_from_regex, is_valid_domain, is_valid_mitm_host, is_valid_positive_mitm_host,
+    normalize_surge_regex,
 };
 use surge_rules::adblock::verify::{verify_adblock_dir, verify_module_text};
 use surge_rules::config::EndpointConfig;
@@ -348,9 +349,9 @@ hostname = %APPEND% api.video.example.com, *.googlevideo.com, *.com
         BodyRewriteKind::HttpResponseJq
     );
 
-    // Unsafe `*.com` must be stripped from MITM
+    // All positive wildcard MITM hosts (`*.googlevideo.com`, `*.com`) must be stripped; only exact domains survive
     assert!(parsed.mitm_hosts.contains("api.video.example.com"));
-    assert!(parsed.mitm_hosts.contains("*.googlevideo.com"));
+    assert!(!parsed.mitm_hosts.contains("*.googlevideo.com"));
     assert!(!parsed.mitm_hosts.contains("*.com"));
 }
 
@@ -2660,4 +2661,172 @@ DOMAIN-SUFFIX,cn,extended-matching\n";
         bitmask_lineages.len(),
         total_lineages.len()
     );
+}
+
+#[test]
+fn mitm_strips_all_positive_wildcards_and_only_includes_on_demand_exact_domains() {
+    // 1. Positive MITM host validator rejects all wildcards, raw IPs, port 0, and placeholders
+    assert!(is_valid_positive_mitm_host("api.weibo.cn"));
+    assert!(is_valid_positive_mitm_host("yuudnn.lz-qs.com:9220"));
+    assert!(!is_valid_positive_mitm_host("*.iqiyi.com"));
+    assert!(!is_valid_positive_mitm_host("rr*.googlevideo.com"));
+    assert!(!is_valid_positive_mitm_host("pic?.ajkimg.com"));
+    assert!(!is_valid_positive_mitm_host("101.201.175.228"));
+    assert!(!is_valid_positive_mitm_host("<ip-address>"));
+    assert!(!is_valid_positive_mitm_host("api.weibo.cn:0"));
+    assert!(!is_valid_positive_mitm_host("com.cn"));
+
+    // Surge module verifier rejects any positive wildcard in [MITM] while permitting `-` wildcard exclusions
+    assert!(
+        verify_module_text(
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[MITM]\nhostname = %INSERT% -*.apple.com, *.iqiyi.com\n"
+        )
+        .is_err()
+    );
+    assert!(
+        verify_module_text(
+            "#!name=T\n#!desc=T\n#!requirement=CORE_VERSION>=20\n[MITM]\nhostname = %INSERT% -*.apple.com, api.iqiyi.com\n"
+        )
+        .is_ok()
+    );
+
+    // 2. Regex host extractor expands finite alternations, optional groups, char classes, (?i), and (:\d+)?
+    let alt_info = extract_hosts_from_regex(r"(?i)^https?://(gw|heic)\.alicdn\.com(:\d+)?/ad/v1");
+    assert_eq!(
+        alt_info.positive_mitm_hosts,
+        vec!["gw.alicdn.com".to_string(), "heic.alicdn.com".to_string()]
+    );
+
+    let opt_info = extract_hosts_from_regex(r"^https?://www\.flyert(rip)?\.com(\.cn)?/ad");
+    assert_eq!(opt_info.positive_mitm_hosts.len(), 4);
+    assert!(
+        opt_info
+            .positive_mitm_hosts
+            .contains(&"www.flyertrip.com.cn".to_string())
+    );
+
+    let cls_info = extract_hosts_from_regex(r"^https://ap[ip]\.bilibili\.com/x/v2/feed");
+    assert_eq!(
+        cls_info.positive_mitm_hosts,
+        vec![
+            "api.bilibili.com".to_string(),
+            "app.bilibili.com".to_string()
+        ]
+    );
+
+    let wild_info =
+        extract_hosts_from_regex(r"^https?://rr[\w-]+\.googlevideo\.com/initplayback\?");
+    assert!(
+        wild_info.positive_mitm_hosts.is_empty(),
+        "wildcard regex must never emit positive MITM hosts"
+    );
+    assert!(
+        wild_info
+            .mitm_patterns
+            .contains(&"*.googlevideo.com".to_string()),
+        "wildcard scope should remain in mitm_patterns for exclusion checks"
+    );
+
+    // 3. End-to-end compilation: orphan upstream MITM hosts, disabled rules, HTTP-only rules,
+    //    pre-matching [Rule] rejects, and bulk $cookie sites must NOT enter [MITM].
+    let mut overrides = AdblockOverrides::empty();
+    overrides.mitm_excluded_hosts.push(MitmHostOverride {
+        pattern: "api.bilibili.com".to_string(),
+        rationale: "TLS pinned".to_string(),
+    });
+    overrides.mitm_excluded_hosts.push(MitmHostOverride {
+        pattern: "app.bilibili.com".to_string(),
+        rationale: "TLS pinned".to_string(),
+    });
+    overrides.mitm_excluded_hosts.push(MitmHostOverride {
+        pattern: "*.tenpay.com".to_string(),
+        rationale: "Payment TLS pinned".to_string(),
+    });
+    overrides
+        .disabled_url_patterns
+        .push("/amdc/mobileDispatch".to_string());
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
+        kind: "DOMAIN".to_string(),
+        value: "forced-blocked.example.com".to_string(),
+        rationale: "Forced ruleset block drops domain before MITM".to_string(),
+    });
+
+    let src_cfg = dummy_adblock_source(
+        "mod_on_demand",
+        AdblockSourceRole::ComplexFirst,
+        AdblockSourceFormat::SurgeModule,
+        150,
+    );
+    let raw_mod = r#"
+#!name=OnDemandTest
+[Rule]
+DOMAIN,httpdns.bilivideo.com,REJECT,pre-matching
+
+[URL Rewrite]
+^https?://cupid\.iqiyi\.com/mixer\? _ reject
+^https?://amdc\.m\.taobao\.com/amdc/mobileDispatch _ reject
+^http://plain-http-only\.example\.com/ad _ reject
+(?i)^https://ccmsupport-sz\.tenpay\.com/cgi-bin/ad _ reject
+^https://ap[ip]\.bilibili\.com/x/v2/splash _ reject
+^https://.+\.gamersky\.com/v1/statisticAd _ reject
+^https?://rr[\w-]+\.googlevideo\.com/initplayback\? _ reject
+^https?://forced-blocked\.example\.com/ad _ reject
+^https?://vip\d\.kuwo\.cn/vip/v2/ad _ reject
+
+[MITM]
+hostname = %INSERT% *.iqiyi.com, rr*.googlevideo.com, cupid.iqiyi.com, orphan.unused.example.org, raw.githubusercontent.com, amdc.m.taobao.com, plain-http-only.example.com, httpdns.bilivideo.com, forced-blocked.example.com, vip1.kuwo.cn, 101.201.175.228
+"#;
+
+    let mut parsed_mod = parse_adblock_source(&src_cfg, raw_mod.as_bytes()).unwrap();
+    // Inject >32 scoped $cookie hosts to trigger bulk_mode and verify zero MITM expansion
+    for idx in 0..40 {
+        parsed_mod
+            .header_mods
+            .push(surge_rules::adblock::model::HeaderModRule {
+                kind: surge_rules::adblock::model::HeaderModKind::Cookie,
+                host_scope: format!("site{}.bulk-cookie.example.net", idx),
+                spec: "_trk".to_string(),
+                weight: 90,
+            });
+    }
+    parsed_mod
+        .header_mods
+        .push(surge_rules::adblock::model::HeaderModRule {
+            kind: surge_rules::adblock::model::HeaderModKind::Cookie,
+            host_scope: "cupid.iqiyi.com".to_string(),
+            spec: "_trk".to_string(),
+            weight: 90,
+        });
+
+    let compiled = compile_adblock(&[parsed_mod], &overrides, 1, 1);
+    let (_, pos_count) =
+        verify_module_text(&compiled.module_text).expect("compiled module must verify");
+
+    let mitm_line = compiled
+        .module_text
+        .lines()
+        .find(|l| l.starts_with("hostname = %INSERT% "))
+        .unwrap();
+
+    // Only `cupid.iqiyi.com` (direct rule) and `vip1.kuwo.cn` (bounded regex hint for `vip\d\.kuwo\.cn`) need MITM!
+    assert_eq!(pos_count, 2, "unexpected MITM line: {}", mitm_line);
+    assert!(mitm_line.contains("cupid.iqiyi.com"));
+    assert!(mitm_line.contains("vip1.kuwo.cn"));
+    assert!(!mitm_line.contains("*.iqiyi.com"));
+    assert!(!mitm_line.contains("googlevideo.com"));
+    assert!(!mitm_line.contains("orphan.unused.example.org"));
+    assert!(!mitm_line.contains("raw.githubusercontent.com"));
+    assert!(!mitm_line.contains("amdc.m.taobao.com"));
+    assert!(!mitm_line.contains("plain-http-only.example.com"));
+    assert!(!mitm_line.contains("httpdns.bilivideo.com"));
+    assert!(!mitm_line.contains("forced-blocked.example.com"));
+    assert!(!mitm_line.contains("bulk-cookie.example.net"));
+    assert!(!mitm_line.contains("101.201.175.228"));
+
+    // Plain HTTP rule and `https?://` fallback rule remain; pinned HTTPS & unbacked `https://` wildcard rules are pruned
+    assert!(compiled.module_text.contains("plain-http-only"));
+    assert!(!compiled.module_text.contains("ccmsupport-sz"));
+    assert!(!compiled.module_text.contains("ap[ip]"));
+    assert!(!compiled.module_text.contains("gamersky"));
 }

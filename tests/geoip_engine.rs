@@ -74,10 +74,21 @@ fn catalog_metadata_and_overrides_are_valid_and_complete() {
 
     assert_eq!(
         catalog.sources.len(),
-        108,
-        "expected 108 upstream sources in catalog, got {}",
+        105,
+        "expected 105 upstream sources in catalog, got {}",
         catalog.sources.len()
     );
+    for forbidden in [
+        "bgptools_tags_cdn",
+        "bgptools_tags_vpsh",
+        "bgptools_tags_anycast",
+    ] {
+        assert!(
+            !catalog.sources.iter().any(|s| s.id == forbidden),
+            "ASN-wide carrier-polluting tag source '{}' must remain excluded",
+            forbidden
+        );
+    }
     for s in &catalog.sources {
         assert!(!s.endpoints.is_empty(), "source {} has no endpoints", s.id);
         assert!(
@@ -1583,4 +1594,68 @@ ip_version,start_ip,end_ip,continent,country_code,country,state,city,zip,timezon
     assert_eq!(parsed_city.strings.get(p_hz.city_en), "Hangzhou");
     assert_eq!(parsed_city.strings.get(p_hz.city_zh), "杭州市");
     assert_eq!(p_hz.accuracy_radius, 5);
+}
+
+#[test]
+fn asn_override_false_clears_polluted_carrier_traits() {
+    let (metadata, _, mut overrides) = load_real_fixtures();
+    let ov_4134 = overrides
+        .asn_overrides
+        .get_mut(&4134)
+        .expect("AS4134 override must exist");
+    ov_4134.is_cdn = Some(false);
+    ov_4134.is_hosting = Some(false);
+
+    let mut arena = GlobalArena::new();
+    let mut sources = Vec::new();
+
+    // Polluted ASN-tag source falsely claiming AS4134 is CDN + Hosting
+    let mut tag_sc = dummy_source(
+        "noisy_asn_tag",
+        SourceTier::TraitOverlay,
+        SourceFormat::BgptoolsTagCsv,
+        "noisy_tags",
+    );
+    tag_sc.is_cdn = true;
+    tag_sc.is_hosting = true;
+    let parsed_tag =
+        parse_source_bytes(&tag_sc, b"AS4134,China Telecom Backbone\n", &metadata).unwrap();
+    let (v4_t, v6_t) = arena.ingest_parsed_source(parsed_tag, 65);
+    sources.push((tag_sc, v4_t, v6_t));
+
+    // BGP RIB + CN location for residential prefix 113.87.100.0/24
+    let mut bgp_sc = dummy_source(
+        "bgp_rib",
+        SourceTier::Tier3BgpRir,
+        SourceFormat::BgptoolsTable,
+        "bgp_rib",
+    );
+    bgp_sc.asn_weight = 98;
+    let parsed_bgp = parse_source_bytes(&bgp_sc, b"113.87.100.0/24 AS4134\n", &metadata).unwrap();
+    let (v4_b, v6_b) = arena.ingest_parsed_source(parsed_bgp, 98);
+    sources.push((bgp_sc, v4_b, v6_b));
+
+    let mut geo_sc = dummy_source(
+        "cn_geo",
+        SourceTier::Tier2aCn,
+        SourceFormat::Rfc8805Csv,
+        "cn_geo",
+    );
+    geo_sc.country_weight = 90;
+    let parsed_geo =
+        parse_source_bytes(&geo_sc, b"113.87.100.0/24,CN,CN-GD,Shenzhen,\n", &metadata).unwrap();
+    let (v4_g, v6_g) = arena.ingest_parsed_source(parsed_geo, 80);
+    sources.push((geo_sc, v4_g, v6_g));
+
+    let fused = run_fusion(&mut arena, &metadata, &overrides, sources);
+    let target_ip = u32::from(Ipv4Addr::new(113, 87, 100, 1));
+    let span = fused
+        .country_v4
+        .iter()
+        .find(|s| s.start <= target_ip && target_ip <= s.end)
+        .expect("113.87.100.1 span should exist");
+    let rec = &fused.country_records[span.record_id as usize];
+    assert_eq!(rec.asn, 4134);
+    assert!(!rec.traits.contains(TraitFlags::IS_CDN));
+    assert!(!rec.traits.contains(TraitFlags::IS_HOSTING));
 }

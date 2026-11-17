@@ -507,67 +507,138 @@ pub fn has_balanced_delimiters(pat: &str) -> bool {
     !in_class && paren == 0 && brace == 0 && !escaped
 }
 
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct RegexHostInfo {
+    /// All Surge MITM-style host patterns targeted by the regex (may include wildcards like `*.example.com`).
+    /// Used for MITM-exclusion checks (`pattern_targets_excluded_https_only`) and ruleset subsumption checks.
     pub mitm_patterns: Vec<String>,
+    /// Strictly exact, wildcard-free positive MITM host entries (`example.com` or `example.com:8443`).
+    pub positive_mitm_hosts: Vec<String>,
+    /// Exact bare domain names (`example.com`, without `:port`) for complex-host ruleset protection.
     pub concrete_hosts: Vec<String>,
 }
 
-/// Extracts MITM host patterns and exact protected hostnames from a URL regex.
+fn push_unique(vec: &mut Vec<String>, item: String) {
+    if !vec.contains(&item) {
+        vec.push(item);
+    }
+}
+
+/// Extracts MITM host patterns, exact positive MITM hosts, and exact protected hostnames from a URL regex.
 pub fn extract_hosts_from_regex(pattern: &str) -> RegexHostInfo {
-    let mut mitm_patterns = Vec::new();
-    let mut concrete_hosts = Vec::new();
+    let mut info = RegexHostInfo::default();
 
     let Some(after_scheme) = strip_regex_scheme_prefix(pattern) else {
-        return RegexHostInfo {
-            mitm_patterns,
-            concrete_hosts,
-        };
+        return info;
     };
 
     let auth_expr = read_authority_segment(after_scheme);
     if auth_expr.is_empty() {
-        return RegexHostInfo {
-            mitm_patterns,
-            concrete_hosts,
-        };
+        return info;
     }
 
-    // Strip optional `:port` matcher on the authority
-    let host_expr = strip_trailing_port_regex(auth_expr);
-    let branches = split_top_level_alternations(host_expr);
+    let top_branches = split_top_level_alternations(auth_expr);
 
-    for branch in branches {
-        if let Some(opt_sub_rest) = branch
-            .trim()
-            .strip_prefix("(?:[^/?#]+\\.)?")
-            .or_else(|| branch.trim().strip_prefix("(?:[a-z0-9-]+\\.)*"))
-            && let Some((dom, true)) = regex_host_to_surge_pattern(opt_sub_rest)
-        {
-            mitm_patterns.push(dom.clone());
-            let wildcard = format!("*.{}", dom);
-            if is_valid_mitm_host(&wildcard) {
-                mitm_patterns.push(wildcard);
-            }
-            concrete_hosts.push(dom);
+    for raw_branch in top_branches {
+        // A top-level alternation may wrap `(host1/path1|host2/path2)`; isolate each branch's authority.
+        let mut branch_auth = read_authority_segment(raw_branch.trim()).trim();
+        if branch_auth.is_empty() {
             continue;
         }
-        if let Some((mitm_host, is_exact)) = regex_host_to_surge_pattern(branch) {
-            mitm_patterns.push(mitm_host.clone());
-            if is_exact && !mitm_host.contains(':') && is_valid_domain(&mitm_host) {
-                concrete_hosts.push(mitm_host);
+        if !branch_auth.ends_with("\\.*")
+            && let Some(stripped) = branch_auth.strip_suffix(".*")
+        {
+            branch_auth = stripped;
+        }
+        if branch_auth.is_empty() {
+            continue;
+        }
+
+        let (mut host_expr, explicit_port) = split_host_and_port_regex(branch_auth);
+        host_expr = host_expr.trim();
+
+        let mut has_opt_subdomain = false;
+        if let Some(rest) = host_expr
+            .strip_prefix("(?:[^/?#]+\\.)?")
+            .or_else(|| host_expr.strip_prefix("(?:[a-z0-9-]+\\.)*"))
+        {
+            has_opt_subdomain = true;
+            host_expr = rest;
+        }
+
+        let expanded = expand_finite_host_branches(host_expr, 32);
+        let candidates: Vec<&str> = if expanded.is_empty() {
+            vec![host_expr]
+        } else {
+            expanded.iter().map(String::as_str).collect()
+        };
+
+        for cand in candidates {
+            let (cand_host_expr, cand_port) = split_host_and_port_regex(cand);
+            let port = explicit_port.or(cand_port);
+            if let Some((mitm_host, is_exact)) = regex_host_to_surge_pattern(cand_host_expr) {
+                if is_exact && !mitm_host.contains(':') && is_valid_domain(&mitm_host) {
+                    let pos_entry = match port {
+                        Some(p) => format!("{}:{}", mitm_host, p),
+                        None => mitm_host.clone(),
+                    };
+                    push_unique(&mut info.mitm_patterns, pos_entry.clone());
+                    if is_valid_positive_mitm_host(&pos_entry) {
+                        push_unique(&mut info.positive_mitm_hosts, pos_entry);
+                    }
+                    if has_opt_subdomain {
+                        let wildcard = format!("*.{}", mitm_host);
+                        if is_valid_mitm_host(&wildcard) {
+                            push_unique(&mut info.mitm_patterns, wildcard);
+                        }
+                    }
+                    push_unique(&mut info.concrete_hosts, mitm_host);
+                } else {
+                    push_unique(&mut info.mitm_patterns, mitm_host);
+                }
+            } else if let Some(wild_suffix) = extract_trailing_wildcard_domain(cand_host_expr) {
+                push_unique(&mut info.mitm_patterns, wild_suffix);
             }
         }
     }
 
-    RegexHostInfo {
-        mitm_patterns,
-        concrete_hosts,
+    info
+}
+
+/// Extracts the authority regex expression from a URL regex (after scheme, before path/query/end),
+/// returning `None` if the pattern has no HTTP(S)/WS(S) scheme prefix.
+pub fn extract_authority_regex(pattern: &str) -> Option<&str> {
+    let after_scheme = strip_regex_scheme_prefix(pattern)?;
+    let auth = read_authority_segment(after_scheme).trim();
+    if auth.is_empty() { None } else { Some(auth) }
+}
+
+fn strip_leading_flags_and_caret(pat: &str) -> &str {
+    let mut s = pat.trim();
+    while let Some(rest) = s.strip_prefix("(?i)").or_else(|| s.strip_prefix('^')) {
+        s = rest;
     }
+    s
+}
+
+/// Returns `true` when a URL regex can ONLY match unencrypted `http://` or `ws://` traffic (no TLS MITM required).
+pub fn is_http_only_url_regex(pattern: &str) -> bool {
+    let s = strip_leading_flags_and_caret(pattern);
+    (s.starts_with("http://") || s.starts_with("ws://"))
+        && !s.contains("https")
+        && !s.contains("wss")
+}
+
+/// Returns `true` when a URL regex ONLY matches encrypted `https://` or `wss://` traffic.
+pub fn is_https_only_url_regex(pattern: &str) -> bool {
+    let s = strip_leading_flags_and_caret(pattern);
+    (s.starts_with("https://") || s.starts_with("wss://"))
+        && !s.contains("http://")
+        && !s.contains("ws://")
 }
 
 fn strip_regex_scheme_prefix(pat: &str) -> Option<&str> {
-    let mut s = pat.trim_start_matches('^');
+    let s = strip_leading_flags_and_caret(pat);
     for prefix in [
         "https?://",
         "http(s)?://",
@@ -576,10 +647,11 @@ fn strip_regex_scheme_prefix(pat: &str) -> Option<&str> {
         "https://",
         "http://",
         "wss?://",
+        "wss://",
+        "ws://",
     ] {
         if let Some(rest) = s.strip_prefix(prefix) {
-            s = rest;
-            return Some(s);
+            return Some(rest);
         }
     }
     None
@@ -588,14 +660,16 @@ fn strip_regex_scheme_prefix(pat: &str) -> Option<&str> {
 fn read_authority_segment(s: &str) -> &str {
     let mut paren = 0i32;
     let mut in_class = false;
-    let mut escaped = false;
+    let mut escaped_at: Option<usize> = None;
     for (idx, ch) in s.char_indices() {
-        if escaped {
-            escaped = false;
+        if let Some(bs_idx) = escaped_at.take() {
+            if !in_class && paren == 0 && matches!(ch, '/' | '?') {
+                return &s[..bs_idx];
+            }
             continue;
         }
         if ch == '\\' {
-            escaped = true;
+            escaped_at = Some(idx);
             continue;
         }
         if in_class {
@@ -612,41 +686,222 @@ fn read_authority_segment(s: &str) -> &str {
                     paren -= 1;
                 }
             }
-            '/' | '$' | '?' if paren == 0 => return &s[..idx],
+            // Note: unescaped `?` in a regex is an optional quantifier (e.g. `(:\d+)?`), never a literal query separator.
+            '/' | '$' | '#' if paren == 0 => return &s[..idx],
             _ => {}
         }
     }
     s
 }
 
+fn split_host_and_port_regex(auth: &str) -> (&str, Option<u16>) {
+    let trimmed = auth.trim();
+    for suffix in [
+        "(:443)?",
+        "(?::443)?",
+        "(\\:443)?",
+        "(?:\\:443)?",
+        "(:\\d+)?",
+        "(?::\\d+)?",
+        "(\\:\\d+)?",
+        "(?:\\:\\d+)?",
+        ":\\d+",
+        "\\:\\d+",
+    ] {
+        if let Some(prefix) = trimmed.strip_suffix(suffix) {
+            return (prefix, None);
+        }
+    }
+
+    // Strip quantified port suffixes like `:\d{4}`, `(:\d{1,5})?`, `(?::\d{2,5})?`
+    if let Some(open_paren) = trimmed.rfind('(') {
+        let tail = &trimmed[open_paren..];
+        if (tail.starts_with("(:\\d{") || tail.starts_with("(?::\\d{"))
+            && (tail.ends_with("})?") || tail.ends_with("})"))
+        {
+            return (&trimmed[..open_paren], None);
+        }
+    }
+    if let Some(colon_d) = trimmed.rfind(":\\d{")
+        && trimmed.ends_with('}')
+    {
+        let prefix = trimmed[..colon_d]
+            .strip_suffix('\\')
+            .unwrap_or(&trimmed[..colon_d]);
+        return (prefix, None);
+    }
+
+    if let Some(idx) = trimmed.rfind(':') {
+        let right = &trimmed[idx + 1..];
+        if !right.is_empty() && right.chars().all(|c| c.is_ascii_digit()) {
+            let host_part = trimmed[..idx].strip_suffix('\\').unwrap_or(&trimmed[..idx]);
+            if let Ok(port) = right.parse::<u16>() {
+                let explicit = if matches!(port, 0 | 80 | 443) {
+                    None
+                } else {
+                    Some(port)
+                };
+                return (host_part, explicit);
+            }
+        }
+    }
+
+    (trimmed, None)
+}
+
 fn strip_trailing_port_regex(auth: &str) -> &str {
-    if let Some(idx) = auth.rfind(':') {
-        let right = &auth[idx + 1..];
-        if right.chars().all(|c| c.is_ascii_digit()) {
-            return &auth[..idx];
+    split_host_and_port_regex(auth).0
+}
+
+fn expand_finite_host_branches(expr: &str, max_branches: usize) -> Vec<String> {
+    let group_expanded = expand_regex_branches(expr, max_branches);
+    let seeds = if group_expanded.is_empty() {
+        vec![expr.to_string()]
+    } else {
+        group_expanded
+    };
+
+    let mut out = Vec::with_capacity(seeds.len());
+    for seed in seeds {
+        let cls_expanded = expand_small_char_classes(&seed, max_branches.saturating_sub(out.len()));
+        if cls_expanded.is_empty() || out.len() + cls_expanded.len() > max_branches {
+            return Vec::new();
+        }
+        out.extend(cls_expanded);
+    }
+    out
+}
+
+fn expand_small_char_classes(expr: &str, max_branches: usize) -> Vec<String> {
+    if max_branches == 0 {
+        return Vec::new();
+    }
+    let bytes = expr.as_bytes();
+    let mut escaped = false;
+    let mut class_span: Option<(usize, usize, bool)> = None;
+
+    for (idx, ch) in expr.char_indices() {
+        if escaped {
+            escaped = false;
+            continue;
+        }
+        if ch == '\\' {
+            escaped = true;
+            continue;
+        }
+        if ch == '[' {
+            let mut close_idx = None;
+            let mut inner_esc = false;
+            for (j, c2) in expr[idx + 1..].char_indices() {
+                if inner_esc {
+                    inner_esc = false;
+                    continue;
+                }
+                if c2 == '\\' {
+                    inner_esc = true;
+                    continue;
+                }
+                if c2 == ']' {
+                    close_idx = Some(idx + 1 + j);
+                    break;
+                }
+            }
+            let Some(c_idx) = close_idx else {
+                return vec![expr.to_string()];
+            };
+            let cls = &expr[idx + 1..c_idx];
+            let next_b = bytes.get(c_idx + 1).copied();
+            if matches!(next_b, Some(b'*') | Some(b'+') | Some(b'{')) {
+                continue;
+            }
+            if !cls.is_empty()
+                && cls.len() <= 4
+                && !cls.starts_with('^')
+                && !cls.contains('-')
+                && cls.chars().all(|c| c.is_ascii_alphanumeric())
+            {
+                class_span = Some((idx, c_idx, next_b == Some(b'?')));
+                break;
+            }
         }
     }
-    for suffix in ["(:\\d+)?", "(?::\\d+)?", ":\\d+"] {
-        if let Some(prefix) = auth.strip_suffix(suffix) {
-            return prefix;
+
+    let Some((open_idx, close_idx, is_opt)) = class_span else {
+        return vec![expr.to_string()];
+    };
+
+    let cls = &expr[open_idx + 1..close_idx];
+    let after_idx = if is_opt { close_idx + 2 } else { close_idx + 1 };
+    let mut choices: Vec<String> = cls.chars().map(|c| c.to_string()).collect();
+    if is_opt {
+        choices.push(String::new());
+    }
+    if choices.len() > max_branches {
+        return Vec::new();
+    }
+
+    let prefix = &expr[..open_idx];
+    let suffix = &expr[after_idx..];
+    let mut out = Vec::new();
+    for ch_str in choices {
+        let combined = format!("{}{}{}", prefix, ch_str, suffix);
+        let sub = expand_small_char_classes(&combined, max_branches.saturating_sub(out.len()));
+        if sub.is_empty() || out.len() + sub.len() > max_branches {
+            return Vec::new();
+        }
+        out.extend(sub);
+    }
+    out
+}
+
+fn extract_trailing_wildcard_domain(expr: &str) -> Option<String> {
+    let unescaped = expr.replace("\\.", ".").replace("\\-", "-");
+    let labels: Vec<&str> = unescaped.split('.').collect();
+    let mut suffix_labels: Vec<&str> = Vec::new();
+    for lbl in labels.iter().rev() {
+        if !lbl.is_empty()
+            && !lbl.starts_with('-')
+            && !lbl.ends_with('-')
+            && lbl.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+        {
+            suffix_labels.push(lbl);
+        } else {
+            break;
         }
     }
-    auth
+    if suffix_labels.len() < 2 {
+        return None;
+    }
+    suffix_labels.reverse();
+    let dom = suffix_labels.join(".").to_ascii_lowercase();
+    let wild = format!("*.{}", dom);
+    if is_valid_domain(&dom) && is_valid_mitm_host(&wild) {
+        Some(wild)
+    } else {
+        None
+    }
+}
+
+fn strip_single_outer_group(expr: &str) -> Option<&str> {
+    if !(expr.starts_with('(') && expr.ends_with(')') && is_single_outer_group(expr)) {
+        return None;
+    }
+    let inner = if let Some(r) = expr
+        .strip_prefix("(?:")
+        .or_else(|| expr.strip_prefix("(?>"))
+    {
+        r.strip_suffix(')')?
+    } else if expr.starts_with("(?") {
+        return None;
+    } else {
+        expr.strip_prefix('(')?.strip_suffix(')')?
+    };
+    if inner.is_empty() { None } else { Some(inner) }
 }
 
 fn split_top_level_alternations(mut expr: &str) -> Vec<&str> {
-    loop {
-        if expr.starts_with('(') && expr.ends_with(')') && is_single_outer_group(expr) {
-            let inner = expr
-                .trim_start_matches("(?:")
-                .trim_start_matches('(')
-                .trim_end_matches(')');
-            if inner != expr && !inner.is_empty() {
-                expr = inner;
-                continue;
-            }
-        }
-        break;
+    while let Some(inner) = strip_single_outer_group(expr) {
+        expr = inner;
     }
 
     let mut out = Vec::new();
@@ -722,11 +977,8 @@ fn is_single_outer_group(expr: &str) -> bool {
 
 fn regex_host_to_surge_pattern(branch: &str) -> Option<(String, bool)> {
     let mut s = branch.trim();
-    while s.starts_with('(') && s.ends_with(')') && is_single_outer_group(s) {
-        s = s
-            .strip_prefix("(?:")
-            .or_else(|| s.strip_prefix('('))?
-            .strip_suffix(')')?;
+    while let Some(inner) = strip_single_outer_group(s) {
+        s = inner;
     }
     if s.is_empty() {
         return None;
@@ -923,6 +1175,57 @@ pub fn is_valid_mitm_host(raw: &str) -> bool {
         .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'-' | b'_' | b'*' | b'?'))
 }
 
+/// Validates a positive (non-`-` excluded) Surge `[MITM] hostname` item.
+/// Positive MITM entries must be exact domain names (optionally with a concrete `1..=65535` port)
+/// and must NEVER contain wildcards (`*`, `?`), `<...>` tokens, or raw IP literals.
+pub fn is_valid_positive_mitm_host(raw: &str) -> bool {
+    let s = raw.trim();
+    if s.is_empty()
+        || s.contains(',')
+        || s.contains('*')
+        || s.contains('?')
+        || s.contains('<')
+        || s.contains('>')
+        || s.contains('[')
+        || s.contains(']')
+        || s.chars().any(|c| c.is_whitespace() || c.is_control())
+    {
+        return false;
+    }
+
+    let host_part = if let Some(colon) = s.rfind(':') {
+        let port_str = &s[colon + 1..];
+        let Ok(port) = port_str.parse::<u16>() else {
+            return false;
+        };
+        if port == 0 {
+            return false;
+        }
+        &s[..colon]
+    } else {
+        s
+    };
+
+    if !is_valid_domain(host_part) || host_part.to_ascii_lowercase().ends_with("hostname") {
+        return false;
+    }
+
+    let labels: Vec<&str> = host_part.split('.').collect();
+    if is_bare_multipart_public_suffix(&labels) {
+        return false;
+    }
+    let Some(&tld) = labels.last() else {
+        return false;
+    };
+    let tld_lower = tld.to_ascii_lowercase();
+    tld.bytes().all(|b| b.is_ascii_alphabetic())
+        || (tld_lower.starts_with("xn--")
+            && tld_lower.len() >= 6
+            && tld_lower[4..]
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'-'))
+}
+
 /// Converts a literal ABP wildcard pattern (such as `||ads.example.com/banner/*`) into a Surge regex.
 pub fn abp_url_pattern_to_surge_regex(pattern: &str) -> Option<(String, Option<String>)> {
     let mut raw = pattern.trim();
@@ -970,8 +1273,16 @@ pub fn abp_url_pattern_to_surge_regex(pattern: &str) -> Option<(String, Option<S
         }
         let host_escaped = escape_literal_regex(&host_lower);
         let tail_regex = abp_wildcard_to_regex(clean_tail);
+        let boundary = if clean_tail.starts_with('/') || clean_tail.starts_with('?') {
+            ""
+        } else {
+            "(?::\\d+)?/"
+        };
         let suffix_anchor = if trailing_anchor { "$" } else { "" };
-        let full = format!("^https?://{}{}{}", host_escaped, tail_regex, suffix_anchor);
+        let full = format!(
+            "^https?://{}{}{}{}",
+            host_escaped, boundary, tail_regex, suffix_anchor
+        );
         let verified = normalize_surge_regex(&full)?;
         return Some((verified, Some(host_lower)));
     }

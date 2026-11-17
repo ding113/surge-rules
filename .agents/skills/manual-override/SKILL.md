@@ -75,7 +75,7 @@ Because local Rust tests are intentionally skipped, double-check these invariant
    - `Direct.list` and overseas `AI` / `Payment` / `Telemetry` / `Proxy` domains must not overlap; pair `<TARGET>_FORCE_ENTRIES` with `<OTHER>_EXCLUDE_ENTRIES` whenever upstream lists disagree.
 4. **Canonical Syntax**:
    - Domains: lowercase ASCII/punycode, no scheme (`https://`), no path/port, no leading `.` or trailing `.`.
-   - `MITM_EXCLUDED_HOSTS` / `MITM_ADDED_HOSTS`: no leading `-` (the compiler prepends `-` automatically), no `*`, `*.*`, `*:0`, bare TLDs, commas, or whitespace.
+   - `MITM_EXCLUDED_HOSTS` / `MITM_ADDED_HOSTS`: no leading `-` (the compiler prepends `-` automatically for `MITM_EXCLUDED_HOSTS`), no `*`, `*.*`, `*:0`, bare TLDs, commas, or whitespace; `MITM_ADDED_HOSTS` additionally requires exact domains only (no wildcards `*` / `?`, `<...>`, or raw IPs).
    - CIDRs (`IP-CIDR`, `IP-CIDR6`, GeoIP overrides): strictly canonical network address with zero host bits set (e.g., `114.24.0.0/14`, never `114.24.0.1/14`).
    - Country codes: canonical uppercase ISO 3166-1 alpha-2 (`GB` instead of `UK`; `XX`, `ZZ`, `AA`, `OO` are disallowed) present in `metadata/generated/geoip-metadata.json`.
    - Every `rationale` field must be non-empty.

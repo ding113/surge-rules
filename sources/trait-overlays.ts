@@ -30,59 +30,13 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
       },
     ],
   },
-  {
-    id: "bgptools_tags_vpsh",
-    tier: "trait_overlay",
-    format: "bgptools_tag_csv",
-    lineage: "bgptools_tags",
-    isHosting: true,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/vpsh/tags-vpsh.csv",
-      },
-      {
-        kind: "github_release",
-        repo: "Alice39s/BGP.Tools-OpenDB",
-        assetPattern: "^tags-vpsh-.*\\.csv\\.gz$",
-      },
-    ],
-  },
-  {
-    id: "bgptools_tags_cdn",
-    tier: "trait_overlay",
-    format: "bgptools_tag_csv",
-    lineage: "bgptools_tags",
-    isCdn: true,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/cdn/tags-cdn.csv",
-      },
-      {
-        kind: "github_release",
-        repo: "Alice39s/BGP.Tools-OpenDB",
-        assetPattern: "^tags-cdn-.*\\.csv\\.gz$",
-      },
-    ],
-  },
-  {
-    id: "bgptools_tags_anycast",
-    tier: "trait_overlay",
-    format: "bgptools_tag_csv",
-    lineage: "bgptools_tags",
-    isAnycast: true,
-    endpoints: [
-      {
-        kind: "direct",
-        url: "https://raw.githubusercontent.com/Alice39s/BGP.Tools-OpenDB/auto-update/tags/anycast/tags-anycast.csv",
-      },
-    ],
-  },
-  // NOTE: bgp.tools `vpn` / `tor` tags are intentionally NOT ingested. They are ASN-wide
-  // "hosts such services" labels (e.g. AS37963/AS45102 Alibaba, Hetzner, OVH), so applying
-  // them to every originated prefix flags whole clouds/ISPs (incl. 223.5.5.5 AliDNS) as
-  // VPN/anonymous-proxy/Tor. Per-IP feeds (x4bnet, josephrocca, Tor exits, OpenProxyDB) cover these traits.
+  // NOTE: bgp.tools `cdn` / `vpsh` / `anycast` / `vpn` / `tor` tags are intentionally NOT
+  // ingested. They are ASN-wide "hosts such services somewhere" labels (e.g. AS4134 China
+  // Telecom, AS4837 China Unicom, AS9808/AS56040 China Mobile, AS3462 HiNet, AS4766 KT,
+  // AS7922 Comcast), so applying them to every originated prefix falsely flags ratusan-million
+  // residential home broadband IPs as CDN, hosting, Anycast, or VPN. Prefix-granular feeds
+  // (Cloudflare/Fastly/Gcore/Akamai/CloudFront/Netflix geofeeds, bgptools_anycast_v4/v6,
+  // hexydec/x4bnet/jhassine/josephrocca/OpenProxyDB, and curated ASN_OVERRIDES) cover these traits.
   {
     id: "bgptools_tags_satnet",
     tier: "trait_overlay",
