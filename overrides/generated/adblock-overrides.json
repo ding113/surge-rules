@@ -4475,6 +4475,16 @@
       "matchType": "suffix",
       "domain": "ipfs.inbrowser.link",
       "rationale": "User report: SNI under ipfs.inbrowser.link matched Adblock.list suffix .ipfs.inbrowser.link; this gateway namespace is not an ad block"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "elseviercdn.cn",
+      "rationale": "User report: blocking sciencedirect.elseviercdn.cn breaks ScienceDirect styling; user authorized suffix allow of elseviercdn.cn"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "sciopen.com",
+      "rationale": "User report: Adblock.list suffix .sciopen.com rejected a normal research site with REJECT-TINYGIF"
     }
   ],
   "protectedApexDomains": [

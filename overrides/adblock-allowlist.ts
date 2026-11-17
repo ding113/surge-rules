@@ -2776,6 +2776,20 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale:
       "User report: SNI under ipfs.inbrowser.link matched Adblock.list suffix .ipfs.inbrowser.link; this gateway namespace is not an ad block",
   },
+  // 用户报告 ScienceDirect 样式被破坏，并明确授权放行整个 elseviercdn.cn
+  {
+    matchType: "suffix",
+    domain: "elseviercdn.cn",
+    rationale:
+      "User report: blocking sciencedirect.elseviercdn.cn breaks ScienceDirect styling; user authorized suffix allow of elseviercdn.cn",
+  },
+  // 用户报告 sciopen.com 是正常科研域名，被 Adblock.list 后缀拦截为 REJECT-TINYGIF
+  {
+    matchType: "suffix",
+    domain: "sciopen.com",
+    rationale:
+      "User report: Adblock.list suffix .sciopen.com rejected a normal research site with REJECT-TINYGIF",
+  },
 ];
 
 /**
