@@ -2756,6 +2756,26 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     domain: "0x0.st",
     rationale: "Developer pastebin/file-sharing service falsely flagged by upstream phishing feeds",
   },
+  // 用户报告 Anna Library 下载域被 Adblock.list 后缀拦截
+  {
+    matchType: "suffix",
+    domain: "wbsg8v.xyz",
+    rationale:
+      "User report: Adblock.list matched suffix .wbsg8v.xyz and blocked an Anna Library download domain",
+  },
+  {
+    matchType: "suffix",
+    domain: "yqrii5.org",
+    rationale:
+      "User report: yqrii5.org is an Anna Library download domain and should not be blocked",
+  },
+  // 用户报告 ipfs.inbrowser.link 网关及其动态 CID 子域被当成广告后缀拦截
+  {
+    matchType: "suffix",
+    domain: "ipfs.inbrowser.link",
+    rationale:
+      "User report: SNI under ipfs.inbrowser.link matched Adblock.list suffix .ipfs.inbrowser.link; this gateway namespace is not an ad block",
+  },
 ];
 
 /**

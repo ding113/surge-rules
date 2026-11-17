@@ -4460,6 +4460,21 @@
       "matchType": "suffix",
       "domain": "0x0.st",
       "rationale": "Developer pastebin/file-sharing service falsely flagged by upstream phishing feeds"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "wbsg8v.xyz",
+      "rationale": "User report: Adblock.list matched suffix .wbsg8v.xyz and blocked an Anna Library download domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "yqrii5.org",
+      "rationale": "User report: yqrii5.org is an Anna Library download domain and should not be blocked"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "ipfs.inbrowser.link",
+      "rationale": "User report: SNI under ipfs.inbrowser.link matched Adblock.list suffix .ipfs.inbrowser.link; this gateway namespace is not an ad block"
     }
   ],
   "protectedApexDomains": [
