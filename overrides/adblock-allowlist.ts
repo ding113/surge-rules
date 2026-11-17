@@ -2750,6 +2750,12 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale:
       "User report: blocking ccc-x.jd.com prevents third-party ads from opening the JD product page",
   },
+  // 0x0.st 为开发者代码片段与文件分享服务（The Null Pointer），被上游钓鱼规则误报拦截
+  {
+    matchType: "suffix",
+    domain: "0x0.st",
+    rationale: "Developer pastebin/file-sharing service falsely flagged by upstream phishing feeds",
+  },
 ];
 
 /**

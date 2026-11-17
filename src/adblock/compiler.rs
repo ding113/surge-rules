@@ -345,6 +345,69 @@ impl TelemetryProtectionSet {
     }
 }
 
+fn is_valid_tld_suffix(raw: &str) -> bool {
+    let bytes = raw.as_bytes();
+    if bytes.len() < 2 || bytes.len() > 63 || raw.contains('.') {
+        return false;
+    }
+    if bytes[0] == b'-' || bytes[bytes.len() - 1] == b'-' {
+        return false;
+    }
+    bytes
+        .iter()
+        .all(|&b| b.is_ascii_alphanumeric() || b == b'-')
+        && !bytes.iter().all(|b| b.is_ascii_digit())
+}
+
+/// Domain and suffix rules imported from `Direct.list` so community threat, scam, and tracker feeds
+/// configured with `filter_direct_collisions = true` never block legitimate domestic domains.
+#[derive(Clone, Default, Debug)]
+pub struct DirectProtectionSet {
+    pub exact_domains: FxHashSet<String>,
+    pub suffix_domains: FxHashSet<String>,
+}
+
+impl DirectProtectionSet {
+    pub fn from_ruleset_text(text: &str) -> Self {
+        let mut out = Self::default();
+        out.ingest_ruleset_text(text);
+        out
+    }
+
+    pub fn ingest_ruleset_text(&mut self, text: &str) {
+        for raw_line in text.lines() {
+            let line = raw_line.trim();
+            if line.is_empty()
+                || line.starts_with('#')
+                || line.starts_with("//")
+                || line.starts_with(';')
+            {
+                continue;
+            }
+            let mut parts = line.split(',').map(str::trim);
+            let Some(kind) = parts.next() else {
+                continue;
+            };
+            let Some(val) = parts.next() else {
+                continue;
+            };
+            let clean = val
+                .trim_start_matches('.')
+                .trim_end_matches('.')
+                .to_ascii_lowercase();
+            match kind {
+                "DOMAIN" if is_valid_domain(&clean) => {
+                    self.exact_domains.insert(clean);
+                }
+                "DOMAIN-SUFFIX" if is_valid_domain(&clean) || is_valid_tld_suffix(&clean) => {
+                    self.suffix_domains.insert(clean);
+                }
+                _ => {}
+            }
+        }
+    }
+}
+
 /// Compiles parsed upstream feeds and TypeScript human overrides into `Adblock.list`, `Privacy.list`, and `Adblock.sgmodule`.
 pub fn compile_adblock(
     sources: &[ParsedAdblockSource],
@@ -352,7 +415,14 @@ pub fn compile_adblock(
     active_sources: usize,
     total_sources: usize,
 ) -> CompiledAdblockArtifacts {
-    compile_adblock_with_telemetry_guard(sources, overrides, None, active_sources, total_sources)
+    compile_adblock_with_guards(
+        sources,
+        overrides,
+        None,
+        None,
+        active_sources,
+        total_sources,
+    )
 }
 
 /// Compiles `Adblock.list`, `Privacy.list`, and `Adblock.sgmodule` while guaranteeing zero conflict
@@ -364,11 +434,31 @@ pub fn compile_adblock_with_telemetry_guard(
     active_sources: usize,
     total_sources: usize,
 ) -> CompiledAdblockArtifacts {
+    compile_adblock_with_guards(
+        sources,
+        overrides,
+        telemetry_guard,
+        None,
+        active_sources,
+        total_sources,
+    )
+}
+
+/// Compiles `Adblock.list`, `Privacy.list`, and `Adblock.sgmodule` with both the global clean-egress
+/// protection set (`Telemetry`/`Payment`/`AI`) and optional per-source `Direct.list` collision filtering.
+pub fn compile_adblock_with_guards(
+    sources: &[ParsedAdblockSource],
+    overrides: &AdblockOverrides,
+    telemetry_guard: Option<&TelemetryProtectionSet>,
+    direct_guard: Option<&DirectProtectionSet>,
+    active_sources: usize,
+    total_sources: usize,
+) -> CompiledAdblockArtifacts {
     // 1. Assemble 4-tier protection / scoped allowlist sets:
     //    P0a: Human allowDomains, protectedApexDomains, and Telemetry.list clean-exit guard
     //    P0b: Human forceRuleSetEntries (beat upstream allowlists and complex_protected_hosts; target = ad | privacy)
     //    P1/P2: Category-scoped upstream allowlists (`both` / `ad` / `privacy`) & complex_protected_hosts
-    //    P3: Upstream blocklists (`ad` / `privacy` / `ad_mixed`)
+    //    P3: Upstream blocklists (`ad` / `privacy` / `ad_mixed`), plus per-source Direct.list guard
     let mut human_allow_exact_set: FxHashSet<String> = FxHashSet::default();
     let mut human_allow_suffix_set: FxHashSet<String> = FxHashSet::default();
     let mut ad_allow_exact_set: FxHashSet<String> = FxHashSet::default();
@@ -395,18 +485,18 @@ pub fn compile_adblock_with_telemetry_guard(
             }
         }
     }
+    let forced_domain_vals: FxHashSet<String> = overrides
+        .force_rule_set_entries
+        .iter()
+        .map(|f| {
+            f.value
+                .trim()
+                .trim_start_matches('.')
+                .trim_end_matches('.')
+                .to_ascii_lowercase()
+        })
+        .collect();
     if let Some(tguard) = telemetry_guard {
-        let forced_domain_vals: FxHashSet<String> = overrides
-            .force_rule_set_entries
-            .iter()
-            .map(|f| {
-                f.value
-                    .trim()
-                    .trim_start_matches('.')
-                    .trim_end_matches('.')
-                    .to_ascii_lowercase()
-            })
-            .collect();
         for d in &tguard.exact_domains {
             if !forced_domain_vals.contains(d) {
                 human_allow_exact_set.insert(d.clone());
@@ -418,6 +508,21 @@ pub fn compile_adblock_with_telemetry_guard(
             }
         }
     }
+    let direct_allow_scope = direct_guard.map(|dguard| {
+        let exact_set: FxHashSet<String> = dguard
+            .exact_domains
+            .iter()
+            .filter(|d| !forced_domain_vals.contains(*d))
+            .cloned()
+            .collect();
+        let suffix_set: FxHashSet<String> = dguard
+            .suffix_domains
+            .iter()
+            .filter(|s| !forced_domain_vals.contains(*s))
+            .cloned()
+            .collect();
+        AllowScope::from_sets(exact_set, suffix_set)
+    });
     for apex in &overrides.protected_apex_domains {
         protected_apex_set.insert(
             apex.domain
@@ -594,11 +699,29 @@ pub fn compile_adblock_with_telemetry_guard(
     let mut proc_claims: BTreeMap<String, RuleClaim> = BTreeMap::new();
 
     for src in sources {
-        let lin_idx = get_lineage_idx(&src.lineage);
+        let has_block_claims = !src.ruleset_suffixes.is_empty()
+            || !src.ruleset_domains.is_empty()
+            || !src.ruleset_keywords.is_empty()
+            || !src.ruleset_wildcards.is_empty()
+            || !src.ruleset_cidrs_v4.is_empty()
+            || !src.ruleset_cidrs_v6.is_empty()
+            || !src.ruleset_asns.is_empty()
+            || !src.ruleset_user_agents.is_empty()
+            || !src.ruleset_process_names.is_empty();
+        let lin_idx = if has_block_claims && src.category != AdblockCategory::AdMixed {
+            get_lineage_idx(&src.lineage)
+        } else {
+            0
+        };
         let scope = match src.category {
             AdblockCategory::Ad | AdblockCategory::Both => &ad_allow_scope,
             AdblockCategory::Privacy => &priv_allow_scope,
             AdblockCategory::AdMixed => &all_upstream_allow_scope,
+        };
+        let src_direct_scope = if src.filter_direct_collisions {
+            direct_allow_scope.as_ref()
+        } else {
+            None
         };
 
         for s in &src.ruleset_suffixes {
@@ -606,7 +729,8 @@ pub fn compile_adblock_with_telemetry_guard(
             let blocked = human_allow_scope.blocks_suffix(s)
                 || protected_apex_set.contains(s)
                 || complex_point_trie.has_mark_at_or_below(s)
-                || scope.blocks_suffix(s);
+                || scope.blocks_suffix(s)
+                || src_direct_scope.is_some_and(|ds| ds.blocks_suffix(s));
             if !blocked {
                 suffix_claims.entry(s.clone()).or_default().ingest(
                     src.category,
@@ -621,7 +745,8 @@ pub fn compile_adblock_with_telemetry_guard(
             let blocked = human_allow_scope.blocks_domain(d)
                 || protected_apex_set.contains(d)
                 || complex_host_set.contains(d)
-                || scope.blocks_domain(d);
+                || scope.blocks_domain(d)
+                || src_direct_scope.is_some_and(|ds| ds.blocks_domain(d));
             if !blocked {
                 domain_claims.entry(d.clone()).or_default().ingest(
                     src.category,
@@ -638,6 +763,7 @@ pub fn compile_adblock_with_telemetry_guard(
             let trimmed = kw.trim_matches(|c: char| !c.is_ascii_alphanumeric());
             let blocked = human_allow_scope.blocks_keyword(kw, trimmed)
                 || scope.blocks_keyword(kw, trimmed)
+                || src_direct_scope.is_some_and(|ds| ds.blocks_keyword(kw, trimmed))
                 || protected_apex_set
                     .iter()
                     .chain(complex_host_set.iter())
@@ -655,6 +781,7 @@ pub fn compile_adblock_with_telemetry_guard(
             let static_tail = wildcard_static_suffix(wc);
             let blocked = human_allow_scope.blocks_wildcard(wc, static_tail)
                 || scope.blocks_wildcard(wc, static_tail)
+                || src_direct_scope.is_some_and(|ds| ds.blocks_wildcard(wc, static_tail))
                 || complex_host_set
                     .iter()
                     .any(|dom| wildcard_matches_domain(wc, dom));

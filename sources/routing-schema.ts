@@ -14,6 +14,8 @@ export type RoutingSourceFormat =
   | "dnsmasq_china"
   | "gfwlist_base64"
   | "ip_cidr"
+  | "sstap_filtered_cidr"
+  | "cn_safe_game_cdn"
   | "openai_ip_json"
   | "asn_list";
 

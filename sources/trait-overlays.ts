@@ -393,10 +393,15 @@ export const TRAIT_OVERLAY_SOURCES: readonly GeoIpSourceEntry[] = [
     format: "cidr_trait",
     lineage: "abusech",
     isMalware: true,
+    core: false,
     endpoints: [
       {
         kind: "direct",
         url: "https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt",
+      },
+      {
+        kind: "direct",
+        url: "https://feodotracker.abuse.ch/downloads/ipblocklist.txt",
       },
     ],
   },

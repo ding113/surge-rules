@@ -65,6 +65,8 @@ pub enum RoutingSourceFormat {
     DnsmasqChina,
     GfwlistBase64,
     IpCidr,
+    SstapFilteredCidr,
+    CnSafeGameCdn,
     OpenaiIpJson,
     AsnList,
 }

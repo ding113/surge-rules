@@ -80,7 +80,7 @@ fmz200 Wool Scripts BlockAds Module, https://raw.githubusercontent.com/fmz200/wo
 </details>
 
 <details>
-<summary>广告与安全威胁拦截数据源（Adblock.list）（共 136 项）</summary>
+<summary>广告与安全威胁拦截数据源（Adblock.list）（共 151 项）</summary>
 
 ```text
 AdGuard Mobile Ads Filter (CoreLibs), https://filters.adtidy.org/windows/filters/11.txt
@@ -184,6 +184,7 @@ Ukrainian Security & Phishing Filter, https://adguardteam.github.io/HostlistsReg
 zachlagden Custom Malicious Domains, https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/custom/malicious.txt
 AdBlockID Plus Indonesian Filter (CoreLibs), https://raw.githubusercontent.com/realodix/AdBlockID/main/dist/adblockid_plus.adfl.txt
 ABPVN Vietnamese AdGuard Advanced Filter, https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_adguard.txt
+MajkiIT Official Polish AdGuard Filter, https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock_adguard.txt
 FiltersHeroes KAD Polish Anti-Scam & Fraud Filter, https://raw.githubusercontent.com/FiltersHeroes/KAD/master/KAD.txt
 FiltersHeroes Polish Annoyances Filters (CoreLibs), https://filters.adtidy.org/windows/filters/237.txt
 EasyList Czech and Slovak, https://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt
@@ -206,7 +207,7 @@ Combined Privacy Block Lists (ABP), https://raw.githubusercontent.com/bongochong
 hostsVN Vietnamese & Global Adservers Filter, https://raw.githubusercontent.com/bigdargon/hostsVN/master/filters/adservers-all.txt
 hostsVN Malicious & Threat Extension Filter, https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/threat/filter.txt
 FMHY Unsafe · Fake-Download & Scamware Filterlist, https://raw.githubusercontent.com/fmhy/FMHYFilterlist/main/filterlist-abp.txt
-MetaMask Web3 & Crypto Drainer Phishing Blocklist, https://raw.githubusercontent.com/MetaMask/eth-phishing-detect/master/src/hosts.txt
+MetaMask Web3 & Crypto Drainer Phishing Blocklist, https://raw.githubusercontent.com/MetaMask/eth-phishing-detect/main/src/config.json
 Global Anti-Scam Organization (GASO) Blocklist, https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/main/global-anti-scam-org-scam-urls-ABP.txt
 ShadowWhisperer Scam & Fraud Domains, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Scam
 ShadowWhisperer Typosquatting & Homograph Domains, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Typo
@@ -219,12 +220,26 @@ EasyList Liste FR (French Supplement), https://easylist-downloads.adblockplus.or
 SPMedia Crypto Scam & Phishing Threat Intel, https://raw.githubusercontent.com/spmedia/Crypto-Scam-and-Crypto-Phishing-Threat-Intel-Feed/main/detected_urls.txt
 Phishunt Active Phishing Hostnames, https://raw.githubusercontent.com/0xDanielLopez/phishunt-feed/main/blocklist/domains.txt
 UT1 Blacklists DDoS & Stresser Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/ddos/domains
+RPiList Specials Malware Blocklist, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/malware
+RPiList Specials Phishing Blocklist, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe
+ScamSniffer Web3 & Drainer Scam Domains, https://raw.githubusercontent.com/scamsniffer/scam-database/main/blacklist/domains.json
+polkadot-js Web3 Phishing & Scam Domains, https://raw.githubusercontent.com/polkadot-js/phishing/master/all.json
+TweetFeed Real-Time Researcher Phishing & C2 Domains, https://raw.githubusercontent.com/0xDanielLopez/TweetFeed/master/week.csv
+ntop nDPI Cryptomining Pool Domains, https://raw.githubusercontent.com/ntop/nDPI/dev/lists/42_mining_domain.list
+AdGuard Tracker Database (Advertising & Pornvertising Slice), https://raw.githubusercontent.com/AdguardTeam/companiesdb/main/dist/trackers.json
+Disconnect Tracking Protection (Advertising & Cryptomining Slice), https://raw.githubusercontent.com/disconnectme/disconnect-tracking-protection/master/services.json
+Ghostery TrackerDB Network Filters (Advertising & Pornvertising Slice), https://github.com/ghostery/trackerdb/releases/latest/download/trackerdb.json
+drb-ra C2IntelFeeds Verified C2 Domains, https://raw.githubusercontent.com/drb-ra/C2IntelFeeds/master/feeds/domainC2s-filter-abused.csv
+Romain Marcoux Malicious & Phishing Domains (Part AA), https://raw.githubusercontent.com/romainmarcoux/malicious-domains/main/full-domains-aa.txt
+Romain Marcoux Malicious & Phishing Domains (Part AB), https://raw.githubusercontent.com/romainmarcoux/malicious-domains/main/full-domains-ab.txt
+Maltrail Trails Malware & C2 Domains, https://github.com/stamparm/trails/releases/latest/download/maltrail-malware-domains.txt
+Red Flag Domains Newly Registered Phishing & Typosquatting, https://dl.red.flag.domains/red.flag.domains.txt
 ```
 
 </details>
 
 <details>
-<summary>隐私跟踪与遥测拦截数据源（Privacy.list）（共 33 项）</summary>
+<summary>隐私跟踪与遥测拦截数据源（Privacy.list）（共 38 项）</summary>
 
 ```text
 AdGuard Tracking Protection Filter (CoreLibs), https://filters.adtidy.org/windows/filters/3.txt
@@ -260,12 +275,17 @@ PhishIndex IP Logger Domains, https://raw.githubusercontent.com/PhishIndex/phish
 UT1 Blacklists Stalkerware & Spyware Domains, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/stalkerware/domains
 Perflyst Session Replay Trackers, https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SessionReplay.txt
 Perflyst Amazon FireTV Native Telemetry, https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/AmazonFireTV.txt
+AdGuard CNAME Disguised Microsites List, https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_microsites.txt
+AdGuard Tracker Database (Analytics & Telemetry Slice), https://raw.githubusercontent.com/AdguardTeam/companiesdb/main/dist/trackers.json
+DuckDuckGo Tracker Radar Blocklist (Default Block Slice), https://raw.githubusercontent.com/duckduckgo/tracker-blocklists/main/web/v6/extension-tds.json
+Disconnect Tracking Protection (Analytics & Fingerprinting Slice), https://raw.githubusercontent.com/disconnectme/disconnect-tracking-protection/master/services.json
+Ghostery TrackerDB Network Filters (Analytics & Telemetry Slice), https://github.com/ghostery/trackerdb/releases/latest/download/trackerdb.json
 ```
 
 </details>
 
 <details>
-<summary>去广告与隐私防误伤白名单数据源（共 73 项）</summary>
+<summary>去广告与隐私防误伤白名单数据源（共 74 项）</summary>
 
 ```text
 uBlock Origin Unbreak Allowlist, https://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt
@@ -314,6 +334,7 @@ zachlagden Pi-hole Optimized Whitelist, https://raw.githubusercontent.com/zachla
 NEO DEV HOST Official Allowlist, https://raw.githubusercontent.com/neodevpro/neodevhost/master/allow
 ShadowWhisperer Curated Whitelist, https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist
 Ultimate Hosts Blacklist Official Whitelist, https://raw.githubusercontent.com/Ultimate-Hosts-Blacklist/whitelist/master/domains.list
+Sefinek Blocklist Collection Main Whitelist, https://raw.githubusercontent.com/sefinek/Sefinek-Blocklist-Collection/main/whitelists/main.txt
 Combined Privacy Block Lists Official Whitelist, https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/NoFormatting/WhitelistedDomains.txt
 UT1 Toulouse University Official Allowlist (liste_blanche), https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/liste_blanche/domains
 ACL4SSR UnBan False-Positive Allowlist, https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/UnBan.list
@@ -346,7 +367,7 @@ BadBlock Miscellaneous Functional Services Whitelist, https://raw.githubusercont
 </details>
 
 <details>
-<summary>国内直连分流数据源（Direct.list）（共 74 项）</summary>
+<summary>国内直连分流数据源（Direct.list）（共 83 项）</summary>
 
 ```text
 Loyalsoldier surge-rules direct ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/direct.txt
@@ -423,6 +444,15 @@ v2fly domain-list-community hsbc-cn, https://raw.githubusercontent.com/v2fly/dom
 gaoyifan china-operator-ip China IPv4, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt
 gaoyifan china-operator-ip China IPv6, https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt
 misakaio chnroutes2 China IPv4, https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt
+UKLANs cache-domains Blizzard Patch CDNs (CN-Safe Filtered), https://raw.githubusercontent.com/uklans/cache-domains/master/blizzard.txt
+UKLANs cache-domains Epic Games Patch CDNs (CN-Safe Filtered), https://raw.githubusercontent.com/uklans/cache-domains/master/epicgames.txt
+UKLANs cache-domains Riot Games Patch CDNs (CN-Safe Filtered), https://raw.githubusercontent.com/uklans/cache-domains/master/riot.txt
+UKLANs cache-domains EA Origin Patch CDNs (CN-Safe Filtered), https://raw.githubusercontent.com/uklans/cache-domains/master/origin.txt
+UKLANs cache-domains Ubisoft Connect Patch CDNs (CN-Safe Filtered), https://raw.githubusercontent.com/uklans/cache-domains/master/uplay.txt
+UKLANs cache-domains Rockstar Patch CDNs (CN-Safe Filtered), https://raw.githubusercontent.com/uklans/cache-domains/master/rockstar.txt
+UKLANs cache-domains Steam Content Depots (CN-Safe Filtered), https://raw.githubusercontent.com/uklans/cache-domains/master/steam.txt
+MetaCubeX category-game-platforms-download (CN-Safe Filtered), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-game-platforms-download.list
+SukkaW Surge game-download.conf (CN-Safe Filtered), https://raw.githubusercontent.com/SukkaW/Surge/master/Source/domainset/game-download.conf
 ```
 
 </details>
@@ -527,7 +557,7 @@ MetaCubeX category-telemetry (Overseas OS & SDK Telemetry), https://raw.githubus
 </details>
 
 <details>
-<summary>境外代理与流媒体数据源（Proxy.list）（共 123 项）</summary>
+<summary>境外代理与流媒体数据源（Proxy.list）（共 141 项）</summary>
 
 ```text
 Loyalsoldier surge-rules proxy ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/proxy.txt
@@ -567,6 +597,7 @@ LM-Firefly GlobalMedia Surge ruleset, https://raw.githubusercontent.com/LM-Firef
 Aethersailor Custom OpenClash Proxy Rules, https://raw.githubusercontent.com/Aethersailor/Custom_OpenClash_Rules/main/rule/Custom_Proxy.list
 217heidai RoutingRules Overseas Proxy Domains, https://raw.githubusercontent.com/217heidai/RoutingRules/main/rules/proxy.txt
 GMOogway Shadowrocket Proxy List, https://raw.githubusercontent.com/GMOogway/shadowrocket-rules/master/sr_proxy_list.module
+hezhijie0327 GFWList2AGH Full Overseas Blacklist (Repurposed), https://raw.githubusercontent.com/hezhijie0327/GFWList2AGH/main/gfwlist2adguardhome/blacklist_full.txt
 Loyalsoldier surge-rules iCloud ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/icloud.txt
 Loyalsoldier surge-rules Google ruleset, https://raw.githubusercontent.com/Loyalsoldier/surge-rules/release/ruleset/google.txt
 MetaCubeX category-scholar-!cn (Global Academic & Research), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-scholar-%21cn.list
@@ -637,6 +668,7 @@ StevenBlack Adult Media Hosts Extension, https://raw.githubusercontent.com/Steve
 StevenBlack Overseas Gambling Hosts Extension, https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling-only/hosts
 HaGeZi Overseas Gambling Platforms (Full), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.txt
 HaGeZi Anti-Piracy · Sci-Hub · LibGen · DDL & Streaming Mirrors, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/anti.piracy.txt
+RPiList Adult & NSFW Content Inventory (pornblock1), https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/pornblock1
 Stevo's AI & Generative Media Blocklist (Repurposed for Proxy), https://filters.adtidy.org/windows/filters/260.txt
 UT1 Toulouse University Gambling Platforms, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/gambling/domains
 UT1 Toulouse University Dating Platforms, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/dating/domains
@@ -646,6 +678,8 @@ UT1 Toulouse University Residential Proxy & Circumvention Endpoints, https://raw
 UT1 Toulouse University Warez & DDL Mirrors, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/warez/domains
 UT1 Toulouse University Manga & Anime Portals, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/manga/domains
 UT1 Toulouse University Bitcoin & Crypto Portals, https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/bitcoin/domains
+RPiList Specials Proxy & Bypass Endpoints, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies
+RPiList Specials Overseas Streaming Mirrors, https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Streaming
 cbuijs Accomplist Encrypted DoH & Bypass Inventory, https://raw.githubusercontent.com/cbuijs/accomplist/master/doh/deugniets.black.list
 Sinfonietta Gambling Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts
 Sinfonietta Adult Media Hosts Inventory, https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts
@@ -653,12 +687,26 @@ Sinfonietta Global Social Media Hosts Inventory, https://raw.githubusercontent.c
 hostsVN Overseas Gambling Extension, https://raw.githubusercontent.com/bigdargon/hostsVN/master/extensions/gambling/hosts
 MetaCubeX category-password-management (Passkey & Vault Sync), https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/classical/category-password-management.list
 Telegram Official Data Center CIDR Ranges, https://core.telegram.org/resources/cidr.txt
+Re:filter Discord Voice & RTC Gateway IPv4 CIDRs, https://raw.githubusercontent.com/1andrevich/Re-filter-lists/main/discord_ips.lst
+GhostRooter0953 Discord Regional Voice Gateway IPs, https://raw.githubusercontent.com/GhostRooter0953/discord-voice-ips/master/voice_domains/discord-voice-ipset-list
+FQrabbit SSTap Valorant Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Valorant.rules
+FQrabbit SSTap Apex Legends Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Apex.rules
+FQrabbit SSTap Counter-Strike Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/CS-GO.rules
+FQrabbit SSTap Overwatch 2 Asia/Singapore Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Overwatch-2-Asia-Singapore.rules
+FQrabbit SSTap Overwatch Americas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Overwatch-US.rules
+FQrabbit SSTap Escape from Tarkov Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Escape-from-Tarkov.rules
+FQrabbit SSTap Rainbow Six Siege Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Tom-Clancy%27s-Rainbow-Six-Siege-all.rules
+FQrabbit SSTap PUBG International Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/PUBG-INT.rules
+FQrabbit SSTap GTA Online Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/GTA-V.rules
+FQrabbit SSTap Final Fantasy XIV Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Final-Fantasy-XIV.rules
+FQrabbit SSTap Call of Duty Modern Warfare Overseas CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Call-Of-Duty-Modern-Warfare.rules
+FQrabbit SSTap Roblox Overseas Matchmaking CIDRs (Filtered), https://raw.githubusercontent.com/FQrabbit/SSTap-Rule/master/rules/Roblox.rules
 ```
 
 </details>
 
 <details>
-<summary>GeoIP、ASN 与行政区划元数据数据源（共 112 项）</summary>
+<summary>GeoIP、ASN 与行政区划元数据数据源（共 119 项）</summary>
 
 ```text
 Geofeed Harvester, https://github.com/ipanalytics/GeoFeed-Harvester/releases/latest
@@ -673,6 +721,7 @@ Google Corp Geofeed, https://www.gstatic.com/geofeed/corp_external
 Google VPN Geofeed, https://www.gstatic.com/vpn/geofeed
 Cloudflare Local Geofeed, https://api.cloudflare.com/local-ip-ranges.csv
 Cloudflare Warp Geofeed, https://api.cloudflare.com/warp-egress-ip-ranges.csv
+Cloudflare China (JD Cloud) Geofeed, https://api.cloudflare.com/client/v4/ips?networks=jdcloud
 Apple iCloud Private Relay Ranges, https://mask-api.icloud.com/egress-ip-ranges.csv
 Oracle Cloud Ranges, https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json
 DigitalOcean Geofeed, https://digitalocean.com/geo/google.csv
@@ -691,6 +740,8 @@ Clouvider Geofeed, https://clouvider.com/geoipfeed.csv
 T-Mobile US Geofeed, https://raw.githubusercontent.com/tmobile/tmus-geofeed/main/tmus-geo-ip.txt
 Verizon Geofeed, https://raw.githubusercontent.com/Verizon/verizon-geofeed/main/feed_5Ghome.csv
 Microsoft Geofeed, https://download.microsoft.com/download/0b9dc6ca-68f9-43b2-b094-da4f6d509bc3/geoloc-Microsoft.csv
+Microsoft Azure Service Tags (Regional), https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519
+Equinix Official Geofeed, https://raw.githubusercontent.com/equinix/geofeed/main/geofeed.csv
 lionsoul2014 ip2region IPv4, https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v4.xdb
 lionsoul2014 ip2region IPv6, https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v6.xdb
 Cz88 Qqwry, https://github.com/metowolf/qqwry.dat/releases/latest
@@ -715,12 +766,16 @@ IPinfo Lite Country & ASN, https://github.com/Alice39s/ipinfo-csv-lite/releases/
 MaxMind GeoLite2 City / Country / ASN, https://github.com/Skiddle-ID/geoip2-mirror/releases/latest
 DB-IP City Lite, https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-city-lite.mmdb
 DB-IP Country Lite, https://github.com/jcjc-dev/mmdb-latest/releases/download/dbip-latest/dbip-country-lite.mmdb
+IP2Location LITE DB11 IPv6, https://github.com/renfei/ip2location/releases/latest
+IP2Location LITE DB1 Country, https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP
 IPFire Location Database, https://location.ipfire.org/databases/1/location.db.xz
 Sapics User Country, https://github.com/sapics/ip-location-db/releases/download/latest/user-country.mmdb
 IPLocate IP-to-Country, https://media.githubusercontent.com/media/iplocate/ip-address-databases/HEAD/ip-to-country/ip-to-country.mmdb
 IPScope Lite, https://api.ipscope.io/v1/lite/ipscope-lite.csv.gz
 ip66.dev GeoIP Database, https://downloads.ip66.dev/db/ip66.mmdb
 Sypex Geo Country, https://sypexgeo.net/files/SxGeoCountry.zip
+ipapi.is Geolocation Database IPv4, https://raw.githubusercontent.com/ipapi-is/ipapi/main/databases/geolocationDatabaseIPv4.csv.zip
+ipapi.is Geolocation Database IPv6, https://raw.githubusercontent.com/ipapi-is/ipapi/main/databases/geolocationDatabaseIPv6.csv.zip
 bgp.tools Routing Table (with Alice39s/BGP.Tools-OpenDB mirror), https://bgp.tools/table.jsonl
 bgp.tools ASN Registry (with Alice39s/BGP.Tools-OpenDB mirror), https://bgp.tools/asns.csv
 ipverse AS Metadata, https://raw.githubusercontent.com/ipverse/as-metadata/master/as.csv
@@ -788,7 +843,7 @@ bun install
 bun run build:config
 bun run sync:metadata
 
-# 2. 构建并校验全部产物（输出至 dist/；先运行 routing build 以生成 Clean-Egress 保护集合）
+# 2. 按依赖顺序构建并校验全部产物（输出至 dist/：geoip -> routing -> adblock，以加载 CN 与直连/纯净出口保护集合）
 cargo run --release -- geoip build --output dist
 cargo run --release -- routing build --output dist
 cargo run --release -- adblock build --output dist
@@ -798,8 +853,8 @@ cargo run --release -- adblock build --output dist
 
 本项目仓库源码采用 [MIT License](./LICENSE) 开源许可协议发布。自动编译生成的规则集与 GeoIP 产物聚合了以下开源数据集（各自遵循其上游许可协议与署名条款）：
 
-- **GeoIP、ASN 与地理元数据**：[IPinfo Lite](https://ipinfo.io) (`CC-BY-SA-4.0`)、[IP Geolocation by DB-IP](https://db-ip.com) (`CC-BY-4.0`)、[GeoLite2 Data created by MaxMind](https://www.maxmind.com)、[IP address data powered by IPLocate.io](https://www.iplocate.io) (`CC-BY-4.0`)、[hexydec/ip-ranges](https://github.com/hexydec/ip-ranges) (`MIT` / `CC-BY-4.0`)、[GeoNames](https://www.geonames.org) (`CC-BY-4.0`)。
-- **分流与去广告规则集**：[UT1 Blacklists — Université Toulouse 1 Capitole (Fabrice Prigent)](https://dsi.ut-capitole.fr/blacklists/) / [olbat/ut1-blacklists](https://github.com/olbat/ut1-blacklists) (`CC-BY-SA-4.0`)、[ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) (`CC-BY-SA-4.0`)、[Aethersailor/Custom_OpenClash_Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) (`CC-BY-SA-4.0`)、[misakaio/chnroutes2](https://github.com/misakaio/chnroutes2) (`CC-BY-SA-4.0`)、[EasyList](https://easylist.to) (`CC-BY-SA-3.0` / `GPL-3.0`)、[DandelionSprout/adfilt](https://github.com/DandelionSprout/adfilt) (`Dandelicence-1.4`) 及完整数据源目录中所列各开源仓库。
+- **GeoIP、ASN 与地理元数据**：[IPinfo Lite](https://ipinfo.io) (`CC-BY-SA-4.0`)、[ipapi.is Geolocation Database](https://github.com/ipapi-is/ipapi) (`CC-BY-SA-4.0`)、[IP Geolocation by DB-IP](https://db-ip.com) (`CC-BY-4.0`)、[GeoLite2 Data created by MaxMind](https://www.maxmind.com)、[IP2Location LITE](https://lite.ip2location.com)、[IP address data powered by IPLocate.io](https://www.iplocate.io) (`CC-BY-4.0`)、[hexydec/ip-ranges](https://github.com/hexydec/ip-ranges) (`MIT` / `CC-BY-4.0`)、[GeoNames](https://www.geonames.org) (`CC-BY-4.0`)。
+- **分流与去广告规则集**：[AdGuard CompaniesDB](https://github.com/AdguardTeam/companiesdb) (`CC-BY-SA-4.0`)、[DuckDuckGo Tracker Radar](https://github.com/duckduckgo/tracker-blocklists) (`CC-BY-NC-SA-4.0`)、[Ghostery TrackerDB](https://github.com/ghostery/trackerdb) (`CC-BY-NC-SA-4.0`)、[Disconnect Tracking Protection](https://github.com/disconnectme/disconnect-tracking-protection) (`GPL-3.0`)、[ntop/nDPI](https://github.com/ntop/nDPI) (`LGPL-3.0`)、[MetaMask eth-phishing-detect](https://github.com/MetaMask/eth-phishing-detect) (`DBAD-1.2`)、[polkadot-js/phishing](https://github.com/polkadot-js/phishing) (`Apache-2.0`)、[scamsniffer/scam-database](https://github.com/scamsniffer/scam-database) (`GPL-3.0`)、[uklans/cache-domains](https://github.com/uklans/cache-domains) (`MIT`)、[FQrabbit/SSTap-Rule](https://github.com/FQrabbit/SSTap-Rule) (`Apache-2.0`)、[UT1 Blacklists — Université Toulouse 1 Capitole (Fabrice Prigent)](https://dsi.ut-capitole.fr/blacklists/) / [olbat/ut1-blacklists](https://github.com/olbat/ut1-blacklists) (`CC-BY-SA-4.0`)、[ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) (`CC-BY-SA-4.0`)、[Aethersailor/Custom_OpenClash_Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) (`CC-BY-SA-4.0`)、[misakaio/chnroutes2](https://github.com/misakaio/chnroutes2) (`CC-BY-SA-4.0`)、[EasyList](https://easylist.to) (`CC-BY-SA-3.0` / `GPL-3.0`)、[DandelionSprout/adfilt](https://github.com/DandelionSprout/adfilt) (`Dandelicence-1.4`) 及完整数据源目录中所列各开源仓库。
 
 ## 免责声明
 

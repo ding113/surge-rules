@@ -26,6 +26,7 @@ pub struct ParsedRoutingSource {
     pub target: RoutingTarget,
     pub lineage: String,
     pub weight: u16,
+    pub strict_cn_cidr_guard: bool,
     pub rules: Vec<RoutingRule>,
 }
 
@@ -36,6 +37,7 @@ impl ParsedRoutingSource {
             target,
             lineage: lineage.to_string(),
             weight,
+            strict_cn_cidr_guard: false,
             rules: Vec::new(),
         }
     }

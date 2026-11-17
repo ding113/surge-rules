@@ -16,7 +16,9 @@ use rayon::prelude::*;
 use rustc_hash::FxHashMap;
 use tracing::{info, warn};
 
-use crate::adblock::compiler::{TelemetryProtectionSet, compile_adblock_with_telemetry_guard};
+use crate::adblock::compiler::{
+    DirectProtectionSet, TelemetryProtectionSet, compile_adblock_with_guards,
+};
 use crate::adblock::config::{AdblockOverrides, AdblockSourceCatalog, AdblockSourceConfig};
 use crate::adblock::model::ParsedAdblockSource;
 use crate::adblock::parsers::parse_adblock_source;
@@ -129,11 +131,27 @@ pub async fn build_adblock_pipeline(
         None
     };
 
+    let direct_path = opts.output_dir.join("Direct.list");
+    let direct_guard = if direct_path.exists() {
+        let direct_raw = fs::read_to_string(&direct_path)
+            .with_context(|| format!("failed reading Direct.list at {}", direct_path.display()))?;
+        let dset = DirectProtectionSet::from_ruleset_text(&direct_raw);
+        info!(
+            direct_exact = dset.exact_domains.len(),
+            direct_suffixes = dset.suffix_domains.len(),
+            "loaded Direct.list domestic collision guard for community Adblock & Privacy sources"
+        );
+        Some(dset)
+    } else {
+        None
+    };
+
     let active_sources = parsed_sources.len();
-    let compiled = compile_adblock_with_telemetry_guard(
+    let compiled = compile_adblock_with_guards(
         &parsed_sources,
         &overrides,
         telemetry_guard.as_ref(),
+        direct_guard.as_ref(),
         active_sources,
         total_sources,
     );

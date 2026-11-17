@@ -2,6 +2,7 @@ pub mod bgp_rir;
 pub mod cidr_list;
 pub mod geofeed;
 pub mod ip2location;
+pub mod ipapi;
 pub mod ipdb;
 pub mod libloc;
 pub mod mmdb;
@@ -25,6 +26,13 @@ pub fn parse_source_bytes(
         SourceFormat::AwsIpRangesJson => geofeed::parse_aws_ip_ranges(src, bytes, metadata),
         SourceFormat::GcpCloudJson => geofeed::parse_gcp_cloud_json(src, bytes, metadata),
         SourceFormat::OracleCloudJson => geofeed::parse_oracle_cloud_json(src, bytes, metadata),
+        SourceFormat::AzureServiceTagsJson => {
+            geofeed::parse_azure_service_tags_json(src, bytes, metadata)
+        }
+        SourceFormat::CloudflareJdcloudJson => {
+            geofeed::parse_cloudflare_jdcloud_json(src, bytes, metadata)
+        }
+        SourceFormat::IpapiCsvZip => ipapi::parse_ipapi_csv_zip(src, bytes, metadata),
         SourceFormat::FastlyJson => geofeed::parse_fastly_json(src, bytes),
         SourceFormat::GcoreJson => geofeed::parse_gcore_json(src, bytes),
         SourceFormat::GithubMetaJson => geofeed::parse_github_meta_json(src, bytes),

@@ -36,6 +36,14 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   { pattern: "*.ccb.com", rationale: "China Construction Bank enforces certificate pinning" },
   { pattern: "*.abchina.com", rationale: "Agricultural Bank of China enforces cert pinning" },
   { pattern: "*.bankcomm.com", rationale: "Bank of Communications enforces certificate pinning" },
+  {
+    pattern: "*.bankcomm.cn",
+    rationale: "Bank of Communications (.cn) credit card app enforces certificate pinning",
+  },
+  {
+    pattern: "bankcomm.cn",
+    rationale: "Bank of Communications (.cn) root domain enforces certificate pinning",
+  },
   { pattern: "*.boc.cn", rationale: "Bank of China enforces certificate pinning" },
   { pattern: "*.psbc.com", rationale: "Postal Savings Bank enforces certificate pinning" },
   { pattern: "*.spdb.com.cn", rationale: "Shanghai Pudong Development Bank enforces TLS pinning" },
@@ -76,6 +84,33 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   { pattern: "*.binance.com", rationale: "Binance app enforces strict certificate pinning" },
   { pattern: "*.okx.com", rationale: "OKX app enforces strict certificate pinning" },
   { pattern: "*.coinbase.com", rationale: "Coinbase app enforces strict certificate pinning" },
+  {
+    pattern: "*.mexc.com",
+    rationale: "MEXC crypto exchange API/app subdomains enforce TLS pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "mexc.com",
+    rationale: "MEXC crypto exchange root domain enforces TLS pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "*.sberbank.ru",
+    rationale:
+      "Sberbank banking portal subdomains enforce TLS certificate pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "sberbank.ru",
+    rationale:
+      "Sberbank banking portal root domain enforces TLS certificate pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "*.tbank.ru",
+    rationale: "T-Bank banking portal subdomains enforce TLS certificate pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "tbank.ru",
+    rationale:
+      "T-Bank banking portal root domain enforces TLS certificate pinning (HttpsExclusions)",
+  },
 
   // Password vaults, encrypted mail & identity providers (AdGuard HttpsExclusions/sensitive.txt)
   { pattern: "*.1password.com", rationale: "1Password vault requires unmodified TLS" },
@@ -113,8 +148,20 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   { pattern: "auth.openai.com", rationale: "OpenAI OAuth login breaks under MITM" },
   { pattern: "sentinel.openai.com", rationale: "OpenAI anti-abuse attestation breaks under MITM" },
   { pattern: "chatgpt.com", rationale: "ChatGPT macOS/iOS Atlas app TLS compatibility" },
+  {
+    pattern: "*.chatgpt.com",
+    rationale: "ChatGPT macOS/iOS Atlas app subdomains TLS compatibility (HttpsExclusions)",
+  },
   { pattern: "chat.openai.com", rationale: "ChatGPT client TLS compatibility" },
+  {
+    pattern: "*.chat.openai.com",
+    rationale: "ChatGPT mobile/desktop client subdomains (ios.chat.openai.com) TLS compatibility",
+  },
   { pattern: "oaistatic.com", rationale: "ChatGPT client static bundle integrity" },
+  {
+    pattern: "*.oaistatic.com",
+    rationale: "ChatGPT static bundle CDN subdomains (cdn.oaistatic.com) TLS integrity",
+  },
   { pattern: "*.anthropic.com", rationale: "Claude API and CLI require unmodified TLS streaming" },
   { pattern: "*.claude.ai", rationale: "Claude desktop/mobile app TLS compatibility" },
 
@@ -124,6 +171,30 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   { pattern: "*.signal.org", rationale: "Signal Messenger enforces strict TLS pinning" },
   { pattern: "*.telegram.org", rationale: "Telegram MTProto/HTTPS transport" },
   { pattern: "line.naver.jp", rationale: "LINE messaging transport (HttpsExclusions)" },
+  {
+    pattern: "*.line.naver.jp",
+    rationale: "LINE gateway subdomains enforce TLS certificate pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "*.zoom.us",
+    rationale: "Zoom client and subdomains enforce TLS certificate pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "zoom.us",
+    rationale: "Zoom root domain enforces TLS certificate pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "*.mozilla.net",
+    rationale: "Firefox add-on and update CDN subdomains enforce cert pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "mozilla.net",
+    rationale: "Firefox add-on and update root domain enforces cert pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "static.tumblr.com",
+    rationale: "Tumblr mobile client asset endpoint enforces TLS validation (HttpsExclusions)",
+  },
   { pattern: "accounts.kakao.com", rationale: "Kakao authentication (HttpsExclusions)" },
   { pattern: "kauth.kakao.com", rationale: "Kakao OAuth (HttpsExclusions)" },
   { pattern: "pay.naver.com", rationale: "Naver Pay (HttpsExclusions)" },
@@ -179,6 +250,14 @@ export const MITM_EXCLUDED_HOSTS: readonly MitmHostEntry[] = [
   {
     pattern: "amemv.com",
     rationale: "Douyin (ByteDance) API root domain enforces TLS certificate pinning",
+  },
+  {
+    pattern: "*.musical.ly",
+    rationale: "ByteDance/TikTok legacy mobile API endpoints enforce TLS pinning (HttpsExclusions)",
+  },
+  {
+    pattern: "musical.ly",
+    rationale: "ByteDance/TikTok legacy root domain enforces TLS pinning (HttpsExclusions)",
   },
 ];
 
@@ -240,6 +319,7 @@ export const DISABLED_URL_PATTERNS: readonly string[] = [
   "pingan\\.com",
   "ecitic\\.com",
   "cib\\.com\\.cn",
+  "bankcomm\\.",
   // Prevent overly broad logical AND rules from blocking Volcengine Cloud, Douyin Live WebSocket, or core QUIC APIs
   "DOMAIN-KEYWORD,volc",
   "webcast100-ws-c-",

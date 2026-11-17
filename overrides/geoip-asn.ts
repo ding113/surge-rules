@@ -238,6 +238,14 @@ export const ASN_OVERRIDES: readonly AsnOverrideEntry[] = [
     isHosting: true,
     isCdn: true,
   },
+  {
+    asn: 137718,
+    organization: "Beijing Volcano Engine Technology Co., Ltd.",
+    isp: "Volcano Engine",
+    domain: "volcengine.com",
+    isHosting: true,
+    isCdn: true,
+  },
 
   // === Global Major Cloud, CDN & Regional Carriers ===
   {
@@ -316,5 +324,38 @@ export const ASN_OVERRIDES: readonly AsnOverrideEntry[] = [
     organization: "Space Exploration Technologies Corporation (Starlink)",
     isp: "Starlink",
     domain: "starlink.com",
+  },
+
+  // === Telegram Messenger Infrastructure ===
+  {
+    asn: 62041,
+    organization: "Telegram Messenger Inc.",
+    isp: "Telegram Messenger",
+    domain: "telegram.org",
+  },
+  {
+    asn: 59930,
+    organization: "Telegram Messenger Inc.",
+    isp: "Telegram Messenger",
+    domain: "telegram.org",
+  },
+  {
+    asn: 62014,
+    organization: "Telegram Messenger Inc.",
+    isp: "Telegram Messenger",
+    domain: "telegram.org",
+  },
+  {
+    asn: 44907,
+    organization: "Telegram Messenger Inc.",
+    isp: "Telegram Messenger",
+    domain: "telegram.org",
+    isCdn: true,
+  },
+  {
+    asn: 211157,
+    organization: "Telegram Messenger Inc.",
+    isp: "Telegram Messenger",
+    domain: "telegram.org",
   },
 ];

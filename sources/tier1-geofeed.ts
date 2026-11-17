@@ -188,6 +188,21 @@ export const TIER1_GEOFEED_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
+    id: "cloudflare_jdcloud_geofeed",
+    tier: "tier1_geofeed",
+    format: "cloudflare_jdcloud_json",
+    lineage: "cloudflare_official",
+    countryWeight: 100,
+    isCdn: true,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://api.cloudflare.com/client/v4/ips?networks=jdcloud",
+      },
+    ],
+  },
+  {
     id: "apple_icloud_private_relay",
     tier: "tier1_geofeed",
     format: "rfc8805_csv",
@@ -461,6 +476,46 @@ export const TIER1_GEOFEED_SOURCES: readonly GeoIpSourceEntry[] = [
       {
         kind: "direct",
         url: "https://download.microsoft.com/download/0b9dc6ca-68f9-43b2-b094-da4f6d509bc3/geoloc-Microsoft.csv",
+      },
+    ],
+  },
+  {
+    id: "azure_service_tags",
+    tier: "tier1_geofeed",
+    format: "azure_service_tags_json",
+    lineage: "microsoft_official",
+    countryWeight: 98,
+    cityWeight: 95,
+    isHosting: true,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519",
+      },
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/endgor/azure-hub/main/public/data/AzureCloud.json",
+      },
+    ],
+  },
+  {
+    id: "equinix_geofeed",
+    tier: "tier1_geofeed",
+    format: "rfc8805_csv",
+    lineage: "equinix_official",
+    countryWeight: 99,
+    cityWeight: 97,
+    isHosting: true,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/equinix/geofeed/main/geofeed.csv",
+      },
+      {
+        kind: "direct",
+        url: "https://cdn.jsdelivr.net/gh/equinix/geofeed@main/geofeed.csv",
       },
     ],
   },

@@ -131,6 +131,39 @@ export const TIER2B_GLOBAL_SOURCES: readonly GeoIpSourceEntry[] = [
     ],
   },
   {
+    id: "ip2location_db11",
+    tier: "tier2b_global",
+    format: "ip2location_bin",
+    lineage: "ip2location",
+    countryWeight: 78,
+    cityWeight: 82,
+    core: true,
+    endpoints: [
+      {
+        kind: "github_release",
+        repo: "renfei/ip2location",
+        assetPattern: "^IP2LOCATION-LITE-DB11\\.IPV6\\.BIN$",
+      },
+      {
+        kind: "direct",
+        url: "https://github.com/renfei/ip2location/releases/latest/download/IP2LOCATION-LITE-DB11.IPV6.BIN",
+      },
+    ],
+  },
+  {
+    id: "ip2location_db1_official",
+    tier: "tier2b_global",
+    format: "ip2location_csv",
+    lineage: "ip2location",
+    countryWeight: 78,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP",
+      },
+    ],
+  },
+  {
     id: "ipfire_libloc",
     tier: "tier2b_global",
     format: "libloc",
@@ -207,6 +240,42 @@ export const TIER2B_GLOBAL_SOURCES: readonly GeoIpSourceEntry[] = [
       {
         kind: "direct",
         url: "https://sypexgeo.net/files/SxGeoCountry.zip",
+      },
+    ],
+  },
+  {
+    id: "ipapi_geolocation_v4",
+    tier: "tier2b_global",
+    format: "ipapi_csv_zip",
+    lineage: "ipapi_is",
+    countryWeight: 70,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ipapi-is/ipapi/main/databases/geolocationDatabaseIPv4.csv.zip",
+      },
+      {
+        kind: "direct",
+        url: "https://github.com/ipapi-is/ipapi/raw/main/databases/geolocationDatabaseIPv4.csv.zip",
+      },
+    ],
+  },
+  {
+    id: "ipapi_geolocation_v6",
+    tier: "tier2b_global",
+    format: "ipapi_csv_zip",
+    lineage: "ipapi_is",
+    countryWeight: 70,
+    core: false,
+    endpoints: [
+      {
+        kind: "direct",
+        url: "https://raw.githubusercontent.com/ipapi-is/ipapi/main/databases/geolocationDatabaseIPv6.csv.zip",
+      },
+      {
+        kind: "direct",
+        url: "https://github.com/ipapi-is/ipapi/raw/main/databases/geolocationDatabaseIPv6.csv.zip",
       },
     ],
   },

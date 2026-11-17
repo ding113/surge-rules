@@ -11,7 +11,16 @@ export type AdblockSourceFormat =
   | "surge_domainset"
   | "abp_filter"
   | "hosts"
-  | "domain_list";
+  | "domain_list"
+  | "json_domain_array"
+  | "polkadot_phishing_json"
+  | "metamask_config_json"
+  | "tweetfeed_csv"
+  | "adguard_companiesdb_json"
+  | "ddg_tds_json"
+  | "disconnect_services_json"
+  | "ghostery_trackerdb_json"
+  | "c2intel_domain_csv";
 
 export type AdblockPlatformScope = "universal" | "mobile" | "desktop";
 
@@ -27,6 +36,7 @@ export interface AdblockSourceEntry {
   readonly core?: boolean;
   readonly extractComplexNetworkRules?: boolean;
   readonly extractFallbackDomainRules?: boolean;
+  readonly filterDirectCollisions?: boolean;
   readonly endpoints: readonly SourceEndpoint[];
 }
 

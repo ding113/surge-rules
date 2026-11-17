@@ -44,6 +44,16 @@ pub enum AdblockSourceFormat {
     AbpFilter,
     Hosts,
     DomainList,
+    JsonDomainArray,
+    PolkadotPhishingJson,
+    MetamaskConfigJson,
+    TweetfeedCsv,
+    AdguardCompaniesdbJson,
+    DdgTdsJson,
+    DisconnectServicesJson,
+    GhosteryTrackerdbJson,
+    #[serde(rename = "c2intel_domain_csv")]
+    C2intelDomainCsv,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize)]
@@ -71,6 +81,8 @@ pub struct AdblockSourceConfig {
     pub extract_complex_network_rules: bool,
     #[serde(default)]
     pub extract_fallback_domain_rules: bool,
+    #[serde(default)]
+    pub filter_direct_collisions: bool,
     pub endpoints: Vec<EndpointConfig>,
 }
 

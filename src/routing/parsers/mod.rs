@@ -1,6 +1,8 @@
 pub mod dnsmasq;
+pub mod game_cdn;
 pub mod geosite;
 pub mod gfwlist;
+pub mod sstap_cidr;
 pub mod surge_clash;
 
 use anyhow::Result;
@@ -49,6 +51,13 @@ pub fn parse_routing_source(
         }
         RoutingSourceFormat::IpCidr => {
             surge_clash::parse_ip_cidr_list(&text, &mut out);
+        }
+        RoutingSourceFormat::SstapFilteredCidr => {
+            out.strict_cn_cidr_guard = true;
+            sstap_cidr::parse_sstap_filtered_cidr(&text, &mut out);
+        }
+        RoutingSourceFormat::CnSafeGameCdn => {
+            game_cdn::parse_cn_safe_game_cdn(&text, &mut out);
         }
         RoutingSourceFormat::OpenaiIpJson => {
             surge_clash::parse_openai_ip_json(bytes, &src.id, &mut out)?;

@@ -215,9 +215,16 @@ impl SourceFetcher {
             let url_matches_endpoints = !endpoints
                 .iter()
                 .all(|ep| matches!(ep, EndpointConfig::Direct { .. }))
-                || endpoints.iter().any(
-                    |ep| matches!(ep, EndpointConfig::Direct { url } if url == &meta.resolved_url),
-                );
+                || endpoints.iter().any(|ep| match ep {
+                    EndpointConfig::Direct { url } => {
+                        url == &meta.resolved_url
+                            || (is_microsoft_download_page(url)
+                                && meta
+                                    .resolved_url
+                                    .starts_with("https://download.microsoft.com/download/"))
+                    }
+                    _ => false,
+                });
             if url_matches_endpoints
                 && now.saturating_sub(meta.fetched_at_epoch) < self.opts.max_cache_age_secs
                 && meta.size_bytes > 0
@@ -282,7 +289,14 @@ impl SourceFetcher {
         meta_path: &Path,
     ) -> Result<FetchedSource> {
         let (resolved_url, npm_member_path) = match endpoint {
-            EndpointConfig::Direct { url } => (url.clone(), None),
+            EndpointConfig::Direct { url } => {
+                if is_microsoft_download_page(url) {
+                    let dyn_url = self.resolve_microsoft_download_url(url).await?;
+                    (dyn_url, None)
+                } else {
+                    (url.clone(), None)
+                }
+            }
             EndpointConfig::GithubRelease {
                 repo,
                 asset_pattern,
@@ -404,6 +418,46 @@ impl SourceFetcher {
             .await
             .with_context(|| format!("invalid npm metadata JSON for {}", package))?;
         Ok(meta.dist.tarball)
+    }
+
+    async fn resolve_microsoft_download_url(&self, page_url: &str) -> Result<String> {
+        let mut candidates = vec![page_url.to_string()];
+        if page_url.contains("/download/confirmation.aspx") {
+            candidates
+                .push(page_url.replace("/download/confirmation.aspx", "/download/details.aspx"));
+        } else if page_url.contains("/download/details.aspx") {
+            candidates
+                .push(page_url.replace("/download/details.aspx", "/download/confirmation.aspx"));
+        }
+
+        let mut last_err = None;
+        for candidate in &candidates {
+            match self.client.get(candidate).send().await {
+                Ok(resp) => match resp.error_for_status() {
+                    Ok(ok_resp) => match ok_resp.text().await {
+                        Ok(html) => {
+                            if let Some(json_url) = extract_microsoft_download_json_url(&html) {
+                                return Ok(json_url);
+                            }
+                            last_err = Some(anyhow!(
+                                "no download.microsoft.com JSON link found on {}",
+                                candidate
+                            ));
+                        }
+                        Err(err) => last_err = Some(err.into()),
+                    },
+                    Err(err) => last_err = Some(err.into()),
+                },
+                Err(err) => last_err = Some(err.into()),
+            }
+        }
+
+        Err(last_err.unwrap_or_else(|| {
+            anyhow!(
+                "failed resolving Microsoft Download Center URL {}",
+                page_url
+            )
+        }))
     }
 
     async fn download_with_cache(
@@ -591,6 +645,11 @@ fn unpack_payload(raw: &[u8], url: &str, npm_member_path: Option<&str>) -> Resul
             }
         }
         let (idx, sz) = best_idx.with_context(|| format!("no data entry found in zip {}", url))?;
+        // Keep large ZIP archives (> 64 MiB uncompressed, such as ipapi.is 590 MB CSVs)
+        // compressed on disk and in RAM so streaming ZIP parsers read them directly.
+        if sz > 64 * 1024 * 1024 {
+            return Ok(raw.to_vec());
+        }
         let mut file = archive.by_index(idx)?;
         let mut out = Vec::with_capacity(sz as usize);
         file.read_to_end(&mut out)?;
@@ -598,6 +657,27 @@ fn unpack_payload(raw: &[u8], url: &str, npm_member_path: Option<&str>) -> Resul
     }
 
     Ok(raw.to_vec())
+}
+
+fn is_microsoft_download_page(url: &str) -> bool {
+    (url.starts_with("https://www.microsoft.com/") || url.starts_with("https://microsoft.com/"))
+        && (url.contains("/download/confirmation.aspx") || url.contains("/download/details.aspx"))
+}
+
+pub fn extract_microsoft_download_json_url(html: &str) -> Option<String> {
+    let re = Regex::new(r#"https://download\.microsoft\.com/download/[^"'\s<>]+\.json"#).ok()?;
+    let mut service_tags_urls: Vec<String> = Vec::new();
+    let mut fallback_url: Option<String> = None;
+    for m in re.find_iter(html) {
+        let u = m.as_str().to_string();
+        if u.contains("ServiceTags_Public_") {
+            service_tags_urls.push(u);
+        } else if fallback_url.is_none() {
+            fallback_url = Some(u);
+        }
+    }
+    service_tags_urls.sort();
+    service_tags_urls.pop().or(fallback_url)
 }
 
 fn simple_anchored_filename(pattern: &str) -> Option<String> {

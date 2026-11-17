@@ -4455,6 +4455,11 @@
       "matchType": "exact",
       "domain": "ccc-x.jd.com",
       "rationale": "User report: blocking ccc-x.jd.com prevents third-party ads from opening the JD product page"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "0x0.st",
+      "rationale": "Developer pastebin/file-sharing service falsely flagged by upstream phishing feeds"
     }
   ],
   "protectedApexDomains": [
@@ -5303,6 +5308,14 @@
       "rationale": "Bank of Communications enforces certificate pinning"
     },
     {
+      "pattern": "*.bankcomm.cn",
+      "rationale": "Bank of Communications (.cn) credit card app enforces certificate pinning"
+    },
+    {
+      "pattern": "bankcomm.cn",
+      "rationale": "Bank of Communications (.cn) root domain enforces certificate pinning"
+    },
+    {
       "pattern": "*.boc.cn",
       "rationale": "Bank of China enforces certificate pinning"
     },
@@ -5451,6 +5464,30 @@
       "rationale": "Coinbase app enforces strict certificate pinning"
     },
     {
+      "pattern": "*.mexc.com",
+      "rationale": "MEXC crypto exchange API/app subdomains enforce TLS pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "mexc.com",
+      "rationale": "MEXC crypto exchange root domain enforces TLS pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "*.sberbank.ru",
+      "rationale": "Sberbank banking portal subdomains enforce TLS certificate pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "sberbank.ru",
+      "rationale": "Sberbank banking portal root domain enforces TLS certificate pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "*.tbank.ru",
+      "rationale": "T-Bank banking portal subdomains enforce TLS certificate pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "tbank.ru",
+      "rationale": "T-Bank banking portal root domain enforces TLS certificate pinning (HttpsExclusions)"
+    },
+    {
       "pattern": "*.1password.com",
       "rationale": "1Password vault requires unmodified TLS"
     },
@@ -5547,12 +5584,24 @@
       "rationale": "ChatGPT macOS/iOS Atlas app TLS compatibility"
     },
     {
+      "pattern": "*.chatgpt.com",
+      "rationale": "ChatGPT macOS/iOS Atlas app subdomains TLS compatibility (HttpsExclusions)"
+    },
+    {
       "pattern": "chat.openai.com",
       "rationale": "ChatGPT client TLS compatibility"
     },
     {
+      "pattern": "*.chat.openai.com",
+      "rationale": "ChatGPT mobile/desktop client subdomains (ios.chat.openai.com) TLS compatibility"
+    },
+    {
       "pattern": "oaistatic.com",
       "rationale": "ChatGPT client static bundle integrity"
+    },
+    {
+      "pattern": "*.oaistatic.com",
+      "rationale": "ChatGPT static bundle CDN subdomains (cdn.oaistatic.com) TLS integrity"
     },
     {
       "pattern": "*.anthropic.com",
@@ -5581,6 +5630,30 @@
     {
       "pattern": "line.naver.jp",
       "rationale": "LINE messaging transport (HttpsExclusions)"
+    },
+    {
+      "pattern": "*.line.naver.jp",
+      "rationale": "LINE gateway subdomains enforce TLS certificate pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "*.zoom.us",
+      "rationale": "Zoom client and subdomains enforce TLS certificate pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "zoom.us",
+      "rationale": "Zoom root domain enforces TLS certificate pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "*.mozilla.net",
+      "rationale": "Firefox add-on and update CDN subdomains enforce cert pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "mozilla.net",
+      "rationale": "Firefox add-on and update root domain enforces cert pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "static.tumblr.com",
+      "rationale": "Tumblr mobile client asset endpoint enforces TLS validation (HttpsExclusions)"
     },
     {
       "pattern": "accounts.kakao.com",
@@ -5673,6 +5746,14 @@
     {
       "pattern": "amemv.com",
       "rationale": "Douyin (ByteDance) API root domain enforces TLS certificate pinning"
+    },
+    {
+      "pattern": "*.musical.ly",
+      "rationale": "ByteDance/TikTok legacy mobile API endpoints enforce TLS pinning (HttpsExclusions)"
+    },
+    {
+      "pattern": "musical.ly",
+      "rationale": "ByteDance/TikTok legacy root domain enforces TLS pinning (HttpsExclusions)"
     }
   ],
   "mitmAddedHosts": [],
@@ -5721,6 +5802,7 @@
     "pingan\\.com",
     "ecitic\\.com",
     "cib\\.com\\.cn",
+    "bankcomm\\.",
     "DOMAIN-KEYWORD,volc",
     "webcast100-ws-c-",
     "api100-normal-quic-",

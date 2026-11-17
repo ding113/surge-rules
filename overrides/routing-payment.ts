@@ -169,9 +169,16 @@ export const PAYMENT_FORCE_ENTRIES: readonly RoutingRuleOverride[] = [
       ["tastytrade.com", "tastytrade US options brokerage"],
       ["webull.com", "Webull overseas brokerage"],
       ["futuhk.com", "Futu Bull Hong Kong brokerage"],
+      ["fututrade.com", "Futu US overseas brokerage trading platform"],
+      ["futuau.com", "Futu Australia overseas brokerage platform"],
       ["moomoo.com", "Moomoo overseas brokerage"],
+      ["moomooequity.com", "Moomoo US equities clearing and brokerage platform"],
+      ["moomootrustee.com", "Moomoo overseas trustee and custody service"],
       ["longbridgeapp.com", "Longbridge Hong Kong/Singapore brokerage"],
+      ["longbridgehk.com", "Longbridge Hong Kong overseas brokerage portal"],
       ["tigerbrokers.com", "Tiger Brokers overseas brokerage"],
+      ["itiger.com", "Tiger Brokers international brokerage trading portal"],
+      ["itigergrowth.com", "Tiger Brokers overseas wealth and trading platform"],
     ] as const
   ).map(
     ([value, rationale]): RoutingRuleOverride => ({

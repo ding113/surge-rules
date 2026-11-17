@@ -6,7 +6,8 @@ use tempfile::tempdir;
 
 use surge_rules::adblock::config::AdblockOverrides;
 use surge_rules::routing::compiler::{
-    CompiledRoutingArtifacts, RoutingSourceCounts, compile_routing,
+    CnCidrExclusionSet, CompiledRoutingArtifacts, RoutingSourceCounts, compile_routing,
+    compile_routing_with_cn_exclusions,
 };
 use surge_rules::routing::config::{
     GeositeTagFilter, RoutingExclusionOverride, RoutingOverrides, RoutingRuleKind,
@@ -471,6 +472,7 @@ fn shared_infra_roots_blocks_apex_and_wildcards_while_allowing_ai_children() {
         target: RoutingTarget::Ai,
         lineage: "noisy".to_string(),
         weight: 90,
+        strict_cn_cidr_guard: false,
         rules: vec![
             rule(RoutingRuleKind::DomainSuffix, "amazonaws.com", false),
             rule(RoutingRuleKind::Domain, "cloudflare.com", false),
@@ -538,6 +540,7 @@ fn direct_vs_proxy_scoring_and_real_overrides_reconcile_cleanly() {
             target: RoutingTarget::Direct,
             lineage: "felixonmars".to_string(),
             weight: 68,
+            strict_cn_cidr_guard: false,
             rules: vec![
                 rule(RoutingRuleKind::DomainSuffix, "overseas-example.com", false),
                 rule(RoutingRuleKind::DomainSuffix, "baidu.com", false),
@@ -548,6 +551,7 @@ fn direct_vs_proxy_scoring_and_real_overrides_reconcile_cleanly() {
             target: RoutingTarget::Proxy,
             lineage: "loyalsoldier".to_string(),
             weight: 88,
+            strict_cn_cidr_guard: false,
             rules: vec![rule(
                 RoutingRuleKind::DomainSuffix,
                 "overseas-example.com",
@@ -559,6 +563,7 @@ fn direct_vs_proxy_scoring_and_real_overrides_reconcile_cleanly() {
             target: RoutingTarget::Proxy,
             lineage: "sukkaw".to_string(),
             weight: 90,
+            strict_cn_cidr_guard: false,
             rules: vec![rule(
                 RoutingRuleKind::DomainSuffix,
                 "overseas-example.com",
@@ -570,6 +575,7 @@ fn direct_vs_proxy_scoring_and_real_overrides_reconcile_cleanly() {
             target: RoutingTarget::Ai,
             lineage: "upstream_ai".to_string(),
             weight: 92,
+            strict_cn_cidr_guard: false,
             rules: vec![
                 rule(RoutingRuleKind::DomainSuffix, "deepseek.com", false),
                 rule(RoutingRuleKind::DomainSuffix, "moonshot.cn", false),
@@ -738,6 +744,7 @@ fn direct_list_strips_extended_matching_even_when_requested() {
         target: RoutingTarget::Direct,
         lineage: "test".to_string(),
         weight: 90,
+        strict_cn_cidr_guard: false,
         rules: vec![
             rule(RoutingRuleKind::DomainSuffix, "baidu.com", true),
             rule(RoutingRuleKind::DomainWildcard, "*.qq.com", true),
@@ -1001,6 +1008,7 @@ proptest! {
                 target: RoutingTarget::Direct,
                 lineage: "d".to_string(),
                 weight: 70,
+                strict_cn_cidr_guard: false,
                 rules: direct_rules.clone(),
             },
             ParsedRoutingSource {
@@ -1008,6 +1016,7 @@ proptest! {
                 target: RoutingTarget::Ai,
                 lineage: "a".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: ai_rules.clone(),
             },
             ParsedRoutingSource {
@@ -1015,6 +1024,7 @@ proptest! {
                 target: RoutingTarget::Payment,
                 lineage: "pay".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: payment_rules.clone(),
             },
             ParsedRoutingSource {
@@ -1022,6 +1032,7 @@ proptest! {
                 target: RoutingTarget::Telemetry,
                 lineage: "tel".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: telemetry_rules.clone(),
             },
             ParsedRoutingSource {
@@ -1029,6 +1040,7 @@ proptest! {
                 target: RoutingTarget::Proxy,
                 lineage: "p".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: proxy_rules.clone(),
             },
         ];
@@ -1040,6 +1052,7 @@ proptest! {
                 target: RoutingTarget::Direct,
                 lineage: "d".to_string(),
                 weight: 70,
+                strict_cn_cidr_guard: false,
                 rules: direct_rules,
             },
             ParsedRoutingSource {
@@ -1047,6 +1060,7 @@ proptest! {
                 target: RoutingTarget::Ai,
                 lineage: "a".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: ai_rules,
             },
             ParsedRoutingSource {
@@ -1054,6 +1068,7 @@ proptest! {
                 target: RoutingTarget::Ai,
                 lineage: "pay".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: payment_rules,
             },
             ParsedRoutingSource {
@@ -1061,6 +1076,7 @@ proptest! {
                 target: RoutingTarget::Ai,
                 lineage: "tel".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: telemetry_rules,
             },
             ParsedRoutingSource {
@@ -1068,6 +1084,7 @@ proptest! {
                 target: RoutingTarget::Proxy,
                 lineage: "p".to_string(),
                 weight: 90,
+                strict_cn_cidr_guard: false,
                 rules: proxy_rules,
             },
         ];
@@ -1171,6 +1188,7 @@ proptest! {
             target: chosen_target,
             lineage: "clean".to_string(),
             weight: 95,
+            strict_cn_cidr_guard: false,
             rules: clean_rules,
         }];
 
@@ -1214,6 +1232,7 @@ proptest! {
             target: RoutingTarget::Proxy,
             lineage: "ip".to_string(),
             weight: 90,
+            strict_cn_cidr_guard: false,
             rules,
         }];
         let overrides = RoutingOverrides {
@@ -1261,6 +1280,7 @@ proptest! {
             target: RoutingTarget::Ai,
             lineage: "ai".to_string(),
             weight: 95,
+            strict_cn_cidr_guard: false,
             rules: vec![
                 rule(RoutingRuleKind::DomainSuffix, &root, false),
                 rule(RoutingRuleKind::Domain, &child, true),
@@ -1272,6 +1292,7 @@ proptest! {
                 target: RoutingTarget::Proxy,
                 lineage: "proxy".to_string(),
                 weight: 95,
+                strict_cn_cidr_guard: false,
                 rules: vec![rule(RoutingRuleKind::DomainSuffix, &root, false)],
             });
         }
@@ -1491,4 +1512,391 @@ fn parses_openai_chatgpt_voice_json() {
     );
 
     assert!(parse_routing_source(b"not-json", &cfg).is_err());
+}
+
+#[test]
+fn cn_safe_game_cdn_enforces_cdn_apex_guard_and_overseas_storefront_deny_filter() {
+    use surge_rules::routing::config::RoutingSourceCatalog;
+
+    let catalog =
+        RoutingSourceCatalog::load_from_path(Path::new("sources/generated/routing-sources.json"))
+            .expect("sources/generated/routing-sources.json should load cleanly");
+    for expected_id in [
+        "uklans_cache_blizzard",
+        "uklans_cache_epicgames",
+        "uklans_cache_riot",
+        "uklans_cache_origin",
+        "uklans_cache_uplay",
+        "uklans_cache_rockstar",
+        "uklans_cache_steam",
+        "metacubex_game_platforms_dl_filtered",
+        "sukkaw_game_download_filtered",
+    ] {
+        assert!(
+            catalog.sources.iter().any(|s| {
+                s.id == expected_id
+                    && s.format == RoutingSourceFormat::CnSafeGameCdn
+                    && s.target == RoutingTarget::Direct
+            }),
+            "routing catalog must register {} as cn_safe_game_cdn -> direct",
+            expected_id
+        );
+    }
+
+    let raw_mixed_feed = "\
+# Combined uklans/cache-domains, clash_classical, and SukkaW domainset lines
+*.akamaized.net
+DOMAIN-SUFFIX,akamaihd.net
+.edgesuite.net
+*.vo.llnwd.net
+amazonaws.com
+egdownload.fastly-edge.com
+DOMAIN-SUFFIX,egdownload.fastly-edge.com
+fastly-download.epicgames.com
+cloudflare.epicgamescdn.com
+egs-cloudfront-chunks.epicgamescdn.com
+.epicgamescdn.com
+edge.blizzard.top.comcast.net
+edge.steam-dns.top.comcast.net
+ecs-lp1.hac.shop.nintendo.net
+*.hac.lp1.eshop.nintendo.net
+eshop.nintendo.net
+.wup.shop.nintendo.net
+store.steampowered.com
+.content.steampowered.com
+steamcommunity.com
+api.steamgames.com
+auth.riotgames.com
+l3cdn.riotgames.com
+epicgames.com
+download.epicgames.com
+xvcf1.xboxlive.com
+.dl.playstation.net
+recommendations-api.gog.com
+discord.gg
+twitch.tv
+
+# Valid concrete 3+-label tenant depot hostnames -> exact DOMAIN ONLY
+steampipe.akamaized.net # inline comment
+DOMAIN,epicgames-download1.akamaized.net
+blzddist1-a.akamaihd.net
+riotgamespatcher-a.akamaihd.net
+origin-a.akamaihd.net
+blizzard.vo.llnwd.net
+
+# Valid dedicated game patch CDN subdomains -> DOMAIN-SUFFIX
+*.dyn.riotcdn.net
+.cdn.ubi.com
+*.cdn.blizzard.com
+.steamcontent.com
+";
+
+    let cfg = dummy_source_cfg(
+        "test_cn_game_cdn",
+        RoutingTarget::Direct,
+        "uklans_lancache",
+        RoutingSourceFormat::CnSafeGameCdn,
+        None,
+        88,
+    );
+    let parsed = parse_routing_source(raw_mixed_feed.as_bytes(), &cfg).unwrap();
+
+    // Concrete 3+-label tenant depot hostnames MUST emit exact DOMAIN, never DOMAIN-SUFFIX
+    for exact_depot in [
+        "steampipe.akamaized.net",
+        "epicgames-download1.akamaized.net",
+        "blzddist1-a.akamaihd.net",
+        "riotgamespatcher-a.akamaihd.net",
+        "origin-a.akamaihd.net",
+        "blizzard.vo.llnwd.net",
+    ] {
+        assert!(
+            parsed
+                .rules
+                .contains(&rule(RoutingRuleKind::Domain, exact_depot, false)),
+            "expected exact DOMAIN for {}",
+            exact_depot
+        );
+        assert!(
+            !parsed
+                .rules
+                .iter()
+                .any(|r| r.key.kind == RoutingRuleKind::DomainSuffix && r.key.value == exact_depot),
+            "must NOT emit DOMAIN-SUFFIX for shared CDN tenant {}",
+            exact_depot
+        );
+    }
+
+    // Dedicated 1st-party game CDN subdomains may emit DOMAIN-SUFFIX
+    for sfx_depot in [
+        "dyn.riotcdn.net",
+        "cdn.ubi.com",
+        "cdn.blizzard.com",
+        "steamcontent.com",
+    ] {
+        assert!(
+            parsed
+                .rules
+                .contains(&rule(RoutingRuleKind::DomainSuffix, sfx_depot, false)),
+            "expected DOMAIN-SUFFIX for {}",
+            sfx_depot
+        );
+    }
+
+    // Shared CDN parents, Fastly/CloudFront/Cloudflare/Comcast, and storefronts MUST be dropped
+    for forbidden in [
+        "akamaized.net",
+        "akamaihd.net",
+        "edgesuite.net",
+        "llnwd.net",
+        "vo.llnwd.net",
+        "amazonaws.com",
+        "egdownload.fastly-edge.com",
+        "fastly-download.epicgames.com",
+        "cloudflare.epicgamescdn.com",
+        "egs-cloudfront-chunks.epicgamescdn.com",
+        "epicgamescdn.com",
+        "edge.blizzard.top.comcast.net",
+        "edge.steam-dns.top.comcast.net",
+        "ecs-lp1.hac.shop.nintendo.net",
+        "eshop.nintendo.net",
+        "wup.shop.nintendo.net",
+        "store.steampowered.com",
+        "content.steampowered.com",
+        "steamcommunity.com",
+        "api.steamgames.com",
+        "auth.riotgames.com",
+        "l3cdn.riotgames.com",
+        "epicgames.com",
+        "download.epicgames.com",
+        "xvcf1.xboxlive.com",
+        "dl.playstation.net",
+        "recommendations-api.gog.com",
+        "discord.gg",
+        "twitch.tv",
+    ] {
+        assert!(
+            !parsed.rules.iter().any(|r| r.key.value == forbidden),
+            "forbidden domain '{}' leaked through cn_safe_game_cdn",
+            forbidden
+        );
+    }
+
+    let compiled = compile_routing(
+        &[parsed],
+        &RoutingOverrides::empty(),
+        &AdblockOverrides::empty(),
+        RoutingSourceCounts::default(),
+    );
+    assert!(
+        compiled
+            .direct_text
+            .contains("DOMAIN,steampipe.akamaized.net\n")
+    );
+    assert!(
+        compiled
+            .direct_text
+            .contains("DOMAIN,epicgames-download1.akamaized.net\n")
+    );
+    assert!(!compiled.direct_text.contains("fastly"));
+    assert!(!compiled.direct_text.contains("comcast.net"));
+    assert!(!compiled.direct_text.contains("nintendo.net"));
+    assert!(!compiled.direct_text.contains("steampowered.com"));
+}
+
+#[test]
+fn sstap_filtered_cidr_enforces_prefix_floor_bogons_ipset_and_cn_exclusion() {
+    use ipnet::{Ipv4Net, Ipv6Net};
+    use surge_rules::routing::config::RoutingSourceCatalog;
+
+    let catalog =
+        RoutingSourceCatalog::load_from_path(Path::new("sources/generated/routing-sources.json"))
+            .expect("sources/generated/routing-sources.json should load cleanly");
+    for expected_id in [
+        "refilter_discord_voice_cidr",
+        "ghostrooter_discord_voice_cidr",
+        "fqrabbit_sstap_valorant",
+        "fqrabbit_sstap_apex",
+        "fqrabbit_sstap_cs2",
+    ] {
+        assert!(
+            catalog.sources.iter().any(|s| {
+                s.id == expected_id
+                    && s.format == RoutingSourceFormat::SstapFilteredCidr
+                    && s.target == RoutingTarget::Proxy
+            }),
+            "routing catalog must register {} as sstap_filtered_cidr -> proxy",
+            expected_id
+        );
+    }
+    // Verify #49 restored entries and co-origin lineage deduplication
+    assert!(
+        catalog
+            .sources
+            .iter()
+            .any(|s| s.id == "hezhijie_gfwlist_agh" && s.lineage == "gfwlist")
+    );
+    for rpi_id in ["rpilist_pornblock1", "rpilist_proxies", "rpilist_streaming"] {
+        assert!(
+            catalog.sources.iter().any(|s| s.id == rpi_id
+                && s.lineage == "rpilist"
+                && s.target == RoutingTarget::Proxy),
+            "routing catalog must restore {}",
+            rpi_id
+        );
+    }
+
+    let raw_sstap_and_discord = "\
+#Valorant,无畏契约,0,0,1,0,0,0,By-小明
+# Cloud supernets (< /22 IPv4 and < /40 IPv6) -> MUST DROP
+104.16.0.0/12
+52.0.0.0/13
+13.32.0.0/15
+34.64.0.0/20
+35.184.0.0/21
+2600:1900::/28
+2404:6800::/39
+
+# Bogon / private / loopback / CGNAT / benchmarking / documentation / multicast -> MUST DROP
+0.0.0.0/24
+10.0.0.0/24
+100.64.1.0/24
+127.0.0.1/32
+169.254.1.0/24
+172.16.5.0/24
+192.0.2.0/24
+192.88.99.0/24
+192.168.1.0/24
+198.18.0.0/24
+198.51.100.0/24
+203.0.113.0/24
+224.0.0.0/24
+240.0.0.0/24
+::1/128
+2001:db8::/48
+fc00::/48
+fe80::/64
+
+# Domestic CN CIDRs (to be suppressed by compiler CN exclusion guard even if >= /22)
+14.17.12.0/24
+114.114.114.114/32
+223.5.5.0/24
+240e:900::/44
+
+# Valid overseas game / Discord voice subnets (>= /22 IPv4, >= /40 IPv6, plus ipset line)
+66.22.244.163/24
+138.128.140.253/32
+add unblock 66.22.196.10 -exist
+2606:4700:10::1/44
+";
+
+    let sstap_cfg = dummy_source_cfg(
+        "test_sstap",
+        RoutingTarget::Proxy,
+        "fqrabbit_sstap",
+        RoutingSourceFormat::SstapFilteredCidr,
+        None,
+        89,
+    );
+    let parsed_sstap = parse_routing_source(raw_sstap_and_discord.as_bytes(), &sstap_cfg).unwrap();
+    assert!(parsed_sstap.strict_cn_cidr_guard);
+
+    // Supernets and bogons must already be dropped at parse time
+    for dropped_at_parse in [
+        "104.16.0.0/12",
+        "52.0.0.0/13",
+        "13.32.0.0/15",
+        "34.64.0.0/20",
+        "35.184.0.0/21",
+        "2600:1900::/28",
+        "2404:6800::/39",
+        "10.0.0.0/24",
+        "100.64.1.0/24",
+        "127.0.0.1/32",
+        "192.88.99.0/24",
+        "192.168.1.0/24",
+        "198.18.0.0/24",
+        "203.0.113.0/24",
+        "2001:db8::/48",
+    ] {
+        assert!(
+            !parsed_sstap
+                .rules
+                .iter()
+                .any(|r| r.key.value == dropped_at_parse),
+            "supernet/bogon '{}' must be dropped by sstap_filtered_cidr parser",
+            dropped_at_parse
+        );
+    }
+
+    // Canonicalized host-bit truncation and ipset extraction
+    assert!(
+        parsed_sstap
+            .rules
+            .contains(&rule(RoutingRuleKind::IpCidr, "66.22.244.0/24", false))
+    );
+    assert!(
+        parsed_sstap
+            .rules
+            .contains(&rule(RoutingRuleKind::IpCidr, "66.22.196.10/32", false))
+    );
+    assert!(parsed_sstap.rules.contains(&rule(
+        RoutingRuleKind::IpCidr6,
+        "2606:4700:10::/44",
+        false
+    )));
+
+    // Deliberately give Direct a LOWER weight (60 < 89) to prove `sstap_filtered_cidr` yields
+    // unconditionally to ANY Direct CN CIDR, AND also test external `CnCidrExclusionSet` (MMDB).
+    let direct_cn_cfg = dummy_source_cfg(
+        "direct_cn_cidr",
+        RoutingTarget::Direct,
+        "gaoyifan_cn",
+        RoutingSourceFormat::IpCidr,
+        None,
+        60,
+    );
+    let parsed_direct_cn =
+        parse_routing_source(b"14.16.0.0/14\n114.114.114.114/32\n", &direct_cn_cfg).unwrap();
+
+    let mmdb_cn_exclusions = CnCidrExclusionSet::from_cidrs(
+        &["223.5.0.0/16".parse::<Ipv4Net>().unwrap()],
+        &["240e::/20".parse::<Ipv6Net>().unwrap()],
+    );
+
+    let compiled = compile_routing_with_cn_exclusions(
+        &[parsed_direct_cn, parsed_sstap],
+        &RoutingOverrides::empty(),
+        &AdblockOverrides::empty(),
+        RoutingSourceCounts::default(),
+        &mmdb_cn_exclusions,
+    );
+
+    // Overseas Discord voice / game subnets MUST emit `,no-resolve` in Proxy.list
+    assert!(
+        compiled
+            .proxy_text
+            .contains("IP-CIDR,66.22.244.0/24,no-resolve\n")
+    );
+    assert!(
+        compiled
+            .proxy_text
+            .contains("IP-CIDR,138.128.140.253/32,no-resolve\n")
+    );
+    assert!(
+        compiled
+            .proxy_text
+            .contains("IP-CIDR,66.22.196.10/32,no-resolve\n")
+    );
+    assert!(
+        compiled
+            .proxy_text
+            .contains("IP-CIDR6,2606:4700:10::/44,no-resolve\n")
+    );
+
+    // ALL CN-overlapping CIDRs (both Direct-claimed and Country-cn.mmdb-claimed) MUST be suppressed
+    assert!(!compiled.proxy_text.contains("14.17.12.0"));
+    assert!(!compiled.proxy_text.contains("114.114.114.114"));
+    assert!(!compiled.proxy_text.contains("223.5.5.0"));
+    assert!(!compiled.proxy_text.contains("240e:900::"));
 }

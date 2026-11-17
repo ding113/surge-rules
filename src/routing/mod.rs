@@ -15,7 +15,9 @@ use tracing::{info, warn};
 
 use crate::adblock::config::AdblockOverrides;
 use crate::fetch::{FetchOptions, SourceFetcher};
-use crate::routing::compiler::{RoutingSourceCounts, compile_routing};
+use crate::routing::compiler::{
+    CnCidrExclusionSet, RoutingSourceCounts, compile_routing_with_cn_exclusions,
+};
 use crate::routing::config::{
     RoutingOverrides, RoutingSourceCatalog, RoutingSourceConfig, RoutingTarget,
 };
@@ -164,7 +166,32 @@ pub async fn build_routing_pipeline(
         "parsed routing sources; compiling RULE-SET artifacts"
     );
 
-    let compiled = compile_routing(
+    let cn_mmdb_path = opts.output_dir.join("Country-cn.mmdb");
+    let cn_exclusions = if cn_mmdb_path.exists() {
+        match CnCidrExclusionSet::from_mmdb_path(&cn_mmdb_path) {
+            Ok(set) => {
+                info!(
+                    path = %cn_mmdb_path.display(),
+                    v4_intervals = set.v4_interval_count(),
+                    v6_intervals = set.v6_interval_count(),
+                    "loaded Country-cn.mmdb for strict domestic CIDR exclusion"
+                );
+                set
+            }
+            Err(err) => {
+                warn!(
+                    path = %cn_mmdb_path.display(),
+                    error = %format!("{:#}", err),
+                    "failed to load Country-cn.mmdb; falling back to Direct CIDR exclusions only"
+                );
+                CnCidrExclusionSet::default()
+            }
+        }
+    } else {
+        CnCidrExclusionSet::default()
+    };
+
+    let compiled = compile_routing_with_cn_exclusions(
         &parsed_sources,
         &overrides,
         &adblock_overrides,
@@ -180,6 +207,7 @@ pub async fn build_routing_pipeline(
             active_proxy,
             total_proxy,
         },
+        &cn_exclusions,
     );
 
     info!(

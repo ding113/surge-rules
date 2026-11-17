@@ -306,7 +306,7 @@ pub fn parse_canonical_cidr(raw: &str) -> Option<IpNet> {
     parse_canonical_v6(raw).map(IpNet::V6)
 }
 
-fn is_local_hosts_sentinel(dom: &str) -> bool {
+pub(crate) fn is_local_hosts_sentinel(dom: &str) -> bool {
     matches!(
         dom,
         "localhost"

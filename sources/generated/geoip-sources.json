@@ -185,6 +185,21 @@
       ]
     },
     {
+      "id": "cloudflare_jdcloud_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "cloudflare_jdcloud_json",
+      "lineage": "cloudflare_official",
+      "countryWeight": 100,
+      "isCdn": true,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://api.cloudflare.com/client/v4/ips?networks=jdcloud"
+        }
+      ]
+    },
+    {
       "id": "apple_icloud_private_relay",
       "tier": "tier1_geofeed",
       "format": "rfc8805_csv",
@@ -458,6 +473,46 @@
         {
           "kind": "direct",
           "url": "https://download.microsoft.com/download/0b9dc6ca-68f9-43b2-b094-da4f6d509bc3/geoloc-Microsoft.csv"
+        }
+      ]
+    },
+    {
+      "id": "azure_service_tags",
+      "tier": "tier1_geofeed",
+      "format": "azure_service_tags_json",
+      "lineage": "microsoft_official",
+      "countryWeight": 98,
+      "cityWeight": 95,
+      "isHosting": true,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519"
+        },
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/endgor/azure-hub/main/public/data/AzureCloud.json"
+        }
+      ]
+    },
+    {
+      "id": "equinix_geofeed",
+      "tier": "tier1_geofeed",
+      "format": "rfc8805_csv",
+      "lineage": "equinix_official",
+      "countryWeight": 99,
+      "cityWeight": 97,
+      "isHosting": true,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/equinix/geofeed/main/geofeed.csv"
+        },
+        {
+          "kind": "direct",
+          "url": "https://cdn.jsdelivr.net/gh/equinix/geofeed@main/geofeed.csv"
         }
       ]
     },
@@ -932,6 +987,39 @@
       ]
     },
     {
+      "id": "ip2location_db11",
+      "tier": "tier2b_global",
+      "format": "ip2location_bin",
+      "lineage": "ip2location",
+      "countryWeight": 78,
+      "cityWeight": 82,
+      "core": true,
+      "endpoints": [
+        {
+          "kind": "github_release",
+          "repo": "renfei/ip2location",
+          "assetPattern": "^IP2LOCATION-LITE-DB11\\.IPV6\\.BIN$"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/renfei/ip2location/releases/latest/download/IP2LOCATION-LITE-DB11.IPV6.BIN"
+        }
+      ]
+    },
+    {
+      "id": "ip2location_db1_official",
+      "tier": "tier2b_global",
+      "format": "ip2location_csv",
+      "lineage": "ip2location",
+      "countryWeight": 78,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://download.ip2location.com/lite/IP2LOCATION-LITE-DB1.CSV.ZIP"
+        }
+      ]
+    },
+    {
       "id": "ipfire_libloc",
       "tier": "tier2b_global",
       "format": "libloc",
@@ -1008,6 +1096,42 @@
         {
           "kind": "direct",
           "url": "https://sypexgeo.net/files/SxGeoCountry.zip"
+        }
+      ]
+    },
+    {
+      "id": "ipapi_geolocation_v4",
+      "tier": "tier2b_global",
+      "format": "ipapi_csv_zip",
+      "lineage": "ipapi_is",
+      "countryWeight": 70,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ipapi-is/ipapi/main/databases/geolocationDatabaseIPv4.csv.zip"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/ipapi-is/ipapi/raw/main/databases/geolocationDatabaseIPv4.csv.zip"
+        }
+      ]
+    },
+    {
+      "id": "ipapi_geolocation_v6",
+      "tier": "tier2b_global",
+      "format": "ipapi_csv_zip",
+      "lineage": "ipapi_is",
+      "countryWeight": 70,
+      "core": false,
+      "endpoints": [
+        {
+          "kind": "direct",
+          "url": "https://raw.githubusercontent.com/ipapi-is/ipapi/main/databases/geolocationDatabaseIPv6.csv.zip"
+        },
+        {
+          "kind": "direct",
+          "url": "https://github.com/ipapi-is/ipapi/raw/main/databases/geolocationDatabaseIPv6.csv.zip"
         }
       ]
     },
@@ -1622,10 +1746,15 @@
       "format": "cidr_trait",
       "lineage": "abusech",
       "isMalware": true,
+      "core": false,
       "endpoints": [
         {
           "kind": "direct",
           "url": "https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt"
+        },
+        {
+          "kind": "direct",
+          "url": "https://feodotracker.abuse.ch/downloads/ipblocklist.txt"
         }
       ]
     }

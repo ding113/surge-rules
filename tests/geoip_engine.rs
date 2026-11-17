@@ -74,8 +74,8 @@ fn catalog_metadata_and_overrides_are_valid_and_complete() {
 
     assert_eq!(
         catalog.sources.len(),
-        101,
-        "expected 101 upstream sources in catalog, got {}",
+        108,
+        "expected 108 upstream sources in catalog, got {}",
         catalog.sources.len()
     );
     for s in &catalog.sources {
@@ -1291,4 +1291,296 @@ fn rejects_default_route_and_overbroad_prefixes() {
         parsed_pq.v6[0].start,
         u128::from("2a01:170::".parse::<Ipv6Addr>().unwrap())
     );
+}
+
+#[test]
+fn cloudflare_jdcloud_partial_extractor_ignores_global_anycast_cidrs() {
+    let (metadata, _, _) = load_real_fixtures();
+
+    let cf_json = br#"{
+      "result": {
+        "ipv4_cidrs": ["173.245.48.0/20", "1.1.1.0/24", "104.16.0.0/13"],
+        "ipv6_cidrs": ["2606:4700::/32", "2400:cb00::/32"],
+        "jdcloud_cidrs": [
+          "0.0.0.0/0",
+          "14.0.0.0/7",
+          "::/0",
+          "240e::/18",
+          "14.204.96.224/27",
+          "240e:954:2000:20e:1000::/68"
+        ],
+        "etag": "38f79d050aa027e3be3865e495dcc9bc"
+      },
+      "success": true,
+      "errors": [],
+      "messages": []
+    }"#;
+
+    let mut src = dummy_source(
+        "cloudflare_jdcloud_geofeed",
+        SourceTier::Tier1Geofeed,
+        SourceFormat::CloudflareJdcloudJson,
+        "cloudflare_official",
+    );
+    src.is_cdn = true;
+
+    let parsed = parse_source_bytes(&src, cf_json, &metadata).unwrap();
+    assert_eq!(
+        parsed.v4.len(),
+        1,
+        "must extract only valid jdcloud v4 CIDR and ignore ipv4_cidrs + short prefixes"
+    );
+    assert_eq!(
+        parsed.v6.len(),
+        1,
+        "must extract only valid jdcloud v6 CIDR and ignore ipv6_cidrs + short prefixes"
+    );
+
+    assert_eq!(
+        parsed.v4[0].start,
+        u32::from(Ipv4Addr::new(14, 204, 96, 224))
+    );
+    assert_eq!(parsed.v4[0].end, u32::from(Ipv4Addr::new(14, 204, 96, 255)));
+    assert_eq!(
+        parsed.v6[0].start,
+        u128::from("240e:954:2000:20e:1000::".parse::<Ipv6Addr>().unwrap())
+    );
+
+    let p = &parsed.payloads[parsed.v4[0].payload_id() as usize];
+    assert_eq!(p.country, Some(IsoCode::CN));
+    assert!(p.traits.contains(TraitFlags::IS_CDN));
+    assert_eq!(
+        parsed.strings.get(p.organization),
+        "Cloudflare China (JD Cloud)"
+    );
+}
+
+#[test]
+fn azure_service_tags_extractor_skips_anycast_and_maps_physical_regions() {
+    use surge_rules::fetch::extract_microsoft_download_json_url;
+
+    let (metadata, _, _) = load_real_fixtures();
+
+    let html = r#"
+      <html><body>
+        <a href="https://download.microsoft.com/download/7/1/d/71d86715-5596-4529-9b13-da13a5de5b63/ServiceTags_Public_20261102.json">Old</a>
+        <a href="https://download.microsoft.com/download/7/1/d/71d86715-5596-4529-9b13-da13a5de5b63/ServiceTags_Public_20261109.json">Click here to download manually</a>
+      </body></html>
+    "#;
+    assert_eq!(
+        extract_microsoft_download_json_url(html).as_deref(),
+        Some(
+            "https://download.microsoft.com/download/7/1/d/71d86715-5596-4529-9b13-da13a5de5b63/ServiceTags_Public_20261109.json"
+        )
+    );
+
+    let azure_json = br#"{
+      "changeNumber": 426,
+      "cloud": "Public",
+      "values": [
+        {
+          "name": "ActionGroup",
+          "id": "ActionGroup",
+          "properties": {
+            "region": "",
+            "systemService": "ActionGroup",
+            "addressPrefixes": ["13.64.0.0/16"]
+          }
+        },
+        {
+          "name": "AzureFrontDoor.Frontend",
+          "id": "AzureFrontDoor.Frontend",
+          "properties": {
+            "region": "eastus",
+            "systemService": "AzureFrontDoor",
+            "addressPrefixes": ["13.107.246.0/24"]
+          }
+        },
+        {
+          "name": "AzureCloud.global",
+          "id": "AzureCloud.global",
+          "properties": {
+            "region": "global",
+            "systemService": "",
+            "addressPrefixes": ["13.107.42.0/24"]
+          }
+        },
+        {
+          "name": "AzureCloud.southeastasia3",
+          "id": "AzureCloud.southeastasia3",
+          "properties": {
+            "region": "southeastasia3",
+            "systemService": "",
+            "addressPrefixes": ["48.198.93.0/24"]
+          }
+        },
+        {
+          "name": "AzureCloud.eastus",
+          "id": "AzureCloud.eastus",
+          "properties": {
+            "region": "eastus",
+            "systemService": "",
+            "addressPrefixes": ["20.42.0.0/16", "0.0.0.0/0"]
+          }
+        },
+        {
+          "name": "AzureCloud.israelcentral",
+          "id": "AzureCloud.israelcentral",
+          "properties": {
+            "region": "israelcentral",
+            "systemService": "",
+            "addressPrefixes": ["20.217.0.0/16"]
+          }
+        },
+        {
+          "name": "AzureCloud.eastasia",
+          "id": "AzureCloud.eastasia",
+          "properties": {
+            "region": "eastasia",
+            "systemService": "",
+            "addressPrefixes": ["20.187.0.0/16"]
+          }
+        },
+        {
+          "name": "AzureCloud.germanywc",
+          "id": "AzureCloud.germanywc",
+          "properties": {
+            "region": "germanywc",
+            "systemService": "",
+            "addressPrefixes": ["2603:1020:c00::/40", "::/0"]
+          }
+        },
+        {
+          "name": "AzureCloud.chinanorth3",
+          "id": "AzureCloud.chinanorth3",
+          "properties": {
+            "region": "chinanorth3",
+            "systemService": "",
+            "addressPrefixes": ["42.159.0.0/16"]
+          }
+        }
+      ]
+    }"#;
+
+    let mut src = dummy_source(
+        "azure_service_tags",
+        SourceTier::Tier1Geofeed,
+        SourceFormat::AzureServiceTagsJson,
+        "microsoft_official",
+    );
+    src.is_hosting = true;
+
+    let parsed = parse_source_bytes(&src, azure_json, &metadata).unwrap();
+    assert_eq!(parsed.v4.len(), 4);
+    assert_eq!(parsed.v6.len(), 1);
+
+    let lookup_v4_cc = |ip: Ipv4Addr| -> Option<(IsoCode, String)> {
+        let u = u32::from(ip);
+        let iv = parsed.v4.iter().find(|iv| iv.start <= u && u <= iv.end)?;
+        let p = &parsed.payloads[iv.payload_id() as usize];
+        Some((p.country?, parsed.strings.get(p.city_en).to_string()))
+    };
+
+    assert!(lookup_v4_cc(Ipv4Addr::new(13, 64, 0, 1)).is_none());
+    assert!(lookup_v4_cc(Ipv4Addr::new(13, 107, 246, 1)).is_none());
+    assert!(lookup_v4_cc(Ipv4Addr::new(13, 107, 42, 1)).is_none());
+    assert!(lookup_v4_cc(Ipv4Addr::new(48, 198, 93, 1)).is_none());
+
+    assert_eq!(
+        lookup_v4_cc(Ipv4Addr::new(20, 42, 1, 1)),
+        Some((IsoCode::parse_raw("US").unwrap(), "Ashburn".to_string()))
+    );
+    assert_eq!(
+        lookup_v4_cc(Ipv4Addr::new(20, 217, 1, 1)),
+        Some((IsoCode::parse_raw("IL").unwrap(), "Tel Aviv".to_string()))
+    );
+    assert_eq!(
+        lookup_v4_cc(Ipv4Addr::new(20, 187, 1, 1)),
+        Some((IsoCode::HK, "Hong Kong".to_string()))
+    );
+    assert_eq!(
+        lookup_v4_cc(Ipv4Addr::new(42, 159, 1, 1)),
+        Some((IsoCode::CN, "Zhangjiakou".to_string()))
+    );
+
+    let p_de = &parsed.payloads[parsed.v6[0].payload_id() as usize];
+    assert_eq!(p_de.country, IsoCode::parse_raw("DE"));
+    assert_eq!(parsed.strings.get(p_de.city_en), "Frankfurt");
+    assert!(p_de.traits.contains(TraitFlags::IS_HOSTING));
+}
+
+#[test]
+fn ipapi_csv_zip_streams_zip_archive_canonicalizes_iso_and_enforces_min_plen() {
+    use std::io::Write;
+    use zip::write::SimpleFileOptions;
+
+    let (metadata, _, _) = load_real_fixtures();
+
+    let csv_body = "\
+ip_version,start_ip,end_ip,continent,country_code,country,state,city,zip,timezone,latitude,longitude,accuracy,source\n\
+4,0.0.0.0,15.255.255.255,NA,US,United States,California,Los Angeles,90001,America/Los_Angeles,34.05,-118.24,1,whoisArin\n\
+4,223.5.4.0,223.5.4.255,AS,CN,China,Zhejiang,Hangzhou,310000,Asia/Shanghai,30.2741,120.1551,5,whoisDescrAttr\n\
+4,223.5.5.0,223.5.5.255,AS,CN,China,Guangdong,Shenzhen,518000,Asia/Shanghai,22.5431,114.0579,5,whoisDescrAttr\n\
+4,81.2.69.0,81.2.69.255,EU,UK,United Kingdom,England,London,EC1A,Europe/London,51.5074,-0.1278,4,whoisDescrAttr\n\
+4,198.51.100.0,198.51.100.255,NA,ZZ,Unknown,,,,,,,0,whoisArin\n\
+4,203.0.113.0,203.0.113.255,NA,XX,Unknown,,,,,,,0,whoisArin\n\
+6,2000:0000:0000:0000:0000:0000:0000:0000,2000:ffff:ffff:ffff:ffff:ffff:ffff:ffff,EU,DE,Germany,,,,,,,0,whoisDescrAttr\n\
+6,2400:3200:0000:0000:0000:0000:0000:0000,2400:3200:ffff:ffff:ffff:ffff:ffff:ffff,AS,CN,China,Zhejiang,Hangzhou,310000,Asia/Shanghai,30.2741,120.1551,5,whoisDescrAttr\n";
+
+    let mut zip_buf = Vec::new();
+    {
+        let mut zw = zip::ZipWriter::new(std::io::Cursor::new(&mut zip_buf));
+        let opts =
+            SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+        zw.start_file("LICENSE-free-geolocation-database.txt", opts)
+            .unwrap();
+        zw.write_all(
+            b"CC BY-SA 4.0 license text that is intentionally long enough to test skipping",
+        )
+        .unwrap();
+        zw.start_file("geolocationDatabaseIPv4.csv", opts).unwrap();
+        zw.write_all(csv_body.as_bytes()).unwrap();
+        zw.finish().unwrap();
+    }
+    assert_eq!(&zip_buf[..4], b"PK\x03\x04");
+
+    // 1. Production country-only mode (`city_weight == 0`): adjacent CN /24s coalesce into one /23
+    let mut src_country = dummy_source(
+        "ipapi_geolocation_v4",
+        SourceTier::Tier2bGlobal,
+        SourceFormat::IpapiCsvZip,
+        "ipapi_is",
+    );
+    src_country.city_weight = 0;
+
+    let parsed_co = parse_source_bytes(&src_country, &zip_buf, &metadata).unwrap();
+    assert_eq!(
+        parsed_co.v4.len(),
+        2,
+        "81.2.69.0/24 (GB) + coalesced 223.5.4.0..223.5.5.255 (CN)"
+    );
+    assert_eq!(parsed_co.v6.len(), 1, "only 2400:3200::/32 survives >= /19");
+
+    let p_gb = &parsed_co.payloads[parsed_co.v4[0].payload_id() as usize];
+    assert_eq!(p_gb.country, Some(IsoCode::GB));
+    let p_cn = &parsed_co.payloads[parsed_co.v4[1].payload_id() as usize];
+    assert_eq!(p_cn.country, Some(IsoCode::CN));
+    assert_eq!(
+        parsed_co.v4[1].start,
+        u32::from(Ipv4Addr::new(223, 5, 4, 0))
+    );
+    assert_eq!(
+        parsed_co.v4[1].end,
+        u32::from(Ipv4Addr::new(223, 5, 5, 255))
+    );
+
+    // 2. City-enriched mode (`city_weight > 0`): preserves Hangzhou & Shenzhen metadata
+    let mut src_city = src_country.clone();
+    src_city.city_weight = 80;
+    let parsed_city = parse_source_bytes(&src_city, &zip_buf, &metadata).unwrap();
+    assert_eq!(parsed_city.v4.len(), 3);
+    let p_hz = &parsed_city.payloads[parsed_city.v4[1].payload_id() as usize];
+    assert_eq!(parsed_city.strings.get(p_hz.city_en), "Hangzhou");
+    assert_eq!(parsed_city.strings.get(p_hz.city_zh), "杭州市");
+    assert_eq!(p_hz.accuracy_radius, 5);
 }

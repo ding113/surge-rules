@@ -93,6 +93,38 @@ export const COUNTRY_OVERRIDES: readonly CountryOverrideEntry[] = [
     clearCity: true,
     rationale: "Baidu Public DNS (180.76.76.76)",
   },
+  {
+    cidr: "1.12.12.0/24",
+    isoCode: "CN",
+    registeredIsoCode: "CN",
+    isp: "Tencent Cloud",
+    organization: "DNSPod Public DNS",
+    isAnycast: true,
+    clearCity: true,
+    rationale: "DNSPod / Tencent Cloud Public DNS (1.12.12.12) mainland China anycast",
+  },
+  {
+    cidr: "180.184.1.0/24",
+    isoCode: "CN",
+    registeredIsoCode: "CN",
+    isp: "Volcano Engine",
+    organization: "Volcengine TrafficRoute Public DNS",
+    isAnycast: true,
+    clearCity: true,
+    rationale:
+      "Volcengine / ByteDance TrafficRoute Public DNS primary block (180.184.1.1) mainland anycast",
+  },
+  {
+    cidr: "180.184.2.0/24",
+    isoCode: "CN",
+    registeredIsoCode: "CN",
+    isp: "Volcano Engine",
+    organization: "Volcengine TrafficRoute Public DNS",
+    isAnycast: true,
+    clearCity: true,
+    rationale:
+      "Volcengine / ByteDance TrafficRoute Public DNS secondary block (180.184.2.2) mainland anycast",
+  },
 
   // === Global Anycast Public Resolvers ===
   {
@@ -224,6 +256,12 @@ export const COUNTRY_OVERRIDES: readonly CountryOverrideEntry[] = [
     rationale: "Telegram Amsterdam deployment",
   },
   {
+    cidr: "95.161.64.0/20",
+    isoCode: "NL",
+    organization: "Telegram Messenger Inc.",
+    rationale: "Telegram Amsterdam deployment (AS62041 TM-SUBNETS)",
+  },
+  {
     cidr: "2001:b28:f23d::/48",
     isoCode: "NL",
     organization: "Telegram Messenger Inc.",
@@ -289,5 +327,26 @@ export const CN_EXCLUSIONS: readonly CnExclusionEntry[] = [
     fallbackIsoCode: "HK",
     asn: 32590,
     rationale: "Valve Steam Hong Kong edge block outside Mainland China",
+  },
+  {
+    cidr: "223.118.0.0/15",
+    fallbackIsoCode: "HK",
+    asn: 58453,
+    rationale:
+      "AS58453 China Mobile International (CMI-INT-AS-AP) Hong Kong/international backbone block",
+  },
+  {
+    cidr: "223.120.0.0/17",
+    fallbackIsoCode: "HK",
+    asn: 58453,
+    rationale:
+      "AS58453 China Mobile International (CMI-INT-HK) Hong Kong block (preserving 223.120.128.0/17 CMNET)",
+  },
+  {
+    cidr: "223.121.0.0/17",
+    fallbackIsoCode: "HK",
+    asn: 58453,
+    rationale:
+      "AS58453 China Mobile International (CMI-INT-HK) Hong Kong block (preserving 223.121.128.0/17 AS9808 CMNET)",
   },
 ];

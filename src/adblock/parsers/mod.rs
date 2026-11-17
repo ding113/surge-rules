@@ -1,6 +1,7 @@
 pub mod abp;
 pub mod qx_rewrite;
 pub mod ruleset;
+pub mod structured;
 pub mod surge_module;
 
 use anyhow::Result;
@@ -15,6 +16,7 @@ pub fn parse_adblock_source(src: &AdblockSourceConfig, raw: &[u8]) -> Result<Par
         category: src.category,
         lineage: src.lineage.clone(),
         weight: src.weight,
+        filter_direct_collisions: src.filter_direct_collisions,
         ..Default::default()
     };
 
@@ -39,6 +41,33 @@ pub fn parse_adblock_source(src: &AdblockSourceConfig, raw: &[u8]) -> Result<Par
         }
         AdblockSourceFormat::DomainList => {
             ruleset::parse_domain_list(&text, src, &mut parsed);
+        }
+        AdblockSourceFormat::JsonDomainArray => {
+            structured::parse_json_domain_array(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::PolkadotPhishingJson => {
+            structured::parse_polkadot_phishing_json(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::MetamaskConfigJson => {
+            structured::parse_metamask_config_json(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::TweetfeedCsv => {
+            structured::parse_tweetfeed_csv(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::AdguardCompaniesdbJson => {
+            structured::parse_adguard_companiesdb_json(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::DdgTdsJson => {
+            structured::parse_ddg_tds_json(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::DisconnectServicesJson => {
+            structured::parse_disconnect_services_json(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::GhosteryTrackerdbJson => {
+            structured::parse_ghostery_trackerdb_json(&text, src, &mut parsed)?;
+        }
+        AdblockSourceFormat::C2intelDomainCsv => {
+            structured::parse_c2intel_domain_csv(&text, src, &mut parsed)?;
         }
     }
 

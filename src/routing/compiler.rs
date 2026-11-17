@@ -1,6 +1,11 @@
 use std::collections::{BTreeMap, BTreeSet};
+use std::fs;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::path::Path;
 
+use anyhow::{Context, Result, bail};
 use ipnet::{Ipv4Net, Ipv6Net};
+use maxminddb::{Reader, geoip2};
 use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::adblock::compiler::{
@@ -357,11 +362,355 @@ impl RuleMatcher {
     }
 }
 
+#[derive(Clone, Debug, Default)]
+pub struct CnCidrExclusionSet {
+    v4_intervals: Vec<(u32, u32)>,
+    v6_intervals: Vec<(u128, u128)>,
+}
+
+impl CnCidrExclusionSet {
+    pub fn from_cidrs(v4: &[Ipv4Net], v6: &[Ipv6Net]) -> Self {
+        let raw_v4: Vec<(u32, u32)> = v4
+            .iter()
+            .map(|n| {
+                let c = n.trunc();
+                (u32::from(c.network()), u32::from(c.broadcast()))
+            })
+            .collect();
+        let raw_v6: Vec<(u128, u128)> = v6
+            .iter()
+            .map(|n| {
+                let c = n.trunc();
+                (u128::from(c.network()), u128::from(c.broadcast()))
+            })
+            .collect();
+        Self {
+            v4_intervals: coalesce_u32_intervals(raw_v4),
+            v6_intervals: coalesce_u128_intervals(raw_v6),
+        }
+    }
+
+    pub fn from_mmdb_path(path: &Path) -> Result<Self> {
+        let bytes =
+            fs::read(path).with_context(|| format!("failed to read CN MMDB {}", path.display()))?;
+        Self::from_mmdb_bytes(&bytes)
+            .with_context(|| format!("failed to extract CN CIDRs from {}", path.display()))
+    }
+
+    pub fn from_mmdb_bytes(bytes: &[u8]) -> Result<Self> {
+        let reader = Reader::from_source(bytes).context("invalid MaxMind MMDB")?;
+        let node_count = reader.metadata.node_count as usize;
+        let record_size = reader.metadata.record_size as usize;
+        let ip_version = reader.metadata.ip_version as u8;
+
+        if !matches!(record_size, 24 | 28 | 32) {
+            bail!("unsupported MMDB record_size {}", record_size);
+        }
+        if !matches!(ip_version, 4 | 6) {
+            bail!("unsupported MMDB ip_version {}", ip_version);
+        }
+
+        let node_byte_size = (record_size * 2) / 8;
+        let tree_byte_size = node_count
+            .checked_mul(node_byte_size)
+            .context("MMDB tree_byte_size overflow")?;
+        if tree_byte_size > bytes.len() {
+            bail!("corrupt MMDB: tree_byte_size exceeds file size");
+        }
+
+        let v4_zero_root = if ip_version == 6 {
+            mmdb_walk_fixed_bits(bytes, node_count, record_size, 0, 96, false)
+        } else {
+            None
+        };
+        let v4_mapped_root = if ip_version == 6 {
+            if let Some(after_80) =
+                mmdb_walk_fixed_bits(bytes, node_count, record_size, 0, 80, false)
+                && after_80 < node_count
+            {
+                mmdb_walk_fixed_bits(bytes, node_count, record_size, after_80, 16, true)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        let skip_mapped_subtree =
+            ip_version == 6 && v4_zero_root.is_some() && v4_zero_root == v4_mapped_root;
+
+        let max_depth: u8 = if ip_version == 4 { 32 } else { 128 };
+        let mut stack: Vec<(usize, u8, u128)> = Vec::with_capacity(256);
+        if node_count > 0 {
+            stack.push((0, 0, 0));
+        }
+
+        let mut ptr_is_cn: FxHashMap<usize, bool> = FxHashMap::default();
+        let mut raw_v4: Vec<(u32, u32)> = Vec::new();
+        let mut raw_v6: Vec<(u128, u128)> = Vec::new();
+
+        const V4_COMPAT_END: u128 = 0x0000_0000_FFFF_FFFF;
+        const V4_MAPPED_START: u128 = 0x0000_FFFF_0000_0000;
+        const V4_MAPPED_END: u128 = 0x0000_FFFF_FFFF_FFFF;
+
+        while let Some((node_idx, depth, prefix)) = stack.pop() {
+            if skip_mapped_subtree && depth == 96 && prefix == V4_MAPPED_START {
+                continue;
+            }
+            let (left, right) = mmdb_read_node(bytes, node_idx, record_size);
+            for (bit, rec) in [(1u128, right), (0u128, left)] {
+                let next_depth = depth + 1;
+                let shift = (max_depth - next_depth) as u32;
+                let child_prefix = prefix | (bit << shift);
+
+                if rec < node_count {
+                    if next_depth < max_depth {
+                        stack.push((rec, next_depth, child_prefix));
+                    }
+                } else if rec > node_count {
+                    let host_bits = max_depth - next_depth;
+                    let mask = if host_bits == 128 {
+                        u128::MAX
+                    } else if host_bits == 0 {
+                        0
+                    } else {
+                        (1u128 << host_bits) - 1
+                    };
+                    let start = child_prefix;
+                    let end = child_prefix | mask;
+
+                    let sample_ip = if ip_version == 4 {
+                        IpAddr::V4(Ipv4Addr::from(start as u32))
+                    } else if end <= V4_COMPAT_END {
+                        if start == 0 && end == V4_COMPAT_END {
+                            continue;
+                        }
+                        IpAddr::V4(Ipv4Addr::from(start as u32))
+                    } else if start >= V4_MAPPED_START && end <= V4_MAPPED_END {
+                        IpAddr::V4(Ipv4Addr::from((start - V4_MAPPED_START) as u32))
+                    } else {
+                        let clipped = start.max(V4_MAPPED_END + 1);
+                        if clipped > end {
+                            continue;
+                        }
+                        IpAddr::V6(Ipv6Addr::from(clipped))
+                    };
+
+                    let is_cn = *ptr_is_cn.entry(rec).or_insert_with(|| {
+                        reader
+                            .lookup::<geoip2::Country>(sample_ip)
+                            .ok()
+                            .is_some_and(|doc| {
+                                doc.country.and_then(|c| c.iso_code) == Some("CN")
+                                    || doc.registered_country.and_then(|c| c.iso_code) == Some("CN")
+                            })
+                    });
+
+                    if is_cn {
+                        match sample_ip {
+                            IpAddr::V4(_) => {
+                                let (s4, e4) = if ip_version == 6 && start >= V4_MAPPED_START {
+                                    (
+                                        (start - V4_MAPPED_START) as u32,
+                                        (end - V4_MAPPED_START) as u32,
+                                    )
+                                } else {
+                                    (start as u32, end as u32)
+                                };
+                                raw_v4.push((s4, e4));
+                            }
+                            IpAddr::V6(v6) => {
+                                raw_v6.push((u128::from(v6), end));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(Self {
+            v4_intervals: coalesce_u32_intervals(raw_v4),
+            v6_intervals: coalesce_u128_intervals(raw_v6),
+        })
+    }
+
+    pub fn v4_interval_count(&self) -> usize {
+        self.v4_intervals.len()
+    }
+
+    pub fn v6_interval_count(&self) -> usize {
+        self.v6_intervals.len()
+    }
+
+    pub fn overlaps_v4(&self, net: Ipv4Net) -> bool {
+        let c = net.trunc();
+        let q_start = u32::from(c.network());
+        let q_end = u32::from(c.broadcast());
+        let idx = self.v4_intervals.partition_point(|&(s, _)| s <= q_end);
+        idx > 0 && self.v4_intervals[idx - 1].1 >= q_start
+    }
+
+    pub fn overlaps_v6(&self, net: Ipv6Net) -> bool {
+        let c = net.trunc();
+        let q_start = u128::from(c.network());
+        let q_end = u128::from(c.broadcast());
+        let idx = self.v6_intervals.partition_point(|&(s, _)| s <= q_end);
+        idx > 0 && self.v6_intervals[idx - 1].1 >= q_start
+    }
+
+    fn merged_with_direct_map(
+        &self,
+        direct_map: &FxHashMap<RoutingRuleKey, CandidateRule>,
+    ) -> Self {
+        let mut raw_v4 = self.v4_intervals.clone();
+        let mut raw_v6 = self.v6_intervals.clone();
+        for dk in direct_map.keys() {
+            match dk.kind {
+                RoutingRuleKind::IpCidr => {
+                    if let Ok(net) = dk.value.parse::<Ipv4Net>() {
+                        let c = net.trunc();
+                        raw_v4.push((u32::from(c.network()), u32::from(c.broadcast())));
+                    }
+                }
+                RoutingRuleKind::IpCidr6 => {
+                    if let Ok(net) = dk.value.parse::<Ipv6Net>() {
+                        let c = net.trunc();
+                        raw_v6.push((u128::from(c.network()), u128::from(c.broadcast())));
+                    }
+                }
+                _ => {}
+            }
+        }
+        Self {
+            v4_intervals: coalesce_u32_intervals(raw_v4),
+            v6_intervals: coalesce_u128_intervals(raw_v6),
+        }
+    }
+}
+
+fn coalesce_u32_intervals(mut raw: Vec<(u32, u32)>) -> Vec<(u32, u32)> {
+    if raw.is_empty() {
+        return raw;
+    }
+    raw.sort_unstable_by_key(|&(s, e)| (s, e));
+    let mut out: Vec<(u32, u32)> = Vec::with_capacity(raw.len());
+    for (s, e) in raw {
+        if s > e {
+            continue;
+        }
+        if let Some(last) = out.last_mut()
+            && last.1.saturating_add(1) >= s
+        {
+            last.1 = last.1.max(e);
+        } else {
+            out.push((s, e));
+        }
+    }
+    out
+}
+
+fn coalesce_u128_intervals(mut raw: Vec<(u128, u128)>) -> Vec<(u128, u128)> {
+    if raw.is_empty() {
+        return raw;
+    }
+    raw.sort_unstable_by_key(|&(s, e)| (s, e));
+    let mut out: Vec<(u128, u128)> = Vec::with_capacity(raw.len());
+    for (s, e) in raw {
+        if s > e {
+            continue;
+        }
+        if let Some(last) = out.last_mut()
+            && last.1.saturating_add(1) >= s
+        {
+            last.1 = last.1.max(e);
+        } else {
+            out.push((s, e));
+        }
+    }
+    out
+}
+
+#[inline]
+fn mmdb_read_node(bytes: &[u8], node_idx: usize, record_size: usize) -> (usize, usize) {
+    match record_size {
+        24 => {
+            let off = node_idx * 6;
+            let left = ((bytes[off] as usize) << 16)
+                | ((bytes[off + 1] as usize) << 8)
+                | (bytes[off + 2] as usize);
+            let right = ((bytes[off + 3] as usize) << 16)
+                | ((bytes[off + 4] as usize) << 8)
+                | (bytes[off + 5] as usize);
+            (left, right)
+        }
+        28 => {
+            let off = node_idx * 7;
+            let mid = bytes[off + 3] as usize;
+            let left = ((mid >> 4) << 24)
+                | ((bytes[off] as usize) << 16)
+                | ((bytes[off + 1] as usize) << 8)
+                | (bytes[off + 2] as usize);
+            let right = ((mid & 0x0f) << 24)
+                | ((bytes[off + 4] as usize) << 16)
+                | ((bytes[off + 5] as usize) << 8)
+                | (bytes[off + 6] as usize);
+            (left, right)
+        }
+        32 => {
+            let off = node_idx * 8;
+            let left =
+                u32::from_be_bytes([bytes[off], bytes[off + 1], bytes[off + 2], bytes[off + 3]])
+                    as usize;
+            let right = u32::from_be_bytes([
+                bytes[off + 4],
+                bytes[off + 5],
+                bytes[off + 6],
+                bytes[off + 7],
+            ]) as usize;
+            (left, right)
+        }
+        _ => (0, 0),
+    }
+}
+
+fn mmdb_walk_fixed_bits(
+    bytes: &[u8],
+    node_count: usize,
+    record_size: usize,
+    mut cur: usize,
+    steps: usize,
+    bit_one: bool,
+) -> Option<usize> {
+    for _ in 0..steps {
+        if cur >= node_count {
+            return Some(cur);
+        }
+        let (l, r) = mmdb_read_node(bytes, cur, record_size);
+        cur = if bit_one { r } else { l };
+    }
+    Some(cur)
+}
+
 pub fn compile_routing(
     sources: &[ParsedRoutingSource],
     overrides: &RoutingOverrides,
     adblock_overrides: &AdblockOverrides,
     source_counts: RoutingSourceCounts,
+) -> CompiledRoutingArtifacts {
+    compile_routing_with_cn_exclusions(
+        sources,
+        overrides,
+        adblock_overrides,
+        source_counts,
+        &CnCidrExclusionSet::default(),
+    )
+}
+
+pub fn compile_routing_with_cn_exclusions(
+    sources: &[ParsedRoutingSource],
+    overrides: &RoutingOverrides,
+    adblock_overrides: &AdblockOverrides,
+    source_counts: RoutingSourceCounts,
+    external_cn_exclusions: &CnCidrExclusionSet,
 ) -> CompiledRoutingArtifacts {
     let mut direct_map: FxHashMap<RoutingRuleKey, CandidateRule> = FxHashMap::default();
     let mut clean_map: FxHashMap<RoutingRuleKey, CleanCandidate> = FxHashMap::default();
@@ -378,7 +727,7 @@ pub fn compile_routing(
                     );
                 }
             }
-            RoutingTarget::Proxy => {
+            RoutingTarget::Proxy if !src.strict_cn_cidr_guard => {
                 for rule in &src.rules {
                     proxy_map.entry(rule.key.clone()).or_default().ingest(
                         &src.lineage,
@@ -595,6 +944,56 @@ pub fn compile_routing(
     });
     proxy_map.retain(|k, c| c.forced || !is_excluded(&proxy_exclude, k));
 
+    // Ingest `strict_cn_cidr_guard` Proxy sources (e.g. `sstap_filtered_cidr`) while suppressing
+    // ANY CIDR overlapping domestic CN CIDRs claimed by `Direct` sources or `Country-cn.mmdb`.
+    let mut cn_cidrs_suppressed = 0usize;
+    if sources
+        .iter()
+        .any(|s| s.target == RoutingTarget::Proxy && s.strict_cn_cidr_guard)
+    {
+        let cn_guard = external_cn_exclusions.merged_with_direct_map(&direct_map);
+        for src in sources {
+            if src.target != RoutingTarget::Proxy || !src.strict_cn_cidr_guard {
+                continue;
+            }
+            for rule in &src.rules {
+                if is_excluded(&proxy_exclude, &rule.key) {
+                    continue;
+                }
+                match rule.key.kind {
+                    RoutingRuleKind::IpCidr => {
+                        if let Ok(net) = rule.key.value.parse::<Ipv4Net>()
+                            && cn_guard.overlaps_v4(net)
+                        {
+                            cn_cidrs_suppressed += 1;
+                            continue;
+                        }
+                    }
+                    RoutingRuleKind::IpCidr6 => {
+                        if let Ok(net) = rule.key.value.parse::<Ipv6Net>()
+                            && cn_guard.overlaps_v6(net)
+                        {
+                            cn_cidrs_suppressed += 1;
+                            continue;
+                        }
+                    }
+                    RoutingRuleKind::Domain | RoutingRuleKind::DomainSuffix
+                        if ad_guard.is_ad_domain(&rule.key.value) =>
+                    {
+                        ad_domains_filtered += 1;
+                        continue;
+                    }
+                    _ => {}
+                }
+                proxy_map.entry(rule.key.clone()).or_default().ingest(
+                    &src.lineage,
+                    src.weight,
+                    rule.extended_matching,
+                );
+            }
+        }
+    }
+
     // Resolve overlaps between Direct and Clean-Egress ({AI, Payment, Telemetry}):
     // 1. Non-forced clean-egress rules yield when Direct has strictly higher multi-lineage domestic consensus
     //    (e.g., global topical lists repurposed into Payment/Telemetry/AI that incidentally include CN domains).
@@ -620,7 +1019,7 @@ pub fn compile_routing(
         }
     }
 
-    let mut conflicts_resolved = 0usize;
+    let mut conflicts_resolved = cn_cidrs_suppressed;
     clean_map.retain(|k, c| {
         if c.is_forced() {
             return true;

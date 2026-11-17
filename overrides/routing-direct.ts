@@ -792,8 +792,32 @@ export const DIRECT_EXCLUDE_ENTRIES: readonly RoutingExclusionOverride[] = [
   {
     target: "direct",
     kind: "DOMAIN-SUFFIX",
+    value: "fututrade.com",
+    rationale: "Futu US overseas brokerage trading platform",
+  },
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
+    value: "futuau.com",
+    rationale: "Futu Australia overseas brokerage platform",
+  },
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
     value: "moomoo.com",
     rationale: "Moomoo overseas brokerage",
+  },
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
+    value: "moomooequity.com",
+    rationale: "Moomoo US equities clearing and brokerage platform",
+  },
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
+    value: "moomootrustee.com",
+    rationale: "Moomoo overseas trustee and custody service",
   },
   {
     target: "direct",
@@ -804,8 +828,26 @@ export const DIRECT_EXCLUDE_ENTRIES: readonly RoutingExclusionOverride[] = [
   {
     target: "direct",
     kind: "DOMAIN-SUFFIX",
+    value: "longbridgehk.com",
+    rationale: "Longbridge Hong Kong overseas brokerage portal",
+  },
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
     value: "tigerbrokers.com",
     rationale: "Tiger Brokers overseas brokerage",
+  },
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
+    value: "itiger.com",
+    rationale: "Tiger Brokers international brokerage trading portal",
+  },
+  {
+    target: "direct",
+    kind: "DOMAIN-SUFFIX",
+    value: "itigergrowth.com",
+    rationale: "Tiger Brokers overseas wealth and trading platform",
   },
   {
     target: "direct",

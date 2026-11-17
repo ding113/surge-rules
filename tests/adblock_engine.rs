@@ -6,9 +6,9 @@ use proptest::prelude::*;
 use tempfile::TempDir;
 
 use surge_rules::adblock::compiler::{
-    DomainTrie, TelemetryProtectionSet, compile_adblock, compile_adblock_with_telemetry_guard,
-    overlaps_reserved_v4, overlaps_reserved_v6, overlaps_shared_cdn_or_dns_v4,
-    overlaps_shared_cdn_or_dns_v6,
+    DirectProtectionSet, DomainTrie, TelemetryProtectionSet, compile_adblock,
+    compile_adblock_with_guards, compile_adblock_with_telemetry_guard, overlaps_reserved_v4,
+    overlaps_reserved_v6, overlaps_shared_cdn_or_dns_v4, overlaps_shared_cdn_or_dns_v6,
 };
 use surge_rules::adblock::config::{
     AdblockCategory, AdblockOverrides, AdblockPlatformScope, AdblockRuleTarget,
@@ -49,6 +49,7 @@ fn dummy_adblock_source(
         core: true,
         extract_complex_network_rules: true,
         extract_fallback_domain_rules: true,
+        filter_direct_collisions: false,
         endpoints: vec![EndpointConfig::Direct {
             url: format!("https://example.com/{}.txt", id),
         }],
@@ -2202,5 +2203,461 @@ DOMAIN-SUFFIX,chatgpt.com,extended-matching\n";
     assert!(
         verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
         "Privacy.list blocking AI.list domain must fail verifier"
+    );
+}
+
+#[test]
+fn dedicated_web3_and_threat_converters_normalize_subtract_and_skip_cloud_buckets() {
+    // 1. json_domain_array (`scamsniffer_domains`)
+    let mut ss_src = dummy_adblock_source(
+        "scamsniffer_domains",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::JsonDomainArray,
+        88,
+    );
+    ss_src.filter_direct_collisions = true;
+    let ss_raw = r#"[
+        "Evil-Drainer.XYZ.",
+        "xn--80ak6aa92e.com",
+        "localhost",
+        "127.0.0.1",
+        "pages.dev",
+        "github.com",
+        "𝗼𝘀𝗺𝗼𝗵𝘂𝗯.𝗰𝗼𝗺"
+    ]"#;
+    let ss_parsed =
+        parse_adblock_source(&ss_src, ss_raw.as_bytes()).expect("json_domain_array should parse");
+    assert!(ss_parsed.filter_direct_collisions);
+    assert!(ss_parsed.ruleset_domains.contains("evil-drainer.xyz"));
+    assert!(ss_parsed.ruleset_domains.contains("xn--80ak6aa92e.com"));
+    assert!(ss_parsed.ruleset_suffixes.is_empty());
+    assert!(!ss_parsed.ruleset_domains.contains("localhost"));
+    assert!(!ss_parsed.ruleset_domains.contains("pages.dev"));
+
+    let mut overrides = AdblockOverrides::empty();
+    overrides
+        .protected_apex_domains
+        .push(ProtectedApexDomainOverride {
+            domain: "github.com".to_string(),
+            rationale: "Protected developer apex".to_string(),
+        });
+    let ss_compiled = compile_adblock(&[ss_parsed], &overrides, 1, 1);
+    assert!(
+        ss_compiled
+            .ruleset_text
+            .contains("DOMAIN,evil-drainer.xyz\n")
+    );
+    assert!(!ss_compiled.ruleset_text.contains("github.com"));
+
+    // 2. polkadot_phishing_json (`polkadot_js_phishing`) — subtracts allow[] exact & wildcard suffixes
+    let pk_src = dummy_adblock_source(
+        "polkadot_js_phishing",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::PolkadotPhishingJson,
+        89,
+    );
+    let pk_raw = r#"{
+        "allow": ["*.fleek.co", "pages.dev", "duckdns.org"],
+        "deny": [
+            "0-chain-scam.com",
+            "0000deadburn.pages.dev",
+            "app.fleek.co",
+            "fleek.co",
+            "09sync00.duckdns.org",
+            "0kxwallet-fake.org"
+        ],
+        "denySub": ["twitter.com/AcalaNetworks"]
+    }"#;
+    let pk_parsed = parse_adblock_source(&pk_src, pk_raw.as_bytes())
+        .expect("polkadot_phishing_json should parse");
+    assert_eq!(pk_parsed.ruleset_domains.len(), 2);
+    assert!(pk_parsed.ruleset_domains.contains("0-chain-scam.com"));
+    assert!(pk_parsed.ruleset_domains.contains("0kxwallet-fake.org"));
+    assert!(!pk_parsed.ruleset_domains.contains("0000deadburn.pages.dev"));
+    assert!(!pk_parsed.ruleset_domains.contains("app.fleek.co"));
+    assert!(!pk_parsed.ruleset_domains.contains("09sync00.duckdns.org"));
+
+    // 3. metamask_config_json (`metamask_eth_phishing`) — subtracts whitelist[] & ignores fuzzylist[]
+    let mm_src = dummy_adblock_source(
+        "metamask_eth_phishing",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::MetamaskConfigJson,
+        91,
+    );
+    let mm_raw = r#"{
+        "version": 2,
+        "tolerance": 1,
+        "fuzzylist": ["metamask.io", "opensea.io", "etherscan.io"],
+        "whitelist": ["metamask.io", "walletconnect.org"],
+        "blacklist": [
+            "opencea.mom",
+            "metamask.io",
+            "ten.metamask.io",
+            "relay.walletconnect.org",
+            "fake-metamask-claim.top"
+        ]
+    }"#;
+    let mm_parsed = parse_adblock_source(&mm_src, mm_raw.as_bytes())
+        .expect("metamask_config_json should parse");
+    assert_eq!(mm_parsed.ruleset_domains.len(), 2);
+    assert!(mm_parsed.ruleset_domains.contains("opencea.mom"));
+    assert!(
+        mm_parsed
+            .ruleset_domains
+            .contains("fake-metamask-claim.top")
+    );
+    assert!(!mm_parsed.ruleset_domains.contains("metamask.io"));
+    assert!(!mm_parsed.ruleset_domains.contains("ten.metamask.io"));
+    assert!(
+        !mm_parsed
+            .ruleset_domains
+            .contains("relay.walletconnect.org")
+    );
+    assert!(!mm_parsed.ruleset_domains.contains("opensea.io"));
+
+    // 4. tweetfeed_csv (`tweetfeed_domains`) — keeps col[2]=="domain" and skips shared cloud buckets
+    let tf_src = dummy_adblock_source(
+        "tweetfeed_domains",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::TweetfeedCsv,
+        87,
+    );
+    let tf_raw = "\
+2026-11-11 00:40:02,scanmalware,domain,vexolunara.cfd,#phishing,https://x.com/s/1\n\
+2026-11-11 00:40:02,scanmalware,url,https://vexolunara.cfd/login,#phishing,https://x.com/s/1\n\
+2026-11-11 01:00:00,res,ip,198.51.100.7,#c2,https://x.com/s/2\n\
+2026-11-11 01:10:00,res,domain,09rzc45a.s3.us-east-1.amazonaws.com,#phishing,https://x.com/s/3\n\
+2026-11-11 01:11:00,res,domain,badbucket.s3.amazonaws.com,#phishing,https://x.com/s/4\n\
+2026-11-11 01:12:00,res,domain,badbucket.s3-us-west-2.amazonaws.com,#phishing,https://x.com/s/5\n\
+2026-11-11 01:13:00,res,domain,storage.googleapis.com,#phishing,https://x.com/s/6\n\
+2026-11-11 01:14:00,res,domain,mal.blob.core.windows.net,#phishing,https://x.com/s/7\n\
+2026-11-11 01:15:00,res,domain,pub-0d275574d4.r2.dev,#phishing,https://x.com/s/8\n\
+2026-11-11 01:16:00,res,domain,org-apex.workers.dev,#phishing,https://x.com/s/9\n\
+2026-11-11 01:17:00,res,domain,c2-worker.evil-actor.workers.dev,#c2,https://x.com/s/10\n";
+    let tf_parsed =
+        parse_adblock_source(&tf_src, tf_raw.as_bytes()).expect("tweetfeed_csv should parse");
+    assert_eq!(tf_parsed.ruleset_domains.len(), 2);
+    assert!(tf_parsed.ruleset_domains.contains("vexolunara.cfd"));
+    assert!(
+        tf_parsed
+            .ruleset_domains
+            .contains("c2-worker.evil-actor.workers.dev")
+    );
+    assert!(
+        !tf_parsed
+            .ruleset_domains
+            .contains("09rzc45a.s3.us-east-1.amazonaws.com")
+    );
+    assert!(!tf_parsed.ruleset_domains.contains("org-apex.workers.dev"));
+
+    // 5. c2intel_domain_csv (`drb_ra_c2_domains`) — skips Domain Fronting CDNs
+    let c2_src = dummy_adblock_source(
+        "drb_ra_c2_domains",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::C2intelDomainCsv,
+        88,
+    );
+    let c2_raw = "\
+#domain,ioc\n\
+api.baidubce.com,Possible Cobalt Strike C2 Fronting Domain\n\
+at1.227api.com,Possible Cobalt Strike C2 Domain\n\
+bad.s3.amazonaws.com,Possible Cobalt Strike C2 Domain\n";
+    let c2_parsed =
+        parse_adblock_source(&c2_src, c2_raw.as_bytes()).expect("c2intel_domain_csv should parse");
+    assert_eq!(c2_parsed.ruleset_domains.len(), 1);
+    assert!(c2_parsed.ruleset_domains.contains("at1.227api.com"));
+    assert!(!c2_parsed.ruleset_domains.contains("api.baidubce.com"));
+}
+
+#[test]
+fn structured_tracker_databases_enforce_strict_category_and_portal_exclusions() {
+    // 1. adguard_companiesdb_json (`adguard_companiesdb` + `adguard_companiesdb_analytics` + Allowlist guard mode)
+    let cdb_raw = r#"{
+        "timeUpdated": "2026-11-16T10:08:27.301Z",
+        "categories": {
+            "2": "customer_interaction",
+            "3": "pornvertising",
+            "4": "advertising",
+            "5": "essential",
+            "6": "site_analytics",
+            "9": "cdn",
+            "10": "hosting",
+            "11": "unknown",
+            "15": "telemetry",
+            "99": "online_payment"
+        },
+        "trackers": {
+            "criteo": { "name": "Criteo", "categoryId": 4, "url": "https://www.criteo.com/", "companyId": "criteo" },
+            "exoclick": { "name": "ExoClick", "categoryId": 3, "url": "https://exoclick.com/", "companyId": "exoclick" },
+            "hotjar": { "name": "Hotjar", "categoryId": 6, "url": "https://www.hotjar.com/", "companyId": "hotjar" },
+            "adobe_aam": { "name": "Adobe Audience Manager", "categoryId": 4, "url": "https://www.adobe.com/", "companyId": "adobe" },
+            "adobe_cdn": { "name": "Adobe CDN", "categoryId": 9, "url": "https://www.adobe.com/", "companyId": "adobe" },
+            "digicert": { "name": "DigiCert", "categoryId": 5, "companyId": "digicert" },
+            "stripe_pay": { "name": "Stripe", "categoryId": 99, "companyId": "stripe" },
+            "aws_host": { "name": "AWS", "categoryId": 10, "companyId": "amazon" },
+            "intercom": { "name": "Intercom", "categoryId": 2, "companyId": "intercom" },
+            "mystery": { "name": "Mystery", "categoryId": 11 }
+        },
+        "trackerDomains": {
+            "criteo.com": "criteo",
+            "exoclick.com": "exoclick",
+            "hotjar.com": "hotjar",
+            "demdex.net": "adobe_aam",
+            "adobe.com": "adobe_aam",
+            "adobedtm-cdn.example.net": "adobe_cdn",
+            "ocsp.digicert.com": "digicert",
+            "hooks.stripe.com": "stripe_pay",
+            "compute.amazonaws.com": "aws_host",
+            "widget.intercom.io": "intercom",
+            "unk-domain.net": "mystery"
+        }
+    }"#;
+
+    let cdb_ad_src = dummy_adblock_source(
+        "adguard_companiesdb",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::AdguardCompaniesdbJson,
+        86,
+    );
+    let cdb_ad = parse_adblock_source(&cdb_ad_src, cdb_raw.as_bytes()).expect("cdb ad parse");
+    assert!(cdb_ad.ruleset_domains.contains("criteo.com"));
+    assert!(cdb_ad.ruleset_domains.contains("exoclick.com"));
+    assert!(cdb_ad.ruleset_domains.contains("demdex.net"));
+    assert!(!cdb_ad.ruleset_domains.contains("hotjar.com"));
+    assert!(!cdb_ad.ruleset_domains.contains("adobe.com"));
+    assert!(!cdb_ad.ruleset_domains.contains("adobedtm-cdn.example.net"));
+    assert!(!cdb_ad.ruleset_domains.contains("ocsp.digicert.com"));
+    assert!(!cdb_ad.ruleset_domains.contains("hooks.stripe.com"));
+    assert!(!cdb_ad.ruleset_domains.contains("widget.intercom.io"));
+    assert!(!cdb_ad.ruleset_domains.contains("unk-domain.net"));
+
+    let mut cdb_priv_src = dummy_adblock_source(
+        "adguard_companiesdb_analytics",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::AdguardCompaniesdbJson,
+        86,
+    );
+    cdb_priv_src.category = AdblockCategory::Privacy;
+    let cdb_priv = parse_adblock_source(&cdb_priv_src, cdb_raw.as_bytes()).expect("cdb priv parse");
+    assert_eq!(cdb_priv.ruleset_domains.len(), 1);
+    assert!(cdb_priv.ruleset_domains.contains("hotjar.com"));
+
+    let cdb_allow_src = dummy_adblock_source(
+        "adguard_companiesdb_guard",
+        AdblockSourceRole::Allowlist,
+        AdblockSourceFormat::AdguardCompaniesdbJson,
+        95,
+    );
+    let cdb_allow =
+        parse_adblock_source(&cdb_allow_src, cdb_raw.as_bytes()).expect("cdb allow parse");
+    assert!(
+        cdb_allow
+            .allow_exact_domains
+            .contains("adobedtm-cdn.example.net")
+    );
+    assert!(cdb_allow.allow_exact_domains.contains("ocsp.digicert.com"));
+    assert!(cdb_allow.allow_exact_domains.contains("hooks.stripe.com"));
+    assert!(!cdb_allow.allow_exact_domains.contains("criteo.com"));
+
+    // 2. ddg_tds_json — keeps default=="block", skips default=="ignore" & portals
+    let mut ddg_src = dummy_adblock_source(
+        "ddg_tracker_radar",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::DdgTdsJson,
+        88,
+    );
+    ddg_src.category = AdblockCategory::Privacy;
+    let ddg_raw = r#"{
+        "trackers": {
+            "33across.com": { "domain": "33across.com", "default": "block" },
+            "cloudflare.com": { "domain": "cloudflare.com", "default": "ignore" },
+            "bing.com": { "domain": "bing.com", "default": "block" },
+            "ad-company.example": { "domain": "ad-company.example", "default": "block" }
+        }
+    }"#;
+    let ddg_parsed = parse_adblock_source(&ddg_src, ddg_raw.as_bytes()).expect("ddg parse");
+    assert_eq!(ddg_parsed.ruleset_domains.len(), 1);
+    assert!(ddg_parsed.ruleset_domains.contains("33across.com"));
+
+    // 3. disconnect_services_json — extracts Advertising vs Analytics/Fingerprinting, subtracts Social/Content
+    let disc_raw = r#"{
+        "categories": {
+            "Advertising": [
+                { "AdNet": { "https://adnet.io/": ["ads.adnet.io", "tiktok.com"] } }
+            ],
+            "Analytics": [
+                { "TrackerCo": { "https://trackerco.io/": ["metrics.trackerco.io", "cdn.contentco.net"] } }
+            ],
+            "FingerprintingInvasive": [
+                { "FP": { "https://fp.io/": ["fp-probe.io"] } }
+            ],
+            "Content": [
+                { "ContentCo": { "https://contentco.net/": ["contentco.net"] } }
+            ],
+            "Social": [
+                { "ByteDance": { "https://bytedance.com/": ["tiktok.com"] } }
+            ]
+        }
+    }"#;
+    let disc_ad_src = dummy_adblock_source(
+        "disconnect_advertising",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::DisconnectServicesJson,
+        88,
+    );
+    let disc_ad = parse_adblock_source(&disc_ad_src, disc_raw.as_bytes()).expect("disc ad parse");
+    assert_eq!(disc_ad.ruleset_domains.len(), 1);
+    assert!(disc_ad.ruleset_domains.contains("ads.adnet.io"));
+    assert!(!disc_ad.ruleset_domains.contains("tiktok.com"));
+
+    let mut disc_priv_src = dummy_adblock_source(
+        "disconnect_tracking",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::DisconnectServicesJson,
+        88,
+    );
+    disc_priv_src.category = AdblockCategory::Privacy;
+    let disc_priv =
+        parse_adblock_source(&disc_priv_src, disc_raw.as_bytes()).expect("disc priv parse");
+    assert_eq!(disc_priv.ruleset_domains.len(), 2);
+    assert!(disc_priv.ruleset_domains.contains("metrics.trackerco.io"));
+    assert!(disc_priv.ruleset_domains.contains("fp-probe.io"));
+    assert!(!disc_priv.ruleset_domains.contains("cdn.contentco.net"));
+
+    // 4. ghostery_trackerdb_json — extracts whole-domain filters ONLY from pure tracker categories
+    let gh_raw = r#"{
+        "patterns": {
+            "ebay": { "category": "advertising", "domains": ["ebay.com"], "filters": ["||rover.ebay.com^$3p"] },
+            "facebook": { "category": "advertising", "domains": ["facebook.com"], "filters": ["||facebook.com/tr"] },
+            "mmtro": { "category": "site_analytics", "domains": ["mmtro.com"], "filters": ["||mmtro.com^$3p"] },
+            "jwplayer": { "category": "audio_video_player", "domains": ["jwpcdn.com"], "filters": ["||jwpcdn.com^$3p"] }
+        }
+    }"#;
+    let gh_ad_src = dummy_adblock_source(
+        "ghostery_trackerdb_ads",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::GhosteryTrackerdbJson,
+        87,
+    );
+    let gh_ad = parse_adblock_source(&gh_ad_src, gh_raw.as_bytes()).expect("ghostery ad parse");
+    assert_eq!(gh_ad.ruleset_domains.len(), 1);
+    assert!(gh_ad.ruleset_domains.contains("rover.ebay.com"));
+    assert!(!gh_ad.ruleset_domains.contains("ebay.com"));
+    assert!(!gh_ad.ruleset_domains.contains("facebook.com"));
+    assert!(!gh_ad.ruleset_domains.contains("jwpcdn.com"));
+
+    let mut gh_priv_src = dummy_adblock_source(
+        "ghostery_trackerdb_privacy",
+        AdblockSourceRole::RulesetFallback,
+        AdblockSourceFormat::GhosteryTrackerdbJson,
+        87,
+    );
+    gh_priv_src.category = AdblockCategory::Privacy;
+    let gh_priv =
+        parse_adblock_source(&gh_priv_src, gh_raw.as_bytes()).expect("ghostery priv parse");
+    assert_eq!(gh_priv.ruleset_domains.len(), 1);
+    assert!(gh_priv.ruleset_domains.contains("mmtro.com"));
+}
+
+#[test]
+fn direct_collision_guard_suppresses_community_fps_and_preserves_lineage_budget() {
+    use rustc_hash::FxHashSet;
+
+    let direct_raw = "\
+# Direct.list fixture\n\
+DOMAIN,pay.domestic-portal.com\n\
+DOMAIN-SUFFIX,psbc.com,extended-matching\n\
+DOMAIN-SUFFIX,cn,extended-matching\n";
+    let dguard = DirectProtectionSet::from_ruleset_text(direct_raw);
+
+    // Community Web3 feed with `filter_direct_collisions = true`
+    let mut web3_feed = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "scamsniffer".to_string(),
+        weight: 88,
+        filter_direct_collisions: true,
+        ..Default::default()
+    };
+    web3_feed
+        .ruleset_domains
+        .insert("shop.psbc.com".to_string());
+    web3_feed
+        .ruleset_domains
+        .insert("card.szu.edu.cn".to_string());
+    web3_feed
+        .ruleset_domains
+        .insert("pay.domestic-portal.com".to_string());
+    web3_feed
+        .ruleset_domains
+        .insert("wallet-drainer.xyz".to_string());
+
+    // Dedicated domestic adblock feed (`filter_direct_collisions = false`) must still block domestic ad hosts
+    let mut cn_ad_feed = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "anti_ad".to_string(),
+        weight: 90,
+        filter_direct_collisions: false,
+        ..Default::default()
+    };
+    cn_ad_feed
+        .ruleset_domains
+        .insert("adtracker.example.cn".to_string());
+
+    let mut overrides = AdblockOverrides::empty();
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
+        kind: "DOMAIN".to_string(),
+        value: "forced-ad.psbc.com".to_string(),
+        rationale: "Human force entry always overrides DirectProtectionSet".to_string(),
+    });
+
+    let compiled = compile_adblock_with_guards(
+        &[web3_feed, cn_ad_feed],
+        &overrides,
+        None,
+        Some(&dguard),
+        2,
+        2,
+    );
+
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,wallet-drainer.xyz\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,adtracker.example.cn\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,forced-ad.psbc.com\n")
+    );
+    assert!(!compiled.ruleset_text.contains("shop.psbc.com"));
+    assert!(!compiled.ruleset_text.contains("card.szu.edu.cn"));
+    assert!(!compiled.ruleset_text.contains("pay.domestic-portal.com"));
+
+    // Verify catalog lineage bitmask budget remains well below 256 (`< 256`)
+    let catalog =
+        AdblockSourceCatalog::load_from_path(Path::new("sources/generated/adblock-sources.json"))
+            .expect("catalog should load");
+    let bitmask_lineages: FxHashSet<&str> = catalog
+        .sources
+        .iter()
+        .filter(|s| {
+            s.role != AdblockSourceRole::Allowlist
+                && matches!(s.category, AdblockCategory::Ad | AdblockCategory::Privacy)
+        })
+        .map(|s| s.lineage.as_str())
+        .collect();
+    let total_lineages: FxHashSet<&str> =
+        catalog.sources.iter().map(|s| s.lineage.as_str()).collect();
+    assert!(
+        bitmask_lineages.len() <= 80 && total_lineages.len() < 256,
+        "expected bitmask lineages <= 80 and total lineages < 256, got bitmask={} total={}",
+        bitmask_lineages.len(),
+        total_lineages.len()
     );
 }

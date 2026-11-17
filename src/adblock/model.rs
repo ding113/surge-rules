@@ -468,6 +468,7 @@ pub struct ParsedAdblockSource {
     pub category: AdblockCategory,
     pub lineage: String,
     pub weight: u16,
+    pub filter_direct_collisions: bool,
     pub allow_exact_domains: FxHashSet<String>,
     pub allow_suffix_domains: FxHashSet<String>,
     pub complex_protected_hosts: FxHashSet<String>,
