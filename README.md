@@ -840,7 +840,7 @@ bun install
 bun run build:config
 bun run sync:metadata
 
-# 2. 按依赖顺序构建并校验全部产物（输出至 dist/：geoip -> routing -> adblock，以加载 CN 与直连/纯净出口保护集合）
+# 2. 按依赖顺序构建并校验全部产物（输出至 dist/：geoip -> routing -> adblock，以加载 CN 及各分流规则集的精确域名与纯净出口白名单保护集合）
 cargo run --release -- geoip build --output dist
 cargo run --release -- routing build --output dist
 cargo run --release -- adblock build --output dist

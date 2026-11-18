@@ -16,6 +16,7 @@ use crate::adblock::model::{
     MapLocalDataType, MapLocalRule, ParsedAdblockSource, RemoveParamRule, ScriptRule, ScriptType,
     UrlRewriteMode, UrlRewriteRule,
 };
+use crate::adblock::parsers::ruleset::strip_inline_comment;
 use crate::adblock::regex_util::{
     canonical_url_pattern_key, extract_authority_regex, extract_hosts_from_regex,
     is_http_only_url_regex, is_https_only_url_regex, is_valid_domain, is_valid_mitm_host,
@@ -26,6 +27,7 @@ use crate::adblock::regex_util::{
 struct DomainTrieNode {
     has_exact_mark: bool,
     has_suffix_mark: bool,
+    has_subtree_mark: bool,
     children: HashMap<String, DomainTrieNode>,
 }
 
@@ -41,17 +43,21 @@ impl DomainTrie {
     }
 
     pub fn insert_exact(&mut self, domain: &str) {
+        self.root.has_subtree_mark = true;
         let mut node = &mut self.root;
         for label in Self::split_labels_rev(domain) {
             node = node.children.entry(label.to_ascii_lowercase()).or_default();
+            node.has_subtree_mark = true;
         }
         node.has_exact_mark = true;
     }
 
     pub fn insert_suffix(&mut self, suffix: &str) {
+        self.root.has_subtree_mark = true;
         let mut node = &mut self.root;
         for label in Self::split_labels_rev(suffix) {
             node = node.children.entry(label.to_ascii_lowercase()).or_default();
+            node.has_subtree_mark = true;
         }
         node.has_suffix_mark = true;
     }
@@ -99,14 +105,44 @@ impl DomainTrie {
             };
             node = next;
         }
-        Self::subtree_has_any_mark(node)
+        node.has_subtree_mark
     }
 
-    fn subtree_has_any_mark(node: &DomainTrieNode) -> bool {
-        if node.has_exact_mark || node.has_suffix_mark {
+    /// Visits marked domains at or below `tail` (in `O(labels + subtree_size)`) and returns true
+    /// as soon as `pred` matches one of them.
+    pub fn any_marked_domain_under<F>(&self, tail: &str, mut pred: F) -> bool
+    where
+        F: FnMut(&str) -> bool,
+    {
+        let clean_tail = tail.trim_end_matches('.').to_ascii_lowercase();
+        let mut node = &self.root;
+        for label in Self::split_labels_rev(&clean_tail) {
+            let Some(next) = node.children.get(label) else {
+                return false;
+            };
+            node = next;
+        }
+        Self::dfs_any_marked(node, &clean_tail, &mut pred)
+    }
+
+    fn dfs_any_marked<F>(node: &DomainTrieNode, cur_domain: &str, pred: &mut F) -> bool
+    where
+        F: FnMut(&str) -> bool,
+    {
+        if (node.has_exact_mark || node.has_suffix_mark) && pred(cur_domain) {
             return true;
         }
-        node.children.values().any(Self::subtree_has_any_mark)
+        for (label, child) in &node.children {
+            let next_domain = if cur_domain.is_empty() {
+                label.clone()
+            } else {
+                format!("{}.{}", label, cur_domain)
+            };
+            if Self::dfs_any_marked(child, &next_domain, pred) {
+                return true;
+            }
+        }
+        false
     }
 }
 
@@ -198,12 +234,95 @@ impl AllowScope {
     }
 
     fn blocks_wildcard(&self, wc: &str, static_tail: Option<&str>) -> bool {
-        static_tail.is_some_and(|tail| self.suffix_trie.has_suffix_ancestor_or_eq(tail))
-            || self
-                .exact_set
+        if let Some(tail) = static_tail {
+            if self.suffix_trie.has_suffix_ancestor_or_eq(tail) {
+                return true;
+            }
+            self.point_trie
+                .any_marked_domain_under(tail, |dom| wildcard_matches_domain(wc, dom))
+                || self
+                    .suffix_trie
+                    .any_marked_domain_under(tail, |dom| wildcard_matches_domain(wc, dom))
+        } else {
+            self.exact_set
                 .iter()
                 .chain(self.suffix_set.iter())
                 .any(|dom| wildcard_matches_domain(wc, dom))
+        }
+    }
+}
+
+/// Evaluates whether an auto-imported routing domain/suffix collides with a human Tier-P0b
+/// `FORCE_RULESET_ENTRIES` entry (`AdblockOverrides::force_rule_set_entries`).
+#[derive(Default)]
+pub struct HumanForcedBlockMatcher {
+    scope: AllowScope,
+    keywords: Vec<String>,
+    wildcards: Vec<String>,
+}
+
+impl HumanForcedBlockMatcher {
+    pub fn from_overrides(overrides: &AdblockOverrides) -> Self {
+        let mut exact_set = FxHashSet::default();
+        let mut suffix_set = FxHashSet::default();
+        let mut keywords = Vec::new();
+        let mut wildcards = Vec::new();
+        for f in &overrides.force_rule_set_entries {
+            let v = f.value.trim();
+            match f.kind.as_str() {
+                "DOMAIN" => {
+                    let d = v.trim_end_matches('.').to_ascii_lowercase();
+                    if is_valid_domain(&d) {
+                        exact_set.insert(d);
+                    }
+                }
+                "DOMAIN-SUFFIX" => {
+                    let s = v
+                        .trim_start_matches('.')
+                        .trim_end_matches('.')
+                        .to_ascii_lowercase();
+                    if is_valid_domain(&s) {
+                        suffix_set.insert(s);
+                    }
+                }
+                "DOMAIN-KEYWORD" => {
+                    let kw = v.to_ascii_lowercase();
+                    if !kw.is_empty() {
+                        keywords.push(kw);
+                    }
+                }
+                "DOMAIN-WILDCARD" => {
+                    let wc = v.trim_end_matches('.').to_ascii_lowercase();
+                    if !wc.is_empty() {
+                        wildcards.push(wc);
+                    }
+                }
+                _ => {}
+            }
+        }
+        Self {
+            scope: AllowScope::from_sets(exact_set, suffix_set),
+            keywords,
+            wildcards,
+        }
+    }
+
+    pub fn conflicts_with_exact(&self, dom: &str) -> bool {
+        self.scope.blocks_domain(dom)
+            || self.keywords.iter().any(|kw| dom.contains(kw.as_str()))
+            || self
+                .wildcards
+                .iter()
+                .any(|wc| wildcard_matches_domain(wc, dom))
+    }
+
+    pub fn conflicts_with_suffix(&self, suffix: &str) -> bool {
+        self.scope.blocks_suffix(suffix)
+            || self.keywords.iter().any(|kw| suffix.contains(kw.as_str()))
+            || self
+                .wildcards
+                .iter()
+                .any(|wc| wildcard_matches_domain(wc, suffix))
     }
 }
 
@@ -293,9 +412,20 @@ impl RuleClaim {
     }
 }
 
-/// Domain and suffix rules imported from clean-egress routing lists (`Telemetry.list`, `Payment.list`,
-/// and `AI.list`) so that `Adblock.list` and `Privacy.list` never conflict with or reject clean-exit
-/// risk-control, CAPTCHA, banking/payment, or AI endpoints.
+pub const CLEAN_EGRESS_FILES: &[&str] = &["Telemetry.list", "Payment.list", "AI.list"];
+pub const ROUTING_EXACT_ALLOWLIST_FILES: &[&str] = &[
+    "Direct.list",
+    "Proxy.list",
+    "AI.list",
+    "Payment.list",
+    "Telemetry.list",
+];
+
+/// Global routing protection set imported into Adblock & Privacy compilation:
+/// - Exact `DOMAIN` rules from all non-adblock/non-privacy routing rule sets (`Direct.list`,
+///   `Proxy.list`, `AI.list`, `Payment.list`, `Telemetry.list`), excluding wildcard, suffix,
+///   and keyword rules.
+/// - `DOMAIN-SUFFIX` rules from clean-egress routing lists (`Telemetry.list`, `Payment.list`, `AI.list`).
 #[derive(Clone, Default, Debug)]
 pub struct TelemetryProtectionSet {
     pub exact_domains: FxHashSet<String>,
@@ -309,9 +439,25 @@ impl TelemetryProtectionSet {
         out
     }
 
+    pub fn from_exact_domains_ruleset_text(text: &str) -> Self {
+        let mut out = Self::default();
+        out.ingest_exact_domains_from_ruleset_text(text);
+        out
+    }
+
     pub fn ingest_ruleset_text(&mut self, text: &str) {
+        self.ingest_inner(text, true);
+    }
+
+    /// Ingests strictly exact `DOMAIN,<hostname>` rules (ignoring `DOMAIN-SUFFIX`,
+    /// `DOMAIN-WILDCARD`, `DOMAIN-KEYWORD`, `AND`, IP rules, etc.) as protected allowlist hosts.
+    pub fn ingest_exact_domains_from_ruleset_text(&mut self, text: &str) {
+        self.ingest_inner(text, false);
+    }
+
+    fn ingest_inner(&mut self, text: &str, include_suffixes: bool) {
         for raw_line in text.lines() {
-            let line = raw_line.trim();
+            let line = strip_inline_comment(raw_line.trim_start_matches('\u{feff}'));
             if line.is_empty()
                 || line.starts_with('#')
                 || line.starts_with("//")
@@ -326,19 +472,21 @@ impl TelemetryProtectionSet {
             let Some(val) = parts.next() else {
                 continue;
             };
-            let clean = val
-                .trim_start_matches('.')
-                .trim_end_matches('.')
-                .to_ascii_lowercase();
-            if !is_valid_domain(&clean) {
-                continue;
-            }
             match kind {
                 "DOMAIN" => {
-                    self.exact_domains.insert(clean);
+                    let clean = val.trim_end_matches('.').to_ascii_lowercase();
+                    if is_valid_domain(&clean) {
+                        self.exact_domains.insert(clean);
+                    }
                 }
-                "DOMAIN-SUFFIX" => {
-                    self.suffix_domains.insert(clean);
+                "DOMAIN-SUFFIX" if include_suffixes => {
+                    let clean = val
+                        .trim_start_matches('.')
+                        .trim_end_matches('.')
+                        .to_ascii_lowercase();
+                    if is_valid_domain(&clean) {
+                        self.suffix_domains.insert(clean);
+                    }
                 }
                 _ => {}
             }
@@ -486,43 +634,20 @@ pub fn compile_adblock_with_guards(
             }
         }
     }
-    let forced_domain_vals: FxHashSet<String> = overrides
-        .force_rule_set_entries
-        .iter()
-        .map(|f| {
-            f.value
-                .trim()
-                .trim_start_matches('.')
-                .trim_end_matches('.')
-                .to_ascii_lowercase()
-        })
-        .collect();
+    let mut routing_guard_exact_set: FxHashSet<String> = FxHashSet::default();
+    let mut routing_guard_suffix_set: FxHashSet<String> = FxHashSet::default();
     if let Some(tguard) = telemetry_guard {
-        for d in &tguard.exact_domains {
-            if !forced_domain_vals.contains(d) {
-                human_allow_exact_set.insert(d.clone());
-            }
-        }
-        for s in &tguard.suffix_domains {
-            if !forced_domain_vals.contains(s) {
-                human_allow_suffix_set.insert(s.clone());
-            }
-        }
+        routing_guard_exact_set.extend(tguard.exact_domains.iter().cloned());
+        routing_guard_suffix_set.extend(tguard.suffix_domains.iter().cloned());
     }
+    if let Some(dguard) = direct_guard {
+        routing_guard_exact_set.extend(dguard.exact_domains.iter().cloned());
+    }
+    let routing_guard_scope = (!routing_guard_exact_set.is_empty()
+        || !routing_guard_suffix_set.is_empty())
+    .then(|| AllowScope::from_sets(routing_guard_exact_set, routing_guard_suffix_set));
     let direct_allow_scope = direct_guard.map(|dguard| {
-        let exact_set: FxHashSet<String> = dguard
-            .exact_domains
-            .iter()
-            .filter(|d| !forced_domain_vals.contains(*d))
-            .cloned()
-            .collect();
-        let suffix_set: FxHashSet<String> = dguard
-            .suffix_domains
-            .iter()
-            .filter(|s| !forced_domain_vals.contains(*s))
-            .cloned()
-            .collect();
-        AllowScope::from_sets(exact_set, suffix_set)
+        AllowScope::from_sets(dguard.exact_domains.clone(), dguard.suffix_domains.clone())
     });
     for apex in &overrides.protected_apex_domains {
         protected_apex_set.insert(
@@ -731,6 +856,9 @@ pub fn compile_adblock_with_guards(
         for s in &src.ruleset_suffixes {
             raw_seen_suffixes.insert(s.clone());
             let blocked = human_allow_scope.blocks_suffix(s)
+                || routing_guard_scope
+                    .as_ref()
+                    .is_some_and(|rg| rg.blocks_suffix(s))
                 || protected_apex_set.contains(s)
                 || complex_point_trie.has_mark_at_or_below(s)
                 || scope.blocks_suffix(s)
@@ -747,6 +875,9 @@ pub fn compile_adblock_with_guards(
         for d in &src.ruleset_domains {
             raw_seen_domains.insert(d.clone());
             let blocked = human_allow_scope.blocks_domain(d)
+                || routing_guard_scope
+                    .as_ref()
+                    .is_some_and(|rg| rg.blocks_domain(d))
                 || protected_apex_set.contains(d)
                 || complex_host_set.contains(d)
                 || scope.blocks_domain(d)
@@ -766,6 +897,9 @@ pub fn compile_adblock_with_guards(
             }
             let trimmed = kw.trim_matches(|c: char| !c.is_ascii_alphanumeric());
             let blocked = human_allow_scope.blocks_keyword(kw, trimmed)
+                || routing_guard_scope
+                    .as_ref()
+                    .is_some_and(|rg| rg.blocks_keyword(kw, trimmed))
                 || scope.blocks_keyword(kw, trimmed)
                 || src_direct_scope.is_some_and(|ds| ds.blocks_keyword(kw, trimmed))
                 || protected_apex_set
@@ -784,6 +918,9 @@ pub fn compile_adblock_with_guards(
         for wc in &src.ruleset_wildcards {
             let static_tail = wildcard_static_suffix(wc);
             let blocked = human_allow_scope.blocks_wildcard(wc, static_tail)
+                || routing_guard_scope
+                    .as_ref()
+                    .is_some_and(|rg| rg.blocks_wildcard(wc, static_tail))
                 || scope.blocks_wildcard(wc, static_tail)
                 || src_direct_scope.is_some_and(|ds| ds.blocks_wildcard(wc, static_tail))
                 || complex_host_set
@@ -1055,7 +1192,10 @@ pub fn compile_adblock_with_guards(
                 let blocked_by_human =
                     human_allow_scope.blocks_domain(&d) || protected_apex_set.contains(&d);
                 let blocked_by_upstream = !is_forced
-                    && (all_upstream_allow_scope.blocks_domain(&d)
+                    && (routing_guard_scope
+                        .as_ref()
+                        .is_some_and(|rg| rg.blocks_domain(&d))
+                        || all_upstream_allow_scope.blocks_domain(&d)
                         || complex_host_set.contains(&d));
                 !(blocked_by_human || blocked_by_upstream)
             }
@@ -1068,7 +1208,10 @@ pub fn compile_adblock_with_guards(
                 let blocked_by_human =
                     human_allow_scope.blocks_suffix(&s) || protected_apex_set.contains(&s);
                 let blocked_by_upstream = !is_forced
-                    && (all_upstream_allow_scope.blocks_suffix(&s)
+                    && (routing_guard_scope
+                        .as_ref()
+                        .is_some_and(|rg| rg.blocks_suffix(&s))
+                        || all_upstream_allow_scope.blocks_suffix(&s)
                         || complex_point_trie.has_mark_at_or_below(&s));
                 !(blocked_by_human || blocked_by_upstream)
             }
@@ -2802,8 +2945,8 @@ pub fn wildcard_matches_domain(wildcard: &str, domain: &str) -> bool {
     if !wildcard.contains('*') && !wildcard.contains('?') {
         return wildcard == domain;
     }
-    let w: Vec<u8> = wildcard.bytes().collect();
-    let d: Vec<u8> = domain.bytes().collect();
+    let w = wildcard.as_bytes();
+    let d = domain.as_bytes();
     let (mut wi, mut di) = (0usize, 0usize);
     let (mut star_w, mut match_d) = (None, 0usize);
 
@@ -3118,7 +3261,7 @@ fn order_host_list(vals: &BTreeSet<String>) -> Vec<String> {
     neg
 }
 
-fn wildcard_static_suffix(wc: &str) -> Option<&str> {
+pub fn wildcard_static_suffix(wc: &str) -> Option<&str> {
     let labels: Vec<&str> = wc.split('.').collect();
     let mut first_static = labels.len();
     while first_static > 0 {

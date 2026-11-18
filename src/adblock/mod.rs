@@ -17,7 +17,8 @@ use rustc_hash::FxHashMap;
 use tracing::{info, warn};
 
 use crate::adblock::compiler::{
-    DirectProtectionSet, TelemetryProtectionSet, compile_adblock_with_guards,
+    CLEAN_EGRESS_FILES, DirectProtectionSet, ROUTING_EXACT_ALLOWLIST_FILES, TelemetryProtectionSet,
+    compile_adblock_with_guards,
 };
 use crate::adblock::config::{AdblockOverrides, AdblockSourceCatalog, AdblockSourceConfig};
 use crate::adblock::model::ParsedAdblockSource;
@@ -109,7 +110,7 @@ pub async fn build_adblock_pipeline(
 
     let mut clean_guard = TelemetryProtectionSet::default();
     let mut loaded_clean_lists = Vec::new();
-    for clean_file in ["Telemetry.list", "Payment.list", "AI.list"] {
+    for clean_file in CLEAN_EGRESS_FILES {
         let clean_path = opts.output_dir.join(clean_file);
         if clean_path.exists() {
             let clean_raw = fs::read_to_string(&clean_path).with_context(|| {
@@ -119,12 +120,24 @@ pub async fn build_adblock_pipeline(
             loaded_clean_lists.push(clean_file);
         }
     }
-    let telemetry_guard = if !loaded_clean_lists.is_empty() {
+    let mut loaded_exact_lists = Vec::new();
+    for exact_file in ROUTING_EXACT_ALLOWLIST_FILES {
+        let exact_path = opts.output_dir.join(exact_file);
+        if exact_path.exists() {
+            let exact_raw = fs::read_to_string(&exact_path).with_context(|| {
+                format!("failed reading {} at {}", exact_file, exact_path.display())
+            })?;
+            clean_guard.ingest_exact_domains_from_ruleset_text(&exact_raw);
+            loaded_exact_lists.push(exact_file);
+        }
+    }
+    let telemetry_guard = if !loaded_clean_lists.is_empty() || !loaded_exact_lists.is_empty() {
         info!(
-            lists = ?loaded_clean_lists,
-            clean_exact = clean_guard.exact_domains.len(),
-            clean_suffixes = clean_guard.suffix_domains.len(),
-            "loaded clean-egress protection guard (Telemetry/Payment/AI) for Adblock & Privacy compilation"
+            exact_lists = ?loaded_exact_lists,
+            clean_suffix_lists = ?loaded_clean_lists,
+            protected_exact = clean_guard.exact_domains.len(),
+            protected_suffixes = clean_guard.suffix_domains.len(),
+            "loaded routing exact-domain allowlist & clean-egress protection guard for Adblock & Privacy compilation"
         );
         Some(clean_guard)
     } else {

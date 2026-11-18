@@ -9,10 +9,12 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 
 use crate::adblock::compiler::{
-    DomainTrie, TelemetryProtectionSet, overlaps_reserved_v4, overlaps_reserved_v6,
-    overlaps_shared_cdn_or_dns_v4, overlaps_shared_cdn_or_dns_v6,
+    CLEAN_EGRESS_FILES, DomainTrie, HumanForcedBlockMatcher, ROUTING_EXACT_ALLOWLIST_FILES,
+    TelemetryProtectionSet, overlaps_reserved_v4, overlaps_reserved_v6,
+    overlaps_shared_cdn_or_dns_v4, overlaps_shared_cdn_or_dns_v6, wildcard_matches_domain,
+    wildcard_static_suffix,
 };
-use crate::adblock::config::AdblockOverrides;
+use crate::adblock::config::{AdblockOverrides, AllowDomainMatchType};
 use crate::adblock::model::{MAX_BINARY_SCRIPT_MAX_SIZE, MAX_SCRIPT_TIMEOUT_SECS};
 use crate::adblock::parsers::surge_module::{split_surge_script_params, unquote_surge_value};
 use crate::adblock::regex_util::{
@@ -87,6 +89,8 @@ struct VerifiedRuleset {
     total: usize,
     lines: FxHashSet<String>,
     domains: Vec<String>,
+    keywords: Vec<String>,
+    wildcards: Vec<String>,
     cidrs_v4: Vec<Ipv4Net>,
     cidrs_v6: Vec<Ipv6Net>,
 }
@@ -141,9 +145,32 @@ pub fn verify_adblock_dir(
     verify_disjoint_cidrs_v4(&ad_verified.cidrs_v4, &priv_verified.cidrs_v4)?;
     verify_disjoint_cidrs_v6(&ad_verified.cidrs_v6, &priv_verified.cidrs_v6)?;
 
-    // When clean-egress lists (Telemetry.list, Payment.list, AI.list) are present in the artifact
-    // directory, strictly enforce zero conflict between each list and both Adblock.list and Privacy.list.
-    for clean_file in ["Telemetry.list", "Payment.list", "AI.list"] {
+    let (module_scripts, module_mitm_hosts, mitm_exclusions_seen, module_reject_trie) =
+        verify_module_text_inner(&module_raw)?;
+
+    let mut human_allow_trie = DomainTrie::default();
+    for entry in &overrides.allow_domains {
+        let dom = entry
+            .domain
+            .trim()
+            .trim_end_matches('.')
+            .to_ascii_lowercase();
+        match entry.match_type {
+            AllowDomainMatchType::Exact => human_allow_trie.insert_exact(&dom),
+            AllowDomainMatchType::Suffix => human_allow_trie.insert_suffix(&dom),
+        }
+    }
+    let protected_apex_set: FxHashSet<String> = overrides
+        .protected_apex_domains
+        .iter()
+        .map(|a| a.domain.trim().trim_end_matches('.').to_ascii_lowercase())
+        .collect();
+    let forced_matcher = HumanForcedBlockMatcher::from_overrides(overrides);
+
+    // 1) When clean-egress lists (Telemetry.list, Payment.list, AI.list) are present in the artifact
+    //    directory, strictly enforce zero conflict (both DOMAIN and DOMAIN-SUFFIX) against Adblock.list
+    //    and Privacy.list unless explicitly overridden by human forceRuleSetEntries.
+    for clean_file in CLEAN_EGRESS_FILES {
         let clean_path = dir.join(clean_file);
         if clean_path.exists() {
             let clean_raw = fs::read_to_string(&clean_path).with_context(|| {
@@ -151,17 +178,26 @@ pub fn verify_adblock_dir(
             })?;
             let clean_set = TelemetryProtectionSet::from_ruleset_text(&clean_raw);
             let mut clean_trie = DomainTrie::default();
+            let mut active_clean_domains = Vec::new();
             for d in &clean_set.exact_domains {
-                clean_trie.insert_exact(d);
+                if human_allow_trie.matches_domain(d)
+                    || protected_apex_set.contains(d)
+                    || !forced_matcher.conflicts_with_exact(d)
+                {
+                    clean_trie.insert_exact(d);
+                    active_clean_domains.push(d.as_str());
+                }
             }
             for s in &clean_set.suffix_domains {
                 clean_trie.insert_suffix(s);
+                if human_allow_trie.matches_domain(s)
+                    || protected_apex_set.contains(s)
+                    || !forced_matcher.conflicts_with_suffix(s)
+                {
+                    active_clean_domains.push(s.as_str());
+                }
             }
-            for d in clean_set
-                .exact_domains
-                .iter()
-                .chain(clean_set.suffix_domains.iter())
-            {
+            for d in active_clean_domains {
                 if ad_verified.trie.matches_domain(d) {
                     bail!(
                         "{} domain '{}' is conflicted/blocked by Adblock.list",
@@ -178,20 +214,124 @@ pub fn verify_adblock_dir(
                 }
             }
             for d in &ad_verified.domains {
-                if clean_trie.matches_domain(d) {
+                let explicitly_forced = !human_allow_trie.matches_domain(d)
+                    && !protected_apex_set.contains(d)
+                    && forced_matcher.conflicts_with_exact(d);
+                if !explicitly_forced && clean_trie.matches_domain(d) {
                     bail!("Adblock.list domain '{}' conflicts with {}", d, clean_file);
                 }
             }
             for d in &priv_verified.domains {
-                if clean_trie.matches_domain(d) {
+                let explicitly_forced = !human_allow_trie.matches_domain(d)
+                    && !protected_apex_set.contains(d)
+                    && forced_matcher.conflicts_with_exact(d);
+                if !explicitly_forced && clean_trie.matches_domain(d) {
                     bail!("Privacy.list domain '{}' conflicts with {}", d, clean_file);
                 }
             }
         }
     }
 
-    let (module_scripts, module_mitm_hosts, mitm_exclusions_seen) =
-        verify_module_text_inner(&module_raw)?;
+    // 2) For ALL non-adblock/non-privacy routing rule sets (Direct.list, Proxy.list, AI.list,
+    //    Payment.list, Telemetry.list), strictly enforce that every exact `DOMAIN` rule (excluding
+    //    suffix, wildcard, and keyword rules) is allowlisted and never matched by Adblock.list,
+    //    Privacy.list, or Adblock.sgmodule [Rule] REJECT entries (unless explicitly human-forced).
+    for routing_file in ROUTING_EXACT_ALLOWLIST_FILES {
+        let routing_path = dir.join(routing_file);
+        if routing_path.exists() {
+            let routing_raw = fs::read_to_string(&routing_path).with_context(|| {
+                format!(
+                    "failed reading {} at {}",
+                    routing_file,
+                    routing_path.display()
+                )
+            })?;
+            let exact_set = TelemetryProtectionSet::from_exact_domains_ruleset_text(&routing_raw);
+            let mut routing_exact_trie = DomainTrie::default();
+            let mut protected_exacts: Vec<&str> = Vec::with_capacity(exact_set.exact_domains.len());
+            for d in &exact_set.exact_domains {
+                if human_allow_trie.matches_domain(d)
+                    || protected_apex_set.contains(d)
+                    || !forced_matcher.conflicts_with_exact(d)
+                {
+                    routing_exact_trie.insert_exact(d);
+                    protected_exacts.push(d.as_str());
+                }
+            }
+
+            for &d in &protected_exacts {
+                if ad_verified.trie.matches_domain(d) {
+                    bail!(
+                        "{} exact DOMAIN '{}' is blocked by Adblock.list domain/suffix rule",
+                        routing_file,
+                        d
+                    );
+                }
+                if priv_verified.trie.matches_domain(d) {
+                    bail!(
+                        "{} exact DOMAIN '{}' is blocked by Privacy.list domain/suffix rule",
+                        routing_file,
+                        d
+                    );
+                }
+                if module_reject_trie.matches_domain(d) {
+                    bail!(
+                        "{} exact DOMAIN '{}' is blocked by Adblock.sgmodule [Rule] REJECT rule",
+                        routing_file,
+                        d
+                    );
+                }
+                if let Some(kw) = ad_verified
+                    .keywords
+                    .iter()
+                    .find(|kw| d.contains(kw.as_str()))
+                {
+                    bail!(
+                        "{} exact DOMAIN '{}' is blocked by Adblock.list DOMAIN-KEYWORD '{}'",
+                        routing_file,
+                        d,
+                        kw
+                    );
+                }
+                if let Some(kw) = priv_verified
+                    .keywords
+                    .iter()
+                    .find(|kw| d.contains(kw.as_str()))
+                {
+                    bail!(
+                        "{} exact DOMAIN '{}' is blocked by Privacy.list DOMAIN-KEYWORD '{}'",
+                        routing_file,
+                        d,
+                        kw
+                    );
+                }
+            }
+
+            for (label, wcs) in [
+                ("Adblock.list", &ad_verified.wildcards),
+                ("Privacy.list", &priv_verified.wildcards),
+            ] {
+                for wc in wcs {
+                    let hit = if let Some(tail) = wildcard_static_suffix(wc) {
+                        routing_exact_trie
+                            .any_marked_domain_under(tail, |dom| wildcard_matches_domain(wc, dom))
+                    } else {
+                        protected_exacts
+                            .iter()
+                            .any(|dom| wildcard_matches_domain(wc, dom))
+                    };
+                    if hit {
+                        bail!(
+                            "{} DOMAIN-WILDCARD '{}' blocks a protected exact DOMAIN in {}",
+                            label,
+                            wc,
+                            routing_file
+                        );
+                    }
+                }
+            }
+        }
+    }
 
     for ex in &overrides.mitm_excluded_hosts {
         let pat = ex.pattern.trim().to_ascii_lowercase();
@@ -359,6 +499,8 @@ fn verify_ruleset_text(
     let mut total = 0usize;
     let mut lines: FxHashSet<String> = FxHashSet::default();
     let mut domains: Vec<String> = Vec::new();
+    let mut keywords: Vec<String> = Vec::new();
+    let mut wildcards: Vec<String> = Vec::new();
     let mut cidrs_v4: Vec<Ipv4Net> = Vec::new();
     let mut cidrs_v6: Vec<Ipv6Net> = Vec::new();
 
@@ -445,6 +587,7 @@ fn verify_ruleset_text(
                         val
                     );
                 }
+                keywords.push(val.to_ascii_lowercase());
             }
             "DOMAIN-WILDCARD" => {
                 if !is_valid_domain_wildcard(val) {
@@ -455,6 +598,7 @@ fn verify_ruleset_text(
                         val
                     );
                 }
+                wildcards.push(val.to_ascii_lowercase());
             }
             "IP-CIDR" => {
                 let net: Ipv4Net = val.parse().with_context(|| {
@@ -575,6 +719,8 @@ fn verify_ruleset_text(
         total,
         lines,
         domains,
+        keywords,
+        wildcards,
         cidrs_v4,
         cidrs_v6,
     })
@@ -582,11 +728,11 @@ fn verify_ruleset_text(
 
 /// Validates an emitted `Adblock.sgmodule` strictly against Surge's official module specification.
 pub fn verify_module_text(text: &str) -> Result<(usize, usize)> {
-    let (scripts, hosts, _) = verify_module_text_inner(text)?;
+    let (scripts, hosts, _, _) = verify_module_text_inner(text)?;
     Ok((scripts, hosts))
 }
 
-fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<String>)> {
+fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<String>, DomainTrie)> {
     if !text.contains("#!name=")
         || !text.contains("#!desc=")
         || !text.contains("#!requirement=CORE_VERSION>=20")
@@ -602,6 +748,7 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
     let mut script_triggers: FxHashSet<(String, String)> = FxHashSet::default();
     let mut mitm_hosts_count = 0usize;
     let mut mitm_exclusions_seen: FxHashSet<String> = FxHashSet::default();
+    let mut module_reject_trie = DomainTrie::default();
     let mut has_mitm_section = false;
 
     for (line_no, raw_line) in text.lines().enumerate() {
@@ -929,6 +1076,33 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
                     }
                 }
             }
+            "[Rule]" => {
+                let parts: Vec<&str> = line.split(',').map(str::trim).collect();
+                if parts.len() >= 3
+                    && parts
+                        .iter()
+                        .any(|p| p.to_ascii_uppercase().starts_with("REJECT"))
+                {
+                    match parts[0].to_ascii_uppercase().as_str() {
+                        "DOMAIN" => {
+                            let d = parts[1].trim_end_matches('.').to_ascii_lowercase();
+                            if is_valid_domain(&d) {
+                                module_reject_trie.insert_exact(&d);
+                            }
+                        }
+                        "DOMAIN-SUFFIX" => {
+                            let s = parts[1]
+                                .trim_start_matches('.')
+                                .trim_end_matches('.')
+                                .to_ascii_lowercase();
+                            if is_valid_domain(&s) {
+                                module_reject_trie.insert_suffix(&s);
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
             _ => {}
         }
     }
@@ -937,7 +1111,12 @@ fn verify_module_text_inner(text: &str) -> Result<(usize, usize, FxHashSet<Strin
         bail!("Adblock.sgmodule missing [MITM] section");
     }
 
-    Ok((script_names.len(), mitm_hosts_count, mitm_exclusions_seen))
+    Ok((
+        script_names.len(),
+        mitm_hosts_count,
+        mitm_exclusions_seen,
+        module_reject_trie,
+    ))
 }
 
 pub fn file_summary(name: &str, bytes: &[u8], line_count: usize) -> AdblockFileSummary {

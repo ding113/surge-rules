@@ -2830,3 +2830,270 @@ hostname = %INSERT% *.iqiyi.com, rr*.googlevideo.com, cupid.iqiyi.com, orphan.un
     assert!(!compiled.module_text.contains("ap[ip]"));
     assert!(!compiled.module_text.contains("gamersky"));
 }
+
+#[test]
+fn routing_exact_domains_auto_allowlisted_across_all_lists_while_ignoring_non_exact_routing_rules()
+{
+    use surge_rules::adblock::model::ModuleRuleLine;
+
+    let overrides = AdblockOverrides::empty();
+
+    let proxy_raw = "\
+# Proxy.list fixture\n\
+DOMAIN,account.bandainamcoid.com\n\
+DOMAIN,bandainamcoid.com\n\
+DOMAIN,nekopoi.click.com,extended-matching\n\
+DOMAIN-SUFFIX,proxy-broad.com,extended-matching\n\
+DOMAIN-WILDCARD,*.proxy-wc.net,extended-matching\n\
+DOMAIN-KEYWORD,proxykw,extended-matching\n";
+
+    let direct_raw = "\
+# Direct.list fixture\n\
+DOMAIN,beacons.gvt2.com\n\
+DOMAIN,portal.domestic-biz.cn\n\
+DOMAIN-SUFFIX,direct-broad.cn\n\
+DOMAIN-WILDCARD,*.direct-wc.cn\n\
+DOMAIN-KEYWORD,directkw\n";
+
+    let payment_raw = "DOMAIN,checkout.bank-pay.com\n";
+    let ai_raw = "DOMAIN,api.ai-app.io\n";
+    let telemetry_raw = "DOMAIN,challenge.risk-check.net\n";
+
+    let mut guard = TelemetryProtectionSet::default();
+    for clean_txt in [telemetry_raw, payment_raw, ai_raw] {
+        guard.ingest_ruleset_text(clean_txt);
+    }
+    for exact_txt in [direct_raw, proxy_raw, ai_raw, payment_raw, telemetry_raw] {
+        guard.ingest_exact_domains_from_ruleset_text(exact_txt);
+    }
+
+    // Ensure non-exact rules from Proxy.list and Direct.list were NOT ingested into guard
+    assert!(!guard.suffix_domains.contains("proxy-broad.com"));
+    assert!(!guard.suffix_domains.contains("direct-broad.cn"));
+    assert!(!guard.exact_domains.contains("proxy-broad.com"));
+
+    let mut src_ad = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "ad_feed".to_string(),
+        weight: 92,
+        filter_direct_collisions: false,
+        ..Default::default()
+    };
+    // Rules colliding with exact DOMAINs in Proxy/Direct/Payment/AI/Telemetry -> must be suppressed
+    src_ad
+        .ruleset_suffixes
+        .insert("bandainamcoid.com".to_string());
+    src_ad
+        .ruleset_domains
+        .insert("portal.domestic-biz.cn".to_string());
+    src_ad
+        .ruleset_wildcards
+        .insert("beacons*.gvt?.com".to_string());
+    src_ad
+        .ruleset_wildcards
+        .insert("*.domestic-biz.cn".to_string());
+    src_ad.ruleset_keywords.insert("domestic-biz".to_string());
+    src_ad
+        .ruleset_domains
+        .insert("checkout.bank-pay.com".to_string());
+    src_ad.module_rules.push(ModuleRuleLine {
+        line: "DOMAIN,portal.domestic-biz.cn,REJECT,pre-matching".to_string(),
+        weight: 95,
+    });
+    // Sibling/subdomain ad rules that do NOT match exact routing domains -> must SURVIVE
+    src_ad
+        .ruleset_domains
+        .insert("ads.bandainamcoid.com".to_string());
+    src_ad
+        .ruleset_suffixes
+        .insert("ad-sdk.bandainamcoid.com".to_string());
+    // Rules under Proxy/Direct non-exact suffix/wildcard/keyword -> must SURVIVE
+    src_ad
+        .ruleset_domains
+        .insert("ads.proxy-broad.com".to_string());
+    src_ad
+        .ruleset_domains
+        .insert("ads.proxy-wc.net".to_string());
+    src_ad.ruleset_domains.insert("ad-proxykw.com".to_string());
+    src_ad
+        .ruleset_domains
+        .insert("ads.direct-broad.cn".to_string());
+    src_ad
+        .ruleset_domains
+        .insert("ads.direct-wc.cn".to_string());
+    src_ad.ruleset_domains.insert("ad-directkw.cn".to_string());
+
+    let mut src_priv = ParsedAdblockSource {
+        category: AdblockCategory::Privacy,
+        lineage: "priv_feed".to_string(),
+        weight: 91,
+        ..Default::default()
+    };
+    // Privacy suffix `click.com` would block `nekopoi.click.com` in Proxy.list -> must be suppressed
+    src_priv.ruleset_suffixes.insert("click.com".to_string());
+    src_priv.ruleset_domains.insert("api.ai-app.io".to_string());
+    src_priv
+        .ruleset_domains
+        .insert("challenge.risk-check.net".to_string());
+    // Unrelated tracker under click.com -> must SURVIVE
+    src_priv.ruleset_domains.insert("trk.click.com".to_string());
+
+    let dguard = DirectProtectionSet::from_ruleset_text(direct_raw);
+    let compiled = compile_adblock_with_guards(
+        &[src_ad, src_priv],
+        &overrides,
+        Some(&guard),
+        Some(&dguard),
+        2,
+        2,
+    );
+
+    // Suppressed exact/ancestor/wildcard/keyword collisions
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,bandainamcoid.com\n")
+    );
+    assert!(!compiled.ruleset_text.contains("portal.domestic-biz.cn"));
+    assert!(!compiled.ruleset_text.contains("beacons*.gvt?.com"));
+    assert!(!compiled.ruleset_text.contains("*.domestic-biz.cn"));
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN-KEYWORD,domestic-biz\n")
+    );
+    assert!(!compiled.ruleset_text.contains("checkout.bank-pay.com"));
+    assert!(!compiled.module_text.contains("portal.domestic-biz.cn"));
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("DOMAIN-SUFFIX,click.com\n")
+    );
+    assert!(!compiled.privacy_ruleset_text.contains("api.ai-app.io"));
+    assert!(
+        !compiled
+            .privacy_ruleset_text
+            .contains("challenge.risk-check.net")
+    );
+
+    // Preserved ad subdomains and non-exact routing rule neighbors
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,ads.bandainamcoid.com\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,ad-sdk.bandainamcoid.com\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,ads.proxy-broad.com\n")
+    );
+    assert!(compiled.ruleset_text.contains("DOMAIN,ads.proxy-wc.net\n"));
+    assert!(compiled.ruleset_text.contains("DOMAIN,ad-proxykw.com\n"));
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,ads.direct-broad.cn\n")
+    );
+    assert!(compiled.ruleset_text.contains("DOMAIN,ads.direct-wc.cn\n"));
+    assert!(compiled.ruleset_text.contains("DOMAIN,ad-directkw.cn\n"));
+    assert!(
+        compiled
+            .privacy_ruleset_text
+            .contains("DOMAIN,trk.click.com\n")
+    );
+
+    // Full artifact directory verification must pass
+    let tmp = TempDir::new().unwrap();
+    fs::write(tmp.path().join("Proxy.list"), proxy_raw).unwrap();
+    fs::write(tmp.path().join("Direct.list"), direct_raw).unwrap();
+    fs::write(tmp.path().join("Payment.list"), payment_raw).unwrap();
+    fs::write(tmp.path().join("AI.list"), ai_raw).unwrap();
+    fs::write(tmp.path().join("Telemetry.list"), telemetry_raw).unwrap();
+    fs::write(tmp.path().join("Adblock.list"), &compiled.ruleset_text).unwrap();
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        &compiled.privacy_ruleset_text,
+    )
+    .unwrap();
+    fs::write(tmp.path().join("Adblock.sgmodule"), &compiled.module_text).unwrap();
+
+    verify_adblock_dir(tmp.path(), &overrides, 0, 0)
+        .expect("exact routing allowlist protection must satisfy verify_adblock_dir");
+
+    // Verifier must reject Adblock.list suffix/wildcard/keyword blocking a Proxy.list exact DOMAIN
+    fs::write(
+        tmp.path().join("Adblock.list"),
+        format!("{}DOMAIN-SUFFIX,bandainamcoid.com\n", compiled.ruleset_text),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "Adblock.list suffix matching Proxy.list exact DOMAIN must fail verifier"
+    );
+
+    fs::write(
+        tmp.path().join("Adblock.list"),
+        format!(
+            "{}DOMAIN-WILDCARD,*.bandainamcoid.com\n",
+            compiled.ruleset_text
+        ),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "Adblock.list wildcard matching Proxy.list exact DOMAIN must fail verifier"
+    );
+}
+
+#[test]
+fn human_force_ruleset_beats_auto_routing_exact_allowlist_while_human_allow_beats_force() {
+    let proxy_raw = "DOMAIN,sub.forced-adnet.com\nDOMAIN,safe.forced-adnet.com\n";
+    let guard = TelemetryProtectionSet::from_exact_domains_ruleset_text(proxy_raw);
+
+    let mut overrides = AdblockOverrides::empty();
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
+        kind: "DOMAIN-SUFFIX".to_string(),
+        value: "forced-adnet.com".to_string(),
+        rationale: "Explicit human Tier-P0b force block beats auto-imported routing exact domain"
+            .to_string(),
+    });
+
+    let compiled = compile_adblock_with_guards(&[], &overrides, Some(&guard), None, 1, 1);
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,forced-adnet.com\n")
+    );
+
+    let tmp = TempDir::new().unwrap();
+    fs::write(tmp.path().join("Proxy.list"), proxy_raw).unwrap();
+    fs::write(tmp.path().join("Adblock.list"), &compiled.ruleset_text).unwrap();
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        &compiled.privacy_ruleset_text,
+    )
+    .unwrap();
+    fs::write(tmp.path().join("Adblock.sgmodule"), &compiled.module_text).unwrap();
+    verify_adblock_dir(tmp.path(), &overrides, 0, 0).expect(
+        "human forced suffix must remain valid even when Proxy.list contains a child exact domain",
+    );
+
+    // Adding a human Tier-P0a allowDomain overrides Tier-P0b forceRuleSetEntries
+    overrides.allow_domains.push(AllowDomainOverride {
+        match_type: AllowDomainMatchType::Exact,
+        domain: "safe.forced-adnet.com".to_string(),
+        rationale: "Human P0a allow overrides P0b force".to_string(),
+    });
+    let compiled2 = compile_adblock_with_guards(&[], &overrides, Some(&guard), None, 1, 1);
+    assert!(
+        !compiled2
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,forced-adnet.com\n")
+    );
+}
