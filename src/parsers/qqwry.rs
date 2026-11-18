@@ -1,9 +1,10 @@
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
 use encoding_rs::GB18030;
 use rustc_hash::FxHashMap;
 
 use crate::config::{MetadataRegistry, SourceConfig, normalize_isp_name};
 use crate::model::{IsoCode, ObsPayload, ParsedSource, effective_prefix_v4};
+use crate::parsers::{checked_slice, read_u32_le};
 
 pub fn parse_qqwry(
     src: &SourceConfig,
@@ -13,9 +14,12 @@ pub fn parse_qqwry(
     if bytes.len() < 8 {
         bail!("QQWry file '{}' too short ({} bytes)", src.id, bytes.len());
     }
-    let first_idx = u32::from_le_bytes(bytes[0..4].try_into().unwrap()) as usize;
-    let last_idx = u32::from_le_bytes(bytes[4..8].try_into().unwrap()) as usize;
-    if first_idx >= bytes.len() || last_idx + 7 > bytes.len() || first_idx > last_idx {
+    let first_idx = read_u32_le(bytes, 0).context("QQWry header EOF")? as usize;
+    let last_idx = read_u32_le(bytes, 4).context("QQWry header EOF")? as usize;
+    if first_idx >= bytes.len()
+        || last_idx.checked_add(7).is_none_or(|end| end > bytes.len())
+        || first_idx > last_idx
+    {
         bail!(
             "invalid QQWry header offsets in '{}': first={} last={} len={}",
             src.id,
@@ -31,20 +35,22 @@ pub fn parse_qqwry(
 
     let mut idx_pos = first_idx;
     while idx_pos <= last_idx {
-        let start_ip = u32::from_le_bytes(bytes[idx_pos..idx_pos + 4].try_into().unwrap());
-        let rec_off = u32::from_le_bytes([
-            bytes[idx_pos + 4],
-            bytes[idx_pos + 5],
-            bytes[idx_pos + 6],
-            0,
-        ]) as usize;
+        let Some(entry) = checked_slice(bytes, idx_pos, 7) else {
+            break;
+        };
+        let Some(start_ip) = read_u32_le(entry, 0) else {
+            break;
+        };
+        let rec_off = u32::from_le_bytes([entry[4], entry[5], entry[6], 0]) as usize;
         idx_pos += 7;
 
         // Skip 255.255.255.0/24 version metadata banner
-        if start_ip >= 0xFFFF_FF00 || rec_off + 5 > bytes.len() {
+        if start_ip >= 0xFFFF_FF00 || checked_slice(bytes, rec_off, 5).is_none() {
             continue;
         }
-        let end_ip = u32::from_le_bytes(bytes[rec_off..rec_off + 4].try_into().unwrap());
+        let Some(end_ip) = read_u32_le(bytes, rec_off) else {
+            continue;
+        };
         if end_ip < start_ip {
             continue;
         }

@@ -110,15 +110,12 @@ pub async fn build_routing_pipeline(
 
     let parsed_results: Vec<(String, bool, RoutingTarget, Result<ParsedRoutingSource>)> = fetched
         .par_iter()
-        .map(|item| {
-            let src = source_map
-                .get(item.source_id.as_str())
-                .copied()
-                .expect("fetched source must exist in catalog");
+        .filter_map(|item| {
+            let src = *source_map.get(item.source_id.as_str())?;
             let res = fs::read(&item.data_path)
                 .with_context(|| format!("failed to read cached {}", item.data_path.display()))
                 .and_then(|bytes| parse_routing_source(&bytes, src));
-            (item.source_id.clone(), src.core, src.target, res)
+            Some((item.source_id.clone(), src.core, src.target, res))
         })
         .collect();
 

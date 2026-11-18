@@ -15,6 +15,59 @@ use anyhow::Result;
 use crate::config::{MetadataRegistry, SourceConfig, SourceFormat};
 use crate::model::ParsedSource;
 
+#[inline]
+pub(crate) fn checked_slice(bytes: &[u8], offset: usize, len: usize) -> Option<&[u8]> {
+    bytes.get(offset..offset.checked_add(len)?)
+}
+
+#[inline]
+pub(crate) fn read_u16_le(bytes: &[u8], offset: usize) -> Option<u16> {
+    let arr: [u8; 2] = checked_slice(bytes, offset, 2)?.try_into().ok()?;
+    Some(u16::from_le_bytes(arr))
+}
+
+#[inline]
+pub(crate) fn read_u16_be(bytes: &[u8], offset: usize) -> Option<u16> {
+    let arr: [u8; 2] = checked_slice(bytes, offset, 2)?.try_into().ok()?;
+    Some(u16::from_be_bytes(arr))
+}
+
+#[inline]
+pub(crate) fn read_u32_le(bytes: &[u8], offset: usize) -> Option<u32> {
+    let arr: [u8; 4] = checked_slice(bytes, offset, 4)?.try_into().ok()?;
+    Some(u32::from_le_bytes(arr))
+}
+
+#[inline]
+pub(crate) fn read_u32_be(bytes: &[u8], offset: usize) -> Option<u32> {
+    let arr: [u8; 4] = checked_slice(bytes, offset, 4)?.try_into().ok()?;
+    Some(u32::from_be_bytes(arr))
+}
+
+#[inline]
+pub(crate) fn read_u128_le(bytes: &[u8], offset: usize) -> Option<u128> {
+    let arr: [u8; 16] = checked_slice(bytes, offset, 16)?.try_into().ok()?;
+    Some(u128::from_le_bytes(arr))
+}
+
+#[inline]
+pub(crate) fn read_u128_be(bytes: &[u8], offset: usize) -> Option<u128> {
+    let arr: [u8; 16] = checked_slice(bytes, offset, 16)?.try_into().ok()?;
+    Some(u128::from_be_bytes(arr))
+}
+
+#[inline]
+pub(crate) fn read_f32_be(bytes: &[u8], offset: usize) -> Option<f32> {
+    let arr: [u8; 4] = checked_slice(bytes, offset, 4)?.try_into().ok()?;
+    Some(f32::from_be_bytes(arr))
+}
+
+#[inline]
+pub(crate) fn read_f64_be(bytes: &[u8], offset: usize) -> Option<f64> {
+    let arr: [u8; 8] = checked_slice(bytes, offset, 8)?.try_into().ok()?;
+    Some(f64::from_be_bytes(arr))
+}
+
 pub fn parse_source_bytes(
     src: &SourceConfig,
     bytes: &[u8],

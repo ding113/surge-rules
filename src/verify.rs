@@ -121,7 +121,7 @@ pub fn verify_artifact_dir(
     ];
 
     for &(ip_str, expected_vnet) in special_canaries {
-        let ip: IpAddr = ip_str.parse().unwrap();
+        let ip: IpAddr = ip_str.parse()?;
         let val: Option<serde_json::Value> = lookup_opt(&country_reader, ip)
             .with_context(|| format!("Country.mmdb lookup error for {}", ip_str))?;
         let Some(doc) = val else {
@@ -203,7 +203,7 @@ pub fn verify_artifact_dir(
             ("114.114.114.114", &[][..]),
             ("182.254.118.119", &[][..]),
         ] {
-            let ip: IpAddr = ip_str.parse().unwrap();
+            let ip: IpAddr = ip_str.parse()?;
             // Verify typed MaxMind structs decode cleanly
             let typed_city: geoip2::City<'_> = lookup_opt(&country_reader, ip)?
                 .with_context(|| format!("{} missing in Country.mmdb", ip_str))?;
@@ -241,7 +241,7 @@ pub fn verify_artifact_dir(
         }
 
         // Also check IPv4-mapped IPv6 lookup `::ffff:223.5.5.5`
-        let mapped_ip: IpAddr = "::ffff:223.5.5.5".parse().unwrap();
+        let mapped_ip: IpAddr = "::ffff:223.5.5.5".parse()?;
         let mapped_city: geoip2::City<'_> = lookup_opt(&country_reader, mapped_ip)?
             .context("::ffff:223.5.5.5 missing via IPv4-mapped subtree")?;
         if mapped_city.country.and_then(|c| c.iso_code) != Some("CN") {
@@ -261,7 +261,7 @@ pub fn verify_artifact_dir(
             ("168.95.1.1", Some("TW"), Some(3462u32)),
             ("114.24.27.200", Some("TW"), Some(3462u32)),
         ] {
-            let ip: IpAddr = ip_str.parse().unwrap();
+            let ip: IpAddr = ip_str.parse()?;
             let doc: serde_json::Value = lookup_opt(&country_reader, ip)?
                 .with_context(|| format!("{} missing in Country.mmdb", ip_str))?;
             if let Some(cc) = exp_iso {

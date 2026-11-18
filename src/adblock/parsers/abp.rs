@@ -1156,7 +1156,9 @@ fn unescape_adguard_modifier_text(raw: &str) -> String {
         if c == '\\' {
             match chars.peek().copied() {
                 Some('$') | Some(',') | Some('/') => {
-                    out.push(chars.next().unwrap());
+                    if let Some(esc) = chars.next() {
+                        out.push(esc);
+                    }
                 }
                 Some(next) => {
                     out.push('\\');

@@ -63,14 +63,19 @@ pub fn parse_bgptools_table(src: &SourceConfig, bytes: &[u8]) -> Result<ParsedSo
         let Ok(net) = cidr_str.parse::<IpNet>() else {
             continue;
         };
-        let pid = *asn_cache.entry(asn).or_insert_with(|| {
-            out.intern_payload(ObsPayload {
+        let pid = if let Some(&id) = asn_cache.get(&asn) {
+            id
+        } else {
+            let Some(id) = out.intern_payload(ObsPayload {
                 asn,
                 traits: base_traits,
                 ..ObsPayload::default()
-            })
-            .unwrap()
-        });
+            }) else {
+                continue;
+            };
+            asn_cache.insert(asn, id);
+            id
+        };
         out.push_ipnet(net, pid);
     }
 
@@ -354,15 +359,20 @@ pub fn parse_rir_delegated(
             continue;
         }
 
-        let pid = *iso_cache.entry(iso).or_insert_with(|| {
-            out.intern_payload(ObsPayload {
+        let pid = if let Some(&id) = iso_cache.get(&iso) {
+            id
+        } else {
+            let Some(id) = out.intern_payload(ObsPayload {
                 country: Some(iso),
                 registered_country: Some(iso),
                 traits: base_traits,
                 ..ObsPayload::default()
-            })
-            .unwrap()
-        });
+            }) else {
+                continue;
+            };
+            iso_cache.insert(iso, id);
+            id
+        };
 
         if rec_type == "ipv4" {
             let Ok(start_addr) = cols[3].trim().parse::<Ipv4Addr>() else {

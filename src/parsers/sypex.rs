@@ -1,8 +1,9 @@
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
 use rustc_hash::FxHashMap;
 
 use crate::config::{MetadataRegistry, SourceConfig};
 use crate::model::{IsoCode, ObsPayload, ParsedSource, effective_prefix_v4};
+use crate::parsers::{checked_slice, read_u16_be, read_u32_be};
 
 /// Official Sypex Geo v2.2 ID-to-ISO3166-1 alpha-2 table (`SxGeo.php`).
 const SYPEX_ID2ISO: [&str; 256] = [
@@ -38,29 +39,43 @@ pub fn parse_sypex(
     }
 
     let b_idx_len = bytes[10] as usize;
-    let m_idx_len = u16::from_be_bytes([bytes[11], bytes[12]]) as usize;
-    let db_items = u32::from_be_bytes(bytes[15..19].try_into().unwrap()) as usize;
+    let m_idx_len = read_u16_be(bytes, 11).context("Sypex header EOF")? as usize;
+    let db_items = read_u32_be(bytes, 15).context("Sypex header EOF")? as usize;
     let id_len = bytes[19] as usize;
-    let region_size = u32::from_be_bytes(bytes[24..28].try_into().unwrap()) as usize;
-    let city_size = u32::from_be_bytes(bytes[28..32].try_into().unwrap()) as usize;
-    let country_size = u32::from_be_bytes(bytes[34..38].try_into().unwrap()) as usize;
-    let pack_size = u16::from_be_bytes([bytes[38], bytes[39]]) as usize;
+    let region_size = read_u32_be(bytes, 24).context("Sypex header EOF")? as usize;
+    let city_size = read_u32_be(bytes, 28).context("Sypex header EOF")? as usize;
+    let country_size = read_u32_be(bytes, 34).context("Sypex header EOF")? as usize;
+    let pack_size = read_u16_be(bytes, 38).context("Sypex header EOF")? as usize;
 
-    let block_len = 3 + id_len;
-    let b_idx_off = 40 + pack_size;
-    let m_idx_off = b_idx_off + b_idx_len * 4;
-    let db_off = m_idx_off + m_idx_len * 4;
+    let block_len = 3usize
+        .checked_add(id_len)
+        .context("Sypex block_len overflow")?;
+    let b_idx_off = 40usize
+        .checked_add(pack_size)
+        .context("Sypex b_idx_off overflow")?;
+    let m_idx_off = b_idx_len
+        .checked_mul(4)
+        .and_then(|sz| b_idx_off.checked_add(sz))
+        .context("Sypex m_idx_off overflow")?;
+    let db_off = m_idx_len
+        .checked_mul(4)
+        .and_then(|sz| m_idx_off.checked_add(sz))
+        .context("Sypex db_off overflow")?;
     let db_bytes = db_items
         .checked_mul(block_len)
-        .ok_or_else(|| anyhow::anyhow!("Sypex db_bytes overflow"))?;
-    let regions_off = db_off + db_bytes;
-    let cities_off = regions_off + region_size + country_size;
+        .context("Sypex db_bytes overflow")?;
+    let regions_off = db_off
+        .checked_add(db_bytes)
+        .context("Sypex regions_off overflow")?;
+    let cities_off = regions_off
+        .saturating_add(region_size)
+        .saturating_add(country_size);
 
-    if db_off + db_bytes > bytes.len() || b_idx_len < 2 || !matches!(id_len, 1 | 3) {
+    if regions_off > bytes.len() || b_idx_len < 2 || !matches!(id_len, 1 | 3) {
         bail!(
             "invalid Sypex Geo layout in '{}': db_end={} total={}",
             src.id,
-            db_off + db_bytes,
+            regions_off,
             bytes.len()
         );
     }
@@ -69,7 +84,8 @@ pub fn parse_sypex(
     let mut b_idx = Vec::with_capacity(b_idx_len);
     for i in 0..b_idx_len {
         let off = b_idx_off + i * 4;
-        b_idx.push(u32::from_be_bytes(bytes[off..off + 4].try_into().unwrap()) as usize);
+        let val = read_u32_be(bytes, off).context("Sypex b_idx truncated")? as usize;
+        b_idx.push(val);
     }
 
     let mut entries: Vec<(u32, u32)> = Vec::with_capacity(db_items);
@@ -81,13 +97,14 @@ pub fn parse_sypex(
         }
         for item in start_item..end_item {
             let off = db_off + item * block_len;
-            let ip = u32::from_be_bytes([octet as u8, bytes[off], bytes[off + 1], bytes[off + 2]]);
+            let Some(rec) = checked_slice(bytes, off, block_len) else {
+                continue;
+            };
+            let ip = u32::from_be_bytes([octet as u8, rec[0], rec[1], rec[2]]);
             let raw_id = if id_len == 1 {
-                bytes[off + 3] as u32
+                rec[3] as u32
             } else {
-                ((bytes[off + 3] as u32) << 16)
-                    | ((bytes[off + 4] as u32) << 8)
-                    | (bytes[off + 5] as u32)
+                ((rec[3] as u32) << 16) | ((rec[4] as u32) << 8) | (rec[5] as u32)
             };
             entries.push((ip, raw_id));
         }

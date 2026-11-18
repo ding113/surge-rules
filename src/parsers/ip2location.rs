@@ -1,6 +1,6 @@
 use std::io::Cursor;
 
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
 use rustc_hash::FxHashMap;
 
 use crate::config::{MetadataRegistry, SourceConfig};
@@ -8,6 +8,7 @@ use crate::model::{
     COORD_UNSET, IsoCode, ObsPayload, ParsedSource, effective_prefix_v4, effective_prefix_v6,
     quantize_coord,
 };
+use crate::parsers::{checked_slice, read_u32_le, read_u128_le};
 
 // 1-based column indices in IP2Location BIN by DB type (1..=26), matching official IP2Location specification.
 const COUNTRY_POS: [u8; 27] = [
@@ -53,10 +54,10 @@ pub fn parse_ip2location_bin(
         );
     }
 
-    let ipv4_count = u32::from_le_bytes(bytes[5..9].try_into().unwrap()) as usize;
-    let ipv4_base_1 = u32::from_le_bytes(bytes[9..13].try_into().unwrap()) as usize;
-    let ipv6_count = u32::from_le_bytes(bytes[13..17].try_into().unwrap()) as usize;
-    let ipv6_base_1 = u32::from_le_bytes(bytes[17..21].try_into().unwrap()) as usize;
+    let ipv4_count = read_u32_le(bytes, 5).context("IP2Location header EOF")? as usize;
+    let ipv4_base_1 = read_u32_le(bytes, 9).context("IP2Location header EOF")? as usize;
+    let ipv6_count = read_u32_le(bytes, 13).context("IP2Location header EOF")? as usize;
+    let ipv6_base_1 = read_u32_le(bytes, 17).context("IP2Location header EOF")? as usize;
 
     let mut out = ParsedSource::new(&src.id);
     let base_traits = src.base_traits();
@@ -67,18 +68,26 @@ pub fn parse_ip2location_bin(
     if ipv4_count > 1 && ipv4_base_1 > 0 {
         let base = ipv4_base_1 - 1;
         let stride = db_cols * 4;
-        if base + ipv4_count * stride <= bytes.len() {
+        if let Some(table_end) = ipv4_count
+            .checked_mul(stride)
+            .and_then(|sz| base.checked_add(sz))
+            && table_end <= bytes.len()
+        {
             for i in 0..(ipv4_count - 1) {
                 let off = base + i * stride;
                 let next_off = off + stride;
-                let ip_from = u32::from_le_bytes(bytes[off..off + 4].try_into().unwrap());
-                let next_ip_from =
-                    u32::from_le_bytes(bytes[next_off..next_off + 4].try_into().unwrap());
+                let (Some(ip_from), Some(next_ip_from)) =
+                    (read_u32_le(bytes, off), read_u32_le(bytes, next_off))
+                else {
+                    continue;
+                };
                 if next_ip_from <= ip_from {
                     continue;
                 }
                 let ip_to = next_ip_from - 1;
-                let col_slice = &bytes[off + 4..off + 4 + payload_bytes_len];
+                let Some(col_slice) = checked_slice(bytes, off + 4, payload_bytes_len) else {
+                    continue;
+                };
                 if let Some(pid) = decode_ip2loc_cols(
                     bytes,
                     col_slice,
@@ -98,14 +107,20 @@ pub fn parse_ip2location_bin(
     if ipv6_count > 1 && ipv6_base_1 > 0 {
         let base = ipv6_base_1 - 1;
         let stride = 16 + payload_bytes_len;
-        if base + ipv6_count * stride <= bytes.len() {
+        if let Some(table_end) = ipv6_count
+            .checked_mul(stride)
+            .and_then(|sz| base.checked_add(sz))
+            && table_end <= bytes.len()
+        {
             let skip_embedded_v4 = ipv4_count > 1;
             for i in 0..(ipv6_count - 1) {
                 let off = base + i * stride;
                 let next_off = off + stride;
-                let ip_from = u128::from_le_bytes(bytes[off..off + 16].try_into().unwrap());
-                let next_ip_from =
-                    u128::from_le_bytes(bytes[next_off..next_off + 16].try_into().unwrap());
+                let (Some(ip_from), Some(next_ip_from)) =
+                    (read_u128_le(bytes, off), read_u128_le(bytes, next_off))
+                else {
+                    continue;
+                };
                 if next_ip_from <= ip_from {
                     continue;
                 }
@@ -113,7 +128,9 @@ pub fn parse_ip2location_bin(
                 if skip_embedded_v4 && ip_to <= 0x0000_FFFF_FFFF_FFFF {
                     continue;
                 }
-                let col_slice = &bytes[off + 16..off + 16 + payload_bytes_len];
+                let Some(col_slice) = checked_slice(bytes, off + 16, payload_bytes_len) else {
+                    continue;
+                };
                 if let Some(pid) = decode_ip2loc_cols(
                     bytes,
                     col_slice,
@@ -151,13 +168,7 @@ fn decode_ip2loc_cols(
             return None;
         }
         let idx = (pos_1based as usize - 2) * 4;
-        if idx + 4 <= col_slice.len() {
-            Some(u32::from_le_bytes(
-                col_slice[idx..idx + 4].try_into().unwrap(),
-            ))
-        } else {
-            None
-        }
+        read_u32_le(col_slice, idx)
     };
 
     let c_ptr = read_col_u32(COUNTRY_POS[db_type])? as usize;

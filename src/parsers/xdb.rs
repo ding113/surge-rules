@@ -1,10 +1,11 @@
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
 use rustc_hash::FxHashMap;
 
 use crate::config::{MetadataRegistry, SourceConfig, normalize_isp_name};
 use crate::model::{
     IsoCode, ObsPayload, ParsedSource, TraitFlags, effective_prefix_v4, effective_prefix_v6,
 };
+use crate::parsers::{checked_slice, read_u16_le, read_u32_le, read_u128_be};
 
 const XDB_HEADER_LEN: usize = 256;
 
@@ -21,9 +22,9 @@ pub fn parse_xdb(
         );
     }
 
-    let start_idx_ptr = u32::from_le_bytes(bytes[8..12].try_into().unwrap()) as usize;
-    let end_idx_ptr = u32::from_le_bytes(bytes[12..16].try_into().unwrap()) as usize;
-    let ip_ver_hdr = u16::from_le_bytes(bytes[16..18].try_into().unwrap());
+    let start_idx_ptr = read_u32_le(bytes, 8).context("XDB header EOF")? as usize;
+    let end_idx_ptr = read_u32_le(bytes, 12).context("XDB header EOF")? as usize;
+    let ip_ver_hdr = read_u16_le(bytes, 16).context("XDB header EOF")?;
 
     if start_idx_ptr < XDB_HEADER_LEN || end_idx_ptr < start_idx_ptr || end_idx_ptr >= bytes.len() {
         bail!(
@@ -45,7 +46,10 @@ pub fn parse_xdb(
     };
 
     let stride = if is_ipv6 { 38 } else { 14 };
-    if end_idx_ptr + stride > bytes.len() {
+    if end_idx_ptr
+        .checked_add(stride)
+        .is_none_or(|end| end > bytes.len())
+    {
         bail!("ip2region XDB '{}' truncated at end_idx_ptr", src.id);
     }
 
@@ -56,14 +60,17 @@ pub fn parse_xdb(
     let mut pos = start_idx_ptr;
     while pos <= end_idx_ptr {
         if is_ipv6 {
-            let start = u128::from_be_bytes(bytes[pos..pos + 16].try_into().unwrap());
-            let end = u128::from_be_bytes(bytes[pos + 16..pos + 32].try_into().unwrap());
-            let data_len = u16::from_le_bytes([bytes[pos + 32], bytes[pos + 33]]) as usize;
-            let data_ptr =
-                u32::from_le_bytes(bytes[pos + 34..pos + 38].try_into().unwrap()) as usize;
+            let (Some(start), Some(end), Some(data_len), Some(data_ptr)) = (
+                read_u128_be(bytes, pos),
+                read_u128_be(bytes, pos + 16),
+                read_u16_le(bytes, pos + 32).map(|v| v as usize),
+                read_u32_le(bytes, pos + 34).map(|v| v as usize),
+            ) else {
+                break;
+            };
             pos += 38;
 
-            if start > end || data_len == 0 || data_ptr + data_len > bytes.len() {
+            if start > end || data_len == 0 || checked_slice(bytes, data_ptr, data_len).is_none() {
                 continue;
             }
             if let Some(pid) = decode_xdb_region(
@@ -78,14 +85,17 @@ pub fn parse_xdb(
                 out.push_v6(start, end, pid, effective_prefix_v6(start, end));
             }
         } else {
-            let start = u32::from_le_bytes(bytes[pos..pos + 4].try_into().unwrap());
-            let end = u32::from_le_bytes(bytes[pos + 4..pos + 8].try_into().unwrap());
-            let data_len = u16::from_le_bytes([bytes[pos + 8], bytes[pos + 9]]) as usize;
-            let data_ptr =
-                u32::from_le_bytes(bytes[pos + 10..pos + 14].try_into().unwrap()) as usize;
+            let (Some(start), Some(end), Some(data_len), Some(data_ptr)) = (
+                read_u32_le(bytes, pos),
+                read_u32_le(bytes, pos + 4),
+                read_u16_le(bytes, pos + 8).map(|v| v as usize),
+                read_u32_le(bytes, pos + 10).map(|v| v as usize),
+            ) else {
+                break;
+            };
             pos += 14;
 
-            if start > end || data_len == 0 || data_ptr + data_len > bytes.len() {
+            if start > end || data_len == 0 || checked_slice(bytes, data_ptr, data_len).is_none() {
                 continue;
             }
             if let Some(pid) = decode_xdb_region(

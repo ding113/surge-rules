@@ -8,6 +8,7 @@ use crate::config::{MetadataRegistry, SourceConfig, normalize_isp_name};
 use crate::model::{
     IsoCode, ObsPayload, ParsedSource, TraitFlags, effective_prefix_v4, effective_prefix_v6,
 };
+use crate::parsers::{checked_slice, read_u16_be, read_u32_be};
 
 #[derive(Deserialize)]
 struct IpdbMeta {
@@ -25,12 +26,12 @@ pub fn parse_ipdb(
     if bytes.len() < 8 {
         bail!("IPDB file '{}' too short", src.id);
     }
-    let header_len = u32::from_be_bytes(bytes[0..4].try_into().unwrap()) as usize;
-    if 4 + header_len > bytes.len() {
+    let header_len = read_u32_be(bytes, 0).context("IPDB header EOF")? as usize;
+    let Some(hdr_slice) = checked_slice(bytes, 4, header_len) else {
         bail!("IPDB invalid header_len {} in '{}'", header_len, src.id);
-    }
+    };
 
-    let meta: IpdbMeta = serde_json::from_slice(&bytes[4..4 + header_len])
+    let meta: IpdbMeta = serde_json::from_slice(hdr_slice)
         .with_context(|| format!("failed to parse IPDB JSON header in '{}'", src.id))?;
 
     let tree_base = 4 + header_len;
@@ -38,7 +39,10 @@ pub fn parse_ipdb(
         .node_count
         .checked_mul(8)
         .context("IPDB tree byte size overflow")?;
-    if tree_base + tree_bytes > bytes.len() {
+    if tree_base
+        .checked_add(tree_bytes)
+        .is_none_or(|end| end > bytes.len())
+    {
         bail!("IPDB truncated tree in '{}'", src.id);
     }
 
@@ -98,9 +102,12 @@ pub fn parse_ipdb(
             continue;
         }
         let node_off = tree_base + node_idx * 8;
-        let left = u32::from_be_bytes(bytes[node_off..node_off + 4].try_into().unwrap()) as usize;
-        let right =
-            u32::from_be_bytes(bytes[node_off + 4..node_off + 8].try_into().unwrap()) as usize;
+        let (Some(left), Some(right)) = (
+            read_u32_be(bytes, node_off).map(|v| v as usize),
+            read_u32_be(bytes, node_off + 4).map(|v| v as usize),
+        ) else {
+            continue;
+        };
 
         for (bit, rec) in [(1u128, right), (0u128, left)] {
             let next_depth = depth + 1;
@@ -115,39 +122,30 @@ pub fn parse_ipdb(
                 let payload_opt = if let Some(&cached) = ptr_cache.get(&rec) {
                     cached
                 } else {
-                    let data_off = tree_base + tree_bytes + (rec - meta.node_count);
-                    let decoded = if data_off + 2 <= bytes.len() {
-                        let d_len =
-                            u16::from_be_bytes([bytes[data_off], bytes[data_off + 1]]) as usize;
-                        if data_off + 2 + d_len <= bytes.len() {
-                            std::str::from_utf8(&bytes[data_off + 2..data_off + 2 + d_len])
-                                .ok()
-                                .and_then(|s| {
-                                    let cols: Vec<&str> = s.split('\t').collect();
-                                    if cols.len() < lang_offset + field_count {
-                                        return None;
-                                    }
-                                    let slice = &cols[lang_offset..lang_offset + field_count];
-                                    build_ipdb_payload(
-                                        slice,
-                                        idx_country_name,
-                                        idx_region_name,
-                                        idx_city_name,
-                                        idx_district_name,
-                                        idx_owner,
-                                        idx_isp,
-                                        idx_country_code,
-                                        base_traits,
-                                        metadata,
-                                        &mut out,
-                                    )
-                                })
-                        } else {
-                            None
-                        }
-                    } else {
-                        None
-                    };
+                    let decoded = (tree_base + tree_bytes)
+                        .checked_add(rec - meta.node_count)
+                        .and_then(|data_off| {
+                            let d_len = read_u16_be(bytes, data_off)? as usize;
+                            let payload_bytes =
+                                checked_slice(bytes, data_off.checked_add(2)?, d_len)?;
+                            let s = std::str::from_utf8(payload_bytes).ok()?;
+                            let cols: Vec<&str> = s.split('\t').collect();
+                            let end_col = lang_offset.checked_add(field_count)?;
+                            let slice = cols.get(lang_offset..end_col)?;
+                            build_ipdb_payload(
+                                slice,
+                                idx_country_name,
+                                idx_region_name,
+                                idx_city_name,
+                                idx_district_name,
+                                idx_owner,
+                                idx_isp,
+                                idx_country_code,
+                                base_traits,
+                                metadata,
+                                &mut out,
+                            )
+                        });
                     ptr_cache.insert(rec, decoded);
                     decoded
                 };
@@ -202,8 +200,8 @@ fn walk_ipdb_bits(
             return Some(cur);
         }
         let off = tree_base + cur * 8;
-        let l = u32::from_be_bytes(bytes[off..off + 4].try_into().unwrap()) as usize;
-        let r = u32::from_be_bytes(bytes[off + 4..off + 8].try_into().unwrap()) as usize;
+        let l = read_u32_be(bytes, off)? as usize;
+        let r = read_u32_be(bytes, off + 4)? as usize;
         cur = if bit_one { r } else { l };
     }
     Some(cur)

@@ -153,18 +153,28 @@ impl CandidateRule {
     }
 }
 
-const CLEAN_TARGETS: [RoutingTarget; 3] = [
-    RoutingTarget::Ai,
-    RoutingTarget::Payment,
-    RoutingTarget::Telemetry,
-];
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+enum CleanSlot {
+    Ai = 0,
+    Payment = 1,
+    Telemetry = 2,
+}
 
-fn clean_slot(target: RoutingTarget) -> Option<usize> {
-    match target {
-        RoutingTarget::Ai => Some(0),
-        RoutingTarget::Payment => Some(1),
-        RoutingTarget::Telemetry => Some(2),
-        RoutingTarget::Direct | RoutingTarget::Proxy => None,
+impl CleanSlot {
+    const ALL_PRIORITY_DESC: [Self; 3] = [Self::Telemetry, Self::Payment, Self::Ai];
+
+    fn from_target(target: RoutingTarget) -> Option<Self> {
+        match target {
+            RoutingTarget::Ai => Some(Self::Ai),
+            RoutingTarget::Payment => Some(Self::Payment),
+            RoutingTarget::Telemetry => Some(Self::Telemetry),
+            RoutingTarget::Direct | RoutingTarget::Proxy => None,
+        }
+    }
+
+    #[inline]
+    const fn idx(self) -> usize {
+        self as usize
     }
 }
 
@@ -174,16 +184,14 @@ struct CleanCandidate {
 }
 
 impl CleanCandidate {
-    fn ingest(&mut self, target: RoutingTarget, lineage: &str, weight: u16, extended: bool) {
-        let slot = clean_slot(target).expect("CleanCandidate only accepts clean-egress targets");
-        self.claims[slot]
+    fn ingest(&mut self, slot: CleanSlot, lineage: &str, weight: u16, extended: bool) {
+        self.claims[slot.idx()]
             .get_or_insert_with(CandidateRule::default)
             .ingest(lineage, weight, extended);
     }
 
-    fn force(&mut self, target: RoutingTarget, extended: bool) {
-        let slot = clean_slot(target).expect("CleanCandidate only accepts clean-egress targets");
-        self.claims[slot]
+    fn force(&mut self, slot: CleanSlot, extended: bool) {
+        self.claims[slot.idx()]
             .get_or_insert_with(CandidateRule::default)
             .force(extended);
     }
@@ -247,18 +255,18 @@ impl CleanCandidate {
     /// Forced overrides take precedence; for unforced cross-feed overlaps (e.g. bundled AI feeds
     /// that also include Stripe/PayPal or CAPTCHA/telemetry domains), dedicated Telemetry and
     /// Payment catalogs take ownership so `AI.list` stays scoped strictly to AI applications.
-    fn owner(&self) -> RoutingTarget {
-        for &slot in &[2usize, 1, 0] {
-            if self.claims[slot].as_ref().is_some_and(|c| c.forced) {
-                return CLEAN_TARGETS[slot];
+    fn owner(&self) -> CleanSlot {
+        for slot in CleanSlot::ALL_PRIORITY_DESC {
+            if self.claims[slot.idx()].as_ref().is_some_and(|c| c.forced) {
+                return slot;
             }
         }
-        for &slot in &[2usize, 1, 0] {
-            if self.claims[slot].is_some() {
-                return CLEAN_TARGETS[slot];
+        for slot in CleanSlot::ALL_PRIORITY_DESC {
+            if self.claims[slot.idx()].is_some() {
+                return slot;
             }
         }
-        RoutingTarget::Ai
+        CleanSlot::Ai
     }
 }
 
@@ -736,17 +744,18 @@ pub fn compile_routing_with_cn_exclusions(
                     );
                 }
             }
-            target if target.is_clean_egress() => {
-                for rule in &src.rules {
-                    clean_map.entry(rule.key.clone()).or_default().ingest(
-                        target,
-                        &src.lineage,
-                        src.weight,
-                        rule.extended_matching,
-                    );
+            target => {
+                if let Some(slot) = CleanSlot::from_target(target) {
+                    for rule in &src.rules {
+                        clean_map.entry(rule.key.clone()).or_default().ingest(
+                            slot,
+                            &src.lineage,
+                            src.weight,
+                            rule.extended_matching,
+                        );
+                    }
                 }
             }
-            _ => {}
         }
     }
 
@@ -770,10 +779,11 @@ pub fn compile_routing_with_cn_exclusions(
                 proxy_forced.insert_key(&key);
                 proxy_map.entry(key).or_default().force(extended);
             }
-            target if target.is_clean_egress() => {
-                clean_map.entry(key).or_default().force(target, extended);
+            target => {
+                if let Some(slot) = CleanSlot::from_target(target) {
+                    clean_map.entry(key).or_default().force(slot, extended);
+                }
             }
-            _ => {}
         }
     }
 
@@ -927,8 +937,8 @@ pub fn compile_routing_with_cn_exclusions(
             RoutingTarget::Direct => direct_exclude.insert_key(&key),
             RoutingTarget::Proxy => proxy_exclude.insert_key(&key),
             target => {
-                if let Some(slot) = clean_slot(target) {
-                    clean_excludes[slot].insert_key(&key);
+                if let Some(slot) = CleanSlot::from_target(target) {
+                    clean_excludes[slot.idx()].insert_key(&key);
                 }
             }
         }
@@ -1295,17 +1305,17 @@ fn compress_and_partition_clean(
     rules: FxHashMap<RoutingRuleKey, CleanCandidate>,
     counts: RoutingSourceCounts,
 ) -> [(String, TargetStats); 3] {
-    let mut exact_domains: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
-    let mut suffix_domains: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
-    let mut keywords: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
-    let mut wildcards: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
-    let mut url_regexes: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
-    let mut user_agents: BTreeMap<String, RoutingTarget> = BTreeMap::new();
-    let mut process_names: BTreeMap<String, RoutingTarget> = BTreeMap::new();
-    let mut logical_ands: BTreeMap<String, RoutingTarget> = BTreeMap::new();
+    let mut exact_domains: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
+    let mut suffix_domains: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
+    let mut keywords: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
+    let mut wildcards: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
+    let mut url_regexes: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
+    let mut user_agents: BTreeMap<String, CleanSlot> = BTreeMap::new();
+    let mut process_names: BTreeMap<String, CleanSlot> = BTreeMap::new();
+    let mut logical_ands: BTreeMap<String, CleanSlot> = BTreeMap::new();
     let mut raw_v4: Vec<(Ipv4Net, CleanCandidate)> = Vec::new();
     let mut raw_v6: Vec<(Ipv6Net, CleanCandidate)> = Vec::new();
-    let mut asns: BTreeMap<u32, RoutingTarget> = BTreeMap::new();
+    let mut asns: BTreeMap<u32, CleanSlot> = BTreeMap::new();
 
     for (key, cand) in rules {
         let owner = cand.owner();
@@ -1356,7 +1366,7 @@ fn compress_and_partition_clean(
     let mut stats: [TargetStats; 3] = Default::default();
 
     // 1. Compress DOMAIN-SUFFIX tree and propagate extended-matching flags upward to surviving ancestors.
-    let mut sorted_suffixes: Vec<(String, (RoutingTarget, bool))> =
+    let mut sorted_suffixes: Vec<(String, (CleanSlot, bool))> =
         suffix_domains.into_iter().collect();
     sorted_suffixes.sort_by(|a, b| {
         label_count(&a.0)
@@ -1365,7 +1375,7 @@ fn compress_and_partition_clean(
     });
 
     let mut trie = DomainTrie::default();
-    let mut surviving_suffixes: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut surviving_suffixes: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
 
     for (dom, (owner, ext)) in sorted_suffixes {
         if !trie.has_suffix_ancestor_or_eq(&dom) {
@@ -1375,23 +1385,19 @@ fn compress_and_partition_clean(
             find_broadest_suffix_ancestor(&dom, &mut surviving_suffixes)
         {
             *anc_ext |= ext;
-            if let Some(slot) = clean_slot(*anc_owner) {
-                stats[slot].subsumed_by_trie += 1;
-            }
+            stats[anc_owner.idx()].subsumed_by_trie += 1;
         }
     }
 
     // 2. Subsume exact DOMAIN entries already covered by a surviving DOMAIN-SUFFIX, preserving extended-matching.
-    let mut surviving_exact: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut surviving_exact: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
     for (dom, (owner, ext)) in exact_domains {
         if trie.matches_domain(&dom) {
             if let Some((anc_owner, anc_ext)) =
                 find_broadest_suffix_ancestor(&dom, &mut surviving_suffixes)
             {
                 *anc_ext |= ext;
-                if let Some(slot) = clean_slot(*anc_owner) {
-                    stats[slot].subsumed_by_trie += 1;
-                }
+                stats[anc_owner.idx()].subsumed_by_trie += 1;
             }
         } else {
             surviving_exact.insert(dom, (owner, ext));
@@ -1399,7 +1405,7 @@ fn compress_and_partition_clean(
     }
 
     // 3. Subsume simple `*.tail` DOMAIN-WILDCARD entries covered by a surviving DOMAIN-SUFFIX ancestor.
-    let mut surviving_wildcards: BTreeMap<String, (RoutingTarget, bool)> = BTreeMap::new();
+    let mut surviving_wildcards: BTreeMap<String, (CleanSlot, bool)> = BTreeMap::new();
     for (wc, (owner, ext)) in wildcards {
         if let Some(tail) = wc.strip_prefix("*.")
             && !tail.contains('*')
@@ -1410,9 +1416,7 @@ fn compress_and_partition_clean(
                 find_broadest_suffix_ancestor(tail, &mut surviving_suffixes)
             {
                 *anc_ext |= ext;
-                if let Some(slot) = clean_slot(*anc_owner) {
-                    stats[slot].subsumed_by_trie += 1;
-                }
+                stats[anc_owner.idx()].subsumed_by_trie += 1;
             }
         } else {
             surviving_wildcards.insert(wc, (owner, ext));
@@ -1422,9 +1426,7 @@ fn compress_and_partition_clean(
     // 4. Filter private/LAN/Fake-IP/Tailscale/Cloudflare-Mesh bogon CIDRs before aggregating.
     raw_v4.retain(|(net, cand)| {
         if overlaps_reserved_v4(*net) {
-            if let Some(slot) = clean_slot(cand.owner()) {
-                stats[slot].reserved_cidrs_dropped += 1;
-            }
+            stats[cand.owner().idx()].reserved_cidrs_dropped += 1;
             false
         } else {
             true
@@ -1432,9 +1434,7 @@ fn compress_and_partition_clean(
     });
     raw_v6.retain(|(net, cand)| {
         if overlaps_reserved_v6(*net) {
-            if let Some(slot) = clean_slot(cand.owner()) {
-                stats[slot].reserved_cidrs_dropped += 1;
-            }
+            stats[cand.owner().idx()].reserved_cidrs_dropped += 1;
             false
         } else {
             true
@@ -1446,7 +1446,7 @@ fn compress_and_partition_clean(
     let coalesced_v4 = Ipv4Net::aggregate(&v4_nets);
     let coalesced_v6 = Ipv6Net::aggregate(&v6_nets);
 
-    let mut owned_v4: Vec<(Ipv4Net, RoutingTarget)> = Vec::with_capacity(coalesced_v4.len());
+    let mut owned_v4: Vec<(Ipv4Net, CleanSlot)> = Vec::with_capacity(coalesced_v4.len());
     for agg in coalesced_v4 {
         let mut merged = CleanCandidate::default();
         for (net, cand) in &raw_v4 {
@@ -1457,7 +1457,7 @@ fn compress_and_partition_clean(
         owned_v4.push((agg, merged.owner()));
     }
 
-    let mut owned_v6: Vec<(Ipv6Net, RoutingTarget)> = Vec::with_capacity(coalesced_v6.len());
+    let mut owned_v6: Vec<(Ipv6Net, CleanSlot)> = Vec::with_capacity(coalesced_v6.len());
     for agg in coalesced_v6 {
         let mut merged = CleanCandidate::default();
         for (net, cand) in &raw_v6 {
@@ -1471,7 +1471,7 @@ fn compress_and_partition_clean(
     let mut rendered_lines: [Vec<String>; 3] = Default::default();
 
     for (proc_name, owner) in process_names {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].process_name_count += 1;
         rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
             key: RoutingRuleKey {
@@ -1482,7 +1482,7 @@ fn compress_and_partition_clean(
         }));
     }
     for (ua, owner) in user_agents {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].user_agent_count += 1;
         rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
             key: RoutingRuleKey {
@@ -1493,7 +1493,7 @@ fn compress_and_partition_clean(
         }));
     }
     for (and_val, owner) in logical_ands {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].logical_and_count += 1;
         rendered_lines[slot].push(format_routing_rule_line(&RoutingRule {
             key: RoutingRuleKey {
@@ -1504,7 +1504,7 @@ fn compress_and_partition_clean(
         }));
     }
     for (dom, (owner, ext)) in surviving_exact {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].domain_count += 1;
         if ext {
             stats[slot].extended_matching_count += 1;
@@ -1518,7 +1518,7 @@ fn compress_and_partition_clean(
         }));
     }
     for (dom, (owner, ext)) in surviving_suffixes {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].domain_suffix_count += 1;
         if ext {
             stats[slot].extended_matching_count += 1;
@@ -1532,7 +1532,7 @@ fn compress_and_partition_clean(
         }));
     }
     for (kw, (owner, ext)) in keywords {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].domain_keyword_count += 1;
         if ext {
             stats[slot].extended_matching_count += 1;
@@ -1546,7 +1546,7 @@ fn compress_and_partition_clean(
         }));
     }
     for (wc, (owner, ext)) in surviving_wildcards {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].domain_wildcard_count += 1;
         if ext {
             stats[slot].extended_matching_count += 1;
@@ -1560,7 +1560,7 @@ fn compress_and_partition_clean(
         }));
     }
     for (re, (owner, ext)) in url_regexes {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].url_regex_count += 1;
         if ext {
             stats[slot].extended_matching_count += 1;
@@ -1574,17 +1574,17 @@ fn compress_and_partition_clean(
         }));
     }
     for (v4, owner) in owned_v4 {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].ip_cidr_count += 1;
         rendered_lines[slot].push(format!("IP-CIDR,{},no-resolve", v4));
     }
     for (v6, owner) in owned_v6 {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].ip_cidr6_count += 1;
         rendered_lines[slot].push(format!("IP-CIDR6,{},no-resolve", v6));
     }
     for (asn, owner) in asns {
-        let slot = clean_slot(owner).unwrap();
+        let slot = owner.idx();
         stats[slot].ip_asn_count += 1;
         rendered_lines[slot].push(format!("IP-ASN,{},no-resolve", asn));
     }

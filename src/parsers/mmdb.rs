@@ -412,10 +412,7 @@ fn decode_value<'a>(
             Ok((MmdbVal::Str(s), pos + sz))
         }
         3 => {
-            if pos + 8 > bytes.len() {
-                bail!("MMDB f64 EOF");
-            }
-            let v = f64::from_be_bytes(bytes[pos..pos + 8].try_into().unwrap());
+            let v = crate::parsers::read_f64_be(bytes, pos).context("MMDB f64 EOF")?;
             Ok((MmdbVal::Double(v), pos + 8))
         }
         4 => {
@@ -475,10 +472,7 @@ fn decode_value<'a>(
         12 | 13 => Ok((MmdbVal::Ignored, pos)),
         14 => Ok((MmdbVal::Bool(sz != 0), pos)),
         15 => {
-            if pos + 4 > bytes.len() {
-                bail!("MMDB f32 EOF");
-            }
-            let v = f32::from_be_bytes(bytes[pos..pos + 4].try_into().unwrap());
+            let v = crate::parsers::read_f32_be(bytes, pos).context("MMDB f32 EOF")?;
             Ok((MmdbVal::Float(v), pos + 4))
         }
         other => bail!("unknown MMDB data type {}", other),

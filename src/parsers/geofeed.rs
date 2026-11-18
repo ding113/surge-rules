@@ -460,7 +460,7 @@ pub fn parse_fastly_json(src: &SourceConfig, bytes: &[u8]) -> Result<ParsedSourc
             traits: src.base_traits(),
             ..ObsPayload::default()
         })
-        .unwrap();
+        .context("Fastly payload must be meaningful")?;
 
     for s in doc.addresses.iter().chain(doc.ipv6_addresses.iter()) {
         if let Ok(net) = s.trim().parse::<IpNet>() {
@@ -490,7 +490,7 @@ pub fn parse_gcore_json(src: &SourceConfig, bytes: &[u8]) -> Result<ParsedSource
             traits: src.base_traits(),
             ..ObsPayload::default()
         })
-        .unwrap();
+        .context("Gcore payload must be meaningful")?;
 
     for s in doc.addresses.iter().chain(doc.addresses_v6.iter()) {
         if let Ok(net) = s.trim().parse::<IpNet>() {
@@ -512,7 +512,7 @@ pub fn parse_github_meta_json(src: &SourceConfig, bytes: &[u8]) -> Result<Parsed
             traits: src.base_traits(),
             ..ObsPayload::default()
         })
-        .unwrap();
+        .context("GitHub payload must be meaningful")?;
 
     if let Some(obj) = root.as_object() {
         for (_k, val) in obj {

@@ -1197,7 +1197,7 @@ fn finalize_mmdb_file(
                 out.extend_from_slice(&l.to_be_bytes());
                 out.extend_from_slice(&r.to_be_bytes());
             }
-            _ => unreachable!(),
+            _ => bail!("unsupported MMDB record_size {}", record_size),
         }
     }
 
