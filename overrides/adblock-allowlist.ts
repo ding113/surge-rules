@@ -2797,6 +2797,13 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale:
       "User report: blob.superlogical.com was blocked by Adblock.list suffix .superlogical.com; user authorized suffix allow of the whole superlogical.com zone",
   },
+  // 用户报告 workbuddy.ai 是正常域名，被 Adblock.list 后缀拦截
+  {
+    matchType: "suffix",
+    domain: "workbuddy.ai",
+    rationale:
+      "User report: Adblock.list suffix .workbuddy.ai blocked a normal domain with REJECT-TINYGIF",
+  },
 ];
 
 /**

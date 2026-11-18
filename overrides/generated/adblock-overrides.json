@@ -4490,6 +4490,11 @@
       "matchType": "suffix",
       "domain": "superlogical.com",
       "rationale": "User report: blob.superlogical.com was blocked by Adblock.list suffix .superlogical.com; user authorized suffix allow of the whole superlogical.com zone"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "workbuddy.ai",
+      "rationale": "User report: Adblock.list suffix .workbuddy.ai blocked a normal domain with REJECT-TINYGIF"
     }
   ],
   "protectedApexDomains": [
