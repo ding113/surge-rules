@@ -108,6 +108,18 @@ impl DomainTrie {
         node.has_subtree_mark
     }
 
+    /// Returns true if any strict descendant of `domain` (excluding `domain` itself) has a mark.
+    pub fn has_strict_descendant_mark(&self, domain: &str) -> bool {
+        let mut node = &self.root;
+        for label in Self::split_labels_rev(domain) {
+            let Some(next) = node.children.get(&label.to_ascii_lowercase()) else {
+                return false;
+            };
+            node = next;
+        }
+        node.children.values().any(|child| child.has_subtree_mark)
+    }
+
     /// Visits marked domains at or below `tail` (in `O(labels + subtree_size)`) and returns true
     /// as soon as `pred` matches one of them.
     pub fn any_marked_domain_under<F>(&self, tail: &str, mut pred: F) -> bool
@@ -973,6 +985,8 @@ pub fn compile_adblock_with_guards(
 
     let mut forced_domains: FxHashSet<String> = FxHashSet::default();
     let mut forced_suffixes: FxHashSet<String> = FxHashSet::default();
+    let mut forced_keywords: FxHashSet<String> = FxHashSet::default();
+    let mut forced_wildcards: FxHashSet<String> = FxHashSet::default();
     for f in &overrides.force_rule_set_entries {
         let v = f.value.trim();
         match f.kind.as_str() {
@@ -1005,13 +1019,15 @@ pub fn compile_adblock_with_guards(
                 if !(human_allow_scope.blocks_keyword(&kw, trimmed)
                     || protected_apex_set.iter().any(|dom| dom.contains(&kw)))
                 {
+                    forced_keywords.insert(kw.clone());
                     keyword_claims.entry(kw).or_default().force(f.target);
                 }
             }
             "DOMAIN-WILDCARD" => {
-                let wc = v.to_ascii_lowercase();
+                let wc = v.trim_end_matches('.').to_ascii_lowercase();
                 let static_tail = wildcard_static_suffix(&wc);
                 if !human_allow_scope.blocks_wildcard(&wc, static_tail) {
+                    forced_wildcards.insert(wc.clone());
                     wildcard_claims.entry(wc).or_default().force(f.target);
                 }
             }
@@ -1049,134 +1065,7 @@ pub fn compile_adblock_with_guards(
         }
     }
 
-    // Propagate exact DOMAIN force flags onto matching DOMAIN-SUFFIX entries so an unforced suffix
-    // at the same hostname always honors the human-forced target before subsuming the exact DOMAIN.
-    for (d, d_claim) in &domain_claims {
-        let force_bits = d_claim.flags & (CLAIM_FORCED_AD | CLAIM_FORCED_PRIV);
-        if force_bits != 0
-            && let Some(s_claim) = suffix_claims.get_mut(d)
-        {
-            s_claim.flags |= force_bits;
-        }
-    }
-
-    let suppressed_by_protection = raw_seen_suffixes.len().saturating_sub(suffix_claims.len())
-        + raw_seen_domains.len().saturating_sub(domain_claims.len());
-
-    // Build unified suffix trie and partition into mutually disjoint Ad vs Privacy suffix sets
-    let mut surviving_suffixes: Vec<(String, RuleClaim)> = suffix_claims.into_iter().collect();
-    surviving_suffixes.sort_by(|a, b| {
-        a.0.split('.')
-            .count()
-            .cmp(&b.0.split('.').count())
-            .then_with(|| a.0.cmp(&b.0))
-    });
-    let mut final_suffix_trie = DomainTrie::default();
-    let mut ad_suffixes: BTreeSet<String> = BTreeSet::new();
-    let mut priv_suffixes: BTreeSet<String> = BTreeSet::new();
-    let mut subsumed_by_trie = 0usize;
-
-    for (s, claim) in surviving_suffixes {
-        if final_suffix_trie.has_suffix_ancestor_or_eq(&s) {
-            subsumed_by_trie += 1;
-            continue;
-        }
-        final_suffix_trie.insert_suffix(&s);
-        match claim.owner() {
-            AdblockRuleTarget::Ad => {
-                ad_suffixes.insert(s);
-            }
-            AdblockRuleTarget::Privacy => {
-                priv_suffixes.insert(s);
-            }
-        }
-    }
-
-    let mut compressed_domains: BTreeSet<String> = BTreeSet::new();
-    let mut ad_domains: BTreeSet<String> = BTreeSet::new();
-    let mut priv_domains: BTreeSet<String> = BTreeSet::new();
-    for (d, claim) in domain_claims {
-        if final_suffix_trie.has_suffix_ancestor_or_eq(&d) {
-            subsumed_by_trie += 1;
-            continue;
-        }
-        compressed_domains.insert(d.clone());
-        match claim.owner() {
-            AdblockRuleTarget::Ad => {
-                ad_domains.insert(d);
-            }
-            AdblockRuleTarget::Privacy => {
-                priv_domains.insert(d);
-            }
-        }
-    }
-
-    let mut ad_keywords: BTreeSet<String> = BTreeSet::new();
-    let mut priv_keywords: BTreeSet<String> = BTreeSet::new();
-    for (kw, claim) in keyword_claims {
-        match claim.owner() {
-            AdblockRuleTarget::Ad => {
-                ad_keywords.insert(kw);
-            }
-            AdblockRuleTarget::Privacy => {
-                priv_keywords.insert(kw);
-            }
-        }
-    }
-
-    let mut ad_wildcards: BTreeSet<String> = BTreeSet::new();
-    let mut priv_wildcards: BTreeSet<String> = BTreeSet::new();
-    for (wc, claim) in wildcard_claims {
-        match claim.owner() {
-            AdblockRuleTarget::Ad => {
-                ad_wildcards.insert(wc);
-            }
-            AdblockRuleTarget::Privacy => {
-                priv_wildcards.insert(wc);
-            }
-        }
-    }
-
-    let mut ad_asns: BTreeSet<u32> = BTreeSet::new();
-    let mut priv_asns: BTreeSet<u32> = BTreeSet::new();
-    for (asn, claim) in asn_claims {
-        match claim.owner() {
-            AdblockRuleTarget::Ad => {
-                ad_asns.insert(asn);
-            }
-            AdblockRuleTarget::Privacy => {
-                priv_asns.insert(asn);
-            }
-        }
-    }
-
-    let mut ad_uas: BTreeSet<String> = BTreeSet::new();
-    let mut priv_uas: BTreeSet<String> = BTreeSet::new();
-    for (ua, claim) in ua_claims {
-        match claim.owner() {
-            AdblockRuleTarget::Ad => {
-                ad_uas.insert(ua);
-            }
-            AdblockRuleTarget::Privacy => {
-                priv_uas.insert(ua);
-            }
-        }
-    }
-
-    let mut ad_procs: BTreeSet<String> = BTreeSet::new();
-    let mut priv_procs: BTreeSet<String> = BTreeSet::new();
-    for (proc_name, claim) in proc_claims {
-        match claim.owner() {
-            AdblockRuleTarget::Ad => {
-                ad_procs.insert(proc_name);
-            }
-            AdblockRuleTarget::Privacy => {
-                priv_procs.insert(proc_name);
-            }
-        }
-    }
-
-    // Enforce 4-tier domain precedence and reserved/shared-CDN CIDR guards on module `[Rule]` REJECT entries too
+    // Filter module `[Rule]` REJECT entries against Tier P0a/P0c/P1/P2 allowlists & CIDR guards first
     module_rule_map.retain(|line, _| {
         let parts: Vec<&str> = line.split(',').map(str::trim).collect();
         let is_reject = parts
@@ -1229,6 +1118,260 @@ pub fn compile_adblock_with_guards(
                     !overlaps_reserved_v6(net) && !overlaps_shared_cdn_or_dns_v6(net)
                 })
                 .unwrap_or(false),
+            _ => true,
+        }
+    });
+
+    // Identify every parent domain `P` that has >= 1 strict child subdomain rule across surviving
+    // suffixes, exact domains, patterned child wildcards, child-suffix keywords, and module REJECT rules.
+    // Same-level rules (`DOMAIN,foo.com` + `DOMAIN-SUFFIX,foo.com` + `DOMAIN-WILDCARD,*.foo.com`) do NOT
+    // mark `foo.com` itself as having a strict child, preserving `foo.com` unchanged when it is a leaf.
+    let mut has_strict_child: FxHashSet<String> = FxHashSet::default();
+    let mark_strict_ancestors = |host: &str, set: &mut FxHashSet<String>| {
+        let mut rest = host;
+        while let Some(idx) = rest.find('.') {
+            rest = &rest[idx + 1..];
+            if rest.contains('.') {
+                set.insert(rest.to_string());
+            }
+        }
+    };
+    for s in suffix_claims.keys() {
+        mark_strict_ancestors(s, &mut has_strict_child);
+    }
+    for d in domain_claims.keys() {
+        mark_strict_ancestors(d, &mut has_strict_child);
+    }
+    for wc in wildcard_claims.keys() {
+        if let Some(bare) = wc.strip_prefix("*.")
+            && !bare.contains('*')
+            && !bare.contains('?')
+        {
+            mark_strict_ancestors(bare, &mut has_strict_child);
+        } else if let Some(tail) = wildcard_static_suffix(wc) {
+            has_strict_child.insert(tail.to_string());
+            mark_strict_ancestors(tail, &mut has_strict_child);
+        }
+    }
+    for kw in keyword_claims.keys() {
+        if !kw.starts_with('.')
+            && !kw.ends_with('.')
+            && let Some(idx) = kw.find('.')
+        {
+            let tail = &kw[idx + 1..];
+            if is_valid_domain(tail) {
+                has_strict_child.insert(tail.to_string());
+                mark_strict_ancestors(tail, &mut has_strict_child);
+            }
+        }
+    }
+    for line in module_rule_map.keys() {
+        let parts: Vec<&str> = line.split(',').map(str::trim).collect();
+        if parts.len() >= 3
+            && parts
+                .iter()
+                .any(|p| p.to_ascii_uppercase().starts_with("REJECT"))
+        {
+            let kind = parts[0].to_ascii_uppercase();
+            if matches!(kind.as_str(), "DOMAIN" | "DOMAIN-SUFFIX") {
+                let clean = parts[1]
+                    .trim_start_matches('.')
+                    .trim_end_matches('.')
+                    .to_ascii_lowercase();
+                if is_valid_domain(&clean) {
+                    mark_strict_ancestors(&clean, &mut has_strict_child);
+                }
+            }
+        }
+    }
+
+    let mut suppressed_by_protection = raw_seen_suffixes.len().saturating_sub(suffix_claims.len())
+        + raw_seen_domains.len().saturating_sub(domain_claims.len());
+
+    // Child-over-parent precedence: drop unforced parent `DOMAIN-SUFFIX` entries whenever >= 1 strict
+    // child subdomain rule exists; keep human-forced `FORCE_RULESET_ENTRIES` suffixes and all leaf suffixes.
+    // For surviving suffixes, pool same-hostname claims (`DOMAIN,s` and `DOMAIN-WILDCARD,*.s`) so category
+    // ownership reflects all lineages targeting `s`.
+    let before_parent_sfx = suffix_claims.len();
+    suffix_claims.retain(|s, _| forced_suffixes.contains(s) || !has_strict_child.contains(s));
+    suppressed_by_protection += before_parent_sfx.saturating_sub(suffix_claims.len());
+
+    for (s, s_claim) in &mut suffix_claims {
+        if let Some(d_claim) = domain_claims.get(s) {
+            s_claim.merge_from(d_claim);
+        }
+        if let Some(w_claim) = wildcard_claims.get(&format!("*.{}", s)) {
+            s_claim.merge_from(w_claim);
+        }
+    }
+
+    // Build unified suffix trie and partition into mutually disjoint Ad vs Privacy suffix sets
+    let mut surviving_suffixes: Vec<(String, RuleClaim)> = suffix_claims.into_iter().collect();
+    surviving_suffixes.sort_by(|a, b| {
+        a.0.split('.')
+            .count()
+            .cmp(&b.0.split('.').count())
+            .then_with(|| a.0.cmp(&b.0))
+    });
+    let mut final_suffix_trie = DomainTrie::default();
+    let mut ad_suffixes: BTreeSet<String> = BTreeSet::new();
+    let mut priv_suffixes: BTreeSet<String> = BTreeSet::new();
+    let mut subsumed_by_trie = 0usize;
+
+    for (s, claim) in surviving_suffixes {
+        if final_suffix_trie.has_suffix_ancestor_or_eq(&s) {
+            subsumed_by_trie += 1;
+            continue;
+        }
+        final_suffix_trie.insert_suffix(&s);
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_suffixes.insert(s);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_suffixes.insert(s);
+            }
+        }
+    }
+
+    let mut compressed_domains: BTreeSet<String> = BTreeSet::new();
+    let mut ad_domains: BTreeSet<String> = BTreeSet::new();
+    let mut priv_domains: BTreeSet<String> = BTreeSet::new();
+    for (d, claim) in domain_claims {
+        if final_suffix_trie.has_suffix_ancestor_or_eq(&d) {
+            subsumed_by_trie += 1;
+            continue;
+        }
+        if !forced_domains.contains(&d) && has_strict_child.contains(&d) {
+            suppressed_by_protection += 1;
+            continue;
+        }
+        compressed_domains.insert(d.clone());
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_domains.insert(d);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_domains.insert(d);
+            }
+        }
+    }
+
+    let mut ad_keywords: BTreeSet<String> = BTreeSet::new();
+    let mut priv_keywords: BTreeSet<String> = BTreeSet::new();
+    for (kw, claim) in keyword_claims {
+        if !forced_keywords.contains(&kw) && kw.starts_with('.') && kw.ends_with('.') {
+            let stem = kw.trim_matches('.');
+            if !stem.is_empty()
+                && has_strict_child
+                    .iter()
+                    .any(|p| p.starts_with(stem) && p.as_bytes().get(stem.len()) == Some(&b'.'))
+            {
+                suppressed_by_protection += 1;
+                continue;
+            }
+        }
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_keywords.insert(kw);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_keywords.insert(kw);
+            }
+        }
+    }
+
+    let mut ad_wildcards: BTreeSet<String> = BTreeSet::new();
+    let mut priv_wildcards: BTreeSet<String> = BTreeSet::new();
+    for (wc, claim) in wildcard_claims {
+        if let Some(bare) = wc.strip_prefix("*.")
+            && !bare.contains('*')
+            && !bare.contains('?')
+        {
+            if final_suffix_trie.has_suffix_ancestor_or_eq(bare) {
+                subsumed_by_trie += 1;
+                continue;
+            }
+            if !forced_wildcards.contains(&wc) && has_strict_child.contains(bare) {
+                suppressed_by_protection += 1;
+                continue;
+            }
+        } else if let Some(tail) = wildcard_static_suffix(&wc)
+            && final_suffix_trie.has_suffix_ancestor_or_eq(tail)
+        {
+            subsumed_by_trie += 1;
+            continue;
+        }
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_wildcards.insert(wc);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_wildcards.insert(wc);
+            }
+        }
+    }
+
+    let mut ad_asns: BTreeSet<u32> = BTreeSet::new();
+    let mut priv_asns: BTreeSet<u32> = BTreeSet::new();
+    for (asn, claim) in asn_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_asns.insert(asn);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_asns.insert(asn);
+            }
+        }
+    }
+
+    let mut ad_uas: BTreeSet<String> = BTreeSet::new();
+    let mut priv_uas: BTreeSet<String> = BTreeSet::new();
+    for (ua, claim) in ua_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_uas.insert(ua);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_uas.insert(ua);
+            }
+        }
+    }
+
+    let mut ad_procs: BTreeSet<String> = BTreeSet::new();
+    let mut priv_procs: BTreeSet<String> = BTreeSet::new();
+    for (proc_name, claim) in proc_claims {
+        match claim.owner() {
+            AdblockRuleTarget::Ad => {
+                ad_procs.insert(proc_name);
+            }
+            AdblockRuleTarget::Privacy => {
+                priv_procs.insert(proc_name);
+            }
+        }
+    }
+
+    // Also drop unforced parent root/suffix REJECT entries in module `[Rule]` when strict children exist
+    module_rule_map.retain(|line, _| {
+        let parts: Vec<&str> = line.split(',').map(str::trim).collect();
+        let is_reject = parts
+            .iter()
+            .any(|p| p.to_ascii_uppercase().starts_with("REJECT"));
+        if !is_reject || parts.len() < 2 {
+            return true;
+        }
+        match parts[0].to_ascii_uppercase().as_str() {
+            "DOMAIN" => {
+                let d = parts[1].trim_end_matches('.').to_ascii_lowercase();
+                forced_domains.contains(&d) || !has_strict_child.contains(&d)
+            }
+            "DOMAIN-SUFFIX" => {
+                let s = parts[1]
+                    .trim_start_matches('.')
+                    .trim_end_matches('.')
+                    .to_ascii_lowercase();
+                forced_suffixes.contains(&s) || !has_strict_child.contains(&s)
+            }
             _ => true,
         }
     });

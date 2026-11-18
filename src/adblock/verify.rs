@@ -89,6 +89,8 @@ struct VerifiedRuleset {
     total: usize,
     lines: FxHashSet<String>,
     domains: Vec<String>,
+    exact_domains: Vec<String>,
+    suffix_domains: Vec<String>,
     keywords: Vec<String>,
     wildcards: Vec<String>,
     cidrs_v4: Vec<Ipv4Net>,
@@ -144,6 +146,55 @@ pub fn verify_adblock_dir(
     }
     verify_disjoint_cidrs_v4(&ad_verified.cidrs_v4, &priv_verified.cidrs_v4)?;
     verify_disjoint_cidrs_v6(&ad_verified.cidrs_v6, &priv_verified.cidrs_v6)?;
+
+    // Enforce child-over-parent domain specificity across (Adblock.list ∪ Privacy.list):
+    // no surviving DOMAIN-SUFFIX or unforced root DOMAIN may coexist with a strict child subdomain rule.
+    let mut combined_emitted_trie = DomainTrie::default();
+    for d in ad_verified
+        .exact_domains
+        .iter()
+        .chain(&priv_verified.exact_domains)
+    {
+        combined_emitted_trie.insert_exact(d);
+    }
+    for s in ad_verified
+        .suffix_domains
+        .iter()
+        .chain(&priv_verified.suffix_domains)
+    {
+        combined_emitted_trie.insert_suffix(s);
+    }
+    let forced_exact_domains: FxHashSet<String> = overrides
+        .force_rule_set_entries
+        .iter()
+        .filter(|f| f.kind == "DOMAIN")
+        .map(|f| f.value.trim().trim_end_matches('.').to_ascii_lowercase())
+        .collect();
+    for s in ad_verified
+        .suffix_domains
+        .iter()
+        .chain(&priv_verified.suffix_domains)
+    {
+        if combined_emitted_trie.has_strict_descendant_mark(s) {
+            bail!(
+                "parent DOMAIN-SUFFIX '{}' coexists with a strict child subdomain rule in Adblock.list / Privacy.list",
+                s
+            );
+        }
+    }
+    for d in ad_verified
+        .exact_domains
+        .iter()
+        .chain(&priv_verified.exact_domains)
+    {
+        if !forced_exact_domains.contains(d) && combined_emitted_trie.has_strict_descendant_mark(d)
+        {
+            bail!(
+                "unforced parent root DOMAIN '{}' coexists with a strict child subdomain rule in Adblock.list / Privacy.list",
+                d
+            );
+        }
+    }
 
     let (module_scripts, module_mitm_hosts, mitm_exclusions_seen, module_reject_trie) =
         verify_module_text_inner(&module_raw)?;
@@ -499,6 +550,8 @@ fn verify_ruleset_text(
     let mut total = 0usize;
     let mut lines: FxHashSet<String> = FxHashSet::default();
     let mut domains: Vec<String> = Vec::new();
+    let mut exact_domains: Vec<String> = Vec::new();
+    let mut suffix_domains: Vec<String> = Vec::new();
     let mut keywords: Vec<String> = Vec::new();
     let mut wildcards: Vec<String> = Vec::new();
     let mut cidrs_v4: Vec<Ipv4Net> = Vec::new();
@@ -563,8 +616,10 @@ fn verify_ruleset_text(
                         val
                     );
                 }
-                trie.insert_exact(val);
-                domains.push(val.to_ascii_lowercase());
+                let low = val.to_ascii_lowercase();
+                trie.insert_exact(&low);
+                domains.push(low.clone());
+                exact_domains.push(low);
             }
             "DOMAIN-SUFFIX" => {
                 if !is_valid_domain(val) {
@@ -575,8 +630,10 @@ fn verify_ruleset_text(
                         val
                     );
                 }
-                trie.insert_suffix(val);
-                domains.push(val.to_ascii_lowercase());
+                let low = val.to_ascii_lowercase();
+                trie.insert_suffix(&low);
+                domains.push(low.clone());
+                suffix_domains.push(low);
             }
             "DOMAIN-KEYWORD" => {
                 if val.is_empty() || val.contains(char::is_whitespace) {
@@ -719,6 +776,8 @@ fn verify_ruleset_text(
         total,
         lines,
         domains,
+        exact_domains,
+        suffix_domains,
         keywords,
         wildcards,
         cidrs_v4,

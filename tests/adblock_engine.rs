@@ -374,6 +374,13 @@ fn compiler_enforces_complex_over_host_reserved_cidrs_and_script_precedence() {
         rationale: "Certificate pinning".to_string(),
     });
 
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
+        kind: "DOMAIN-SUFFIX".to_string(),
+        value: "doubleclick.net".to_string(),
+        rationale: "Tier-P0b pure ad network keeps suffix over child entries".to_string(),
+    });
+
     // Complex source intercepts api.bilibili.com and deduplicates conflicting script trigger
     let mut complex_src = ParsedAdblockSource::default();
     complex_src
@@ -1214,17 +1221,20 @@ proptest! {
             prop_assert!(!trie.matches_domain(c));
         }
 
-        // Invariant C: redundant child `sub.d` must be subsumed whenever `DOMAIN-SUFFIX,d` survived
-        for line in compiled.ruleset_text.lines() {
-            if let Some(d) = line.strip_prefix("DOMAIN-SUFFIX,") {
-                let redundant = format!("DOMAIN,sub.{}", d);
-                prop_assert!(
-                    !compiled.ruleset_text.lines().any(|l| l == redundant),
-                    "redundant child '{}' was not subsumed by DOMAIN-SUFFIX,{}",
-                    redundant,
-                    d
-                );
-            }
+        // Invariant C: child-over-parent specificity — unforced parent `DOMAIN-SUFFIX,d` yields to
+        // strict child `DOMAIN,sub.d`, so `d` itself is never whole-domain blocked while `sub.d` is blocked
+        // (unless `d` or `sub.d` was suppressed by `protected` or `complex`).
+        for d in &ads {
+            let sub = format!("sub.{}", d);
+            prop_assert!(
+                !compiled
+                    .ruleset_text
+                    .lines()
+                    .any(|l| l == format!("DOMAIN-SUFFIX,{}", d)),
+                "unforced parent DOMAIN-SUFFIX,{} should yield to strict child {}",
+                d,
+                sub
+            );
         }
     }
 
@@ -1835,12 +1845,17 @@ fn ad_and_privacy_split_enforces_scoped_allowlists_conflict_precedence_and_disjo
     );
     assert!(!compiled.ruleset_text.contains("app-measurement.com"));
 
-    // 5. Unified trie compression & CIDR aggregation produce zero overlap
+    // 5. Child-over-parent specificity & CIDR aggregation produce zero overlap:
+    //    unforced parent `pure-ad.example.com` yields to strict child `pixel.pure-ad.example.com`
     assert!(
-        !compiled
+        compiled
             .privacy_ruleset_text
-            .contains("pixel.pure-ad.example.com"),
-        "child domain must be subsumed by parent suffix in Adblock.list"
+            .contains("DOMAIN,pixel.pure-ad.example.com\n"),
+        "strict child domain must take precedence over unforced parent suffix"
+    );
+    assert!(
+        !compiled.ruleset_text.contains("pure-ad.example.com"),
+        "unforced parent suffix must be ignored when strict child rule exists"
     );
     assert!(
         compiled
@@ -3095,5 +3110,206 @@ fn human_force_ruleset_beats_auto_routing_exact_allowlist_while_human_allow_beat
         !compiled2
             .ruleset_text
             .contains("DOMAIN-SUFFIX,forced-adnet.com\n")
+    );
+}
+
+#[test]
+fn child_subdomain_rules_override_unforced_parent_suffix_wildcard_and_root_domain() {
+    use surge_rules::adblock::model::ModuleRuleLine;
+
+    let mut overrides = AdblockOverrides::empty();
+    overrides.force_rule_set_entries.push(ForceRuleSetOverride {
+        target: AdblockRuleTarget::Ad,
+        kind: "DOMAIN-SUFFIX".to_string(),
+        value: "doubleclick.net".to_string(),
+        rationale: "Human-forced pure ad suffix retains whole-suffix block".to_string(),
+    });
+
+    let mut src_aggressive = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "aggressive_feed".to_string(),
+        weight: 85,
+        ..Default::default()
+    };
+    // Multi-tenant platform where aggressive feed blocked whole suffix/root/wildcard
+    src_aggressive
+        .ruleset_suffixes
+        .insert("webflow.io".to_string());
+    src_aggressive
+        .ruleset_domains
+        .insert("webflow.io".to_string());
+    src_aggressive
+        .ruleset_wildcards
+        .insert("*.webflow.io".to_string());
+    src_aggressive.module_rules.push(ModuleRuleLine {
+        line: "DOMAIN-SUFFIX,webflow.io,REJECT,pre-matching".to_string(),
+        weight: 90,
+    });
+    // Multi-level hierarchy (`daraz.com` -> `net.daraz.com` -> `phish.net.daraz.com` + `.net.daraz.`)
+    src_aggressive
+        .ruleset_suffixes
+        .insert("daraz.com".to_string());
+    src_aggressive
+        .ruleset_suffixes
+        .insert("net.daraz.com".to_string());
+    src_aggressive
+        .ruleset_keywords
+        .insert(".net.daraz.".to_string());
+    // Parent suffixes whose children are patterned wildcards or child-suffix keywords
+    src_aggressive
+        .ruleset_suffixes
+        .insert("ettoday.net".to_string());
+    src_aggressive
+        .ruleset_suffixes
+        .insert("ixigua.com".to_string());
+    // Leaf-only domain claimed in multiple formats (`DOMAIN-SUFFIX`, `DOMAIN-WILDCARD`, `DOMAIN`) with NO child rules
+    src_aggressive
+        .ruleset_suffixes
+        .insert("leaf-only-ad.com".to_string());
+
+    let mut src_surgical = ParsedAdblockSource {
+        category: AdblockCategory::Ad,
+        lineage: "surgical_feed".to_string(),
+        weight: 95,
+        ..Default::default()
+    };
+    src_surgical
+        .ruleset_domains
+        .insert("evil-phish.webflow.io".to_string());
+    src_surgical
+        .ruleset_domains
+        .insert("phish.net.daraz.com".to_string());
+    src_surgical
+        .ruleset_wildcards
+        .insert("ad*.ettoday.net".to_string());
+    src_surgical
+        .ruleset_keywords
+        .insert("-ad.ixigua.com".to_string());
+    // Same-level different formats on `leaf-only-ad.com` + `wildcard-only-parent.org`
+    src_surgical
+        .ruleset_domains
+        .insert("leaf-only-ad.com".to_string());
+    src_surgical
+        .ruleset_wildcards
+        .insert("*.leaf-only-ad.com".to_string());
+    src_surgical
+        .ruleset_wildcards
+        .insert("*.wildcard-only-parent.org".to_string());
+    // Child under forced `doubleclick.net` -> must still be subsumed by forced suffix
+    src_surgical
+        .ruleset_domains
+        .insert("ad.doubleclick.net".to_string());
+
+    let compiled = compile_adblock(&[src_aggressive, src_surgical], &overrides, 2, 2);
+
+    // 1. Unforced parent suffixes, catch-all `*.parent`, TLD-wildcard `.parent.`, and root `DOMAIN` are ignored
+    assert!(!compiled.ruleset_text.contains("DOMAIN-SUFFIX,webflow.io\n"));
+    assert!(!compiled.ruleset_text.contains("DOMAIN,webflow.io\n"));
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN-WILDCARD,*.webflow.io\n")
+    );
+    assert!(!compiled.module_text.contains("webflow.io"));
+    assert!(!compiled.ruleset_text.contains("DOMAIN-SUFFIX,daraz.com\n"));
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,net.daraz.com\n")
+    );
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN-KEYWORD,.net.daraz.\n")
+    );
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,ettoday.net\n")
+    );
+    assert!(!compiled.ruleset_text.contains("DOMAIN-SUFFIX,ixigua.com\n"));
+
+    // 2. Specific child rules survive intact
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,evil-phish.webflow.io\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN,phish.net.daraz.com\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-WILDCARD,ad*.ettoday.net\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-KEYWORD,-ad.ixigua.com\n")
+    );
+
+    // 3. Leaf-only parent rules (with zero strict child rules, even across suffix/wildcard/exact formats) stay intact
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,leaf-only-ad.com\n")
+    );
+    assert!(!compiled.ruleset_text.contains("DOMAIN,leaf-only-ad.com\n"));
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN-WILDCARD,*.leaf-only-ad.com\n")
+    );
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-WILDCARD,*.wildcard-only-parent.org\n")
+    );
+
+    // 4. Human-forced `doubleclick.net` keeps full suffix and subsumes child `ad.doubleclick.net`
+    assert!(
+        compiled
+            .ruleset_text
+            .contains("DOMAIN-SUFFIX,doubleclick.net\n")
+    );
+    assert!(
+        !compiled
+            .ruleset_text
+            .contains("DOMAIN,ad.doubleclick.net\n")
+    );
+
+    // 5. Verifier passes on clean output and rejects coexisting parent + strict child rules
+    let tmp = TempDir::new().unwrap();
+    fs::write(tmp.path().join("Adblock.list"), &compiled.ruleset_text).unwrap();
+    fs::write(
+        tmp.path().join("Privacy.list"),
+        &compiled.privacy_ruleset_text,
+    )
+    .unwrap();
+    fs::write(tmp.path().join("Adblock.sgmodule"), &compiled.module_text).unwrap();
+    verify_adblock_dir(tmp.path(), &overrides, 0, 0)
+        .expect("child-over-parent output must pass verify_adblock_dir");
+
+    fs::write(
+        tmp.path().join("Adblock.list"),
+        format!("{}DOMAIN-SUFFIX,webflow.io\n", compiled.ruleset_text),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "coexisting parent DOMAIN-SUFFIX and strict child DOMAIN must fail verifier"
+    );
+
+    fs::write(
+        tmp.path().join("Adblock.list"),
+        format!("{}DOMAIN,webflow.io\n", compiled.ruleset_text),
+    )
+    .unwrap();
+    assert!(
+        verify_adblock_dir(tmp.path(), &overrides, 0, 0).is_err(),
+        "coexisting unforced parent root DOMAIN and strict child DOMAIN must fail verifier"
     );
 }
