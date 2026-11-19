@@ -2804,6 +2804,17 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     rationale:
       "User report: Adblock.list suffix .workbuddy.ai blocked a normal domain with REJECT-TINYGIF",
   },
+  // 用户报告 jdx.dev 与 iclr.cc 被 Adblock.list 后缀误拦
+  {
+    matchType: "suffix",
+    domain: "jdx.dev",
+    rationale: "User report: Adblock.list suffix .jdx.dev blocked a normal domain",
+  },
+  {
+    matchType: "suffix",
+    domain: "iclr.cc",
+    rationale: "User report: Adblock.list suffix .iclr.cc blocked a normal domain",
+  },
 ];
 
 /**

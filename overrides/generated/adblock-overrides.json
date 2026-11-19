@@ -4495,6 +4495,16 @@
       "matchType": "suffix",
       "domain": "workbuddy.ai",
       "rationale": "User report: Adblock.list suffix .workbuddy.ai blocked a normal domain with REJECT-TINYGIF"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "jdx.dev",
+      "rationale": "User report: Adblock.list suffix .jdx.dev blocked a normal domain"
+    },
+    {
+      "matchType": "suffix",
+      "domain": "iclr.cc",
+      "rationale": "User report: Adblock.list suffix .iclr.cc blocked a normal domain"
     }
   ],
   "protectedApexDomains": [
