@@ -2193,7 +2193,7 @@ DOMAIN-SUFFIX,chatgpt.com,extended-matching\n";
 
     let report = verify_adblock_dir(tmp.path(), &overrides, 0, 0)
         .expect("disjoint Telemetry/Payment/AI + Adblock/Privacy must pass");
-    let notes = render_adblock_release_notes(&report, 2, 2, 4, 0);
+    let notes = render_adblock_release_notes(&report, 2, 2);
     assert!(notes.contains("https://rule-set.ygxz.de/Adblock.list"));
     assert!(notes.contains("https://rule-set.ygxz.de/Privacy.list"));
     assert!(notes.contains("https://rule-set.ygxz.de/Adblock.sgmodule"));

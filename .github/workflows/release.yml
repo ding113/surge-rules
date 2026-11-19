@@ -154,9 +154,9 @@ jobs:
           done
           {
             cat dist/release-notes.md
-            printf '\n---\n\n'
+            printf '\n'
             cat dist/adblock-notes.md
-            printf '\n---\n\n'
+            printf '\n'
             cat dist/routing-notes.md
           } > dist/combined-notes.md
 

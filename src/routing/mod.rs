@@ -240,8 +240,11 @@ pub async fn build_routing_pipeline(
         &compiled.proxy_text,
     )?;
 
+    let active_sources =
+        active_direct + active_ai + active_payment + active_telemetry + active_proxy;
+    let total_sources = total_direct + total_ai + total_payment + total_telemetry + total_proxy;
     let report = verify_routing_dir(&opts.output_dir, &overrides, opts.thresholds, true)?;
-    let notes = render_routing_notes(&report);
+    let notes = render_routing_notes(&report, active_sources, total_sources);
     fs::write(opts.output_dir.join("routing-notes.md"), &notes)?;
 
     info!(

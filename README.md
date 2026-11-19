@@ -13,13 +13,15 @@
 | `Country-cn.mmdb` | 中国大陆（`CN`）专属双栈 GeoIP 库 | [Country-cn.mmdb](https://rule-set.ygxz.de/Country-cn.mmdb) |
 | `ASN.mmdb` | 全球公网自治系统（ASN）库 | [ASN.mmdb](https://rule-set.ygxz.de/ASN.mmdb) |
 | `Adblock.sgmodule` | 去广告与隐私净化模块（重写、脚本、Map Local 与 HTTPDNS 拦截） | [Adblock.sgmodule](https://rule-set.ygxz.de/Adblock.sgmodule) · <kbd>[一键导入](https://rule-set.ygxz.de/install.html)</kbd> |
-| `Adblock.list` | 广告网络、恶意软件、钓鱼诈骗与挖矿域名/IP 拦截规则集 | [Adblock.list](https://rule-set.ygxz.de/Adblock.list) |
+| `Adblock.list` | 去广告与安全威胁域名/IP 拦截规则集 | [Adblock.list](https://rule-set.ygxz.de/Adblock.list) |
 | `Privacy.list` | 隐私跟踪、统计分析、CNAME 伪装与设备遥测拦截规则集 | [Privacy.list](https://rule-set.ygxz.de/Privacy.list) |
 | `Direct.list` | 中国大陆服务、国内流媒体、国产 AI 及境外服务国内 CDN 直连规则集 | [Direct.list](https://rule-set.ygxz.de/Direct.list) |
 | `AI.list` | 境外 AI 应用、模型 API、Coding Agent 与 Apple Intelligence 规则集 | [AI.list](https://rule-set.ygxz.de/AI.list) |
 | `Payment.list` | 境外银行、支付网关（PayPal / Stripe）、卡组织与券商规则集 | [Payment.list](https://rule-set.ygxz.de/Payment.list) |
 | `Telemetry.list` | 境外风控反欺诈、人机验证（CAPTCHA）与系统遥测规则集 | [Telemetry.list](https://rule-set.ygxz.de/Telemetry.list) |
 | `Proxy.list` | 境外服务与海外流媒体全量代理规则集（已包含 `AI.list`、`Payment.list`、`Telemetry.list`） | [Proxy.list](https://rule-set.ygxz.de/Proxy.list) |
+
+> **Adblock 说明**：集合全球公开广告过滤规则源，基于实际浏览体验数据进行人工增删，尽最大可能避免国内大厂 App 核心功能体验破坏，同时尽可能减少肉眼可见广告。于激进与保守中取甜点。
 
 ## Surge 配置示例
 
@@ -143,7 +145,7 @@ HaGeZi Fake Stores & Scam Blocklist, https://raw.githubusercontent.com/hagezi/dn
 HaGeZi Badware Hoster Blocklist, https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/hoster.txt
 HaGeZi Threat Intelligence Feeds (Full), https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt
 OISD Blocklist Big, https://adguardteam.github.io/HostlistsRegistry/assets/filter_27.txt
-1Hosts (Xtra), https://raw.githubusercontent.com/badmojr/1Hosts/master/Xtra/adblock.txt
+1Hosts (Lite), https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/adblock.txt
 hBlock Unified Ad · Tracking & Malware Domains, https://hblock.molinero.dev/hosts_domains.txt
 NEO DEV HOST Adblocker, https://raw.githubusercontent.com/neodevpro/neodevhost/master/adblocker
 Quidsup NoTrack Malware Blocklist, https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/notrack-malware.txt
@@ -840,7 +842,7 @@ bun install
 bun run build:config
 bun run sync:metadata
 
-# 2. 按依赖顺序构建并校验全部产物（输出至 dist/：geoip -> routing -> adblock，以加载 CN 及各分流规则集的精确域名与纯净出口白名单保护集合）
+# 2. 按依赖顺序构建并校验全部产物（输出至 dist/：geoip -> routing -> adblock）
 cargo run --release -- geoip build --output dist
 cargo run --release -- routing build --output dist
 cargo run --release -- adblock build --output dist

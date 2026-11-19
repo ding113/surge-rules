@@ -3,7 +3,6 @@ use std::net::IpAddr;
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
-use chrono::{DateTime, Utc};
 use maxminddb::{MaxMindDBError, Reader, geoip2};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -427,6 +426,18 @@ fn inspect_summary<S: AsRef<[u8]>>(
     })
 }
 
+pub fn format_human_bytes(bytes: u64) -> String {
+    const KIB: f64 = 1024.0;
+    const MIB: f64 = 1024.0 * 1024.0;
+    if bytes >= 1024 * 1024 {
+        format!("{:.2} MiB", (bytes as f64) / MIB)
+    } else if bytes >= 1024 {
+        format!("{:.2} KiB", (bytes as f64) / KIB)
+    } else {
+        format!("{bytes} B")
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 pub fn render_release_notes(
     report: &VerificationReport,
@@ -437,56 +448,27 @@ pub fn render_release_notes(
     cn_v4_cidrs: usize,
     cn_v6_cidrs: usize,
 ) -> String {
-    let dt = DateTime::<Utc>::from_timestamp(report.country.build_epoch as i64, 0)
-        .unwrap_or_else(Utc::now);
-    let ts_str = dt.format("%Y-%m-%d %H:%M:%S UTC");
-
-    let fmt_mb = |b: u64| format!("{:.2} MiB", (b as f64) / (1024.0 * 1024.0));
-
     format!(
-        "## 构建信息\n\n\
-- 构建时间：`{ts_str}`\n\
-- 活跃上游数据源：`{ingested_sources} / {total_catalog_sources}`\n\
-- 金丝雀校验项：`{}` 项全部通过（含 RFC 6890 私有网段、Surge Fake-IP、Tailscale、Cloudflare Mesh、ZeroTier 隔离校验）\n\n\
-## 产物清单\n\n\
-| 文件 | 数据库类型 | 大小 | 树节点数 | 记录位宽 | SHA-256 |\n\
-| :--- | :--- | ---: | ---: | ---: | :--- |\n\
-| `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\
-| `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\
-| `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\
-| `{}` | `{}` | {} | {} | {}-bit | `{}` |\n\n\
-## 覆盖统计\n\n\
-- `Country.mmdb`：合并后 IPv4 `{country_v4_cidrs}` 段 / IPv6 `{country_v6_cidrs}` 段\n\
-- `Country-cn.mmdb`：合并后中国大陆 IPv4 `{cn_v4_cidrs}` 段 / IPv6 `{cn_v6_cidrs}` 段\n\n\
-## Surge 配置\n\n\
-```ini\n\
-[General]\n\
-geoip-maxmind-url = https://rule-set.ygxz.de/Country.mmdb\n\
-```\n",
-        report.canaries_checked,
-        report.country.file_name,
-        report.country.database_type,
-        fmt_mb(report.country.size_bytes),
-        report.country.node_count,
-        report.country.record_size,
-        report.country.sha256,
-        report.country_only.file_name,
-        report.country_only.database_type,
-        fmt_mb(report.country_only.size_bytes),
-        report.country_only.node_count,
-        report.country_only.record_size,
-        report.country_only.sha256,
-        report.country_cn.file_name,
-        report.country_cn.database_type,
-        fmt_mb(report.country_cn.size_bytes),
-        report.country_cn.node_count,
-        report.country_cn.record_size,
-        report.country_cn.sha256,
-        report.asn.file_name,
-        report.asn.database_type,
-        fmt_mb(report.asn.size_bytes),
-        report.asn.node_count,
-        report.asn.record_size,
-        report.asn.sha256,
+        "## GeoIP（{ingested_sources}/{total_catalog_sources} 源）\n\n\
+| 文件 | 规模 | 大小 | SHA-256 |\n\
+| :--- | :--- | ---: | :--- |\n\
+| [`{cname}`](https://rule-set.ygxz.de/{cname}) | IPv4 {country_v4_cidrs} / IPv6 {country_v6_cidrs} 段 | {csize} | `{csha}` |\n\
+| [`{oname}`](https://rule-set.ygxz.de/{oname}) | {onodes} 节点 | {osize} | `{osha}` |\n\
+| [`{cnname}`](https://rule-set.ygxz.de/{cnname}) | IPv4 {cn_v4_cidrs} / IPv6 {cn_v6_cidrs} 段 | {cnsize} | `{cnsha}` |\n\
+| [`{aname}`](https://rule-set.ygxz.de/{aname}) | {anodes} 节点 | {asize} | `{asha}` |\n",
+        cname = report.country.file_name,
+        csize = format_human_bytes(report.country.size_bytes),
+        csha = report.country.sha256,
+        oname = report.country_only.file_name,
+        onodes = report.country_only.node_count,
+        osize = format_human_bytes(report.country_only.size_bytes),
+        osha = report.country_only.sha256,
+        cnname = report.country_cn.file_name,
+        cnsize = format_human_bytes(report.country_cn.size_bytes),
+        cnsha = report.country_cn.sha256,
+        aname = report.asn.file_name,
+        anodes = report.asn.node_count,
+        asize = format_human_bytes(report.asn.size_bytes),
+        asha = report.asn.sha256,
     )
 }

@@ -187,19 +187,15 @@ pub async fn build_adblock_pipeline(
         opts.min_ruleset_lines,
         opts.min_privacy_lines,
     )?;
-    let notes = render_adblock_release_notes(
-        &report,
-        active_sources,
-        total_sources,
-        compiled.ruleset_counts.suppressed_by_protection,
-        compiled.ruleset_counts.subsumed_by_trie,
-    );
+    let notes = render_adblock_release_notes(&report, active_sources, total_sources);
     fs::write(opts.output_dir.join("adblock-notes.md"), notes)?;
 
     info!(
         total_secs = t0.elapsed().as_secs_f64(),
         adblock_rules = report.ruleset_total,
         privacy_rules = report.privacy_ruleset_total,
+        suppressed = compiled.ruleset_counts.suppressed_by_protection,
+        subsumed = compiled.ruleset_counts.subsumed_by_trie,
         module_scripts = report.module_scripts,
         module_mitm = report.module_mitm_hosts,
         canaries = report.canaries_checked,

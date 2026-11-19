@@ -1170,42 +1170,43 @@ fn run_production_canaries(
     Ok(checked)
 }
 
-pub fn render_routing_notes(report: &RoutingVerificationReport) -> String {
+pub fn render_routing_notes(
+    report: &RoutingVerificationReport,
+    active_sources: usize,
+    total_sources: usize,
+) -> String {
+    use crate::verify::format_human_bytes;
+
     format!(
-        "## Routing Rule Sets\n\n\
-| Artifact | Rules | Extended Matching | Size | SHA-256 |\n\
-| :--- | ---: | ---: | ---: | :--- |\n\
-| `{}` | {} | {} | {} B | `{}` |\n\
-| `{}` | {} | {} | {} B | `{}` |\n\
-| `{}` | {} | {} | {} B | `{}` |\n\
-| `{}` | {} | {} | {} B | `{}` |\n\
-| `{}` | {} | {} | {} B | `{}` |\n\n\
-Verified invariants: `(AI.list ∪ Payment.list ∪ Telemetry.list) ⊆ Proxy.list` (100% syntactic & semantic subset), `AI.list`, `Payment.list`, and `Telemetry.list` pairwise disjoint, `sharedInfraRoots` apex protection active, reserved/LAN/Fake-IP/Tailscale/Cloudflare-Mesh CIDRs excluded, all IP/ASN entries emit `no-resolve`, and {} production canaries passed.\n",
-        report.direct.file_name,
-        report.direct_total,
-        report.direct_extended_count,
-        report.direct.size_bytes,
-        report.direct.sha256,
-        report.ai.file_name,
-        report.ai_total,
-        report.ai_extended_count,
-        report.ai.size_bytes,
-        report.ai.sha256,
-        report.payment.file_name,
-        report.payment_total,
-        report.payment_extended_count,
-        report.payment.size_bytes,
-        report.payment.sha256,
-        report.telemetry.file_name,
-        report.telemetry_total,
-        report.telemetry_extended_count,
-        report.telemetry.size_bytes,
-        report.telemetry.sha256,
-        report.proxy.file_name,
-        report.proxy_total,
-        report.proxy_extended_count,
-        report.proxy.size_bytes,
-        report.proxy.sha256,
-        report.canaries_checked
+        "## 分流规则（{active}/{total} 源）\n\n\
+| 文件 | 规模 | 大小 | SHA-256 |\n\
+| :--- | :--- | ---: | :--- |\n\
+| [`{dname}`](https://rule-set.ygxz.de/{dname}) | {drules} 条 | {dsize} | `{dsha}` |\n\
+| [`{aname}`](https://rule-set.ygxz.de/{aname}) | {arules} 条 | {asize} | `{asha}` |\n\
+| [`{pname}`](https://rule-set.ygxz.de/{pname}) | {prules} 条 | {psize} | `{psha}` |\n\
+| [`{tname}`](https://rule-set.ygxz.de/{tname}) | {trules} 条 | {tsize} | `{tsha}` |\n\
+| [`{xname}`](https://rule-set.ygxz.de/{xname}) | {xrules} 条 | {xsize} | `{xsha}` |\n",
+        active = active_sources,
+        total = total_sources,
+        dname = report.direct.file_name,
+        drules = report.direct_total,
+        dsize = format_human_bytes(report.direct.size_bytes),
+        dsha = report.direct.sha256,
+        aname = report.ai.file_name,
+        arules = report.ai_total,
+        asize = format_human_bytes(report.ai.size_bytes),
+        asha = report.ai.sha256,
+        pname = report.payment.file_name,
+        prules = report.payment_total,
+        psize = format_human_bytes(report.payment.size_bytes),
+        psha = report.payment.sha256,
+        tname = report.telemetry.file_name,
+        trules = report.telemetry_total,
+        tsize = format_human_bytes(report.telemetry.size_bytes),
+        tsha = report.telemetry.sha256,
+        xname = report.proxy.file_name,
+        xrules = report.proxy_total,
+        xsize = format_human_bytes(report.proxy.size_bytes),
+        xsha = report.proxy.sha256,
     )
 }

@@ -1193,36 +1193,30 @@ pub fn render_adblock_release_notes(
     report: &AdblockVerificationReport,
     active_sources: usize,
     total_sources: usize,
-    suppressed_by_protection: usize,
-    subsumed_by_trie: usize,
 ) -> String {
+    use crate::verify::format_human_bytes;
+
     format!(
-        "## Adblock & Privacy\n\
-        - 活跃上游数据源：`{active} / {total}`（自动保护与作用域白名单过滤 `{suppr}` 条、统一前缀树 subsumption 去重 `{subsumed}` 条）\n\
-        - `Adblock.list`（广告与安全威胁）：共 `{ad_rules}` 条 Surge RULE-SET 规则，大小 `{rbytes}` B，SHA-256 `{rsha}`\n\
-        - `Privacy.list`（隐私跟踪与遥测）：共 `{priv_rules}` 条 Surge RULE-SET 规则，大小 `{pbytes}` B，SHA-256 `{psha}`\n\
-        - `Adblock.sgmodule`：包含 `{scripts}` 条无冲突脚本规则与 `{mitm}` 个按需精确 MITM 解密域名（无通配符，`-` 固定证书域名均置顶排除），大小 `{mbytes}` B，SHA-256 `{msha}`\n\
-        - 校验通过：`Adblock.list ∩ Privacy.list = ∅` 严格互不重合，且 `{canaries}` 项正反金丝雀断言与 Surge 模块格式校验全部通过\n\n\
-        ```ini\n\
-        [Rule]\n\
-        RULE-SET,https://rule-set.ygxz.de/Adblock.list,REJECT,extended-matching\n\
-        RULE-SET,https://rule-set.ygxz.de/Privacy.list,REJECT,extended-matching\n\
-        ```\n\
-        模块直链：`https://rule-set.ygxz.de/Adblock.sgmodule`\n",
+        "## 去广告与隐私（{active}/{total} 源）\n\n\
+| 文件 | 规模 | 大小 | SHA-256 |\n\
+| :--- | :--- | ---: | :--- |\n\
+| [`{mname}`](https://rule-set.ygxz.de/{mname}) | {scripts} 脚本 / {mitm} MITM | {msize} | `{msha}` |\n\
+| [`{rname}`](https://rule-set.ygxz.de/{rname}) | {ad_rules} 条 | {rsize} | `{rsha}` |\n\
+| [`{pname}`](https://rule-set.ygxz.de/{pname}) | {priv_rules} 条 | {psize} | `{psha}` |\n",
         active = active_sources,
         total = total_sources,
-        ad_rules = report.ruleset_total,
-        priv_rules = report.privacy_ruleset_total,
-        suppr = suppressed_by_protection,
-        subsumed = subsumed_by_trie,
-        rbytes = report.ruleset.size_bytes,
-        rsha = report.ruleset.sha256,
-        pbytes = report.privacy_ruleset.size_bytes,
-        psha = report.privacy_ruleset.sha256,
+        mname = report.module.file_name,
         scripts = report.module_scripts,
         mitm = report.module_mitm_hosts,
-        mbytes = report.module.size_bytes,
+        msize = format_human_bytes(report.module.size_bytes),
         msha = report.module.sha256,
-        canaries = report.canaries_checked,
+        rname = report.ruleset.file_name,
+        ad_rules = report.ruleset_total,
+        rsize = format_human_bytes(report.ruleset.size_bytes),
+        rsha = report.ruleset.sha256,
+        pname = report.privacy_ruleset.file_name,
+        priv_rules = report.privacy_ruleset_total,
+        psize = format_human_bytes(report.privacy_ruleset.size_bytes),
+        psha = report.privacy_ruleset.sha256,
     )
 }
