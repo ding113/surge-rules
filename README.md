@@ -1,7 +1,7 @@
-# surge-rules (`release-20261121-1650`)
+# surge-rules (`release-20261121-1717`)
 
-- 最新更新（北京时间）：`2026-11-22 00:50`
-- 构建时间（UTC）：`2026-11-21T16:50:47Z`
+- 最新更新（北京时间）：`2026-11-22 01:17`
+- 构建时间（UTC）：`2026-11-21T17:17:29Z`
 - 源码提交：[`abc169d`](https://github.com/ding113/surge-rules/commit/abc169d7aedf1bcf47a96edfa40f6988117dac80)
 - 最新 Release：[https://github.com/ding113/surge-rules/releases/latest](https://github.com/ding113/surge-rules/releases/latest)
 - Cloudflare 镜像：[https://rule-set.ygxz.de](https://rule-set.ygxz.de)
@@ -12,18 +12,18 @@
 
 | 文件 | 规模 | 大小 | SHA-256 |
 | :--- | :--- | ---: | :--- |
-| [`Country.mmdb`](https://rule-set.ygxz.de/Country.mmdb) | IPv4 5442817 / IPv6 11328117 段 | 250.75 MiB | `343b994f97dbf0bd213251bb0ac9842b0922ee900f8afd0991d5a61f401d45a0` |
-| [`Country-only.mmdb`](https://rule-set.ygxz.de/Country-only.mmdb) | 2302818 节点 | 13.19 MiB | `065939a8b236e9dbf0dbd39819345c638fe379ff19e060be77ff9c2a4de9260f` |
-| [`Country-cn.mmdb`](https://rule-set.ygxz.de/Country-cn.mmdb) | IPv4 238761 / IPv6 206514 段 | 5.17 MiB | `49e17e36283378935b21c039d601e50b51aad5b8b3d446ab64567d1f3f59bfd8` |
-| [`ASN.mmdb`](https://rule-set.ygxz.de/ASN.mmdb) | 1905955 节点 | 14.97 MiB | `cddb349bee68939eb5e2df47487850bff3957c723a1f533f8e1c571a74a6345d` |
+| [`Country.mmdb`](https://rule-set.ygxz.de/Country.mmdb) | IPv4 5442906 / IPv6 11328276 段 | 250.75 MiB | `3ba671cbe593232999aad7d0775b187a1195066cdafdaa9fccd54db18962f672` |
+| [`Country-only.mmdb`](https://rule-set.ygxz.de/Country-only.mmdb) | 2302829 节点 | 13.19 MiB | `af7db128fd6334c8d67ae61153c950d9b637ddb7f883e2ca97f08481ef9e2af5` |
+| [`Country-cn.mmdb`](https://rule-set.ygxz.de/Country-cn.mmdb) | IPv4 238761 / IPv6 206616 段 | 5.17 MiB | `919d651ce8722c1b1243adfe5555a4fd56309d432dcd1184d34d0fc93a2b1129` |
+| [`ASN.mmdb`](https://rule-set.ygxz.de/ASN.mmdb) | 1906061 节点 | 14.97 MiB | `08b42a4f7ac1aac744c070e1e696fbbe3544a03bdb68972ce68fb02cf7c58145` |
 
 ## 去广告与隐私（287/287 源）
 
 | 文件 | 规模 | 大小 | SHA-256 |
 | :--- | :--- | ---: | :--- |
 | [`Adblock.sgmodule`](https://rule-set.ygxz.de/Adblock.sgmodule) | 646 脚本 / 1843 MITM | 696.82 KiB | `c429841175f1f54596ff2ae3f6e9cdbd171dbc20d5a4f568b5df7e0e25b96ed3` |
-| [`Adblock.list`](https://rule-set.ygxz.de/Adblock.list) | 3812785 条 | 112.28 MiB | `b6e575f0f3e43f6bcf3aa9774240f0614c1c05f94304d0a2f56adc724beededc` |
-| [`Privacy.list`](https://rule-set.ygxz.de/Privacy.list) | 456431 条 | 18.32 MiB | `bceea1ba31874b2e7bbac07a17b9130c0c15d7da648ea9b1d9c5f2949ba4e602` |
+| [`Adblock.list`](https://rule-set.ygxz.de/Adblock.list) | 3813574 条 | 112.31 MiB | `576ec5b26e954798044d5b26ccf282967d124a8630b16b7b87145b77a9c81d1e` |
+| [`Privacy.list`](https://rule-set.ygxz.de/Privacy.list) | 456433 条 | 18.32 MiB | `5dfc31b3d52c606653c96bafc3181e64fb2dca16686eb23c8da61dd002f3ca80` |
 
 ## 分流规则（299/299 源）
 
