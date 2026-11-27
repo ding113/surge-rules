@@ -1,0 +1,15 @@
+.git
+.build
+.wrangler
+.cloudflare
+.nojekyll
+README.md
+wrangler.jsonc
+worker.js
+cloudflare.config.ts
+wrangler.config.ts
+.assetsignore
+package.json
+package-lock.json
+bun.lock
+node_modules

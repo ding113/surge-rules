@@ -1,0 +1,42 @@
+{
+  "name": "surge-rules",
+  "account_id": "199c831f9865b14c47f24f2f8b0c8ce6",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-16",
+  // Tiered Workers Cache in front of worker.js. Default per-version keying ensures
+  // each release deployment immediately switches to the newly uploaded R2 artifacts.
+  "cache": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "rule-set.ygxz.de",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "html_handling": "none"
+  },
+  // Release artifacts uploaded by the release workflow; serves files above the static-asset size limit.
+  "r2_buckets": [
+    {
+      "binding": "RELEASE_BUCKET",
+      "bucket_name": "surge-rules"
+    }
+  ],
+  // Hourly release dispatch (UTC). Replaces GitHub's best-effort `schedule` trigger.
+  "triggers": {
+    "crons": ["17 * * * *"]
+  },
+  "vars": {
+    "GH_REPO": "ding113/surge-rules",
+    "GH_WORKFLOW": "release.yml",
+    "GH_REF": "main",
+    "RELEASE_TAG": "release-20261127-1517"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

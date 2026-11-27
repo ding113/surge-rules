@@ -1,0 +1,13 @@
+# Static assets only (install page & Surge scripts). Build artifacts, updated-at.svg and
+# build-meta.json are served from R2 through tiered Workers Cache by worker.js.
+/*
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
+
+/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: public, max-age=300, must-revalidate
+
+/install.html
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: public, max-age=300, must-revalidate
