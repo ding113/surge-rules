@@ -34,7 +34,7 @@
     "GH_REPO": "ding113/surge-rules",
     "GH_WORKFLOW": "release.yml",
     "GH_REF": "main",
-    "RELEASE_TAG": "release-20261128-0917"
+    "RELEASE_TAG": "release-20261128-1017"
   },
   "observability": {
     "enabled": true
