@@ -2815,6 +2815,12 @@ export const ALLOW_DOMAINS: readonly AllowDomainEntry[] = [
     domain: "iclr.cc",
     rationale: "User report: Adblock.list suffix .iclr.cc blocked a normal domain",
   },
+  // 用户报告 vip.yyyyai.org 被 Adblock.list 误拦
+  {
+    matchType: "suffix",
+    domain: "vip.yyyyai.org",
+    rationale: "User report: vip.yyyyai.org was incorrectly blocked",
+  },
 ];
 
 /**
